@@ -1,0 +1,89 @@
+\nonstopmode{}
+\documentclass[letterpaper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\usepackage[utf8,latin1]{inputenc}
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `kissDE'}}
+\par\bigskip{\large \today}
+\end{center}
+\begin{description}
+\raggedright{}
+\item[Type]\AsIs{Package}
+\item[Title]\AsIs{Retrieving differentially expressed events in RNA-seq data.}
+\item[Version]\AsIs{1.0}
+\item[Date]\AsIs{2014-03-03}
+\item[Author]\AsIs{Lilia Brinza, Vincent Lacroix, Vincent Miele and Camille Marchet}
+\item[Maintainer]\AsIs{Vincent Miele }\email{vincent.miele@univ-lyon1.fr}\AsIs{, Camille
+Marchet }\email{camille.marchet@inria.fr}\AsIs{}
+\item[Depends]\AsIs{}
+\item[Description]\AsIs{}
+\item[License]\AsIs{CeCill}
+\end{description}
+\Rdcontents{\R{} topics documented:}
+\inputencoding{utf8}
+\HeaderA{kissDE-package}{Differentially expressed events in RNA-seq data}{kissDE.Rdash.package}
+\aliasA{kissDE}{kissDE-package}{kissDE}
+\keyword{package}{kissDE-package}
+%
+\begin{Description}\relax
+This package retrieves differentially expressed events in RNA-seq data.
+\end{Description}
+%
+\begin{Details}\relax
+
+\Tabular{ll}{
+Package: & kissDE\\{}
+Type: & Package\\{}
+Version: & 1.0\\{}
+Date: & 2014-03-03\\{}
+License: & ceCill\\{}
+}
+\end{Details}
+%
+\begin{Author}\relax
+Lilia Brinza, Vincent Lacroix, Vincent Miele and Camille Marchet
+Maintainers: vincent.miele@univ-lyon1.fr, camille.marchet@inria.fr
+\end{Author}
+\inputencoding{utf8}
+\HeaderA{diffExpressedEvents}{Differentially expressed events in RNA-seq data}{diffExpressedEvents}
+%
+\begin{Description}\relax
+Retrieves differentially expressed events in RNA-seq data.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+diffExpressedEvent(n,nr,file)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{n}] 
+\item[\code{nr}] 
+\item[\code{file}] 
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+codediffExpressedEvents returns a data.table with :
+\begin{ldescription}
+\item[\code{ID}] the event ID
+\item[\code{Length}] the size of the sequence
+\item[\code{UP\_Condn\_Rm\_Norm}] (resp LP\_Condn\_Rm\_Norm) returns the counts for the upper path (UP, resp. lower path : LP), for the condition n (Condn) and the replicate m (Rm)
+\item[\code{pALLGlobalPhi.glm}] 
+\item[\code{Deltaf/DeltaPSI}] 
+\end{ldescription}
+\end{Value}
+%
+\begin{Author}\relax
+Lilia Brinza and Vincent Lacroix
+Maintainers: vincent.miele@univ-lyon1.fr, camille.marchet@inria.fr
+\end{Author}
+\printindex{}
+\end{document}

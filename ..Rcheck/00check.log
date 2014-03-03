@@ -1,0 +1,110 @@
+* using log directory ‘/home/marchet/Bureau/kissplice/branches/kissDE/kissDE/..Rcheck’
+* using R version 3.0.1 (2013-05-16)
+* using platform: x86_64-pc-linux-gnu (64-bit)
+* using session charset: UTF-8
+* checking for file ‘./DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘kissDE’ version ‘1.0’
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  ..Rcheck
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘kissDE’ can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... WARNING
+Non-standard license specification:
+  CeCill
+Standardizable: FALSE
+Le champ ‘Authors@R’ ne renvoie personne avec un rôle de mainteneur et une adresse email.
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... WARNING
+Found the following directory with the name of a check directory:
+  ./..Rcheck
+Most likely, these were included erroneously.
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking for unstated dependencies in R code ... WARNING
+‘library’ or ‘require’ calls not declared from:
+  ‘DESeq’ ‘DSS’ ‘aod’ ‘glmnet’ ‘xtable’
+See the information on DESCRIPTION files in the chapter ‘Creating R
+packages’ of the ‘Writing R Extensions’ manual.
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+diffExpressedEvents: no visible global function definition for
+  ‘biocLite’
+diffExpressedEvents: warning in read.table(file, h = F, sep = "\t"):
+  correspondance partielle d'argument de 'h' par rapport à 'header'
+diffExpressedEvents: no visible global function definition for
+  ‘newCountDataSet’
+diffExpressedEvents: no visible global function definition for
+  ‘estimateSizeFactors’
+diffExpressedEvents: no visible global function definition for
+  ‘sizeFactors’
+diffExpressedEvents: no visible global function definition for ‘counts’
+diffExpressedEvents: no visible global function definition for
+  ‘newSeqCountSet’
+diffExpressedEvents: no visible global function definition for
+  ‘estDispersion’
+diffExpressedEvents : fitNBglmModelsDSSPhi: no visible global function
+  definition for ‘negbin’
+diffExpressedEvents: no visible global function definition for
+  ‘dispersion’
+diffExpressedEvents: no visible global function definition for ‘glmnet’
+* checking Rd files ... NOTE
+prepare_Rd: diffExpressedEvents.Rd:43: Dropping empty section \keyword
+prepare_Rd: diffExpressedEvents.Rd:12-14: Dropping empty section \details
+prepare_Rd: diffExpressedEvents.Rd:23-25: Dropping empty section \source
+prepare_Rd: diffExpressedEvents.Rd:32-34: Dropping empty section \references
+* checking Rd metadata ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... WARNING
+Functions or methods with usage in documentation object 'diffExpressedEvents' but not in code:
+  diffExpressedEvent
+
+* checking Rd \usage sections ... WARNING
+Objects in \usage without \alias in documentation object 'diffExpressedEvents':
+  ‘diffExpressedEvent’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See the chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking Rd contents ... WARNING
+Argument items with no description in Rd object 'diffExpressedEvents':
+  ‘n’ ‘nr’ ‘file’
+
+* checking for unstated dependencies in examples ... OK
+* checking examples ... NONE
+* checking for unstated dependencies in tests ... OK
+* checking tests ... OK
+  Running ‘functional_test.R’
+* checking PDF version of manual ... WARNING
+LaTeX errors when creating PDF version.
+This typically indicates Rd problems.
+* checking PDF version of manual without hyperrefs or index ... OK
+WARNING: There were 7 warnings.
+NOTE: There were 3 notes.
+See
+  ‘/home/marchet/Bureau/kissplice/branches/kissDE/kissDE/..Rcheck/00check.log’
+for details.

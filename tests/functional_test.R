@@ -1,0 +1,6 @@
+install.packages("kissDE_1.0.tar.gz")
+library("kissDE")
+data<-("pretraitement.txt")
+x<-diffExpressedEvents(2,c(2,2),data)
+print(x)
+save(x,"refFile.RData")
