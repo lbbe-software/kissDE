@@ -3,4 +3,7 @@ library("kissDE")
 data<-("pretraitement.txt")
 x<-diffExpressedEvents(2,c(2,2),data)
 print(x)
-save(x,"refFile.RData")
+save(x,file="signifEventsRef.RData")
+
+#load("signifEventsRef.RData")
+#x==signifEventsRef
