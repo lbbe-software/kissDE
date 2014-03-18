@@ -128,7 +128,17 @@ convertToCounts <- function(fileName,namesData) {
   }
   return (events.df)
  }
-dataCounts <- convertToCounts(file,namesData)
+
+
+if (is.data.frame(file)) {
+  dataCounts <- file
+  names(dataCounts) <- namesData
+} else {
+      dataCounts <- convertToCounts(file,namesData)
+  }
+
+
+# dataCounts <- convertToCounts(file,namesData)
 dataCounts$Path <- gl( 2, 1, dim(dataCounts)[1], labels = c("UP", "LP") )
 #############################################################################################
 
