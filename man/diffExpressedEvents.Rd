@@ -1,7 +1,7 @@
 \name{diffExpressedEvents}
 \alias{diffExpressedEvents}
-\title{Differentially expressed events in RNA-seq data}
-\description{Retrieves differentially expressed events in RNA-seq data.
+\title{Retrieves condition-specific variants in RNA-seq data.}
+\description{Retrieves condition-specific variants in RNA-seq data. 
 }
 \usage{diffExpressedEvent(n,nr,file)}
 \arguments{
@@ -14,11 +14,11 @@
 }
 \value{
 	code{diffExpressedEvents} returns a data.table with :
-	\item{ID}{the event ID}
-	\item{Length}{the size of the sequence}
-	\item{UP_Condn_Rm_Norm}{(resp LP_Condn_Rm_Norm) returns the counts for the upper path (UP, resp. lower path : LP), for the condition n (Condn) and the replicate m (Rm)}
-	\item{pALLGlobalPhi.glm}{}
-	\item{Deltaf/DeltaPSI}{}
+	\item{ID}{the variation ID}
+	\item{Length}{the size of the first variant}
+	\item{UP_Condn_Rm_Norm}{(resp LP_Condn_Rm_Norm) returns the normalised counts for the first variant (UP, resp. second variant : LP), for the condition n (Condn) and the replicate m (Rm)}
+	\item{pALLGlobalPhi.glm}{adjusted pvalue}
+	\item{Deltaf/DeltaPSI}{difference of relative abundance of variants across conditions}
 }
 \source{
 %%  ~~ reference to a publication or URL from which the data were obtained ~~
@@ -36,7 +36,7 @@
 
 % n<-2 # two biological conditions
 % m<-c(3,2) # three replicates for each condition
-% data.file<-"my_input_file.txt"
+% data.file<-"my_input_file.fa"
 % events<-diffExpressedEvents(n,m,data.file)
 
 % }
