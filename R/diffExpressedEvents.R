@@ -13,21 +13,27 @@ convertToCounts <- function(fileName,namesData) {
 	if (substr(line[index], start = 0, stop = 1) == '>') {
 		len <- length(strsplit(line[index], "|", fixed = TRUE)[[1]])-6
 	}
-	lineCounts <- strsplit(line[index], "|", fixed = TRUE)[[1]][5:(5 + len)] # computes the right number of conditions and their counts
-	eventCounts <- as.vector(as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2])))
-	# eventName <- c(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|T",fixed = TRUE)[[1]][1])
-	eventName <- gsub("|","_",c(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|T",fixed = TRUE)[[1]][1]),fixed=TRUE)
-	eventLength <- as.vector(as.numeric(strsplit(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|",fixed = TRUE)[[1]][4],"_")[[1]][4])) # parsing to get information to build the dataframe : bcc id, path length and counts /!\ I assumed that types are always noted as "|Type_X|" for the sake of the parsing simplicity, which is true in KisSplice outputs so far."
-	events.df <- data.frame(eventName,eventLength,t(eventCounts))
-	names(events.df) <- namesData
-	index <- index+1
+  events.df <- data.frame()
 	while (index <= length(line)) {
-		if (substr(line[index], start = 0, stop = 1) == '>') {lineCounts <- strsplit(line[index], "|", fixed=TRUE)[[1]][5:(5+len)] # computes the right number of conditions and their counts
-			eventCounts <- as.vector(as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2])))
-			# eventName <- c(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|T",fixed = TRUE)[[1]][1])
-			eventName <- gsub("|","_",c(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|T",fixed = TRUE)[[1]][1]),fixed=TRUE)
-			eventLength <- as.vector(as.numeric(strsplit(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|",fixed = TRUE)[[1]][4],"_")[[1]][4])) # parsing to get information to build the dataframe : bcc id, path length and counts /!\ I assumed that types are always noted as "|Type_X|" for the sake of the parsing simplicity, which is true in KisSplice outputs so far."
-			events.df.temp <- data.frame(eventName,eventLength,t(eventCounts))
+    firstLineChar <- substr(line[index], start = 0, stop = 1)
+    if (firstLineChar == '>') {  #if the line contains the header beginning with ">", not the sequence
+      nbCharLine <- length(strsplit(line[index],"|")[[1]]) # number of characters in the line
+      lineInfos <- substr(line[index],start = 2,stop =nbCharLine) #the line without ">" that we want to avoid
+      lineSplit <- strsplit(lineInfos, "|", fixed=TRUE)[[1]] # gets pieces of information separated by "|" in KisSplice format
+      #example of lineSplit :  
+      # lineSplit[1] : "bcc_3929"
+      #          [2] : "Cycle_0"
+      #          [3] : "Type_1"     
+      #          [4] : "upper_path_length_90" 
+      #          [5] : "C1_1" (first condition)
+      #          [5+len] : "Cn_5" (last condition)              
+      #          [5+len+1] : rank_0.90267"    
+      lineCounts <- lineSplit[5:(5+len)] # gets every condition of the line and its associated count
+			eventCounts <- as.vector(as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2]))) # numeric vector with the counts of the conditions of the line 
+      eventName <- paste(lineSplit[1],lineSplit[2],sep="_") # concatenates the two first elements of lineSplit, ie the event name
+      lengthInfo <- lineSplit[4]
+      eventLength <- as.vector(as.numeric(strsplit(lengthInfo,"_")[[1]][4])) #gets the length of the event ie the 4th element
+      events.df.temp <- data.frame(eventName,eventLength,t(eventCounts))
 			names(events.df.temp) <- namesData
 			events.df <- rbind(events.df,events.df.temp)
 		}
@@ -43,7 +49,7 @@ if (option.Plot == TRUE) {
 system("mkdir Figures") 
 }
 
-dataName <- "data name"
+# dataName <- "data name"
 
 # n <- 2 #number of biological conditions
 # nr <- c(2,2) #number of replicates for each condition
@@ -104,7 +110,7 @@ options(warn=-1) # supress the warning for the users
 ###################################################
 # TODO: forbid runnning the vignette if only one condition
 # on personal computer
-dataCounts <- read.table(file,header=F,sep="\t")
+# dataCounts <- read.table(file,header=F,sep="\t")
 
 # namesData <- c("ID", "Length")
 # for(i in 1:n ) {
