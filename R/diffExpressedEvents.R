@@ -5,6 +5,37 @@
 ### code chunk number 1: parameters
 ###################################################
 
+convertToCounts <- function(fileName,namesData) {
+	
+	toConvert <- file(fileName, open = "r")
+	line <- readLines(toConvert)
+	index <- 1
+	if (substr(line[index], start = 0, stop = 1) == '>') {
+		len <- length(strsplit(line[index], "|", fixed = TRUE)[[1]])-6
+	}
+	lineCounts <- strsplit(line[index], "|", fixed = TRUE)[[1]][5:(5 + len)] # computes the right number of conditions and their counts
+	eventCounts <- as.vector(as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2])))
+	# eventName <- c(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|T",fixed = TRUE)[[1]][1])
+	eventName <- gsub("|","_",c(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|T",fixed = TRUE)[[1]][1]),fixed=TRUE)
+	eventLength <- as.vector(as.numeric(strsplit(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|",fixed = TRUE)[[1]][4],"_")[[1]][4])) # parsing to get information to build the dataframe : bcc id, path length and counts /!\ I assumed that types are always noted as "|Type_X|" for the sake of the parsing simplicity, which is true in KisSplice outputs so far."
+	events.df <- data.frame(eventName,eventLength,t(eventCounts))
+	names(events.df) <- namesData
+	index <- index+1
+	while (index <= length(line)) {
+		if (substr(line[index], start = 0, stop = 1) == '>') {lineCounts <- strsplit(line[index], "|", fixed=TRUE)[[1]][5:(5+len)] # computes the right number of conditions and their counts
+			eventCounts <- as.vector(as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2])))
+			# eventName <- c(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|T",fixed = TRUE)[[1]][1])
+			eventName <- gsub("|","_",c(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|T",fixed = TRUE)[[1]][1]),fixed=TRUE)
+			eventLength <- as.vector(as.numeric(strsplit(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|",fixed = TRUE)[[1]][4],"_")[[1]][4])) # parsing to get information to build the dataframe : bcc id, path length and counts /!\ I assumed that types are always noted as "|Type_X|" for the sake of the parsing simplicity, which is true in KisSplice outputs so far."
+			events.df.temp <- data.frame(eventName,eventLength,t(eventCounts))
+			names(events.df.temp) <- namesData
+			events.df <- rbind(events.df,events.df.temp)
+		}
+		index <- index + 1
+	}
+	return (events.df)
+}
+
 diffExpressedEvents <- function(n,nr,file) {
 
 option.Plot <- FALSE
@@ -73,7 +104,7 @@ options(warn=-1) # supress the warning for the users
 ###################################################
 # TODO: forbid runnning the vignette if only one condition
 # on personal computer
-dataCounts <- read.table(file,h=F,sep="\t")
+dataCounts <- read.table(file,header=F,sep="\t")
 
 # namesData <- c("ID", "Length")
 # for(i in 1:n ) {
@@ -97,38 +128,6 @@ for (i in 1:n){
       namesData <- c( namesData,paste("Cond",i,"_","R",j,sep = "",collapse = ""))
     }
 }
-
-convertToCounts <- function(fileName,namesData) {
-
-  toConvert <- file(fileName, open = "r")
-  line <- readLines(toConvert)
-  index <- 1
-  if (substr(line[index], start = 0, stop = 1) == '>') {
-    len <- length(strsplit(line[index], "|", fixed = TRUE)[[1]])-6
-  }
-  lineCounts <- strsplit(line[index], "|", fixed = TRUE)[[1]][5:(5 + len)] # computes the right number of conditions and their counts
-  eventCounts <- as.vector(as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2])))
-  # eventName <- c(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|T",fixed = TRUE)[[1]][1])
-  eventName <- gsub("|","_",c(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|T",fixed = TRUE)[[1]][1]),fixed=TRUE)
-  eventLength <- as.vector(as.numeric(strsplit(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|",fixed = TRUE)[[1]][4],"_")[[1]][4])) # parsing to get information to build the dataframe : bcc id, path length and counts /!\ I assumed that types are always noted as "|Type_X|" for the sake of the parsing simplicity, which is true in KisSplice outputs so far."
-  events.df <- data.frame(eventName,eventLength,t(eventCounts))
-  names(events.df) <- namesData
-  index <- index+1
-  while (index <= length(line)) {
-     if (substr(line[index], start = 0, stop = 1) == '>') {lineCounts <- strsplit(line[index], "|", fixed=TRUE)[[1]][5:(5+len)] # computes the right number of conditions and their counts
-       eventCounts <- as.vector(as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2])))
-       # eventName <- c(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|T",fixed = TRUE)[[1]][1])
-       eventName <- gsub("|","_",c(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|T",fixed = TRUE)[[1]][1]),fixed=TRUE)
-       eventLength <- as.vector(as.numeric(strsplit(strsplit(substr(line[index],start = 2,stop = length(strsplit(line[index],"|")[[1]])),"|",fixed = TRUE)[[1]][4],"_")[[1]][4])) # parsing to get information to build the dataframe : bcc id, path length and counts /!\ I assumed that types are always noted as "|Type_X|" for the sake of the parsing simplicity, which is true in KisSplice outputs so far."
-       events.df.temp <- data.frame(eventName,eventLength,t(eventCounts))
-       names(events.df.temp) <- namesData
-       events.df <- rbind(events.df,events.df.temp)
-     }
-     index <- index + 1
-  }
-  return (events.df)
- }
-
 
 if (is.data.frame(file)) {
   dataCounts <- file

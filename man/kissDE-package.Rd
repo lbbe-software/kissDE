@@ -11,12 +11,12 @@ Package: \tab kissDE\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
 Date: \tab 2014-03-03\cr
-License: \tab ceCill\cr
+License: \tab GPL\cr
 }
 }
 
 \author{
-Lilia Brinza, Vincent Lacroix, Frank Picard, Vincent Miele and Camille Marchet
+Lilia Brinza, Vincent Lacroix, Frank Picard, Vincent Miele and Camille Marchet\cr
 Maintainers: vincent.miele@univ-lyon1.fr, camille.marchet@inria.fr
 }
 \keyword{ package }

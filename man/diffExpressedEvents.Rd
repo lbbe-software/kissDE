@@ -1,9 +1,9 @@
 \name{diffExpressedEvents}
 \alias{diffExpressedEvents}
-\title{Retrieves condition-specific variants in RNA-seq data.}
-\description{Retrieves condition-specific variants in RNA-seq data. 
+\title{Retrieve condition-specific variants in RNA-seq data.}
+\description{Retrieve condition-specific variants in RNA-seq data. 
 }
-\usage{diffExpressedEvent(n,nr,file)}
+\usage{diffExpressedEvents(n,nr,file)}
 \arguments{
 	\item{n}{}
 	\item{nr}{}
@@ -24,8 +24,6 @@
 %%  ~~ reference to a publication or URL from which the data were obtained ~~
 }
 \author{
-  Lilia Brinza and Vincent Lacroix
-  Maintainers: vincent.miele@univ-lyon1.fr, camille.marchet@inria.fr
 }
 
 
