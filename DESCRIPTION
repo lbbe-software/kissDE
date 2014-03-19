@@ -8,3 +8,4 @@ Maintainer: Vincent Miele <vincent.miele@univ-lyon1.fr>, Camille Marchet <camill
 Depends: DESeq, aod, xtable, DSS, glmnet
 Imports: DESeq, aod, xtable, DSS, glmnet
 License: GPL
+Description:
