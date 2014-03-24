@@ -77,21 +77,7 @@ qualityControl <- function(counts){
   ###################################################
   ### code chunk number 4: replicates
   ###################################################
-  # par( mfrow=c(n,1) )
-  # for( i in 1:n ) {
-  #   if ( nr[i] > 1 ) {
-  #     plot( counts[ ,paste("Cond",i,"_R1_Norm",sep="",collapse="")]+1, counts[ ,paste("Cond",i,"_R2_Norm",sep="",collapse="")]+1, log="xy",
-  #       xlim=c( 1, max( counts[ ,paste( "Cond",i,"_R1_Norm",sep="",collapse="" ) ], counts[ ,paste("Cond", i, "_R2_Norm", sep = "", collapse = "") ] ) ),
-  #       xlab = paste( "Cond",i,"_R1_Norm",sep="",collapse="" ),
-  #       ylim=c(1, max(counts[ ,paste("Cond",i,"_R1_Norm",sep="",collapse="")], counts[ ,paste("Cond",i,"_R2_Norm",sep="",collapse="")])),main = paste("Replicate 1 vs Replicate 2, ","Cond",i,sep="",collapse=""),
-  #       ylab = paste("Cond",i,"_R2_Norm",sep="",collapse="")
-  #     )
-  #     #adding ev. with zero counts in on replicates
-  #     zeroC.R1R2 <- counts[which(counts[ ,paste("Cond",i,"_R1_Norm",sep="",collapse="")] == 0 | counts[ ,paste("Cond",i,"_R2_Norm",sep="",collapse="")]==0), ]
-  #     points(zeroC.R1R2[ , paste("Cond",i,"_R1_Norm",sep="",collapse="") ]+1, zeroC.R1R2[ ,paste("Cond",i,"_R2_Norm",sep="",collapse="")]+1, col=3)
-  #     abline(a=0, b=1, col=2, lty=2, lwd=2)
-  #   }
-  # }
+  heatmap(as.matrix(as.dist(1-cor(counts[ ,(dim+1):(dim+length(conds))]))))
 
   ###################################################
   ### code chunk number 5: intra-group and inter-group-variance
@@ -119,6 +105,7 @@ qualityControl <- function(counts){
   ###################################################
   plot( x = counts$varIntra, y = counts$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
   abline( a = 0, b = 1, col = 2, lty = 2, lwd = 2 )
+  dev.off()
 }
 
 diffExpressedEvents <- function(counts) {
@@ -409,9 +396,9 @@ diffExpressedEvents <- function(counts) {
   #   for (numReplicatI in 1:nr[i]) {          
   #     nameUp <- paste('UP_Cond', i, '_R', numReplicatI, '_Norm', sep='')
   #     nameLow <- paste('LP_Cond', i, '_R', numReplicatI, '_Norm', sep='') 
-  #     tmp.psi <- signifEvents[ , nameUp] / (signifEvents[ ,nameUp] + signifEvents[ ,nameLow])
-  #     PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
+  #     tmp.ps 1 <- cbind( PSI.replicat1, tmp.psi)
   #   }
+
   #   PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm = T)
   #   for (j in (i+1):n) {     #j = 2nd condition      
   #     PSI.replicat2 <- c()
@@ -433,6 +420,7 @@ diffExpressedEvents <- function(counts) {
   # signifEvents.sorted <- signifEvents[ order( finalDelta, decreasing = T), ]
   # return(signifEvents.sorted)
   return(signifEvents)
+
 }
 
 
