@@ -7,7 +7,7 @@ kissplice2counts <- function(fileName,conditions) {
 	}
   events.df <- data.frame()
   namesData<-c("ID","Length",conditions)
-	while (index <= length(line)) {
+  while (index <= length(line)) {
     firstLineChar <- substr(line[index], start = 0, stop = 1)
     if (firstLineChar == '>') {  #if the line contains the header beginning with ">", not the sequence
       nbCharLine <- length(strsplit(line[index],"|")[[1]]) # number of characters in the line
@@ -71,8 +71,8 @@ qualityControl <- function(counts){
   ###################################################
   ### code chunk number 3: fig_hclust_norm
   ###################################################
-  par(ask=TRUE)
   plot( hclust(as.dist(1-cor(counts[ ,(dim+1):(dim+length(conds))])),"ward") )
+  par(ask=TRUE)
 
   ###################################################
   ### code chunk number 4: replicates
@@ -105,7 +105,7 @@ qualityControl <- function(counts){
   ###################################################
   plot( x = counts$varIntra, y = counts$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
   abline( a = 0, b = 1, col = 2, lty = 2, lwd = 2 )
-  dev.off()
+  #dev.off()
 }
 
 diffExpressedEvents <- function(counts) {
