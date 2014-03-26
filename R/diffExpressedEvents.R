@@ -1,15 +1,15 @@
-kissplice2counts <- function(fileName,conditions) {
+kissplice2counts <- function(fileName) {
 	toConvert <- file(fileName, open = "r")
 	line <- readLines(toConvert)
 	index <- 1
+  indexNames <- 1
 	if (substr(line[index], start = 0, stop = 1) == '>') {
 		len <- length(strsplit(line[index], "|", fixed = TRUE)[[1]])-6
 	}
-  events.df <- data.frame()
-  namesData<-c("ID","Length",conditions)
-  while (index <= length(line)) {
-    firstLineChar <- substr(line[index], start = 0, stop = 1)
-    if (firstLineChar == '>') {  #if the line contains the header beginning with ">", not the sequence
+  events.mat<- matrix(NA,length(line)/2,len+3)
+  firstLineChar <- substr(line[index], start = 0, stop = 1)
+  if (firstLineChar == '>') {#checks if the line contains the header beginning with ">", not the sequence
+    while (index <= length(line)) {
       nbCharLine <- length(strsplit(line[index],"|")[[1]]) # number of characters in the line
       lineInfos <- substr(line[index],start = 2,stop =nbCharLine) #the line without ">" that we want to avoid
       lineSplit <- strsplit(lineInfos, "|", fixed=TRUE)[[1]] # gets pieces of information separated by "|" in KisSplice format
@@ -20,35 +20,44 @@ kissplice2counts <- function(fileName,conditions) {
       #          [4] : "upper_path_length_90" 
       #          [5] : "C1_1" (first condition)
       #          [5+len] : "Cn_5" (last condition)              
-      #          [5+len+1] : rank_0.90267"    
-      lineCounts <- lineSplit[5:(5+len)] # gets every condition of the line and its associated count
-			eventCounts <- as.vector(as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2]))) # numeric vector with the counts of the conditions of the line 
+      #          [5+len+1] : rank_0.90267" 
       eventName <- paste(lineSplit[1],lineSplit[2],sep="_") # concatenates the two first elements of lineSplit, ie the event name
+      events.mat[indexNames,1] <- eventName
       lengthInfo <- lineSplit[4]
-      eventLength <- as.vector(as.numeric(strsplit(lengthInfo,"_")[[1]][4])) #gets the length of the event ie the 4th element
-      events.df.temp <- data.frame(eventName,eventLength,t(eventCounts))
-			names(events.df.temp) <- namesData
-			events.df <- rbind(events.df,events.df.temp)
-		}
-		index <- index + 1
+      events.mat[indexNames,2] <- as.numeric(strsplit(lengthInfo,"_")[[1]][4]) #fills the second column of the matrix with length info
+      lineCounts <- lineSplit[5:(5+len)] # gets every condition of the line and its associated count
+      events.mat[indexNames,3:dim(events.mat)[2]] <- as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2])) #fills the matrix others columns with the counts of the conditions of the line 
+		index <- index + 2
+    indexNames <- indexNames + 1
+    }
 	}
+  events.df <- data.frame(events.mat)
 	return (events.df)
 }
 
-qualityControl <- function(counts){
+qualityControl <- function(countsData,conditions){
+
+  # namesData <- c("ID", "Length")
+  # for(i in 1:n ) {
+  #   for( j in 1:nr[i] ) {
+  #       namesData <- c( namesData,paste("Cond",i,"_","R",j,sep="",collapse=""))
+  #     }
+  # }
+
+
   ###################################################
   ### code chunk number 1: Read data
   ###################################################
-  sortedconditions <- sort(colnames(counts)[-(1:2)])
+  sortedconditions <- sort(colnames(countsData)[-(1:2)])
   n <- length(unique(sortedconditions))
   nr <- rle(sortedconditions)$lengths
-  sortedindex <- order(colnames(counts)[-(1:2)])+2
-  counts[,-(1:2)] <- counts[,sortedindex]
-  colnames(counts)[-(1:2)] <- colnames(counts)[sortedindex]
+  sortedindex <- order(colnames(countsData)[-(1:2)])+2
+  countsData[,-(1:2)] <- countsData[,sortedindex]
+  colnames(countsData)[-(1:2)] <- colnames(countsData)[sortedindex]
 
   options(warn=-1) # suppress the warning for the users
-  namesData <- colnames(counts)
-  counts$Path <- gl( 2, 1, dim(counts)[1], labels = c("UP", "LP"))
+  namesData <- colnames(countsData)
+  countsData$Path <- gl( 2, 1, dim(countsData)[1], labels = c("UP", "LP"))
 
   ###################################################
   ### code chunk number 2: Normalisation
@@ -60,69 +69,69 @@ qualityControl <- function(counts){
       conds <- c( conds,paste( "Cond", i, sep = "",collapse = "") )
     }
   } 
-  cds <- newCountDataSet( counts[ ,3:(3+length(conds)-1)], conds ) # create object
+  cds <- newCountDataSet( countsData[ ,3:(3+length(conds)-1)], conds ) # create object
   cdsSF <- estimateSizeFactors(cds)
   sizeFactors( cdsSF )
   shouldWeNormalise=sum(is.na(sizeFactors(cdsSF))) < 1
-  dim <- dim(counts)[2]
-  counts[ ,(dim+1):(dim+length(conds)) ] <- round(counts(cdsSF, normalized=shouldWeNormalise))
-  colnames(counts)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
+  dim <- dim(countsData)[2]
+  countsData[ ,(dim+1):(dim+length(conds)) ] <- round(countsData(cdsSF, normalized=shouldWeNormalise))
+  colnames(countsData)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
 
   ###################################################
   ### code chunk number 3: fig_hclust_norm
   ###################################################
-  plot( hclust(as.dist(1-cor(counts[ ,(dim+1):(dim+length(conds))])),"ward") )
+  plot( hclust(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))])),"ward") )
   par(ask=TRUE)
 
   ###################################################
   ### code chunk number 4: replicates
   ###################################################
-  heatmap(as.matrix(as.dist(1-cor(counts[ ,(dim+1):(dim+length(conds))]))))
+  heatmap(as.matrix(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))]))))
 
   ###################################################
   ### code chunk number 5: intra-group and inter-group-variance
   ###################################################
   ## Mean and variance over all conditions and replicates (normalized counts!) 
-  counts$mn <- apply(counts[ ,(dim+1):(dim+length(conds))], 1, mean)
-  counts$var <- apply(counts[ ,(dim+1):(dim+length(conds))], 1, var)
+  countsData$mn <- apply(countsData[ ,(dim+1):(dim+length(conds))], 1, mean)
+  countsData$var <- apply(countsData[ ,(dim+1):(dim+length(conds))], 1, var)
   ## correction term
   nbAll <- sum(nr) # number of all observations in all groups
-  counts$ct  <- apply(counts[ ,(dim+1):(dim+length(conds))], 1, sum)^2/nbAll
+  countsData$ct  <- apply(countsData[ ,(dim+1):(dim+length(conds))], 1, sum)^2/nbAll
   ## sum of squares between groups
-  counts$ss <- apply(counts[ ,(dim+1):(dim+length(conds)/n)],1,sum)^2/nr[1] + 
-  apply(counts[ ,((dim+1)+length(conds)/n):(dim+length(conds))],1,sum)^2/nr[2] 
+  countsData$ss <- apply(countsData[ ,(dim+1):(dim+length(conds)/n)],1,sum)^2/nr[1] + 
+  apply(countsData[ ,((dim+1)+length(conds)/n):(dim+length(conds))],1,sum)^2/nr[2] 
   ## substract the correction term from the SS and divide by the degrees of 
   df <- 1 # freedom(groups); here: df=2-1=1
-  counts$varInter <- (counts$ss - counts$ct)/df
+  countsData$varInter <- (countsData$ss - countsData$ct)/df
   # intra-variability 
-  counts$varC1 <- apply( counts[ ,(dim+1):(dim+nr[1])], 1, var )
-  counts$varC2 <- apply( counts[ ,((dim+1)+nr[1]):(dim+nr[2]+nr[1])], 1, var )
-  counts$varIntra <- apply( data.frame(counts$varC1, counts$varC2), 1, mean )
+  countsData$varC1 <- apply( countsData[ ,(dim+1):(dim+nr[1])], 1, var )
+  countsData$varC2 <- apply( countsData[ ,((dim+1)+nr[1]):(dim+nr[2]+nr[1])], 1, var )
+  countsData$varIntra <- apply( data.frame(countsData$varC1, countsData$varC2), 1, mean )
 
 
   ###################################################
   ### code chunk number 6: intra-vs-inter
   ###################################################
-  plot( x = counts$varIntra, y = counts$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
+  plot( x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
   abline( a = 0, b = 1, col = 2, lty = 2, lwd = 2 )
   #dev.off()
 }
 
-diffExpressedEvents <- function(counts) {
+diffExpressedEvents <- function(countsData) {
 
   ###################################################
   ### code chunk number 1: Read data
   ###################################################
-  sortedconditions <- sort(colnames(counts)[-(1:2)])
+  sortedconditions <- sort(colnames(countsData)[-(1:2)])
   n <- length(unique(sortedconditions))
   nr <- rle(sortedconditions)$lengths
-  sortedindex <- order(colnames(counts)[-(1:2)])+2
-  counts[,-(1:2)] <- counts[,sortedindex]
-  colnames(counts)[-(1:2)] <- colnames(counts)[sortedindex]
+  sortedindex <- order(colnames(countsData)[-(1:2)])+2
+  countsData[,-(1:2)] <- countsData[,sortedindex]
+  colnames(countsData)[-(1:2)] <- colnames(countsData)[sortedindex]
 
   options(warn=-1) # suppress the warning for the users
-  namesData <- colnames(counts)
-  counts$Path <- gl(2, 1, dim(counts)[1], labels = c("UP", "LP"))
+  namesData <- colnames(countsData)
+  countsData$Path <- gl(2, 1, dim(countsData)[1], labels = c("UP", "LP"))
 
   ###################################################
   ### code chunk number 2: Normalisation
@@ -134,21 +143,21 @@ diffExpressedEvents <- function(counts) {
       conds <- c( conds,paste( "Cond", i, sep = "",collapse = "") )
     }
   } 
-  cds <- newCountDataSet( counts[ ,3:(3+length(conds)-1)], conds ) # create object
+  cds <- newCountDataSet( countsData[ ,3:(3+length(conds)-1)], conds ) # create object
   cdsSF <- estimateSizeFactors(cds)
   sizeFactors( cdsSF )
   shouldWeNormalise=sum(is.na(sizeFactors(cdsSF))) < 1
-  dim <- dim(counts)[2]
-  counts[ ,(dim+1):(dim+length(conds)) ] <- round(counts(cdsSF, normalized=shouldWeNormalise))
-  colnames(counts)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
+  dim <- dim(countsData)[2]
+  countsData[ ,(dim+1):(dim+length(conds)) ] <- round(countsData(cdsSF, normalized=shouldWeNormalise))
+  colnames(countsData)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
 
   ###################################################
   ### code chunk number 3: event-list
   ###################################################
   # reduce data frame to the interesting columns
   nbAll <- sum(nr)
-  dataPart <- counts[ ,c(1:2,which(grepl("_Norm",names(counts)))) ] # -> when not want to filter data 
-  dataPart$Path <- gl( 2,1,dim(counts)[1],labels=c("UP","LP") ) 
+  dataPart <- countsData[ ,c(1:2,which(grepl("_Norm",names(countsData)))) ] # -> when not want to filter data 
+  dataPart$Path <- gl( 2,1,dim(countsData)[1],labels=c("UP","LP") ) 
   dataPart2 <- cbind( dataPart[ seq( 1, dim( dataPart )[1], 2 ), ], dataPart[ seq( 2, dim(dataPart)[1] , 2 ), grepl("Norm", names( dataPart) ) ] )
   names(dataPart2)[3:(3+nbAll-1)] <- paste( "UP",names(dataPart2)[3:(3+nbAll-1)], sep="_" )
   names(dataPart2)[(3+nbAll+1):(3+2*nbAll+1-1)] <- paste( "LP", names(dataPart2)[(3+nbAll+1):(3+2*nbAll+1-1)], sep="_" )
