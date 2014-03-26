@@ -6,7 +6,8 @@ kissplice2counts <- function(fileName) {
 	if (substr(line[index], start = 0, stop = 1) == '>') {
 		len <- length(strsplit(line[index], "|", fixed = TRUE)[[1]])-6
 	}
-  events.mat<- matrix(NA,length(line)/2,len+3)
+  events.mat <- matrix(NA,length(line)/2,len+2)
+  events.names <- rep(NA,length(line)/2)
   firstLineChar <- substr(line[index], start = 0, stop = 1)
   if (firstLineChar == '>') {#checks if the line contains the header beginning with ">", not the sequence
     while (index <= length(line)) {
@@ -22,41 +23,41 @@ kissplice2counts <- function(fileName) {
       #          [5+len] : "Cn_5" (last condition)              
       #          [5+len+1] : rank_0.90267" 
       eventName <- paste(lineSplit[1],lineSplit[2],sep="_") # concatenates the two first elements of lineSplit, ie the event name
-      events.mat[indexNames,1] <- eventName
+      events.names[indexNames] <- eventName
       lengthInfo <- lineSplit[4]
-      events.mat[indexNames,2] <- as.numeric(strsplit(lengthInfo,"_")[[1]][4]) #fills the second column of the matrix with length info
+      events.mat[indexNames,1] <- as.numeric(strsplit(lengthInfo,"_")[[1]][4]) #fills the first column of the matrix with length info
       lineCounts <- lineSplit[5:(5+len)] # gets every condition of the line and its associated count
-      events.mat[indexNames,3:dim(events.mat)[2]] <- as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2])) #fills the matrix others columns with the counts of the conditions of the line 
+      events.mat[indexNames,2:dim(events.mat)[2]] <- as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2])) #fills the matrix others columns with the counts of the conditions of the line 
 		index <- index + 2
     indexNames <- indexNames + 1
     }
 	}
-  events.df <- data.frame(events.mat)
+  class(events.mat) <- "numeric"
+  events.df <- as.data.frame(events.mat)
+  events.df <- data.frame(events.names,events.df)
 	return (events.df)
 }
 
-qualityControl <- function(countsData,conditions){
-
-  # namesData <- c("ID", "Length")
-  # for(i in 1:n ) {
-  #   for( j in 1:nr[i] ) {
-  #       namesData <- c( namesData,paste("Cond",i,"_","R",j,sep="",collapse=""))
-  #     }
-  # }
-
-
+qualityControl <- function(countsData,conditions) {
   ###################################################
   ### code chunk number 1: Read data
   ###################################################
-  sortedconditions <- sort(colnames(countsData)[-(1:2)])
+  sortedconditions <- sort(conditions)
   n <- length(unique(sortedconditions))
   nr <- rle(sortedconditions)$lengths
-  sortedindex <- order(colnames(countsData)[-(1:2)])+2
-  countsData[,-(1:2)] <- countsData[,sortedindex]
-  colnames(countsData)[-(1:2)] <- colnames(countsData)[sortedindex]
-
+  sortedindex <- order(conditions)+2
+  namesData <- c("ID","Length",rep(NA,length(conditions)))
+  for (k in 1:nr[1]){
+    namesData[2+k] <- paste(sortedconditions[k],"_r",k,sep="",collapse="")
+  }
+  for (i in 2:n) {
+    for (j in 1:nr[n]) {
+      namesData[2+cumsum(nr)[n-1]+j] <- paste(sortedconditions[cumsum(nr)[n-1]+j],"_r",j,sep="",collapse="")
+    }
+  }
+  countsData[,-(1:2)] = countsData[,sortedindex]
+  colnames(countsData) <- namesData
   options(warn=-1) # suppress the warning for the users
-  namesData <- colnames(countsData)
   countsData$Path <- gl( 2, 1, dim(countsData)[1], labels = c("UP", "LP"))
 
   ###################################################
@@ -74,7 +75,7 @@ qualityControl <- function(countsData,conditions){
   sizeFactors( cdsSF )
   shouldWeNormalise=sum(is.na(sizeFactors(cdsSF))) < 1
   dim <- dim(countsData)[2]
-  countsData[ ,(dim+1):(dim+length(conds)) ] <- round(countsData(cdsSF, normalized=shouldWeNormalise))
+  countsData[ ,(dim+1):(dim+length(conds)) ] <- round(counts(cdsSF, normalized=shouldWeNormalise))
   colnames(countsData)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
 
   ###################################################
@@ -117,21 +118,28 @@ qualityControl <- function(countsData,conditions){
   #dev.off()
 }
 
-diffExpressedEvents <- function(countsData) {
+diffExpressedEvents <- function(countsData,conditions) {
 
   ###################################################
   ### code chunk number 1: Read data
   ###################################################
-  sortedconditions <- sort(colnames(countsData)[-(1:2)])
+  sortedconditions <- sort(conditions)
   n <- length(unique(sortedconditions))
   nr <- rle(sortedconditions)$lengths
-  sortedindex <- order(colnames(countsData)[-(1:2)])+2
-  countsData[,-(1:2)] <- countsData[,sortedindex]
-  colnames(countsData)[-(1:2)] <- colnames(countsData)[sortedindex]
-
+  sortedindex <- order(conditions)+2
+  namesData <- c("ID","Length",rep(NA,length(conditions)))
+  for (k in 1:nr[1]){
+    namesData[2+k] <- paste(sortedconditions[k],"_r",k,sep="",collapse="")
+  }
+  for (i in 2:n) {
+    for (j in 1:nr[n]) {
+      namesData[2+cumsum(nr)[n-1]+j] <- paste(sortedconditions[cumsum(nr)[n-1]+j],"_r",j,sep="",collapse="")
+    }
+  }
+  countsData[,-(1:2)] = countsData[,sortedindex]
+  colnames(countsData) <- namesData
   options(warn=-1) # suppress the warning for the users
-  namesData <- colnames(countsData)
-  countsData$Path <- gl(2, 1, dim(countsData)[1], labels = c("UP", "LP"))
+  countsData$Path <- gl( 2, 1, dim(countsData)[1], labels = c("UP", "LP"))
 
   ###################################################
   ### code chunk number 2: Normalisation
@@ -148,7 +156,7 @@ diffExpressedEvents <- function(countsData) {
   sizeFactors( cdsSF )
   shouldWeNormalise=sum(is.na(sizeFactors(cdsSF))) < 1
   dim <- dim(countsData)[2]
-  countsData[ ,(dim+1):(dim+length(conds)) ] <- round(countsData(cdsSF, normalized=shouldWeNormalise))
+  countsData[ ,(dim+1):(dim+length(conds)) ] <- round(counts(cdsSF, normalized=shouldWeNormalise))
   colnames(countsData)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
 
   ###################################################
