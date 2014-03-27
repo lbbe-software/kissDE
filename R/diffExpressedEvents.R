@@ -196,6 +196,11 @@ diffExpressedEvents <- function(countsData,conditions) {
   dispData <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
   dispData <-estDispersion(dispData)
   dispDataMeanCond <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
+  # if (n > 2) {
+  #     dispDataMeanCond <- estDispersion(dispData)
+  #     } else {
+  #       dispDataMeanCond <- estDispersion(dispData,trend=T)
+  #     }
   dispDataMeanCond <- estDispersion(dispData)
 
   ###################################################
@@ -207,11 +212,11 @@ diffExpressedEvents <- function(countsData,conditions) {
   rownames(event.mean.variance.df) <- as.character(dataPart2[ ,1])
   # estimate the dispersion parameter D of the Quasi-Poisson distribution
   lm.D <- lm(event.mean.variance.df$Variance ~ event.mean.variance.df$Mean-1)
-  coef(lm.D)
+  # coef(lm.D)
   ## estimate the overdispersion parameter theta of the NB distritution
   modelNB <- Variance ~ Mean + 1/theta * Mean^2
   nls.modelNB <- nls(modelNB, data=event.mean.variance.df, start=list(theta=100))
-  coef(nls.modelNB)
+  # coef(nls.modelNB)
   phi <- 1/coef(nls.modelNB) # to be used as fixed parameter later on
   #compute model fit
   # log plot, so exclude 0 from the x values
@@ -406,37 +411,57 @@ diffExpressedEvents <- function(countsData,conditions) {
   signifEvents <- cbind(dataPart2[nonsing.events, ],pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= 0.05, ]
   # sorting by deltaPSI / deltaF
   finalDelta <- NA
+  #1st condition
+  PSI.replicat1 <- c()
+  for (j1 in 1:nr[1]) {
+    nameUp <- paste('UP_',sortedconditions[j1], '_r', j1, '_Norm', sep='')
+    nameLow <- paste('LP_', sortedconditions[j1],'_r', j1, '_Norm', sep='') 
+    tmp.psi <- signifEvents[, nameUp] / (signifEvents[,nameUp] + signifEvents[ ,nameLow])
+    PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
+    PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm = T)
+    for (k1 in (2:n)) { # = 2nd condition
+      PSI.replicat2 <- c()
+      for (l in (1:nr[n])) {
+        nameUp <- paste('UP_',sortedconditions[cumsum(nr)[n-1]+l], '_r', l, '_Norm', sep='')
+        nameLow <- paste('LP_', sortedconditions[cumsum(nr)[n-1]+l],'_r', l, '_Norm', sep='') 
+        tmp.psi <- signifEvents[, nameUp] / (signifEvents[,nameUp] + signifEvents[ ,nameLow])
+        PSI.replicat2 <- cbind( PSI.replicat2, tmp.psi)
+      }
+      PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm = T)
+      #deltaPSI for cond i,j
+      deltaPSIij <- abs( PSIcondJ- PSIcondI ) 
+      finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN = 1, max, na.rm = T)
+    }
+  }
+  for (i in 2:(n-1)) {
+    #1st condition
+    PSI.replicat1 <- c()
+    for (k2 in (1:nr[n-1])) {
+      nameUp <- paste('UP_',sortedconditions[cumsum(nr)[n-1]+k2], '_r', k2, '_Norm', sep='')
+      nameLow <- paste('LP_', sortedconditions[cumsum(nr)[n-1]+k2],'_r', k2, '_Norm', sep='') 
+      tmp.psi <- signifEvents[, nameUp] / (signifEvents[,nameUp] + signifEvents[ ,nameLow])
+      PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
+    }
+    PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm = T)
+    for (k3 in (i+1):n) {
+      PSI.replicat2 <- c()
+      for (l in 1:nr[n]) {
+        nameUp <- paste('UP_',sortedconditions[cumsum(nr)[n-1]+l], '_r', l, '_Norm', sep='')
+        nameLow <- paste('LP_', sortedconditions[cumsum(nr)[n-1]+l],'_r', l, '_Norm', sep='') 
+        tmp.psi <- signifEvents[, nameUp] / (signifEvents[,nameUp] + signifEvents[ ,nameLow])
+        PSI.replicat2 <- cbind( PSI.replicat2, tmp.psi)
+      }
+      PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm = T)
+      # deltaPSI for cond i,j
+      deltaPSIij <- abs( PSIcondJ- PSIcondI ) 
+      finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN = 1, max, na.rm = T)
+    }
+  }
 
-  # for ( i in 1:(n-1)) {
-  # # 1 er condition
-  #   PSI.replicat1 <- c()
-  #   for (numReplicatI in 1:nr[i]) {          
-  #     nameUp <- paste('UP_Cond', i, '_R', numReplicatI, '_Norm', sep='')
-  #     nameLow <- paste('LP_Cond', i, '_R', numReplicatI, '_Norm', sep='') 
-  #     tmp.ps 1 <- cbind( PSI.replicat1, tmp.psi)
-  #   }
-
-  #   PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm = T)
-  #   for (j in (i+1):n) {     #j = 2nd condition      
-  #     PSI.replicat2 <- c()
-  #     for (numReplicatI in 1:nr[j]) {          
-  #         nameUp <- paste('UP_Cond', j, '_R', numReplicatI, '_Norm', sep='')
-  #         nameLow <- paste('LP_Cond', j, '_R', numReplicatI, '_Norm', sep='') 
-  #         tmp.psi <- signifEvents[ ,nameUp] / (signifEvents[ ,nameUp] + signifEvents[ ,nameLow])
-  #         PSI.replicat2 <- cbind( PSI.replicat2, tmp.psi)
-  #       }
-  #     PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm = T)
-  #     # deltaPSI for cond i,j
-  #     deltaPSIij <- abs( PSIcondJ- PSIcondI ) 
-  #     finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN = 1, max, na.rm = T)
-  #   }
-  # }
-
-  # signifEvents <- cbind(signifEvents, finalDelta)# adding DeltaPsi/f to the final table
-  # colnames(signifEvents)[length(colnames(signifEvents))] <- 'Deltaf/DeltaPSI'# renaming last columns
-  # signifEvents.sorted <- signifEvents[ order( finalDelta, decreasing = T), ]
-  # return(signifEvents.sorted)
-  return(signifEvents)
+  signifEvents <- cbind(signifEvents, finalDelta)# adding DeltaPsi/f to the final table
+  colnames(signifEvents)[length(colnames(signifEvents))] <- 'Deltaf/DeltaPSI'# renaming last columns
+  signifEvents.sorted <- signifEvents[ order( finalDelta, decreasing = T), ]
+  return(signifEvents.sorted)
 
 }
 
