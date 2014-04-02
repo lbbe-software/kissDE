@@ -81,13 +81,13 @@ qualityControl <- function(countsData,conditions) {
   ###################################################
   ### code chunk number 3: fig_hclust_norm
   ###################################################
-  plot( hclust(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))])),"ward") )
+  plot(hclust(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))])),"ward"))
   par(ask=TRUE)
 
   ###################################################
   ### code chunk number 4: replicates
   ###################################################
-  heatmap(as.matrix(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))]))))
+  heatmap(as.matrix(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))]))), margins = c(10,10))
 
   ###################################################
   ### code chunk number 5: intra-group and inter-group-variance
