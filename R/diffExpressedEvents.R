@@ -38,7 +38,7 @@ kissplice2counts <- function(fileName) {
 	return (events.df)
 }
 
-qualityControl <- function(countsData,conditions) {
+readAndPrepareData <- function(countsData,conditions) {
   ###################################################
   ### code chunk number 1: Read data
   ###################################################
@@ -77,20 +77,28 @@ qualityControl <- function(countsData,conditions) {
   dim <- dim(countsData)[2]
   countsData[ ,(dim+1):(dim+length(conds)) ] <- round(counts(cdsSF, normalized=shouldWeNormalise))
   colnames(countsData)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
+  return(countsData)
+  }
+
+qualityControl <- function(countsData,conditions) {
+  ###################################################
+  ### code chunk number 1: Read and prepare data
+  ###################################################
+  countsData <- readAndPrepareData(countsData,conditions)
 
   ###################################################
-  ### code chunk number 3: fig_hclust_norm
+  ### code chunk number 2: fig_hclust_norm
   ###################################################
   plot(hclust(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))])),"ward"))
   par(ask=TRUE)
 
   ###################################################
-  ### code chunk number 4: replicates
+  ### code chunk number 3: replicates
   ###################################################
   heatmap(as.matrix(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))]))), margins = c(10,10))
 
   ###################################################
-  ### code chunk number 5: intra-group and inter-group-variance
+  ### code chunk number 4: intra-group and inter-group-variance
   ###################################################
   ## Mean and variance over all conditions and replicates (normalized counts!) 
   countsData$mn <- apply(countsData[ ,(dim+1):(dim+length(conds))], 1, mean)
@@ -111,7 +119,7 @@ qualityControl <- function(countsData,conditions) {
 
 
   ###################################################
-  ### code chunk number 6: intra-vs-inter
+  ### code chunk number 5: intra-vs-inter
   ###################################################
   plot( x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
   abline( a = 0, b = 1, col = 2, lty = 2, lwd = 2 )
@@ -121,46 +129,12 @@ qualityControl <- function(countsData,conditions) {
 diffExpressedEvents <- function(countsData,conditions) {
 
   ###################################################
-  ### code chunk number 1: Read data
+  ### code chunk number 1: Read and prepare data
   ###################################################
-  sortedconditions <- sort(conditions)
-  n <- length(unique(sortedconditions))
-  nr <- rle(sortedconditions)$lengths
-  sortedindex <- order(conditions)+2
-  namesData <- c("ID","Length",rep(NA,length(conditions)))
-  for (k in 1:nr[1]){
-    namesData[2+k] <- paste(sortedconditions[k],"_r",k,sep="",collapse="")
-  }
-  for (i in 2:n) {
-    for (j in 1:nr[n]) {
-      namesData[2+cumsum(nr)[n-1]+j] <- paste(sortedconditions[cumsum(nr)[n-1]+j],"_r",j,sep="",collapse="")
-    }
-  }
-  countsData[,-(1:2)] = countsData[,sortedindex]
-  colnames(countsData) <- namesData
-  options(warn=-1) # suppress the warning for the users
-  countsData$Path <- gl( 2, 1, dim(countsData)[1], labels = c("UP", "LP"))
+  countsData <- readAndPrepareData(countsData,conditions)
 
   ###################################################
-  ### code chunk number 2: Normalisation
-  ###################################################
-  # Normalisation with DESeq
-  conds <- c()
-  for( i in 1:n ) {
-    for( j in 1:nr[i] ) {
-      conds <- c( conds,paste( "Cond", i, sep = "",collapse = "") )
-    }
-  } 
-  cds <- newCountDataSet( countsData[ ,3:(3+length(conds)-1)], conds ) # create object
-  cdsSF <- estimateSizeFactors(cds)
-  sizeFactors( cdsSF )
-  shouldWeNormalise=sum(is.na(sizeFactors(cdsSF))) < 1
-  dim <- dim(countsData)[2]
-  countsData[ ,(dim+1):(dim+length(conds)) ] <- round(counts(cdsSF, normalized=shouldWeNormalise))
-  colnames(countsData)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
-
-  ###################################################
-  ### code chunk number 3: event-list
+  ### code chunk number 2: event-list
   ###################################################
   # reduce data frame to the interesting columns
   nbAll <- sum(nr)
@@ -188,7 +162,7 @@ diffExpressedEvents <- function(countsData,conditions) {
   allEventtables  <- apply(dataPart2,1,eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart2)))[1],endPosCol4Counts = ncol(dataPart2))
 
   ###################################################
-  ### code chunk number 4: DSS dispersion estimation
+  ### code chunk number 3: DSS dispersion estimation
   ###################################################
   dataNormCountsEvent <- as.matrix(dataPart2[ ,3:ncol(dataPart2)]) # the counts matrix
   colnames(dataNormCountsEvent) <- 1:ncol(dataNormCountsEvent)
@@ -204,7 +178,7 @@ diffExpressedEvents <- function(countsData,conditions) {
   dispDataMeanCond <- estDispersion(dispData)
 
   ###################################################
-  ### code chunk number 5: variance - mean - Event level1
+  ### code chunk number 4: variance - mean - Event level1
   ###################################################
   # compute mean and variance per Event (instead of per allele)
   event.mean.variance.df <- as.data.frame(cbind(apply(dataPart2[ ,which(grepl("_Norm",names(dataPart2)))],1,mean),apply(dataPart2[ ,which(grepl("_Norm",names(dataPart2)))],1,var)))
@@ -225,7 +199,7 @@ diffExpressedEvents <- function(countsData,conditions) {
   yNB <- x + 1/coef(nls.modelNB) * x^2
 
   ###################################################
-  ### code chunk number 6: Eventlevel3
+  ### code chunk number 5: Eventlevel3
   ###################################################
   plot(event.mean.variance.df$Mean, event.mean.variance.df$Variance, 
      xlab="Mean Event count", 
@@ -238,7 +212,7 @@ diffExpressedEvents <- function(countsData,conditions) {
    text.col=c(2,3,6), box.lty=0);
 
   ###################################################
-  ### code chunk number 7: function fitNBglmModelsDSSPhi
+  ### code chunk number 6: function fitNBglmModelsDSSPhi
   ###################################################
   fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, phiDSScond, phiGlobal){
     # S: simple, A: additive, I : interaction models
@@ -307,7 +281,7 @@ diffExpressedEvents <- function(countsData,conditions) {
   }
 
   ###################################################
-  ### code chunk number 8: pALLGlobalPhi.glm.nb
+  ### code chunk number 7: pALLGlobalPhi.glm.nb
   ###################################################
   pALLGlobalPhi.glm.nb=data.frame(t(rep(NA,44)))
   for (i in 1:length(allEventtables)) {
@@ -315,7 +289,7 @@ diffExpressedEvents <- function(countsData,conditions) {
   }
 
   ###################################################
-  ### code chunk number 9: excl_errors
+  ### code chunk number 8: excl_errors
   ###################################################
   nonsing.events = which(!grepl("Error",pALLGlobalPhi.glm.nb[ ,1]))
   pALLGlobalPhi.glm.nb.nonsing=data.frame(t(rep(NA,44)))
@@ -348,7 +322,7 @@ diffExpressedEvents <- function(countsData,conditions) {
   pALLGlobalPhi.glm.nb = pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[ ,1]), ]
 
   ###################################################
-  ### code chunk number 10: best model
+  ### code chunk number 9: best model
   ###################################################
   bestmodel.table.n = apply(pALLGlobalPhi.glm.nb[ ,c(11,14,17,20)],1,which.min)
   bestmodel.table = bestmodel.table.n
@@ -368,7 +342,7 @@ diffExpressedEvents <- function(countsData,conditions) {
   colnames(bestmodel3) = paste(colnames(bestmodel3), "Models")
 
   ###################################################
-  ### code chunk number 11: glmnet
+  ### code chunk number 10: glmnet
   ###################################################
 
   pALLGlobalPhi.glm.nb.glmnet = pALLGlobalPhi.glm.nb
@@ -386,7 +360,7 @@ diffExpressedEvents <- function(countsData,conditions) {
   }
 
   ###################################################
-  ### code chunk number 12: final_pval
+  ### code chunk number 11: final_pval
   ###################################################
 
   pALLGlobalPhi.glm.nb$final.pval.a.ia = 1
