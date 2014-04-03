@@ -3,14 +3,12 @@
 \title{Retrieve condition-specific variants in RNA-seq data.}
 \description{Retrieve condition-specific variants in RNA-seq data. 
 }
-\usage{diffExpressedEvents(n,nr,file)}
+\usage{diffExpressedEvents(countsData, conditions)}
 \arguments{
-	\item{n}{}
-	\item{nr}{}
-	\item{file}{}
+	\item{countsData}{a data.frame containing : in its first column, the lengths of the events, in the following columns, the counts corresponding to each pair of condition/replicate}
+	\item{conditions}{a character vector that gives the conditions, it has as much elements as there are pairs of condition/replicates}
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
 }
 \value{
 	code{diffExpressedEvents} returns a data.table with :
@@ -21,21 +19,18 @@
 	\item{Deltaf/DeltaPSI}{difference of relative abundance of variants across conditions}
 }
 \source{
-%%  ~~ reference to a publication or URL from which the data were obtained ~~
 }
 \author{
 }
 
 
 \references{
-%%  ~~ possibly secondary sources and usages ~~
 }
 % \examples{
+% conditions <- c("treated","treated","untreated","untreated")
+% file <- ("myresults.fa")
+% counts <- kissplice2counts(file)
+% events <- diffExpressedEvents(counts, conditions)
 
-% n<-2 # two biological conditions
-% m<-c(3,2) # three replicates for each condition
-% data.file<-"my_input_file.fa"
-% events<-diffExpressedEvents(n,m,data.file)
-
-% }
+% % }
 \keyword{}
