@@ -1,44 +1,4 @@
-kissplice2counts <- function(fileName) {
-	toConvert <- file(fileName, open = "r")
-	line <- readLines(toConvert)
-	index <- 1
-  indexNames <- 1
-	if (substr(line[index], start = 0, stop = 1) == '>') {
-		len <- length(strsplit(line[index], "|", fixed = TRUE)[[1]])-6
-	}
-  events.mat <- matrix(NA,length(line)/2,len+2)
-  events.names <- rep(NA,length(line)/2)
-  firstLineChar <- substr(line[index], start = 0, stop = 1)
-  if (firstLineChar == '>') {#checks if the line contains the header beginning with ">", not the sequence
-    while (index <= length(line)) {
-      nbCharLine <- length(strsplit(line[index],"|")[[1]]) # number of characters in the line
-      lineInfos <- substr(line[index],start = 2,stop =nbCharLine) #the line without ">" that we want to avoid
-      lineSplit <- strsplit(lineInfos, "|", fixed=TRUE)[[1]] # gets pieces of information separated by "|" in KisSplice format
-      #example of lineSplit :  
-      # lineSplit[1] : "bcc_3929"
-      #          [2] : "Cycle_0"
-      #          [3] : "Type_1"     
-      #          [4] : "upper_path_length_90" 
-      #          [5] : "C1_1" (first condition)
-      #          [5+len] : "Cn_5" (last condition)              
-      #          [5+len+1] : rank_0.90267" 
-      eventName <- paste(lineSplit[1],lineSplit[2],sep="_") # concatenates the two first elements of lineSplit, ie the event name
-      events.names[indexNames] <- eventName
-      lengthInfo <- lineSplit[4]
-      events.mat[indexNames,1] <- as.numeric(strsplit(lengthInfo,"_")[[1]][4]) #fills the first column of the matrix with length info
-      lineCounts <- lineSplit[5:(5+len)] # gets every condition of the line and its associated count
-      events.mat[indexNames,2:dim(events.mat)[2]] <- as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2])) #fills the matrix others columns with the counts of the conditions of the line 
-		index <- index + 2
-    indexNames <- indexNames + 1
-    }
-	}
-  class(events.mat) <- "numeric"
-  events.df <- as.data.frame(events.mat)
-  events.df <- data.frame(events.names,events.df)
-	return (events.df)
-}
-
-readAndPrepareData <- function(countsData,conditions) {
+.readAndPrepareData <- function(countsData,conditions) {
   ###################################################
   ### code chunk number 1: Read data
   ###################################################
@@ -78,13 +38,128 @@ readAndPrepareData <- function(countsData,conditions) {
   countsData[ ,(dim+1):(dim+length(conds)) ] <- round(counts(cdsSF, normalized=shouldWeNormalise))
   colnames(countsData)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
   return(countsData)
+}
+
+.eventtable <- function(df,startPosColumn4Counts, endPosCol4Counts){
+  eventTab = data.frame(ID=rep(as.factor(df['ID']), endPosCol4Counts-startPosColumn4Counts+1),
+  cond=as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts],"_"),FUN=function(d){d[2]}))),
+  counts=as.numeric(df[startPosColumn4Counts:endPosCol4Counts]),
+  path=as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts],"_"),FUN=function(d){d[1]}))),
+  row.names = NULL)
+  return(eventTab)
+}
+
+.fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, phiDSScond, phiGlobal){
+    # S: simple, A: additive, I : interaction models
+    # Poisson model  
+  nbglmS0 <- negbin(counts~cond, data=eventdata, random=~1, fixpar=list(3,0))
+  nbglmA0 <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4,0))
+  nbglmI0 <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5,0))  
+
+  nbAnov0 <- anova(nbglmS0, nbglmA0, nbglmI0)
+  nbAIC0 <- c(AIC(nbglmS0,k = log(nbAll))@istats$AIC, AIC(nbglmA0,k = log(nbAll))@istats$AIC, AIC(nbglmI0,k = log(nbAll))@istats$AIC)
+    # singular.hessian:  true when fitting provided a singular hessian, indicating an overparamaterized model.
+  nbSingHes0 <- c(nbglmS0@singular.hessian, nbglmA0@singular.hessian, nbglmI0@singular.hessian)
+    # code: ‘code’ An integer (returned by ‘optim’) indicating why the optimization process terminated.
+  nbCode0 <- c(nbglmS0@code, nbglmA0@code, nbglmI0@code)  
+  
+    # binomial negative model, with global phi
+  nbglmSgb <- negbin(counts~cond, data=eventdata, random=~1, fixpar=list(3,phiGlobal))
+  nbglmAgb <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4,phiGlobal))
+  nbglmIgb <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5,phiGlobal)) 
+  
+  nbAnovgb <- anova(nbglmSgb, nbglmAgb, nbglmIgb)
+  nbAICgb <- c(AIC(nbglmSgb,k = log(nbAll))@istats$AIC, AIC(nbglmAgb,k = log(nbAll))@istats$AIC, AIC(nbglmIgb,k = log(nbAll))@istats$AIC)
+    # the BIC in fact, since we use k = log(nobs)
+  nbSingHesgb <- c(nbglmSgb@singular.hessian, nbglmAgb@singular.hessian, nbglmIgb@singular.hessian)
+  nbCodegb <- c(nbglmSgb@code, nbglmAgb@code, nbglmIgb@code)
+    
+    # binomial negative model, with phi DSS
+  nbglmS <- negbin(counts~cond, data=eventdata, random=~1, fixpar=list(3, phiDSS))
+  nbglmA <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4, phiDSS))
+  nbglmI <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5, phiDSS))
+  
+  nbAnov <- anova(nbglmS, nbglmA, nbglmI)
+  nbAIC <- c(AIC(nbglmS,k = log(nbAll))@istats$AIC, AIC(nbglmA,k = log(nbAll))@istats$AIC, AIC(nbglmI,k = log(nbAll))@istats$AIC)
+  nbSingHes <- c(nbglmS@singular.hessian, nbglmA@singular.hessian, nbglmI@singular.hessian)
+  nbCode <- c(nbglmS@code, nbglmA@code, nbglmI@code)
+  
+    # binomial negative model, with phi DSS, conditionally to the expression mean  
+  nbglmScond <- negbin(counts~cond, data=eventdata, random=~1, fixpar=list(3, phiDSScond))
+  nbglmAcond <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4, phiDSScond))
+  nbglmIcond <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5, phiDSScond))
+
+  nbAnovcond <- anova(nbglmScond, nbglmAcond, nbglmIcond)
+  nbAICcond <- c(AIC(nbglmScond,k = log(nbAll))@istats$AIC, AIC(nbglmAcond,k = log(nbAll))@istats$AIC, AIC(nbglmIcond,k = log(nbAll))@istats$AIC)
+  nbSingHescond <- c(nbglmScond@singular.hessian, nbglmAcond@singular.hessian, nbglmIcond@singular.hessian) 
+  nbCodecond <- c(nbglmScond@code, nbglmAcond@code, nbglmIcond@code) 
+  
+  rslts <- c(nbAnov0@anova.table$'P(> Chi2)'[2:3],
+  nbAnovgb@anova.table$'P(> Chi2)'[2:3],
+  nbAnov@anova.table$'P(> Chi2)'[2:3],
+  nbAnovcond@anova.table$'P(> Chi2)'[2:3],
+             nbAIC0,
+             nbAICgb, 
+             nbAIC,
+             nbAICcond,
+             
+             nbCode0,
+             nbCodegb,
+             nbCode,
+             nbCodecond,
+             
+             nbSingHes0,
+             nbSingHesgb,
+             nbSingHes,
+             nbSingHescond)
+  return(rslts)  
+}
+
+kissplice2counts <- function(fileName) {
+  toConvert <- file(fileName, open = "r")
+  line <- readLines(toConvert)
+  index <- 1
+  indexNames <- 1
+  if (substr(line[index], start = 0, stop = 1) == '>') {
+    len <- length(strsplit(line[index], "|", fixed = TRUE)[[1]])-6
   }
+  events.mat <- matrix(NA,length(line)/2,len+2)
+  events.names <- rep(NA,length(line)/2)
+  firstLineChar <- substr(line[index], start = 0, stop = 1)
+  if (firstLineChar == '>') {#checks if the line contains the header beginning with ">", not the sequence
+    while (index <= length(line)) {
+      nbCharLine <- length(strsplit(line[index],"|")[[1]]) # number of characters in the line
+      lineInfos <- substr(line[index],start = 2,stop =nbCharLine) #the line without ">" that we want to avoid
+      lineSplit <- strsplit(lineInfos, "|", fixed=TRUE)[[1]] # gets pieces of information separated by "|" in KisSplice format
+      #example of lineSplit :  
+      # lineSplit[1] : "bcc_3929"
+      #          [2] : "Cycle_0"
+      #          [3] : "Type_1"     
+      #          [4] : "upper_path_length_90" 
+      #          [5] : "C1_1" (first condition)
+      #          [5+len] : "Cn_5" (last condition)              
+      #          [5+len+1] : rank_0.90267" 
+      eventName <- paste(lineSplit[1],lineSplit[2],sep="_") # concatenates the two first elements of lineSplit, ie the event name
+      events.names[indexNames] <- eventName
+      lengthInfo <- lineSplit[4]
+      events.mat[indexNames,1] <- as.numeric(strsplit(lengthInfo,"_")[[1]][4]) #fills the first column of the matrix with length info
+      lineCounts <- lineSplit[5:(5+len)] # gets every condition of the line and its associated count
+      events.mat[indexNames,2:dim(events.mat)[2]] <- as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2])) #fills the matrix others columns with the counts of the conditions of the line 
+    index <- index + 2
+    indexNames <- indexNames + 1
+    }
+  }
+  class(events.mat) <- "numeric"
+  events.df <- as.data.frame(events.mat)
+  events.df <- data.frame(events.names,events.df)
+  return (events.df)
+}
 
 qualityControl <- function(countsData,conditions) {
   ###################################################
   ### code chunk number 1: Read and prepare data
   ###################################################
-  countsData <- readAndPrepareData(countsData,conditions)
+  countsData <- .readAndPrepareData(countsData,conditions)
 
   ###################################################
   ### code chunk number 2: fig_hclust_norm
@@ -117,13 +192,11 @@ qualityControl <- function(countsData,conditions) {
   countsData$varC2 <- apply( countsData[ ,((dim+1)+nr[1]):(dim+nr[2]+nr[1])], 1, var )
   countsData$varIntra <- apply( data.frame(countsData$varC1, countsData$varC2), 1, mean )
 
-
   ###################################################
   ### code chunk number 5: intra-vs-inter
   ###################################################
   plot( x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
   abline( a = 0, b = 1, col = 2, lty = 2, lwd = 2 )
-  #dev.off()
 }
 
 diffExpressedEvents <- function(countsData,conditions) {
@@ -149,17 +222,8 @@ diffExpressedEvents <- function(countsData,conditions) {
   }
   rownames(dataPart2)=as.character(dataPart2[ ,1])
 
-  eventtable <- function(df,startPosColumn4Counts, endPosCol4Counts){
-    eventTab = data.frame(ID=rep(as.factor(df['ID']), endPosCol4Counts-startPosColumn4Counts+1),
-    cond=as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts],"_"),FUN=function(d){d[2]}))),
-    counts=as.numeric(df[startPosColumn4Counts:endPosCol4Counts]),
-    path=as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts],"_"),FUN=function(d){d[1]}))),
-    row.names = NULL)
-    return(eventTab)
-  }
-
   # create list for the complete data set
-  allEventtables  <- apply(dataPart2,1,eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart2)))[1],endPosCol4Counts = ncol(dataPart2))
+  allEventtables  <- apply(dataPart2,1,.eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart2)))[1],endPosCol4Counts = ncol(dataPart2))
 
   ###################################################
   ### code chunk number 3: DSS dispersion estimation
@@ -212,84 +276,15 @@ diffExpressedEvents <- function(countsData,conditions) {
    text.col=c(2,3,6), box.lty=0);
 
   ###################################################
-  ### code chunk number 6: function fitNBglmModelsDSSPhi
-  ###################################################
-  fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, phiDSScond, phiGlobal){
-    # S: simple, A: additive, I : interaction models
-    # modèle de Poisson   
-    nbglmS0 <- negbin(counts~cond, data=eventdata, random=~1, fixpar=list(3,0))
-    nbglmA0 <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4,0))
-    nbglmI0 <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5,0))  
-
-    nbAnov0 <- anova(nbglmS0, nbglmA0, nbglmI0)
-    nbAIC0 <- c(AIC(nbglmS0,k = log(nbAll))@istats$AIC, AIC(nbglmA0,k = log(nbAll))@istats$AIC, AIC(nbglmI0,k = log(nbAll))@istats$AIC)
-    # singular.hessian:  true when fitting provided a singular hessian, indicating an overparamaterized model.
-    nbSingHes0 <- c(nbglmS0@singular.hessian, nbglmA0@singular.hessian, nbglmI0@singular.hessian)
-    # code: ‘code’ An integer (returned by ‘optim’) indicating why the optimization process terminated.
-    nbCode0 <- c(nbglmS0@code, nbglmA0@code, nbglmI0@code)  
-  
-    # modèle binomial négatif, avec un phi global
-    nbglmSgb <- negbin(counts~cond, data=eventdata, random=~1, fixpar=list(3,phiGlobal))
-    nbglmAgb <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4,phiGlobal))
-    nbglmIgb <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5,phiGlobal))	
-  
-    nbAnovgb <- anova(nbglmSgb, nbglmAgb, nbglmIgb)
-    nbAICgb <- c(AIC(nbglmSgb,k = log(nbAll))@istats$AIC, AIC(nbglmAgb,k = log(nbAll))@istats$AIC, AIC(nbglmIgb,k = log(nbAll))@istats$AIC)
-    # the BIC in fact, since we use k = log(nobs)
-    nbSingHesgb <- c(nbglmSgb@singular.hessian, nbglmAgb@singular.hessian, nbglmIgb@singular.hessian)
-    nbCodegb <- c(nbglmSgb@code, nbglmAgb@code, nbglmIgb@code)
-  	
-    # modèle binomial négatif, avec un phi DSS
-    nbglmS <- negbin(counts~cond, data=eventdata, random=~1, fixpar=list(3, phiDSS))
-    nbglmA <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4, phiDSS))
-    nbglmI <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5, phiDSS))
-  
-    nbAnov <- anova(nbglmS, nbglmA, nbglmI)
-    nbAIC <- c(AIC(nbglmS,k = log(nbAll))@istats$AIC, AIC(nbglmA,k = log(nbAll))@istats$AIC, AIC(nbglmI,k = log(nbAll))@istats$AIC)
-    nbSingHes <- c(nbglmS@singular.hessian, nbglmA@singular.hessian, nbglmI@singular.hessian)
-    nbCode <- c(nbglmS@code, nbglmA@code, nbglmI@code)
-  
-    # modèle binomial négatif, avec un phi DDS, conditionnellement par rapport à la moyenne d'expression  
-    nbglmScond <- negbin(counts~cond, data=eventdata, random=~1, fixpar=list(3, phiDSScond))
-    nbglmAcond <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4, phiDSScond))
-    nbglmIcond <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5, phiDSScond))
-
-    nbAnovcond <- anova(nbglmScond, nbglmAcond, nbglmIcond)
-    nbAICcond <- c(AIC(nbglmScond,k = log(nbAll))@istats$AIC, AIC(nbglmAcond,k = log(nbAll))@istats$AIC, AIC(nbglmIcond,k = log(nbAll))@istats$AIC)
-    nbSingHescond <- c(nbglmScond@singular.hessian, nbglmAcond@singular.hessian, nbglmIcond@singular.hessian) 
-    nbCodecond <- c(nbglmScond@code, nbglmAcond@code, nbglmIcond@code) 
-  
-    rslts <- c(nbAnov0@anova.table$'P(> Chi2)'[2:3],
-    nbAnovgb@anova.table$'P(> Chi2)'[2:3],
-    nbAnov@anova.table$'P(> Chi2)'[2:3],
-    nbAnovcond@anova.table$'P(> Chi2)'[2:3],
-             nbAIC0,
-             nbAICgb, 
-             nbAIC,
-             nbAICcond,
-             
-             nbCode0,
-             nbCodegb,
-             nbCode,
-             nbCodecond,
-             
-             nbSingHes0,
-             nbSingHesgb,
-             nbSingHes,
-             nbSingHescond)
-    return(rslts)  
-  }
-
-  ###################################################
-  ### code chunk number 7: pALLGlobalPhi.glm.nb
+  ### code chunk number 6: pALLGlobalPhi.glm.nb
   ###################################################
   pALLGlobalPhi.glm.nb=data.frame(t(rep(NA,44)))
   for (i in 1:length(allEventtables)) {
-    pALLGlobalPhi.glm.nb[i, ] = try(fitNBglmModelsDSSPhi(allEventtables[[i]],dispersion(dispData)[i],dispersion(dispDataMeanCond)[i], phi) ,silent=T)
+    pALLGlobalPhi.glm.nb[i, ] = try(.fitNBglmModelsDSSPhi(allEventtables[[i]],dispersion(dispData)[i],dispersion(dispDataMeanCond)[i], phi) ,silent=T)
   }
 
   ###################################################
-  ### code chunk number 8: excl_errors
+  ### code chunk number 7: excl_errors
   ###################################################
   nonsing.events = which(!grepl("Error",pALLGlobalPhi.glm.nb[ ,1]))
   pALLGlobalPhi.glm.nb.nonsing=data.frame(t(rep(NA,44)))
@@ -322,7 +317,7 @@ diffExpressedEvents <- function(countsData,conditions) {
   pALLGlobalPhi.glm.nb = pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[ ,1]), ]
 
   ###################################################
-  ### code chunk number 9: best model
+  ### code chunk number 10: best model
   ###################################################
   bestmodel.table.n = apply(pALLGlobalPhi.glm.nb[ ,c(11,14,17,20)],1,which.min)
   bestmodel.table = bestmodel.table.n
@@ -342,7 +337,7 @@ diffExpressedEvents <- function(countsData,conditions) {
   colnames(bestmodel3) = paste(colnames(bestmodel3), "Models")
 
   ###################################################
-  ### code chunk number 10: glmnet
+  ### code chunk number 11: glmnet
   ###################################################
 
   pALLGlobalPhi.glm.nb.glmnet = pALLGlobalPhi.glm.nb
@@ -360,23 +355,22 @@ diffExpressedEvents <- function(countsData,conditions) {
   }
 
   ###################################################
-  ### code chunk number 11: final_pval
   ###################################################
 
   pALLGlobalPhi.glm.nb$final.pval.a.ia = 1
-  i <- 1 #modèle de Poisson
+  i <- 1 #Poisson model
 	li.singhes <- which(apply(pALLGlobalPhi.glm.nb[ ,c(11,14,17,20)],1,which.min)==i)
 	pALLGlobalPhi.glm.nb$final.pval.a.ia[li.singhes] = pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[li.singhes]
 	
-  i  <- 2 # modèle binomial négatif, avec un phi global
+  i  <- 2 # negative binomial model, with global phi
 	li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(11,14,17,20)],1,which.min)==i & apply(pALLGlobalPhi.glm.nb[ ,c(35,38,41,44)],1,sum)==0)
 	pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,4]
 	
-  i  <- 3 # modèle binomial négatif, avec les phi estimés avec DSS
+  i  <- 3 # negative binomial model, phi estimated with DSS
 	li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(11,14,17,20)],1,which.min)==i & apply(pALLGlobalPhi.glm.nb[ ,c(35,38,41,44)],1,sum)==0)
 	pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,6]
 
-  i  <- 4 # modèle binomial négatif, avec les phi estimés avec DSS, conditionnellement à la moyenne de l'expression
+  i  <- 4 # negative binomial model, phi estimated with DSS, conditionally to the expression mean
 	li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(11,14,17,20)],1,which.min)==i & apply(pALLGlobalPhi.glm.nb[ ,c(35,38,41,44)],1,sum)==0)
 	pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,8]
 	
@@ -438,5 +432,3 @@ diffExpressedEvents <- function(countsData,conditions) {
   return(signifEvents.sorted)
 
 }
-
-
