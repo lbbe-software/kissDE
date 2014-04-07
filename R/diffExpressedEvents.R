@@ -37,7 +37,7 @@
   dim <- dim(countsData)[2]
   countsData[ ,(dim+1):(dim+length(conds)) ] <- round(counts(cdsSF, normalized=shouldWeNormalise))
   colnames(countsData)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
-  return(countsData)
+  return(list(countsData, conds, dim, n, nr, sortedconditions))
 }
 
 .eventtable <- function(df,startPosColumn4Counts, endPosCol4Counts){
@@ -49,7 +49,7 @@
   return(eventTab)
 }
 
-.fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, phiDSScond, phiGlobal){
+.fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, phiDSScond, phiGlobal, nbAll){
     # S: simple, A: additive, I : interaction models
     # Poisson model  
   nbglmS0 <- negbin(counts~cond, data=eventdata, random=~1, fixpar=list(3,0))
@@ -156,10 +156,16 @@ kissplice2counts <- function(fileName) {
 }
 
 qualityControl <- function(countsData,conditions) {
+
   ###################################################
   ### code chunk number 1: Read and prepare data
   ###################################################
-  countsData <- .readAndPrepareData(countsData,conditions)
+  list_Data <-.readAndPrepareData(countsData,conditions)
+  countsData <- list_Data[[1]]
+  conds <- list_Data[[2]]
+  dim <- list_Data[[3]]
+  n <- list_Data[[4]]
+  nr <- list_Data[[5]]
 
   ###################################################
   ### code chunk number 2: fig_hclust_norm
@@ -204,11 +210,15 @@ diffExpressedEvents <- function(countsData,conditions) {
   ###################################################
   ### code chunk number 1: Read and prepare data
   ###################################################
-  countsData <- readAndPrepareData(countsData,conditions)
+  list_Data <-.readAndPrepareData(countsData,conditions)
+  countsData <- list_Data[[1]]
+  n <- list_Data[[4]]
+  nr <- list_Data[[5]]
+  sortedconditions <- list_Data[[6]]
 
-  ###################################################
-  ### code chunk number 2: event-list
-  ###################################################
+  ##################################################
+  ## code chunk number 2: event-list
+  ##################################################
   # reduce data frame to the interesting columns
   nbAll <- sum(nr)
   dataPart <- countsData[ ,c(1:2,which(grepl("_Norm",names(countsData)))) ] # -> when not want to filter data 
@@ -280,7 +290,7 @@ diffExpressedEvents <- function(countsData,conditions) {
   ###################################################
   pALLGlobalPhi.glm.nb=data.frame(t(rep(NA,44)))
   for (i in 1:length(allEventtables)) {
-    pALLGlobalPhi.glm.nb[i, ] = try(.fitNBglmModelsDSSPhi(allEventtables[[i]],dispersion(dispData)[i],dispersion(dispDataMeanCond)[i], phi) ,silent=T)
+    pALLGlobalPhi.glm.nb[i, ] = try(.fitNBglmModelsDSSPhi(allEventtables[[i]],dispersion(dispData)[i],dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
   }
 
   ###################################################
