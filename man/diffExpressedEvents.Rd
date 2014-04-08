@@ -5,7 +5,7 @@
 }
 \usage{diffExpressedEvents(countsData, conditions)}
 \arguments{
-	\item{countsData}{a data.frame containing : in its first column, the lengths of the events, in the following columns, the counts corresponding to each pair of condition/replicate}
+	\item{countsData}{a data.frame containing : in its first column the names of the events, in its second column the lengths of the events, in the following columns, the counts corresponding to each pair of condition/replicate}
 	\item{conditions}{a character vector that gives the conditions, it has as much elements as there are pairs of condition/replicates}
 }
 \details{
