@@ -386,7 +386,7 @@ diffExpressedVariants <- function(countsData,conditions) {
 	
   pALLGlobalPhi.glm.nb$final.padj.a.ia <- p.adjust(pALLGlobalPhi.glm.nb$final.pval.a.ia, method="fdr")
 
-  signifEvents <- cbind(dataPart2[nonsing.events, ],pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= 0.05, ]
+  signifVariants <- cbind(dataPart2[nonsing.events, ],pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= 0.05, ]
   # sorting by deltaPSI / deltaF
   finalDelta <- NA
   #1st condition
@@ -394,7 +394,7 @@ diffExpressedVariants <- function(countsData,conditions) {
   for (j1 in 1:nr[1]) {
     nameUp <- paste('UP_',sortedconditions[j1], '_r', j1, '_Norm', sep='')
     nameLow <- paste('LP_', sortedconditions[j1],'_r', j1, '_Norm', sep='') 
-    tmp.psi <- signifEvents[, nameUp] / (signifEvents[,nameUp] + signifEvents[ ,nameLow])
+    tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
     PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
     PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm = T)
     for (k1 in (2:n)) { # = 2nd condition
@@ -402,7 +402,7 @@ diffExpressedVariants <- function(countsData,conditions) {
       for (l in (1:nr[n])) {
         nameUp <- paste('UP_',sortedconditions[cumsum(nr)[n-1]+l], '_r', l, '_Norm', sep='')
         nameLow <- paste('LP_', sortedconditions[cumsum(nr)[n-1]+l],'_r', l, '_Norm', sep='') 
-        tmp.psi <- signifEvents[, nameUp] / (signifEvents[,nameUp] + signifEvents[ ,nameLow])
+        tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
         PSI.replicat2 <- cbind( PSI.replicat2, tmp.psi)
       }
       PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm = T)
@@ -417,7 +417,7 @@ diffExpressedVariants <- function(countsData,conditions) {
     for (k2 in (1:nr[n-1])) {
       nameUp <- paste('UP_',sortedconditions[cumsum(nr)[n-1]+k2], '_r', k2, '_Norm', sep='')
       nameLow <- paste('LP_', sortedconditions[cumsum(nr)[n-1]+k2],'_r', k2, '_Norm', sep='') 
-      tmp.psi <- signifEvents[, nameUp] / (signifEvents[,nameUp] + signifEvents[ ,nameLow])
+      tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
       PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
     }
     PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm = T)
@@ -426,7 +426,7 @@ diffExpressedVariants <- function(countsData,conditions) {
       for (l in 1:nr[n]) {
         nameUp <- paste('UP_',sortedconditions[cumsum(nr)[n-1]+l], '_r', l, '_Norm', sep='')
         nameLow <- paste('LP_', sortedconditions[cumsum(nr)[n-1]+l],'_r', l, '_Norm', sep='') 
-        tmp.psi <- signifEvents[, nameUp] / (signifEvents[,nameUp] + signifEvents[ ,nameLow])
+        tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
         PSI.replicat2 <- cbind( PSI.replicat2, tmp.psi)
       }
       PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm = T)
@@ -436,8 +436,9 @@ diffExpressedVariants <- function(countsData,conditions) {
     }
   }
 
-  signifEvents <- cbind(signifEvents, finalDelta)# adding DeltaPsi/f to the final table
-  colnames(signifEvents)[length(colnames(signifEvents))] <- 'Deltaf/DeltaPSI'# renaming last columns
-  signifEvents.sorted <- signifEvents[ order( finalDelta, decreasing = T), ]
-  return(signifEvents.sorted)
+  signifVariants <- cbind(signifVariants, finalDelta)# adding DeltaPsi/f to the final table
+  colnames(signifVariants)[length(colnames(signifVariants))] <- 'Deltaf/DeltaPSI'# renaming last columns
+  colnames(signifVariants)[length(colnames(signifVariants))-1] <- 'Adjusted pvalue'# renaming last columns
+  signifVariants.sorted <- signifVariants[ order( finalDelta, decreasing = T), ]
+  return(signifVariants.sorted)
 }
