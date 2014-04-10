@@ -205,7 +205,7 @@ qualityControl <- function(countsData,conditions) {
   abline( a = 0, b = 1, col = 2, lty = 2, lwd = 2 )
 }
 
-diffExpressedEvents <- function(countsData,conditions) {
+diffExpressedVariants <- function(countsData,conditions) {
 
   ###################################################
   ### code chunk number 1: Read and prepare data
@@ -440,5 +440,4 @@ diffExpressedEvents <- function(countsData,conditions) {
   colnames(signifEvents)[length(colnames(signifEvents))] <- 'Deltaf/DeltaPSI'# renaming last columns
   signifEvents.sorted <- signifEvents[ order( finalDelta, decreasing = T), ]
   return(signifEvents.sorted)
-
 }
