@@ -17,7 +17,6 @@
   }
   countsData[,-(1:2)] = countsData[,sortedindex]
   colnames(countsData) <- namesData
-  options(warn=-1) # suppress the warning for the users
   countsData$Path <- gl( 2, 1, dim(countsData)[1], labels = c("UP", "LP"))
 
   ###################################################
@@ -155,7 +154,19 @@ kissplice2counts <- function(fileName) {
   return (events.df)
 }
 
-qualityControl <- function(countsData,conditions) {
+qualityControl <- function(countsData,conditions,storeFigs=FALSE) {
+  options(warn=-1) # suppress the warning for the users
+  if (!storeFigs){
+    storeFigs <- FALSE
+  }
+  if (storeFigs == TRUE){
+    d<-system("find -type d -name Figures", TRUE)
+    if (length(d) == 0) {
+      system("mkdir Figures")
+        } else if (d != "./Figures") {
+          system("mkdir Figures") 
+        }
+  }
 
   ###################################################
   ### code chunk number 1: Read and prepare data
@@ -170,13 +181,29 @@ qualityControl <- function(countsData,conditions) {
   ###################################################
   ### code chunk number 2: fig_hclust_norm
   ###################################################
-  plot(hclust(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))])),"ward"))
-  par(ask=TRUE)
+  if (storeFigs == FALSE) {
+    plot(hclust(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))])),"ward"))
+    par(ask=TRUE)
+    } else {
+        png(filename="Figures/dendrogram.png")
+        plot(hclust(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))])),"ward"))
+        dev.off()
+    }
+  
+
 
   ###################################################
   ### code chunk number 3: replicates
   ###################################################
-  heatmap(as.matrix(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))]))), margins = c(10,10))
+  if (storeFigs == FALSE) {
+    heatmap(as.matrix(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))]))), margins = c(10,10))
+    } else {
+        png(filename="Figures/heatmap.png")
+        heatmap(as.matrix(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))]))), margins = c(10,10))
+        dev.off()
+    }
+
+  
 
   ###################################################
   ### code chunk number 4: intra-group and inter-group-variance
@@ -201,12 +228,19 @@ qualityControl <- function(countsData,conditions) {
   ###################################################
   ### code chunk number 5: intra-vs-inter
   ###################################################
-  plot( x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
-  abline( a = 0, b = 1, col = 2, lty = 2, lwd = 2 )
+  if (storeFigs == FALSE) {
+      plot( x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
+      abline( a = 0, b = 1, col = 2, lty = 2, lwd = 2 )
+    } else {
+        png(filename="Figures/varInterIntra.png")
+        plot( x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
+        abline( a = 0, b = 1, col = 2, lty = 2, lwd = 2 )
+        dev.off()
+    }
 }
 
-diffExpressedVariants <- function(countsData,conditions) {
-
+diffExpressedVariants <- function(countsData, conditions) {
+  options(warn=-1) # suppress the warning for the users
   ###################################################
   ### code chunk number 1: Read and prepare data
   ###################################################
@@ -278,14 +312,15 @@ diffExpressedVariants <- function(countsData,conditions) {
   ### code chunk number 5: Eventlevel3
   ###################################################
   plot(event.mean.variance.df$Mean, event.mean.variance.df$Variance, 
-     xlab="Mean Event count", 
-     ylab="Variance Event count",
-     log="xy", las=1)
+    xlab="Mean Event count", 
+    ylab="Variance Event count",
+    log="xy", las=1)
   abline(a=0, b=1, col=2, lwd=2)
   lines(x,yQP,col=3, lwd=2)
   lines(x,yNB,col=6, lwd=2)
   legend("topleft", c("Poisson","Quasi-Poisson", "Negative Binomial"), 
-   text.col=c(2,3,6), box.lty=0);
+    text.col=c(2,3,6), box.lty=0);
+  
 
   ###################################################
   ### code chunk number 6: pALLGlobalPhi.glm.nb
