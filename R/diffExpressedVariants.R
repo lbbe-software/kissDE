@@ -12,7 +12,7 @@
   }
   for (i in 2:n) {
     for (j in 1:nr[n]) {
-      namesData[2+cumsum(nr)[n-1]+j] <- paste(sortedconditions[cumsum(nr)[n-1]+j],"_r",j,sep="",collapse="")
+      namesData[2+cumsum(nr)[i-1]+j] <- paste(sortedconditions[cumsum(nr)[i-1]+j],"_r",j,sep="",collapse="")
     }
   }
   countsData[,-(1:2)] = countsData[,sortedindex]
@@ -452,8 +452,8 @@ diffExpressedVariants <- function(countsData, conditions) {
     #1st condition
     PSI.replicat1 <- c()
     for (k2 in (1:nr[n-1])) {
-      nameUp <- paste('UP_',sortedconditions[cumsum(nr)[n-1]+k2], '_r', k2, '_Norm', sep='')
-      nameLow <- paste('LP_', sortedconditions[cumsum(nr)[n-1]+k2],'_r', k2, '_Norm', sep='') 
+      nameUp <- paste('UP_',sortedconditions[cumsum(nr)[i-1]+k2], '_r', k2, '_Norm', sep='')
+      nameLow <- paste('LP_', sortedconditions[cumsum(nr)[i-1]+k2],'_r', k2, '_Norm', sep='') 
       tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
       PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
     }
@@ -461,8 +461,8 @@ diffExpressedVariants <- function(countsData, conditions) {
     for (k3 in (i+1):n) {
       PSI.replicat2 <- c()
       for (l in 1:nr[n]) {
-        nameUp <- paste('UP_',sortedconditions[cumsum(nr)[n-1]+l], '_r', l, '_Norm', sep='')
-        nameLow <- paste('LP_', sortedconditions[cumsum(nr)[n-1]+l],'_r', l, '_Norm', sep='') 
+        nameUp <- paste('UP_',sortedconditions[cumsum(nr)[k3-1]+l], '_r', l, '_Norm', sep='')
+        nameLow <- paste('LP_', sortedconditions[cumsum(nr)[k3-1]+l],'_r', l, '_Norm', sep='') 
         tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
         PSI.replicat2 <- cbind( PSI.replicat2, tmp.psi)
       }
