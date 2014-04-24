@@ -343,7 +343,7 @@ diffExpressedVariants <- function(countsData, conditions) {
   #   j=j+1
   # }
   # pALLGlobalPhi.glm.nb=pALLGlobalPhi.glm.nb.nonsing
-  sing.events <- which(grepl("Error",pALLGlobalPhi.glm.nb[ ,1]))
+  sing.events <- which(grepl("Error",pALLGlobalPhi.glm.nb[ , 1]))
   if (length(sing.events) != 0) {
       pALLGlobalPhi <- pALLGlobalPhi[ - sing.events, ]
   }
@@ -366,8 +366,12 @@ diffExpressedVariants <- function(countsData, conditions) {
                                     "(gb)shS","(gb)shA","(gb)shI", 
                                     "shS","shA","shI",
                                     "(c)shS","(c)shA","(c)shI")
-  rownames(pALLGlobalPhi.glm.nb) <- dataPart2[nonsing.events,1]
-  pALLGlobalPhi.glm.nb = pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[ ,1]), ]
+  if (length(sing.events) != 0) {
+    rownames(pALLGlobalPhi.glm.nb) <- dataPart2[ - sing.events, 1]
+  } else {
+    rownames(pALLGlobalPhi.glm.nb) <- dataPart2[ , 1]
+  }
+  pALLGlobalPhi.glm.nb = pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[ , 1]), ]
 
   ###################################################
   ### code chunk number 10: best model
@@ -426,8 +430,11 @@ diffExpressedVariants <- function(countsData, conditions) {
 	pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,8]
 	
   pALLGlobalPhi.glm.nb$final.padj.a.ia <- p.adjust(pALLGlobalPhi.glm.nb$final.pval.a.ia, method="fdr")
-
-  signifVariants <- cbind(dataPart2[nonsing.events, ],pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= 0.05, ]
+  if (length(sing.events) != 0) {
+    signifVariants <- cbind(dataPart2[ - sing.events, ],pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= 0.05, ]
+  } else {
+    signifVariants <- cbind(dataPart2, pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= 0.05, ]
+  }
   # sorting by deltaPSI / deltaF
   finalDelta <- NA
   #1st condition
