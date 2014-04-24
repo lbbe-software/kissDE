@@ -151,6 +151,13 @@ kissplice2counts <- function(fileName) {
   class(events.mat) <- "numeric"
   events.df <- as.data.frame(events.mat)
   events.df <- data.frame(events.names,events.df)
+
+  # lignesUp <- which (events.df[3]>10000)
+  # lignesUp <- c(lignesUp, lignesUp+1)
+  # lignesUp <- unique(lignesUp[order(lignesUp, decreasing=TRUE)])
+  # events.df2 <- events.df[-lignesUp]
+  # return (events.df2)
+
   return (events.df)
 }
 
@@ -189,8 +196,6 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE) {
         plot(hclust(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))])),"ward"))
         dev.off()
     }
-  
-
 
   ###################################################
   ### code chunk number 3: replicates
@@ -203,8 +208,6 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE) {
         dev.off()
     }
 
-  
-
   ###################################################
   ### code chunk number 4: intra-group and inter-group-variance
   ###################################################
@@ -215,8 +218,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE) {
   nbAll <- sum(nr) # number of all observations in all groups
   countsData$ct  <- apply(countsData[ ,(dim+1):(dim+length(conds))], 1, sum)^2/nbAll
   ## sum of squares between groups
-  countsData$ss <- apply(countsData[ ,(dim+1):(dim+length(conds)/n)],1,sum)^2/nr[1] + 
-  apply(countsData[ ,((dim+1)+length(conds)/n):(dim+length(conds))],1,sum)^2/nr[2] 
+  countsData$ss <- apply(countsData[ ,(dim+1):(dim+length(conds)/n)],1,sum)^2/nr[1] + apply(countsData[ ,((dim+1)+length(conds)/n):(dim+length(conds))],1,sum)^2/nr[2] 
   ## substract the correction term from the SS and divide by the degrees of 
   df <- 1 # freedom(groups); here: df=2-1=1
   countsData$varInter <- (countsData$ss - countsData$ct)/df
@@ -333,14 +335,18 @@ diffExpressedVariants <- function(countsData, conditions) {
   ###################################################
   ### code chunk number 7: excl_errors
   ###################################################
-  nonsing.events = which(!grepl("Error",pALLGlobalPhi.glm.nb[ ,1]))
-  pALLGlobalPhi.glm.nb.nonsing=data.frame(t(rep(NA,44)))
-  j=1
-  for (i in nonsing.events) {
-    pALLGlobalPhi.glm.nb.nonsing[j, ] = as.numeric(pALLGlobalPhi.glm.nb[i, ])
-    j=j+1
+  # nonsing.events = which(!grepl("Error",pALLGlobalPhi.glm.nb[ ,1]))
+  # pALLGlobalPhi.glm.nb.nonsing=data.frame(t(rep(NA,44)))
+  # j=1
+  # for (i in nonsing.events) {
+  #   pALLGlobalPhi.glm.nb.nonsing[j, ] = as.numeric(pALLGlobalPhi.glm.nb[i, ])
+  #   j=j+1
+  # }
+  # pALLGlobalPhi.glm.nb=pALLGlobalPhi.glm.nb.nonsing
+  sing.events <- which(grepl("Error",pALLGlobalPhi.glm.nb[ ,1]))
+  if (length(sing.events) != 0) {
+      pALLGlobalPhi <- pALLGlobalPhi[ - sing.events, ]
   }
-  pALLGlobalPhi.glm.nb=pALLGlobalPhi.glm.nb.nonsing
   colnames(pALLGlobalPhi.glm.nb) <- c("(0)A vs S","(0)I vs A",
                                     "(gb)A vs S","(gb)I vs A",
                                     "A vs S","I vs A",
@@ -386,11 +392,10 @@ diffExpressedVariants <- function(countsData, conditions) {
   ###################################################
   ### code chunk number 11: glmnet
   ###################################################
-
   pALLGlobalPhi.glm.nb.glmnet = pALLGlobalPhi.glm.nb
   pALLGlobalPhi.glm.nb.glmnet$glmnet.pval = 1
   pALLGlobalPhi.glm.nb.glmnet$glmnet.code = 0
-  singhes0 = which(apply(pALLGlobalPhi.glm.nb[ ,c(11,14,17,20)],1,which.min) == 1)# Event pour lesquels le modèle poissonien est plus adapté
+  singhes0 = which(apply(pALLGlobalPhi.glm.nb[ ,c(11,14,17,20)],1,which.min) == 1)# Variants for which the Poisson model is better
   for (i in singhes0) {
     Xinter   = model.matrix(~cond*path,data= allEventtables[[which(rownames(dataPart2)==rownames(pALLGlobalPhi.glm.nb)[i])]]); 
     outinter = glmnet(Xinter,allEventtables[[which(rownames(dataPart2)==rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
@@ -403,7 +408,6 @@ diffExpressedVariants <- function(countsData, conditions) {
 
   ###################################################
   ###################################################
-
   pALLGlobalPhi.glm.nb$final.pval.a.ia = 1
   i <- 1 #Poisson model
 	li.singhes <- which(apply(pALLGlobalPhi.glm.nb[ ,c(11,14,17,20)],1,which.min)==i)
@@ -448,30 +452,35 @@ diffExpressedVariants <- function(countsData, conditions) {
       finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN = 1, max, na.rm = T)
     }
   }
-  for (i in 2:(n-1)) {
+
+  if (n > 2) {
+    for (i in 2:(n-1)) {
     #1st condition
-    PSI.replicat1 <- c()
-    for (k2 in (1:nr[n-1])) {
-      nameUp <- paste('UP_',sortedconditions[cumsum(nr)[i-1]+k2], '_r', k2, '_Norm', sep='')
-      nameLow <- paste('LP_', sortedconditions[cumsum(nr)[i-1]+k2],'_r', k2, '_Norm', sep='') 
-      tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
-      PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
-    }
-    PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm = T)
-    for (k3 in (i+1):n) {
-      PSI.replicat2 <- c()
-      for (l in 1:nr[n]) {
-        nameUp <- paste('UP_',sortedconditions[cumsum(nr)[k3-1]+l], '_r', l, '_Norm', sep='')
-        nameLow <- paste('LP_', sortedconditions[cumsum(nr)[k3-1]+l],'_r', l, '_Norm', sep='') 
+      PSI.replicat1 <- c()
+      for (k2 in (1:nr[n-1])) {    
+        nameUp <- paste('UP_',sortedconditions[cumsum(nr)[i-1]+k2], '_r', k2, '_Norm', sep='')
+        print(nameUp)
+        nameLow <- paste('LP_', sortedconditions[cumsum(nr)[i-1]+k2],'_r', k2, '_Norm', sep='') 
         tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
-        PSI.replicat2 <- cbind( PSI.replicat2, tmp.psi)
+        PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
       }
-      PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm = T)
-      # deltaPSI for cond i,j
-      deltaPSIij <- abs( PSIcondJ- PSIcondI ) 
-      finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN = 1, max, na.rm = T)
+      PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm = T)
+      for (k3 in (i+1):n) {
+        PSI.replicat2 <- c()
+        for (l in 1:nr[n]) {
+          nameUp <- paste('UP_',sortedconditions[cumsum(nr)[k3-1]+l], '_r', l, '_Norm', sep='')
+          nameLow <- paste('LP_', sortedconditions[cumsum(nr)[k3-1]+l],'_r', l, '_Norm', sep='') 
+          tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
+          PSI.replicat2 <- cbind( PSI.replicat2, tmp.psi)
+        }
+        PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm = T)
+        # deltaPSI for cond i,j
+        deltaPSIij <- abs( PSIcondJ- PSIcondI ) 
+        finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN = 1, max, na.rm = T)
+      }
     }
   }
+  
 
   signifVariants <- cbind(signifVariants, finalDelta)# adding DeltaPsi/f to the final table
   colnames(signifVariants)[length(colnames(signifVariants))] <- 'Deltaf/DeltaPSI'# renaming last columns
