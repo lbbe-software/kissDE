@@ -1,3 +1,69 @@
+.countsSet <- function(lines, counts, indexStart) {
+  beginning_lineToWrite <- ""
+  splitElements <- strsplit(lines, "|", fixed=TRUE)[[1]] # splits the line
+  if (indexStart == 6) {
+    for (k in 1:(indexStart-2)) {
+    beginning_lineToWrite <- paste (beginning_lineToWrite, splitElements[k], sep="|") #writes the firsts elements of the line : bcc, cycle... but NOT branching_nodes
+    }
+  } else {
+    for (k in 1:(indexStart-1)) {
+    beginning_lineToWrite <- paste (beginning_lineToWrite, splitElements[k], sep="|") #writes the firsts elements of the line : bcc, cycle... 
+    }
+  }
+  ending_lineToWrite <- paste(splitElements[length(splitElements)], sep="") #writes the rank
+  ElementsNb <- length(splitElements) #number of elements in the line
+  splitCounts <- splitElements[indexStart : (length(splitElements) - 1)] # avoids the name of the bcc ... and the rank (last one) to get only the counts
+  s <- sapply(splitCounts, function(splitCounts) regmatches(splitCounts[[1]], gregexpr(pattern = "[0-9]+",splitCounts[[1]]))) #gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
+  nbVec <- rep(0, length(s))
+  countsVec <- rep(0, length(s))
+  for (i in 1:length(s)) {
+    nbVec[i] <- as.numeric(s[[i]][1])
+    countsVec[i] <- as.numeric(s[[i]][2])
+    if ( grepl("ASSB", names(s)[i]) == TRUE) { #so that counts on ASSB junction are not counted twice.
+      countsVec[i] <- - countsVec[i]
+    }
+  }
+
+  d <- data.frame(nbVec,countsVec)
+  names(d) <- c("NB", "COUNTS")
+  sums <- aggregate(d$COUNTS, by=list(d$NB), sum) #sums the counts for each junction that belongs to the same event
+  d2 <- data.frame(counts, sums)
+  names(d2)[3] <- 'sums'
+  sums2 <- aggregate(d2$sums, by=list(d2$counts), sum) #sums the counts for each condition given
+  lineToWrite <- ""
+  for (j in 1:(dim(sums2)[1]-1)) {
+    lineToWrite <- paste(lineToWrite, sums2[[1]][j], "_", sums2[[2]][j], "|", sep="")
+  }
+  j <- j+1
+  lineToWrite <- paste(lineToWrite, sums2[[1]][j], "_", sums2[[2]][j], sep="")
+  lineToWrite <- paste(beginning_lineToWrite, lineToWrite, ending_lineToWrite, sep="|")
+  lineToWrite <- substr(lineToWrite, start=2, stop=nchar(lineToWrite))
+  return(lineToWrite)
+}
+
+.replaceCounts <- function(fileIn, counts) {
+  lines <- readLines(fileIn)
+  index <- 1
+  firstLineChar <- substr(lines[index], start = 0, stop = 1)
+  if (grepl("branching_nodes", lines[index])) {
+    indexStart <- 6
+  } else {
+    indexStart <- 5
+  }
+  lineToWrite <- c()
+  if (firstLineChar == '>') {
+    while (index <= length(lines)) {
+      if (index%%2 == 1) {
+      lineToWrite <- c(lineToWrite, .countsSet(lines[index], counts, indexStart))
+    } else {
+      lineToWrite <- c(lineToWrite, lines[index])
+    }
+    index <- index + 1
+    }
+  }
+  return(lineToWrite)
+}
+
 .readAndPrepareData <- function(countsData,conditions) {
   ###################################################
   ### code chunk number 1: Read data
@@ -114,9 +180,19 @@
   return(rslts)  
 }
 
-kissplice2counts <- function(fileName) {
+kissplice2counts <- function(fileName, counts=FALSE, countsWanted=NULL) {
+
   toConvert <- file(fileName, open = "r")
-  line <- readLines(toConvert)
+  if (counts == TRUE){
+    if ((! is.null(countsWanted)) & (is.vector(countsWanted))) {
+        line <- .replaceCounts(toConvert, countsWanted)
+      } else {
+        print('Error in kissplice2counts : countsWanted must be an non empty vector.')
+      }
+  } else {
+    line <- readLines(toConvert)
+  }
+
   index <- 1
   indexNames <- 1
   if (substr(line[index], start = 0, stop = 1) == '>') {
@@ -163,9 +239,7 @@ kissplice2counts <- function(fileName) {
 
 qualityControl <- function(countsData,conditions,storeFigs=FALSE) {
   options(warn=-1) # suppress the warning for the users
-  if (!storeFigs){
-    storeFigs <- FALSE
-  }
+
   if (storeFigs == TRUE){
     d<-system("find -type d -name Figures", TRUE)
     if (length(d) == 0) {
@@ -241,7 +315,16 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE) {
     }
 }
 
-diffExpressedVariants <- function(countsData, conditions) {
+diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE) {
+  if (storeFigs == TRUE){
+    d<-system("find -type d -name Figures", TRUE)
+    if (length(d) == 0) {
+      system("mkdir Figures")
+        } else if (d != "./Figures") {
+          system("mkdir Figures") 
+        }
+  }
+
   options(warn=-1) # suppress the warning for the users
   ###################################################
   ### code chunk number 1: Read and prepare data
@@ -313,16 +396,29 @@ diffExpressedVariants <- function(countsData, conditions) {
   ###################################################
   ### code chunk number 5: Eventlevel3
   ###################################################
-  plot(event.mean.variance.df$Mean, event.mean.variance.df$Variance, 
+  if (storeFigs == FALSE) {
+    plot(event.mean.variance.df$Mean, event.mean.variance.df$Variance, 
     xlab="Mean Event count", 
     ylab="Variance Event count",
     log="xy", las=1)
-  abline(a=0, b=1, col=2, lwd=2)
-  lines(x,yQP,col=3, lwd=2)
-  lines(x,yNB,col=6, lwd=2)
-  legend("topleft", c("Poisson","Quasi-Poisson", "Negative Binomial"), 
+    abline(a=0, b=1, col=2, lwd=2)
+    lines(x,yQP,col=3, lwd=2)
+    lines(x,yNB,col=6, lwd=2)
+    legend("topleft", c("Poisson","Quasi-Poisson", "Negative Binomial"), 
     text.col=c(2,3,6), box.lty=0);
-  
+    } else {
+        png(filename="Figures/models.png")
+        plot(event.mean.variance.df$Mean, event.mean.variance.df$Variance, 
+        xlab="Mean Event count", 
+        ylab="Variance Event count",
+        log="xy", las=1)
+        abline(a=0, b=1, col=2, lwd=2)
+        lines(x,yQP,col=3, lwd=2)
+        lines(x,yNB,col=6, lwd=2)
+        legend("topleft", c("Poisson","Quasi-Poisson", "Negative Binomial"), 
+        text.col=c(2,3,6), box.lty=0);
+        dev.off()
+    }
 
   ###################################################
   ### code chunk number 6: pALLGlobalPhi.glm.nb

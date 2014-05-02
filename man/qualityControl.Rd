@@ -9,7 +9,7 @@ qualityControl(countsData, conditions, storeFigs=FALSE)
 \arguments{
     \item{countsData}{a data.frame containing : in its first column, the lengths of the events, in the following columns, the counts corresponding to each pair of condition/replicate}
     \item{conditions}{a character vector that gives the conditions, it has as much elements as there are pairs of condition/replicates}
-    \item{storeFigs}{if this function is needed to be used into an automatised worflow, setting this option to TRUE will create a Figures directory where plots are stored in .png format. By default (FALSE) the figures are plotted one at time when Enter is pressed. }
+    \item{storeFigs=FALSE}{if this function is needed to be used into an automatised worflow, setting this option to TRUE will create a Figures directory where plots are stored in .png format. By default (FALSE) the figures are plotted one at time when Enter is pressed. }
 }
 \details{
 }
