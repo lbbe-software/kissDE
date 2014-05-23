@@ -587,7 +587,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE) {
 
   signifVariants <- cbind(signifVariants, finalDelta)# adding DeltaPsi/f to the final table
   colnames(signifVariants)[length(colnames(signifVariants))] <- 'Deltaf/DeltaPSI'# renaming last columns
-  colnames(signifVariants)[length(colnames(signifVariants))-1] <- 'Adjusted pvalue'# renaming last columns
+  colnames(signifVariants)[length(colnames(signifVariants))-1] <- 'Adjusted_pvalue'# renaming last columns
   signifVariants.sorted <- signifVariants[ order( finalDelta, decreasing = T), ]
   return(signifVariants.sorted)
 }
