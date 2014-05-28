@@ -233,7 +233,7 @@ kissplice2counts <- function(fileName, counts=FALSE, countsWanted=NULL) {
   # lignesUp <- unique(lignesUp[order(lignesUp, decreasing=TRUE)])
   # events.df2 <- events.df[-lignesUp]
   # return (events.df2)
-
+  close(toConvert)
   return (events.df)
 }
 
@@ -315,7 +315,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE) {
     }
 }
 
-diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE) {
+diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalue=0.05) {
   if (storeFigs == TRUE){
     d<-system("find -type d -name Figures", TRUE)
     if (length(d) == 0) {
@@ -527,9 +527,9 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE) {
 	
   pALLGlobalPhi.glm.nb$final.padj.a.ia <- p.adjust(pALLGlobalPhi.glm.nb$final.pval.a.ia, method="fdr")
   if (length(sing.events) != 0) {
-    signifVariants <- cbind(dataPart2[ - sing.events, ],pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= 0.05, ]
+    signifVariants <- cbind(dataPart2[ - sing.events, ],pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
   } else {
-    signifVariants <- cbind(dataPart2, pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= 0.05, ]
+    signifVariants <- cbind(dataPart2, pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
   }
   # sorting by deltaPSI / deltaF
   finalDelta <- NA
