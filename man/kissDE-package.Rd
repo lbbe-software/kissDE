@@ -8,7 +8,7 @@
 \details{Main functions :
 diffExpressedVariants(countsData, conditions, storeFigs=FALSE, pvalue=0.05)
 qualityControl(countsData, conditions, storeFigs=FALSE)
-kissplice2counts(fileName, counts=FALSE, countsWanted=NULL)
+kissplice2counts(fileName, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE)
 \tabular{ll}{
 Package: \tab kissDE\cr
 Type: \tab Package\cr

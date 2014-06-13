@@ -1,4 +1,4 @@
-.countsSet <- function(lines, counts, indexStart) {
+.lineParse <- function(lines, indexStart) {
   beginning_lineToWrite <- ""
   splitElements <- strsplit(lines, "|", fixed=TRUE)[[1]] # splits the line
   if (indexStart == 6) {
@@ -14,34 +14,70 @@
   ElementsNb <- length(splitElements) #number of elements in the line
   splitCounts <- splitElements[indexStart : (length(splitElements) - 1)] # avoids the name of the bcc ... and the rank (last one) to get only the counts
   s <- sapply(splitCounts, function(splitCounts) regmatches(splitCounts[[1]], gregexpr(pattern = "[0-9]+",splitCounts[[1]]))) #gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
+  return(list(beginning_lineToWrite,s,ending_lineToWrite))
+}
+
+.countsSet <- function(lines, indexStart, counts=0, pairedEnd=FALSE, order=NULL) {
+  beginning_lineToWrite <- .lineParse(lines, indexStart)[[1]]
+  s <- .lineParse(lines, indexStart)[[2]] 
+  ending_lineToWrite <- .lineParse(lines, indexStart)[[3]]
+
   nbVec <- rep(0, length(s))
   countsVec <- rep(0, length(s))
   for (i in 1:length(s)) {
     nbVec[i] <- as.numeric(s[[i]][1])
     countsVec[i] <- as.numeric(s[[i]][2])
-    if ( grepl("ASSB", names(s)[i]) == TRUE) { #so that counts on ASSB junction are not counted twice.
-      countsVec[i] <- - countsVec[i]
+    if (counts == 2) {
+      if ( grepl("ASSB", names(s)[i]) == TRUE) { #so that counts on ASSB junction are not counted twice.
+        countsVec[i] <- - countsVec[i]
+      }
     }
   }
+  if (counts == 2) {
+    d <- data.frame(nbVec,countsVec)
+    names(d) <- c("NB", "COUNTS")
+    sums <- aggregate(d$COUNTS, by=list(d$NB), sum) #sums the counts for each junction that belongs to the same event
 
-  d <- data.frame(nbVec,countsVec)
-  names(d) <- c("NB", "COUNTS")
-  sums <- aggregate(d$COUNTS, by=list(d$NB), sum) #sums the counts for each junction that belongs to the same event
-  d2 <- data.frame(counts, sums)
-  names(d2)[3] <- 'sums'
-  sums2 <- aggregate(d2$sums, by=list(d2$counts), sum) #sums the counts for each condition given
+    if (pairedEnd == TRUE) {
+      if (is.null(order)) {
+        order <- rep(1:((dim(sums)[1])/2), rep(2,((dim(sums)[1])/2)))
+      } else {
+        if (! is.vector(order)) {
+          print("Error, order vector seems to be in a wrong format.")
+        }
+      }
+      d2 <- data.frame(order, sums)
+      dim(d2)
+      names(d2)[3] <- 'sums'
+      sums2 <- aggregate(d2$sums, by=list(d2$order), sum) # in case data is paired-end, there is one more sum to do, for each part of the pair
+      sums <- sums2
+    } 
+  } else { ### counts == FALSE
+    if (pairedEnd == TRUE) {
+      if (is.null(order)) {
+        order <- rep(1:(length(s)/2), rep(2,(length(s)/2))) # for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) (assuming data is ordered)
+      } else {
+        if (! is.vector(order)) {
+          print("Error, order vector seems to be in a wrong format.")
+        }
+      }
+      d <- data.frame(order,countsVec)
+      names(d) <- c("ORDER", "COUNTS")
+      sums <- aggregate(d$COUNTS, by=list(d$ORDER), sum)
+    }
+  }
   lineToWrite <- ""
-  for (j in 1:(dim(sums2)[1]-1)) {
-    lineToWrite <- paste(lineToWrite, sums2[[1]][j], "_", sums2[[2]][j], "|", sep="")
+  for (j in 1:(dim(sums)[1]-1)) {
+    lineToWrite <- paste(lineToWrite, sums[[1]][j], "_", sums[[2]][j], "|", sep="")
   }
   j <- j+1
-  lineToWrite <- paste(lineToWrite, sums2[[1]][j], "_", sums2[[2]][j], sep="")
+  lineToWrite <- paste(lineToWrite, sums[[1]][j], "_", sums[[2]][j], sep="")
   lineToWrite <- paste(beginning_lineToWrite, lineToWrite, ending_lineToWrite, sep="|")
-  lineToWrite <- substr(lineToWrite, start=2, stop=nchar(lineToWrite))
+  lineToWrite <- substr(lineToWrite, start=2, stop=nchar(lineToWrite)) # lineToWrite looks like ">bcc_XXXX|Cycle_Y|Type_1|upper_path_length_ZZ|1_0|2_47|3_1|4_13|rank_1.00000"
   return(lineToWrite)
 }
 
-.replaceCounts <- function(fileIn, counts) {
+.replaceCounts <- function(fileIn, counts=0, pairedEnd=FALSE, order=NULL) {
   lines <- readLines(fileIn)
   index <- 1
   firstLineChar <- substr(lines[index], start = 0, stop = 1)
@@ -54,7 +90,14 @@
   if (firstLineChar == '>') {
     while (index <= length(lines)) {
       if (index%%2 == 1) {
-      lineToWrite <- c(lineToWrite, .countsSet(lines[index], counts, indexStart))
+        if (counts > 0) {
+          lineToWrite <- c(lineToWrite, .countsSet(lines[index], indexStart, counts, pairedEnd, order))
+        } else {
+          if (pairedEnd == TRUE) {
+            lineToWrite <- c(lineToWrite, .countsSet(lines[index], indexStart, counts, pairedEnd, order))
+          }
+        }
+      
     } else {
       lineToWrite <- c(lineToWrite, lines[index])
     }
@@ -180,17 +223,14 @@
   return(rslts)  
 }
 
-kissplice2counts <- function(fileName, counts=FALSE, countsWanted=NULL) {
+kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, exonicReads =TRUE) {
 
   toConvert <- file(fileName, open = "r")
-  if (counts == TRUE){
-    if ((! is.null(countsWanted)) & (is.vector(countsWanted))) {
-        line <- .replaceCounts(toConvert, countsWanted)
-      } else {
-        print('Error in kissplice2counts : countsWanted must be an non empty vector.')
-      }
-  } else {
-    line <- readLines(toConvert)
+
+  if (pairedEnd == TRUE || counts > 0) {
+    line <- .replaceCounts(toConvert, counts, pairedEnd, order)
+    } else {
+      line <- readLines(toConvert)
   }
 
   index <- 1
@@ -227,12 +267,6 @@ kissplice2counts <- function(fileName, counts=FALSE, countsWanted=NULL) {
   class(events.mat) <- "numeric"
   events.df <- as.data.frame(events.mat)
   events.df <- data.frame(events.names,events.df)
-
-  # lignesUp <- which (events.df[3]>10000)
-  # lignesUp <- c(lignesUp, lignesUp+1)
-  # lignesUp <- unique(lignesUp[order(lignesUp, decreasing=TRUE)])
-  # events.df2 <- events.df[-lignesUp]
-  # return (events.df2)
   close(toConvert)
   return (events.df)
 }
@@ -562,7 +596,6 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
       PSI.replicat1 <- c()
       for (k2 in (1:nr[n-1])) {    
         nameUp <- paste('UP_',sortedconditions[cumsum(nr)[i-1]+k2], '_r', k2, '_Norm', sep='')
-        print(nameUp)
         nameLow <- paste('LP_', sortedconditions[cumsum(nr)[i-1]+k2],'_r', k2, '_Norm', sep='') 
         tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
         PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
