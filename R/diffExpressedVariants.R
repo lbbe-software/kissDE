@@ -27,18 +27,18 @@
   for (i in 1:length(s)) {
     nbVec[i] <- as.numeric(s[[i]][1])
     countsVec[i] <- as.numeric(s[[i]][2])
-    if (counts == 2) {
+    if (counts > 1) {
       if (grepl("ASSB", names(s)[i]) == TRUE) { #so that counts on ASSB junction are not counted twice.
         countsVec[i] <- - countsVec[i]
       }
-      if (exonicReads == FALSE) {
+      if ((counts == 2) & (exonicReads == FALSE) {
         if (grepl("^S[0-9]+", names(s)[i]) == TRUE) { #when exonic reads are not wanted we must discard reads counted in S_X
           countsVec[i] <- 0
         }
       }
     }
   }
-  if (counts == 2) {
+  if (counts > 1) {
     d <- data.frame(nbVec,countsVec)
     names(d) <- c("NB", "COUNTS")
     sums <- aggregate(d$COUNTS, by=list(d$NB), sum) #sums the counts for each junction that belongs to the same event
@@ -57,7 +57,7 @@
       sums2 <- aggregate(d2$sums, by=list(d2$order), sum) # in case data is paired-end, there is one more sum to do, for each part of the pair
       sums <- sums2
     } 
-  } else { ### counts == 0 or 1
+  } else { ### counts == 0 
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
         order <- rep(1:(length(s)/2), rep(2,(length(s)/2))) # for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) (assuming data is ordered)
@@ -95,7 +95,7 @@
   if (firstLineChar == '>') {
     while (index <= length(lines)) {
       if (index%%2 == 1) {
-        if (counts > 1) {
+        if (counts > 0) {
           lineToWrite <- c(lineToWrite, .countsSet(lines[index], indexStart, counts, pairedEnd, order, exonicReads))
         } else {
           if (pairedEnd == TRUE) {
