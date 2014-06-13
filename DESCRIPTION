@@ -1,7 +1,7 @@
 Package: kissDE
 Type: Package
 Title: kissDE retrieves condition-specific variants in RNA-seq data.
-Version: 1.0
+Version: 0.1
 Date: 2014-03-03
 Author: Lilia Brinza, Vincent Lacroix, Frank Picard, Vincent Miele and Camille Marchet
 Maintainer: Vincent Miele <vincent.miele@univ-lyon1.fr>, Camille Marchet <camille.marchet@inria.fr>

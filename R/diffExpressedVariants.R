@@ -17,7 +17,7 @@
   return(list(beginning_lineToWrite,s,ending_lineToWrite))
 }
 
-.countsSet <- function(lines, indexStart, counts=0, pairedEnd=FALSE, order=NULL) {
+.countsSet <- function(lines, indexStart, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE) {
   beginning_lineToWrite <- .lineParse(lines, indexStart)[[1]]
   s <- .lineParse(lines, indexStart)[[2]] 
   ending_lineToWrite <- .lineParse(lines, indexStart)[[3]]
@@ -28,8 +28,13 @@
     nbVec[i] <- as.numeric(s[[i]][1])
     countsVec[i] <- as.numeric(s[[i]][2])
     if (counts == 2) {
-      if ( grepl("ASSB", names(s)[i]) == TRUE) { #so that counts on ASSB junction are not counted twice.
+      if (grepl("ASSB", names(s)[i]) == TRUE) { #so that counts on ASSB junction are not counted twice.
         countsVec[i] <- - countsVec[i]
+      }
+      if (exonicReads == FALSE) {
+        if (grepl("^S[0-9]+", names(s)[i]) == TRUE) { #when exonic reads are not wanted we must discard reads counted in S_X
+          countsVec[i] <- 0
+        }
       }
     }
   }
@@ -52,7 +57,7 @@
       sums2 <- aggregate(d2$sums, by=list(d2$order), sum) # in case data is paired-end, there is one more sum to do, for each part of the pair
       sums <- sums2
     } 
-  } else { ### counts == FALSE
+  } else { ### counts == 0 or 1
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
         order <- rep(1:(length(s)/2), rep(2,(length(s)/2))) # for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) (assuming data is ordered)
@@ -77,7 +82,7 @@
   return(lineToWrite)
 }
 
-.replaceCounts <- function(fileIn, counts=0, pairedEnd=FALSE, order=NULL) {
+.replaceCounts <- function(fileIn, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE) {
   lines <- readLines(fileIn)
   index <- 1
   firstLineChar <- substr(lines[index], start = 0, stop = 1)
@@ -90,8 +95,8 @@
   if (firstLineChar == '>') {
     while (index <= length(lines)) {
       if (index%%2 == 1) {
-        if (counts > 0) {
-          lineToWrite <- c(lineToWrite, .countsSet(lines[index], indexStart, counts, pairedEnd, order))
+        if (counts > 1) {
+          lineToWrite <- c(lineToWrite, .countsSet(lines[index], indexStart, counts, pairedEnd, order, exonicReads))
         } else {
           if (pairedEnd == TRUE) {
             lineToWrite <- c(lineToWrite, .countsSet(lines[index], indexStart, counts, pairedEnd, order))
@@ -227,8 +232,8 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, ex
 
   toConvert <- file(fileName, open = "r")
 
-  if (pairedEnd == TRUE || counts > 0) {
-    line <- .replaceCounts(toConvert, counts, pairedEnd, order)
+  if (pairedEnd == TRUE || counts > 1) {
+    line <- .replaceCounts(toConvert, counts, pairedEnd, order, exonicReads)
     } else {
       line <- readLines(toConvert)
   }

@@ -17,7 +17,7 @@ kissplice2counts(fileName)
  -r first_set_pair1.fa -r first_set_pair2.fa -r second_set_pair1.fa -r second_set_pair2.fa
  the input is not organised as two sets of reads coming from the same pair (1 or 2) are not next to each other. The vector order to give would be :
  order=c("p1","p2","p1","p2").}
- \item{exonicReads=TRUE}{ if this option is turned to FALSE, exonic reads will no be taken into account in the counts. It is valid to use this function only if the counts option is at 1 or 2 as the information about junction and exonic reads is needed.}
+ \item{exonicReads=TRUE}{ if this option is turned to FALSE, exonic reads will no be taken into account in the counts. It is valid to use this function only if the counts option is at 2 as the information about junction and exonic reads is needed.}
 
 
 } 
