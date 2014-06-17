@@ -1,4 +1,4 @@
-install.packages("../kissDE_1.0.tar.gz")
+install.packages("../kissDE_0.1.tar.gz")
 library("kissDE")
 
 conditions <- c("C1","C1","C2","C2")
