@@ -1,26 +1,26 @@
 .lineParse <- function(lines, indexStart) {
-  beginning_lineToWrite <- ""
+  beginningLineToWrite <- ""
   splitElements <- strsplit(lines, "|", fixed=TRUE)[[1]] # splits the line
   if (indexStart == 6) {
     for (k in 1:(indexStart-2)) {
-    beginning_lineToWrite <- paste (beginning_lineToWrite, splitElements[k], sep="|") #writes the firsts elements of the line : bcc, cycle... but NOT branching_nodes
+    beginningLineToWrite <- paste (beginningLineToWrite, splitElements[k], sep="|") #writes the firsts elements of the line : bcc, cycle... but NOT branching_nodes
     }
   } else {
     for (k in 1:(indexStart-1)) {
-    beginning_lineToWrite <- paste (beginning_lineToWrite, splitElements[k], sep="|") #writes the firsts elements of the line : bcc, cycle... 
+    beginningLineToWrite <- paste (beginningLineToWrite, splitElements[k], sep="|") #writes the firsts elements of the line : bcc, cycle... 
     }
   }
-  ending_lineToWrite <- paste(splitElements[length(splitElements)], sep="") #writes the rank
+  endingLineToWrite <- paste(splitElements[length(splitElements)], sep="") #writes the rank
   ElementsNb <- length(splitElements) #number of elements in the line
   splitCounts <- splitElements[indexStart : (length(splitElements) - 1)] # avoids the name of the bcc ... and the rank (last one) to get only the counts
   s <- sapply(splitCounts, function(splitCounts) regmatches(splitCounts[[1]], gregexpr(pattern = "[0-9]+",splitCounts[[1]]))) #gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
-  return(list(beginning_lineToWrite,s,ending_lineToWrite))
+  return(list(beginningLineToWrite,s,endingLineToWrite))
 }
 
 .countsSet <- function(lines, indexStart, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE) {
-  beginning_lineToWrite <- .lineParse(lines, indexStart)[[1]]
+  beginningLineToWrite <- .lineParse(lines, indexStart)[[1]]
   s <- .lineParse(lines, indexStart)[[2]] 
-  ending_lineToWrite <- .lineParse(lines, indexStart)[[3]]
+  endingLineToWrite <- .lineParse(lines, indexStart)[[3]]
 
   nbVec <- rep(0, length(s))
   countsVec <- rep(0, length(s))
@@ -77,7 +77,7 @@
   }
   j <- j+1
   lineToWrite <- paste(lineToWrite, sums[[1]][j], "_", sums[[2]][j], sep="")
-  lineToWrite <- paste(beginning_lineToWrite, lineToWrite, ending_lineToWrite, sep="|")
+  lineToWrite <- paste(beginningLineToWrite, lineToWrite, endingLineToWrite, sep="|")
   lineToWrite <- substr(lineToWrite, start=2, stop=nchar(lineToWrite)) # lineToWrite looks like ">bcc_XXXX|Cycle_Y|Type_1|upper_path_length_ZZ|1_0|2_47|3_1|4_13|rank_1.00000"
   return(lineToWrite)
 }
@@ -287,15 +287,15 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE) {
   ###################################################
   ### code chunk number 1: Read and prepare data
   ###################################################
-  list_Data <-.readAndPrepareData(countsData,conditions)
-  countsData <- list_Data[[1]]
-  conds <- list_Data[[2]]
-  dim <- list_Data[[3]]
-  n <- list_Data[[4]]
-  nr <- list_Data[[5]]
+  listData <-.readAndPrepareData(countsData,conditions)
+  countsData <- listData[[1]]
+  conds <- listData[[2]]
+  dim <- listData[[3]]
+  n <- listData[[4]]
+  nr <- listData[[5]]
 
   ###################################################
-  ### code chunk number 2: fig_hclust_norm
+  ### code chunk number 2: dendrogram
   ###################################################
   if (storeFigs == FALSE) {
     plot(hclust(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))])),"ward"))
@@ -364,11 +364,11 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
   ###################################################
   ### code chunk number 1: Read and prepare data
   ###################################################
-  list_Data <-.readAndPrepareData(countsData,conditions)
-  countsData <- list_Data[[1]]
-  n <- list_Data[[4]]
-  nr <- list_Data[[5]]
-  sortedconditions <- list_Data[[6]]
+  listData <-.readAndPrepareData(countsData,conditions)
+  countsData <- listData[[1]]
+  n <- listData[[4]]
+  nr <- listData[[5]]
+  sortedconditions <- listData[[6]]
 
   ##################################################
   ## code chunk number 2: event-list
@@ -416,14 +416,10 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
   rownames(event.mean.variance.df) <- as.character(dataPart2[ ,1])
   # estimate the dispersion parameter D of the Quasi-Poisson distribution
   lm.D <- lm(event.mean.variance.df$Variance ~ event.mean.variance.df$Mean-1)
-  # coef(lm.D)
   ## estimate the overdispersion parameter theta of the NB distritution
   modelNB <- Variance ~ Mean + 1/theta * Mean^2
   nls.modelNB <- nls(modelNB, data=event.mean.variance.df, start=list(theta=100))
-  # coef(nls.modelNB)
   phi <- 1/coef(nls.modelNB) # to be used as fixed parameter later on
-  #compute model fit
-  # log plot, so exclude 0 from the x values
 
   ###################################################
   ### code chunk number 5: plot models
@@ -431,7 +427,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
 
   #compute model fit
   # log plot, so exclude 0 from the x values
-  x <- c(seq(0.1,1,0.1), seq(2,5000,1) )
+  x <- c(seq(0.1,1,0.1),seq(2,5000,1))
   yQP <- x*coef(lm.D)
   yNB <- x + 1/coef(nls.modelNB) * x^2
 
@@ -504,10 +500,10 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
   ###################################################
   bestmodel.table.n = apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min)
   bestmodel.table = bestmodel.table.n
-  bestmodel.table[bestmodel.table==1]="Poisson"
-  bestmodel.table[bestmodel.table==2]="NB, global phi"
-  bestmodel.table[bestmodel.table==3]="NB, DSS phi"
-  bestmodel.table[bestmodel.table==4]="NB, cond DSS phi"
+  bestmodel.table[bestmodel.table == 1] = "Poisson"
+  bestmodel.table[bestmodel.table == 2] = "NB, global phi"
+  bestmodel.table[bestmodel.table == 3] = "NB, DSS phi"
+  bestmodel.table[bestmodel.table == 4] = "NB, cond DSS phi"
   bestmodel.singhes = c()
   for (i in 1:length(bestmodel.table.n)) {
     bestmodel.singhes[i] = c(pALLGlobalPhi.glm.nb[i,c(22,24,26,28)])[bestmodel.table.n[i]]
@@ -527,10 +523,10 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
   pALLGlobalPhi.glm.nb.glmnet$glmnet.code = 0
   singhes0 = which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == 1)# Variants for which the Poisson model is better
   for (i in singhes0) {
-    Xinter   = model.matrix(~cond*path,data= allEventtables[[which(rownames(dataPart2)==rownames(pALLGlobalPhi.glm.nb)[i])]]); 
-    outinter = glmnet(Xinter,allEventtables[[which(rownames(dataPart2)==rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
-    Xprinc   = model.matrix(~path+cond,data= allEventtables[[which(rownames(dataPart2)==rownames(pALLGlobalPhi.glm.nb)[i])]]); 
-    outprinc = glmnet(Xprinc,allEventtables[[which(rownames(dataPart2)==rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
+    Xinter   = model.matrix(~cond*path,data= allEventtables[[which(rownames(dataPart2) == rownames(pALLGlobalPhi.glm.nb)[i])]]); 
+    outinter = glmnet(Xinter,allEventtables[[which(rownames(dataPart2) == rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
+    Xprinc   = model.matrix(~path+cond,data= allEventtables[[which(rownames(dataPart2) == rownames(pALLGlobalPhi.glm.nb)[i])]]); 
+    outprinc = glmnet(Xprinc,allEventtables[[which(rownames(dataPart2) == rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
     Pv       = 1-pchisq(deviance(outprinc) - deviance(outinter),df=1)
     pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[i] = Pv
     pALLGlobalPhi.glm.nb.glmnet$glmnet.code[i] = outinter$jerr
@@ -540,19 +536,19 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
   ###################################################
   pALLGlobalPhi.glm.nb$final.pval.a.ia = 1
   i <- 1 #Poisson model
-  li.singhes <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min)==i)
+  li.singhes <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i)
   pALLGlobalPhi.glm.nb$final.pval.a.ia[li.singhes] = pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[li.singhes]
   
   i  <- 2 # negative binomial model, with global phi
-  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min)==i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum)==0)
+  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) == 0)
   pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,4]
   
   i  <- 3 # negative binomial model, phi estimated with DSS
-  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min)==i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum)==0)
+  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) == 0)
   pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,6]
 
   i  <- 4 # negative binomial model, phi estimated with DSS, conditionally to the expression mean
-  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min)==i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum)==0)
+  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) == 0)
   pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,8]
   
   pALLGlobalPhi.glm.nb$final.padj.a.ia <- p.adjust(pALLGlobalPhi.glm.nb$final.pval.a.ia, method="fdr")
@@ -570,7 +566,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
     nameLow <- paste('LP_', sortedconditions[j1],'_r', j1, '_Norm', sep='') 
     tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
     PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
-    PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm = T)
+    PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm=T)
     for (k1 in (2:n)) { # = 2nd condition
       PSI.replicat2 <- c()
       for (l in (1:nr[n])) {
@@ -579,10 +575,10 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
         tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
         PSI.replicat2 <- cbind( PSI.replicat2, tmp.psi)
       }
-      PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm = T)
+      PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm=T)
       #deltaPSI for cond i,j
       deltaPSIij <- abs( PSIcondJ- PSIcondI ) 
-      finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN = 1, max, na.rm = T)
+      finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN=1, max, na.rm=T)
     }
   }
 
@@ -596,7 +592,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
         tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
         PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
       }
-      PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm = T)
+      PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm=T)
       for (k3 in (i+1):n) {
         PSI.replicat2 <- c()
         for (l in 1:nr[n]) {
@@ -605,10 +601,10 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
           tmp.psi <- signifVariants[, nameUp] / (signifVariants[,nameUp] + signifVariants[ ,nameLow])
           PSI.replicat2 <- cbind( PSI.replicat2, tmp.psi)
         }
-        PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm = T)
+        PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm=T)
         # deltaPSI for cond i,j
         deltaPSIij <- abs( PSIcondJ- PSIcondI ) 
-        finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN = 1, max, na.rm = T)
+        finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN=1, max, na.rm=T)
       }
     }
   }
@@ -617,6 +613,6 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
   signifVariants <- cbind(signifVariants, finalDelta)# adding DeltaPsi/f to the final table
   colnames(signifVariants)[length(colnames(signifVariants))] <- 'Deltaf/DeltaPSI'# renaming last columns
   colnames(signifVariants)[length(colnames(signifVariants))-1] <- 'Adjusted_pvalue'# renaming last columns
-  signifVariants.sorted <- signifVariants[ order( finalDelta, decreasing = T), ]
+  signifVariants.sorted <- signifVariants[order( finalDelta, decreasing=T), ]
   return(signifVariants.sorted)
 }
