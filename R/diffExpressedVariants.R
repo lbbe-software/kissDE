@@ -467,7 +467,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
   ###################################################
   sing.events <- which(grepl("Error",pALLGlobalPhi.glm.nb[ , 1]))
   if (length(sing.events) != 0) {
-      pALLGlobalPhi <- pALLGlobalPhi[ - sing.events, ]
+      pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[ - sing.events, ]
   }
   colnames(pALLGlobalPhi.glm.nb) <- c("(0)I vs A",
                                     "(gb)I vs A",
