@@ -577,7 +577,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
       }
       PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm=T)
       #deltaPSI for cond i,j
-      deltaPSIij <- abs( PSIcondJ- PSIcondI ) 
+      deltaPSIij <- PSIcondJ - PSIcondI  
       finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN=1, max, na.rm=T)
     }
   }
@@ -603,7 +603,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
         }
         PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm=T)
         # deltaPSI for cond i,j
-        deltaPSIij <- abs( PSIcondJ- PSIcondI ) 
+        deltaPSIij <- PSIcondJ - PSIcondI 
         finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN=1, max, na.rm=T)
       }
     }

@@ -18,7 +18,7 @@
 	\item{Length}{the size of the first variant}
 	\item{UP_Condn_Rm_Norm}{(resp LP_Condn_Rm_Norm) returns the normalised counts for the first variant (UP, resp. second variant : LP), for the condition n (Condn) and the replicate m (Rm)}
 	\item{pALLGlobalPhi.glm}{adjusted pvalue}
-	\item{Deltaf/DeltaPSI}{difference of relative abundance of variants across conditions}
+	\item{Deltaf/DeltaPSI}{difference of relative abundance of variants across conditions. For instance if there are 2 conditions, deltaPsi returns relative abudance in condition 2 - relative abundance in condition 1.}
 }
 \source{
 }
