@@ -614,5 +614,18 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
   colnames(signifVariants)[length(colnames(signifVariants))] <- 'Deltaf/DeltaPSI'# renaming last columns
   colnames(signifVariants)[length(colnames(signifVariants))-1] <- 'Adjusted_pvalue'# renaming last columns
   signifVariants.sorted <- signifVariants[order( finalDelta, decreasing=T), ]
+
+  lowcounts <- c()
+  dim1 <- dim(signifVariants.sorted)[1]
+  dim2 <- dim(signifVariants.sorted)[2]
+  for (i in 1:dim1) {
+    if ( length(which(grepl('TRUE',signifVariants.sorted[i,3:dim2-2] < 5))) == 0 ){
+      lowcounts <- rbind(lowcounts, 1) 
+    } else {
+      lowcounts <- rbind(lowcounts, 0)
+    }
+  }
+  signifVariants.sorted <- cbind(signifVariants.sorted, lowcounts)
+  colnames(signifVariants.sorted)[dim2+1] <- 'Low_counts'
   return(signifVariants.sorted)
 }
