@@ -12,8 +12,8 @@ kissplice2counts(fileName, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TR
 \tabular{ll}{
 Package: \tab kissDE\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2014-03-03\cr
+Version: \tab 0.2.0\cr
+Date: \tab 2014-09-01\cr
 License: \tab GPL\cr
 }
 }
