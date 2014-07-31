@@ -82,6 +82,13 @@
   return(lineToWrite)
 }
 
+.addOneCount <- function(df)
+{
+  df$counts <- unlist(lapply(df[,'counts'],function(x){x+1}))
+  return (df)
+}
+
+
 .replaceCounts <- function(fileIn, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE) {
   lines <- readLines(fileIn)
   index <- 1
@@ -532,8 +539,26 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
     pALLGlobalPhi.glm.nb.glmnet$glmnet.code[i] = outinter$jerr
   }
 
+
+  #############################################################################################################
+  ### test : pseudo-count for event with singular hessian for which the best model is not the Poisson model ###
+  #############################################################################################################
+  singhes = which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) > 1 & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) != 0)
+  singhes_n = names(singhes) 
+
+  pALLGlobalPhi.glm.nb.pen = pALLGlobalPhi.glm.nb
+  for(i in singhes){
+    pALLGlobalPhi.glm.nb.pen[i, ] = try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
+                                                            dispersion(dispData)[i],
+                                                            dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
+  }
+  
+  singhes2 = which(apply(pALLGlobalPhi.glm.nb.pen[ ,c(6,8,10,12)],1,which.min) > 1 & apply(pALLGlobalPhi.glm.nb.pen[ ,c(22,24,26,28)],1,sum) != 0)
+
   ###################################################
   ###################################################
+
+
   pALLGlobalPhi.glm.nb$final.pval.a.ia = 1
   i <- 1 #Poisson model
   li.singhes <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i)
@@ -542,14 +567,20 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
   i  <- 2 # negative binomial model, with global phi
   li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) == 0)
   pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,2]
-  
+  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) != 0)
+  pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li,2]
+
   i  <- 3 # negative binomial model, phi estimated with DSS
   li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) == 0)
   pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,3]
+  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) != 0)
+  pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li,3]
 
   i  <- 4 # negative binomial model, phi estimated with DSS, conditionally to the expression mean
   li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) == 0)
   pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,4]
+  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) != 0)
+  pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li,4]
   
   pALLGlobalPhi.glm.nb$final.padj.a.ia <- p.adjust(pALLGlobalPhi.glm.nb$final.pval.a.ia, method="fdr")
   if (length(sing.events) != 0) {
