@@ -676,7 +676,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
   dim1 <- dim(signifVariants.sorted)[1]
   dim2 <- dim(signifVariants.sorted)[2]
   for (i in 1:dim1) {
-    if ( length(which(grepl('TRUE',signifVariants.sorted[i,3:dim2-2] < 5))) > 0 ){
+    if ( length(which(grepl('TRUE',signifVariants.sorted[i,3:(dim2-2)] < 5))) > 0 ){
       lowcounts <- rbind(lowcounts, 1) 
     } else {
       lowcounts <- rbind(lowcounts, 0)
