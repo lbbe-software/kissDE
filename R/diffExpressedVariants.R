@@ -541,7 +541,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
 
 
   #############################################################################################################
-  ### test : pseudo-count for event with singular hessian for which the best model is not the Poisson model ###
+  ### Pseudo-count for event with singular hessian for which the best model is not the Poisson model ###
   #############################################################################################################
   singhes = which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) > 1 & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) != 0)
   singhes_n = names(singhes) 
@@ -672,17 +672,44 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
   colnames(signifVariants)[length(colnames(signifVariants))-1] <- 'Adjusted_pvalue'# renaming last columns
   signifVariants.sorted <- signifVariants[order( abs(finalDelta), decreasing=T), ]
 
+
+
   lowcounts <- c()
-  dim1 <- dim(signifVariants.sorted)[1]
-  dim2 <- dim(signifVariants.sorted)[2]
-  for (i in 1:dim1) {
-    if ( length(which(grepl('TRUE',signifVariants.sorted[i,3:(dim2-2)] < 5))) > 0 ){
-      lowcounts <- rbind(lowcounts, 1) 
-    } else {
-      lowcounts <- rbind(lowcounts, 0)
-    }
-  }
-  signifVariants.sorted <- cbind(signifVariants.sorted, lowcounts)
-  colnames(signifVariants.sorted)[dim2+1] <- 'Low_counts'
-  return(signifVariants.sorted)
+ 
+###################################################
+### Low counts
+###################################################
+#Condition to flag a low count for an event :
+   # If a least a variant has a global count <10 
+   # OR 
+   # if at least n-1 conditions have counts <10 
+
+#variants
+totLOW <- as.vector(apply(signifVariants.sorted[ ,(3 + sum(nr)):(3 + 2 * sum(nr) - 1)],1,sum)) #global counts for each variant (low/up) by event
+totUP <- as.vector(apply(signifVariants.sorted[ ,3:(3 + sum(nr) - 1)],1,sum))
+
+#conditions
+todo1 <- 3
+todo2 <- 0
+done <- 0
+vectCond <- c()
+for (i in 1:length(nr)) { #calculating the total count per condition (summing by variants and replicates) per event
+  todo1 <- todo1 + done
+  done <- nr[i]
+  todo2 <- todo1 + done - 1
+
+ sums <- apply(signifVariants.sorted[,todo1:todo2],1,sum) + apply(signifVariants.sorted[,(todo1 + sum(nr)):(todo2 + sum(nr))],1,sum) #up +low for 1 condition
+ vectCond <- c(vectCond,sums)
+}
+m <- matrix(vectCond, ncol = n)
+totCOND <- c()
+for (i in 1:dim(m)[1]){
+  totCOND <- c(totCOND,length(m[i, m[i, ]<10]) >= n-1) #at least n-1 conditions have counts below 10
+} 
+
+lowcounts <- totUP <10 | totLOW <10 | totCOND
+signifVariants.sorted <- cbind(signifVariants.sorted, lowcounts)
+colnames(signifVariants.sorted[dim(signifVariants.sorted)[2]]) <- 'Low_counts'
+return(signifVariants.sorted)
+
 }
