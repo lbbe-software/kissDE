@@ -1,6 +1,8 @@
-.lineParse <- function(lines, indexStart) {
+.lineParse <- function(line, indexStart, isQuality) {
+  options(warn=-1)
   beginningLineToWrite <- ""
-  splitElements <- strsplit(lines, "|", fixed=TRUE)[[1]] # splits the line
+
+  splitElements <- strsplit(line, "|", fixed=TRUE)[[1]] # splits the line
   if (indexStart == 6) {
     for (k in 1:(indexStart-2)) {
     beginningLineToWrite <- paste (beginningLineToWrite, splitElements[k], sep="|") #writes the firsts elements of the line : bcc, cycle... but NOT branching_nodes
@@ -10,30 +12,35 @@
     beginningLineToWrite <- paste (beginningLineToWrite, splitElements[k], sep="|") #writes the firsts elements of the line : bcc, cycle... 
     }
   }
-  endingLineToWrite <- paste(splitElements[length(splitElements)], sep="") #writes the rank
+
   ElementsNb <- length(splitElements) #number of elements in the line
   splitCounts <- splitElements[indexStart : (length(splitElements) - 1)] # avoids the name of the bcc ... and the rank (last one) to get only the counts
   s <- sapply(splitCounts, function(splitCounts) regmatches(splitCounts[[1]], gregexpr(pattern = "[0-9]+",splitCounts[[1]]))) #gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
-  return(list(beginningLineToWrite,s,endingLineToWrite))
+  
+
+  if (isQuality == TRUE ) { #if there is a quality information  (for SNPs)
+    s<- s[regexpr('Q',names(s)) == -1] # we discard "Q_" information as they are not counts
+  } 
+  return(list(beginning=beginningLineToWrite,countsperCond=s))
 }
 
-.countsSet <- function(lines, indexStart, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE) {
-  beginningLineToWrite <- .lineParse(lines, indexStart)[[1]]
-  s <- .lineParse(lines, indexStart)[[2]] 
-  endingLineToWrite <- .lineParse(lines, indexStart)[[3]]
 
-  nbVec <- rep(0, length(s))
-  countsVec <- rep(0, length(s))
-  for (i in 1:length(s)) {
-    nbVec[i] <- as.numeric(s[[i]][1])
-    countsVec[i] <- as.numeric(s[[i]][2])
-    if (counts > 1) {
-      if (grepl("ASSB", names(s)[i]) == TRUE) { #so that counts on ASSB junction are not counted twice.
+.countsSet <- function(line, indexStart, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, isQuality) {
+  resultParsing <- .lineParse(line, indexStart, isQuality)
+  beginningLineInfo <- resultParsing$beginning
+  countsperCond<- resultParsing$countsperCond
+  nbVec <- rep(0, length(countsperCond))
+  countsVec <- rep(0, length(countsperCond))
+  for (i in 1:length(countsperCond)) {
+    nbVec[i] <- as.numeric(countsperCond[[i]][1])
+    countsVec[i] <- as.numeric(countsperCond[[i]][2])
+    if (counts > 1) { #specific issues linked with --counts option
+      if (grepl("ASSB", names(countsperCond)[i]) == TRUE) { #so that counts on ASSB junction are not counted twice.
         countsVec[i] <- - countsVec[i]
       }
-      
+
       if ((counts == 2) & (exonicReads == FALSE)) {
-        if (grepl("^S[0-9]+", names(s)[i]) == TRUE) { #when exonic reads are not wanted we must discard reads counted in S_X
+        if (grepl("^S[0-9]+", names(countsperCond)[i]) == TRUE) { #when exonic reads are not wanted we must discard reads counted in S_X
           countsVec[i] <- 0
         }
       }
@@ -61,26 +68,21 @@
   } else { ### counts == 0 
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
-        order <- rep(1:(length(s)/2), rep(2,(length(s)/2))) # for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) (assuming data is ordered)
+        order <- rep(1:(length(countsperCond)/2), rep(2,(length(countsperCond)/2))) # for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) (assuming data is ordered)
       } else {
         if (! is.vector(order)) {
           print("Error, order vector seems to be in a wrong format.")
         }
       }
-      d <- data.frame(order,countsVec)
-      names(d) <- c("ORDER", "COUNTS")
-      sums <- aggregate(d$COUNTS, by=list(d$ORDER), sum)
+    } else {
+        order <-c(1:length(countsperCond))
     }
+    d <- data.frame(order,countsVec)
+    names(d) <- c("ORDER", "COUNTS")
+    sums <- aggregate(d$COUNTS, by=list(d$ORDER), sum)
   }
-  lineToWrite <- ""
-  for (j in 1:(dim(sums)[1]-1)) {
-    lineToWrite <- paste(lineToWrite, sums[[1]][j], "_", sums[[2]][j], "|", sep="")
-  }
-  j <- j+1
-  lineToWrite <- paste(lineToWrite, sums[[1]][j], "_", sums[[2]][j], sep="")
-  lineToWrite <- paste(beginningLineToWrite, lineToWrite, endingLineToWrite, sep="|")
-  lineToWrite <- substr(lineToWrite, start=2, stop=nchar(lineToWrite)) # lineToWrite looks like ">bcc_XXXX|Cycle_Y|Type_1|upper_path_length_ZZ|1_0|2_47|3_1|4_13|rank_1.00000"
-  return(lineToWrite)
+    listCounts <- t(sums)[2,]
+    return(list(firstPart=beginningLineInfo, vCounts=listCounts))
 }
 
 .addOneCount <- function(df)
@@ -89,34 +91,20 @@
   return (df)
 }
 
-
-.replaceCounts <- function(lines, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE) {
-  index <- 1
-  firstLineChar <- substr(lines[index], start = 0, stop = 1)
-  if (grepl("branching_nodes", lines[index])) {
-    indexStart <- 6
-  } else {
+.getInfoLine <- function(line, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, isQuality) {
+  if ( grepl("branching_nodes", line) ) { 
+    indexStart <- 6 
+    } else {
     indexStart <- 5
   }
-  lineToWrite <- c()
-  if (firstLineChar == '>') {
-    while (index <= length(lines)) {
-      if (index%%2 == 1) {
-        if (counts > 0) {
-          lineToWrite <- c(lineToWrite, .countsSet(lines[index], indexStart, counts, pairedEnd, order, exonicReads))
-        } else {
-          if (pairedEnd == TRUE) {
-            lineToWrite <- c(lineToWrite, .countsSet(lines[index], indexStart, counts, pairedEnd, order))
-          }
-        }
-      
-    } else {
-      lineToWrite <- c(lineToWrite, lines[index])
-    }
-    index <- index + 1
-    }
-  }
-  return(lineToWrite)
+  resultCountsSet <- .countsSet(line, indexStart, counts, pairedEnd, order, exonicReads, isQuality)
+  lineFirstPart <- resultCountsSet$firstPart
+  lineFirstPartSplit <- strsplit(lineFirstPart,"|",fixed=TRUE)[[1]]
+  name <- paste(lineFirstPartSplit[2],lineFirstPartSplit[3],sep="_")
+  name <- substr(name, start = 2, stop = nchar(name))
+  length <- strsplit(lineFirstPartSplit[5],"_")[[1]][4]
+  vCounts <- resultCountsSet$vCounts
+  return (list(eventName=name,variantLength=length,variantCounts=vCounts))
 }
 
 .readAndPrepareData <- function(countsData,conditions) {
@@ -232,44 +220,34 @@
 }
 
 kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, exonicReads =TRUE) {
-
   toConvert <- file(fileName, open = "r")
-
-  isQuality <- grepl(toConvert[1],)
-  line <- readLines(toConvert)
-  if ( pairedEnd == TRUE || counts > 1 || grepl("Q",line[1]) ) {#if the data is paired-end or there is a count option or quality information (SNPS) we need a special treatment of data
-    line <- .replaceCounts(line, counts, pairedEnd, order, exonicReads)
-    } 
-
-  index <- 1
-  indexNames <- 1
-  if (substr(line[index], start = 0, stop = 1) == '>') {
-    len <- length(strsplit(line[index], "|", fixed = TRUE)[[1]])-6
-  }
-  events.mat <- matrix(NA,length(line)/2,len+2)
-  events.names <- rep(NA,length(line)/2)
-  firstLineChar <- substr(line[index], start = 0, stop = 1)
-  if (firstLineChar == '>') {#checks if the line contains the header beginning with ">", not the sequence
-    while (index <= length(line)) {
-      nbCharLine <- length(strsplit(line[index],"|")[[1]]) # number of characters in the line
-      lineInfos <- substr(line[index],start = 2,stop =nbCharLine) #the line without ">" that we want to avoid
-      lineSplit <- strsplit(lineInfos, "|", fixed=TRUE)[[1]] # gets pieces of information separated by "|" in KisSplice format
-      #example of lineSplit :  
-      # lineSplit[1] : "bcc_3929"
-      #          [2] : "Cycle_0"
-      #          [3] : "Type_1"     
-      #          [4] : "upper_path_length_90" 
-      #          [5] : "C1_1" (first condition)
-      #          [5+len] : "Cn_5" (last condition)              
-      #          [5+len+1] : rank_0.90267" 
-      eventName <- paste(lineSplit[1],lineSplit[2],sep="_") # concatenates the two first elements of lineSplit, ie the event name
+  lines <- readLines(toConvert)
+  line <- lines[1]
+  isQuality <- grepl("Q",line[1])
+  resultLine1 <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, isQuality)
+  eventName <- resultLine1$eventName
+  variantLength <- resultLine1$variantLength
+  variantCounts <- resultLine1$variantCounts
+  events.mat <- matrix(NA,length(lines)/2,length(variantCounts)+1)
+  events.names <- rep(NA,length(lines)/2)
+  events.mat[1,1] <- as.numeric(variantLength)
+  events.mat[1,2:dim(events.mat)[2]] <- variantCounts
+  events.names[1] <- eventName
+  index <- 3
+  indexNames <- 2
+  firstLineChar <- substr(lines[index], start = 0, stop = 1)
+  if (firstLineChar == '>') {
+    while (index <= length(lines)) {
+      line <- lines[index]
+      resultLine <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, isQuality)
+      eventName <- resultLine$eventName
+      variantLength <- resultLine$variantLength
+      variantCounts <- resultLine$variantCounts
+      events.mat[indexNames,1] <- as.numeric(variantLength)
+      events.mat[indexNames,2:dim(events.mat)[2]] <- variantCounts
       events.names[indexNames] <- eventName
-      lengthInfo <- lineSplit[4]
-      events.mat[indexNames,1] <- as.numeric(strsplit(lengthInfo,"_")[[1]][4]) #fills the first column of the matrix with length info
-      lineCounts <- lineSplit[5:(5+len)] # gets every condition of the line and its associated count
-      events.mat[indexNames,2:dim(events.mat)[2]] <- as.numeric(lapply(lineCounts, function(x) strsplit(x, "_")[[1]][2])) #fills the matrix others columns with the counts of the conditions of the line 
-    index <- index + 2
-    indexNames <- indexNames + 1
+      index <- index + 2
+      indexNames <- indexNames + 1
     }
   }
   class(events.mat) <- "numeric"
