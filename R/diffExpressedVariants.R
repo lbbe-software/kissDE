@@ -443,7 +443,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pvalu
   totLOW <- as.vector(apply(dataPart2[ ,(3 + sum(nr)):(3 + 2 * sum(nr) - 1)],1,sum)) #global counts for each variant (low/up) by event
   totUP <- as.vector(apply(dataPart2[ ,3:(3 + sum(nr) - 1)],1,sum))
 
-  dataPart3 <- dataPart2[-which(totUP <10| totLOW<10),]#after the dispersion estimation, discard the events that have at least one variant with global count <10
+  dataPart3 <- dataPart2[-which(totUP <10 & totLOW<10),]#after the dispersion estimation, discard the events that have at least one variant with global count <10
   allEventtables  <- apply(dataPart3,1,.eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart3)))[1],endPosCol4Counts = ncol(dataPart3))
   ###################################################
   ### code chunk number 6: pALLGlobalPhi.glm.nb
