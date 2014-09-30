@@ -100,7 +100,7 @@
   resultCountsSet <- .countsSet(line, indexStart, counts, pairedEnd, order, exonicReads, isQuality)
   lineFirstPart <- resultCountsSet$firstPart
   lineFirstPartSplit <- strsplit(lineFirstPart,"|",fixed=TRUE)[[1]]
-  name <- paste(lineFirstPartSplit[2],lineFirstPartSplit[3],sep="_")
+  name <- paste(lineFirstPartSplit[2],lineFirstPartSplit[3],sep="|")
   name <- substr(name, start = 2, stop = nchar(name))
   length <- strsplit(lineFirstPartSplit[5],"_")[[1]][4]
   vCounts <- resultCountsSet$vCounts
@@ -152,7 +152,7 @@
   eventTab = data.frame(ID=rep(as.factor(df['ID']), endPosCol4Counts-startPosColumn4Counts+1),
   cond=as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts],"_"),FUN=function(d){d[2]}))),
   counts=as.numeric(df[startPosColumn4Counts:endPosCol4Counts]),
-  path=as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts],"_"),FUN=function(d){d[1]}))),
+  path=as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts],"|"),FUN=function(d){d[1]}))),
   row.names = NULL)
   return(eventTab)
 }
