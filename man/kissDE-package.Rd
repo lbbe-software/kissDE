@@ -6,8 +6,8 @@
 \description{Retrieves condition-specific variants in RNA-seq data. Each variation (SNP, indel, alternative splicing) is represented as a pair of variants. The quantification of each variant is summarised as a count, in each condition and each replicate where it was measured. The package tests for enrichment of a variant in a condition. Data counts are modelled using either a poisson or a negative binomial (with several ways of estimating the variance). Likelihood ratio tests are then performed using the glm framework.
 }
 \details{Main functions :
-diffExpressedVariants(countsData, conditions, storeFigs=FALSE, pvalue=0.05)
-qualityControl(countsData, conditions, storeFigs=FALSE)
+diffExpressedVariants(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterBoundary=10, flagLowCountsBoundary=10)
+qualityControl(countsData, conditions, storeFigs=FALSE, pathFigs="None")
 kissplice2counts(fileName, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE)
 \tabular{ll}{
 Package: \tab kissDE\cr
