@@ -258,6 +258,9 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, ex
 }
 
 qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None") {
+
+
+
   options(warn=-1) # suppress the warning for the users
 
   if (storeFigs == TRUE){
@@ -266,8 +269,12 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
     } else {
       pathToFigs = paste(pathFigs,"/kissDEFigures",sep="")
     }
-    command = paste("mkdir", pathToFigs)
-    system(command)
+    find = paste("find",pathToFigs)
+    d<-system(find,TRUE,ignore.stderr=TRUE)
+    if (length(d) == 0) { 
+      command = paste("mkdir", pathToFigs)
+      system(command,ignore.stderr=TRUE)
+    }
   }
 
 
@@ -291,7 +298,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
         filename = paste(pathToFigs,"/dendrogram.png",sep="")
         png(filename)
         plot(hclust(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))])),"ward"))
-        dev.off()
+        void <- dev.off()
     }
 
   ###################################################
@@ -303,7 +310,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
         filename = paste(pathToFigs,"/heatmap.png",sep="")
         png(filename)
         heatmap(as.matrix(as.dist(1-cor(countsData[ ,(dim+1):(dim+length(conds))]))), margins = c(10,10))
-        dev.off()
+        void <- dev.off()
     }
 
   ###################################################
@@ -336,23 +343,29 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
         png(filename)
         plot( x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
         abline( a = 0, b = 1, col = 2, lty = 2, lwd = 2 )
-        dev.off()
+        void <- dev.off()
     }
 }
 
 diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterBoundary=10, flagLowCountsBoundary=10) {
  
+  options(warn=-1) # suppress the warning for the users
+
   if (storeFigs == TRUE){
     if (pathFigs == "None") {
       pathToFigs = "kissDEFigures"
     } else {
       pathToFigs = paste(pathFigs,"/kissDEFigures",sep="")
     }
-    command = paste("mkdir", pathToFigs)
-    system(command)
+    find = paste("find",pathToFigs)
+    d<-system(find,TRUE,ignore.stderr=TRUE)
+    if (length(d) == 0) { 
+      command = paste("mkdir", pathToFigs)
+      system(command,ignore.stderr=TRUE)
+    }
   }
 
-  options(warn=-1) # suppress the warning for the users
+
   ###################################################
   ### code chunk number 1: Read and prepare data
   ###################################################
@@ -445,7 +458,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
         lines(x,yNB,col=6, lwd=2)
         legend("topleft", c("Poisson","Quasi-Poisson", "Negative Binomial"), 
         text.col=c(2,3,6), box.lty=0);
-        dev.off()
+        void <- dev.off()
     }
 
   totLOW <- as.vector(apply(dataPart2[ ,(3 + sum(nr)):(3 + 2 * sum(nr) - 1)],1,sum)) #global counts for each variant (low/up) by event
