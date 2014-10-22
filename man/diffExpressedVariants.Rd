@@ -9,8 +9,8 @@
 	\item{conditions}{a character vector that gives the conditions, it has as much elements as there are pairs of condition/replicates}
 	\item{storeFigs=FALSE}{if this function is needed to be used into an automatised worflow, setting this option to TRUE will create a directory where plots are stored in .png format. By default (FALSE) the figures are plotted one at time when Enter is pressed. }
 	\item{pathFigs="None"}{to give a path (string, e.g. '/path/to/figs') where to store the figures. By default the figure directory is called 'kissDEFigures' and created in the currend directory.}
-	\item{filterBoundary=10}{to change the default value under which events are filtered out. After having computing the overdispersion, we screen out events which both variants have global counts < [filterBoundary](sum of each replicate x condition) in order to gain strength for the models.}
-	\item{flagLowCountsBoundary=10}{to change the default value under which we flag events as 'lowCounts' in the final data frame. This column aims to help seeing which event (variant 1 counts + variant 2 counts) has low counts (< [flagLowCountsBoundary=10])for at least n-1 conditions (over n).}
+	\item{filterLowCountsVariants=10}{to change the default value under which events are filtered out. After having computing the overdispersion, we screen out events which both variants have global counts < [filterBoundary](sum of each replicate x condition) in order to gain strength for the models.}
+	\item{flagLowCountsConditions=10}{to change the default value under which we flag events as 'lowCounts' in the final data frame. This column aims to help seeing which event (variant 1 counts + variant 2 counts) has low counts (< [flagLowCountsBoundary=10])for at least n-1 conditions (over n).}
 }
 \details{
 }
