@@ -347,7 +347,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
     }
 }
 
-diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterBoundary=10, flagLowCountsBoundary=10) {
+diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterLowCountsVariants=10, flagLowCountsConditions=10) {
  
   options(warn=-1) # suppress the warning for the users
 
@@ -464,7 +464,9 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   totLOW <- as.vector(apply(dataPart2[ ,(3 + sum(nr)):(3 + 2 * sum(nr) - 1)],1,sum)) #global counts for each variant (low/up) by event
   totUP <- as.vector(apply(dataPart2[ ,3:(3 + sum(nr) - 1)],1,sum))
 
-  dataPart3 <- dataPart2[-which(totUP <filterBoundary & totLOW<filterBoundary),]#after the dispersion estimation, discard the events that have at least one variant with global count <10
+  dataPart3 <- dataPart2[-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants),]#after the dispersion estimation, discard the events that have at least one variant with global count <10
+  exprs(dispData) <- exprs(dispData)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
+  exprs(dispDataMeanCond) <- exprs(dispDataMeanCond)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
   allEventtables  <- apply(dataPart3,1,.eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart3)))[1],endPosCol4Counts = ncol(dataPart3))
   ###################################################
   ### code chunk number 6: pALLGlobalPhi.glm.nb
@@ -729,7 +731,7 @@ for (i in 1:length(nr)) { #calculating the total count per condition (summing by
 m <- matrix(vectCond, ncol = n)
 totCOND <- c()
 for (i in 1:dim(m)[1]){
-  totCOND <- c(totCOND,length(m[i, m[i, ]<flagLowCountsBoundary]) >= n-1) #at least n-1 conditions have counts below 10
+  totCOND <- c(totCOND,length(m[i, m[i, ]<flagLowCountsConditions]) >= n-1) #at least n-1 conditions have counts below 10
 } 
 
 # lowcounts <- totUP <10 | totLOW <10 | totCOND
