@@ -680,14 +680,12 @@ if (length(pairsCond) >1 ){
 }
 
 signifVariants <- cbind(signifVariants, dPvector1)
-signifVariants.sorted <- signifVariants[order( abs(dPvector1), decreasing=T), ]#sorting by delta psi
-dPvector2.sorted <- dPvector2[order(abs(dPvector1), decreasing=T)]
-signifVariants.sorted[dim(signifVariants.sorted)[2]] <- dPvector2
+signifVariants.sorted <- signifVariants[ order(-abs(dPvector1),signifVariants[dim(signifVariants)[2]-1]), ]#sorting by delta psi then by pvalue
+dPvector2.sorted <- dPvector2[order(-abs(dPvector1),signifVariants.sorted[dim(signifVariants.sorted)[2]-1])]
+signifVariants.sorted[dim(signifVariants.sorted)[2]] <- dPvector2.sorted
 
   colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))] <- 'Deltaf/DeltaPSI'# renaming last columns
-  colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))-1] <- 'Adjusted_pvalue'# renaming last columns
-######################################################################################
-
+  colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))-1] <- 'Adjusted_pvalue'
 
 ###################################################
 ### Low counts
