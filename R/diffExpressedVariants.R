@@ -619,100 +619,83 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   } else {
     signifVariants <- cbind(dataPart3, pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
   }
-  # sorting by deltaPSI / deltaF
-  finalDelta <- NA
-  #1st condition
-  PSI.replicat1 <- c()
-  tmp.psi <-c()
-  for (j1 in 1:nr[1]) {
-    nameUp <- paste('UP_',sortedconditions[j1], '_r', j1, '_Norm', sep='')
-    nameLow <- paste('LP_', sortedconditions[j1],'_r', j1, '_Norm', sep='') 
-    for (indexSignif in 1:dim(signifVariants)[1]) {
-      if (signifVariants[indexSignif,nameUp] + signifVariants[indexSignif,nameLow] != 0) {
-        tmp.psi[indexSignif] <- signifVariants[indexSignif, nameUp] / (signifVariants[indexSignif,nameUp] + signifVariants[indexSignif,nameLow])
-      } else {
-        tmp.psi[indexSignif] <- 0
-      }
-    }
-    PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
-    PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm=T)
-    for (k1 in (2:n)) { # = 2nd condition
-      PSI.replicat2 <- c()
-      for (l in (1:nr[n])) {
-        nameUp <- paste('UP_',sortedconditions[cumsum(nr)[n-1]+l], '_r', l, '_Norm', sep='')
-        nameLow <- paste('LP_', sortedconditions[cumsum(nr)[n-1]+l],'_r', l, '_Norm', sep='') 
-        for (indexSignif in 1:dim(signifVariants)[1]) {
-          if (signifVariants[indexSignif,nameUp] + signifVariants[indexSignif,nameLow] != 0) {
-            tmp.psi[indexSignif] <- signifVariants[indexSignif, nameUp] / (signifVariants[indexSignif,nameUp] + signifVariants[indexSignif,nameLow])
-          } else {
-            tmp.psi[indexSignif] <- 0
-          }
-        }
-        PSI.replicat2 <- cbind( PSI.replicat2, tmp.psi)
-      }
-      PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm=T)
-      #deltaPSI for cond i,j
-      deltaPSIij <- PSIcondJ- PSIcondI
-      finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN=1, max, na.rm=T)
-    }
+
+
+#############################################################################################################
+### deltaPSI / deltaF computation
+#############################################################################################################
+
+pairsCond <-list()
+namesCond <- unique(conditions)
+for ( i in 1:n) {
+  j <- i+1
+  while ( j <= n ) {
+    pairsCond[[length(pairsCond)+1]] <- list(c(i,j))#creation of permutation of size 2 in c
+    j <- j+1
   }
-
-  if (n > 2) {
-    tmp.psi <-c()
-    for (i in 2:(n-1)) {
-    #1st condition
-      PSI.replicat1 <- c()
-      for (k2 in (1:nr[n-1])) {    
-        nameUp <- paste('UP_',sortedconditions[cumsum(nr)[i-1]+k2], '_r', k2, '_Norm', sep='')
-        nameLow <- paste('LP_', sortedconditions[cumsum(nr)[i-1]+k2],'_r', k2, '_Norm', sep='') 
-        for (indexSignif in 1:dim(signifVariants)[1]) {
-          if (signifVariants[indexSignif,nameUp] + signifVariants[indexSignif,nameLow] != 0) {
-            tmp.psi[indexSignif] <- signifVariants[indexSignif, nameUp] / (signifVariants[indexSignif,nameUp] + signifVariants[indexSignif,nameLow])
-          } else {
-            tmp.psi[indexSignif] <- 0
-          }
-        }
-        PSI.replicat1 <- cbind( PSI.replicat1, tmp.psi)
-      }
-      PSIcondI <- apply(PSI.replicat1, MARGIN=1, mean, na.rm=T)
-      for (k3 in (i+1):n) {
-        PSI.replicat2 <- c()
-        for (l in 1:nr[n]) {
-          nameUp <- paste('UP_',sortedconditions[cumsum(nr)[k3-1]+l], '_r', l, '_Norm', sep='')
-          nameLow <- paste('LP_', sortedconditions[cumsum(nr)[k3-1]+l],'_r', l, '_Norm', sep='') 
-          for (indexSignif in 1:dim(signifVariants)[1]) {
-            if (signifVariants[indexSignif,nameUp] + signifVariants[indexSignif,nameLow] != 0) {
-              tmp.psi[indexSignif] <- signifVariants[indexSignif, nameUp] / (signifVariants[indexSignif,nameUp] + signifVariants[indexSignif,nameLow])
-            } else {
-              tmp.psi[indexSignif] <- 0
-            }
-          }
-          PSI.replicat2 <- cbind( PSI.replicat2, tmp.psi)
-        }
-        PSIcondJ <- apply(PSI.replicat2, MARGIN=1, mean, na.rm=T)
-        # deltaPSI for cond i,j
-        deltaPSIij <- PSIcondJ- PSIcondI
-        finalDelta <- apply( cbind( finalDelta, deltaPSIij) , MARGIN=1, max, na.rm=T)
-      }
+}
+sumup <- rep(0,dim(signifVariants)[1])
+sumlow <- rep(0,dim(signifVariants)[1])
+deltapsi <- matrix(data=rep(sumup/(sumup+sumlow),length(pairsCond)), ncol=length(pairsCond))
+indexdelta <- 1
+for (pair in pairsCond) { #delta psi calculated for pairs of conditions
+  index <- pair[[1]]
+  namesC <- namesCond[index]
+  replicates <- nr[index]
+  upNames <- list()
+  lowNames <- list()
+  for (nb in 1:length(replicates)) {
+    indexlist <- 1
+    deltapsi[,indexdelta] = sumup/(sumup+sumlow)
+    sumup <- rep(0,dim(signifVariants)[1])
+    sumlow <- rep(0,dim(signifVariants)[1])
+    for (i in 1:replicates[nb]) { 
+      upNames[[indexlist]] <- paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')
+      lowNames [[indexlist]] <-paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')
+      sumup <- sumup + signifVariants[, paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')] #sum incl. isoform for 1 condition (all replicates)
+      sumlow <- sumlow +signifVariants[, paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')]#sum excl. isoform for 1 condition (all replicates)
     }
+    indexlist <- indexlist +1
   }
-  
+  deltapsi[,indexdelta] = sumup/(sumup+sumlow) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
+  indexdelta <- indexdelta+1
+}
 
-  signifVariants <- cbind(signifVariants, finalDelta)# adding DeltaPsi/f to the final table
-  colnames(signifVariants)[length(colnames(signifVariants))] <- 'Deltaf/DeltaPSI'# renaming last columns
-  colnames(signifVariants)[length(colnames(signifVariants))-1] <- 'Adjusted_pvalue'# renaming last columns
-  signifVariants.sorted <- signifVariants[order( abs(finalDelta), decreasing=T), ]
+dPvector1 <-c(rep(0,dim(signifVariants)[1]))
+dPvector2 <-c(rep(0,dim(signifVariants)[1]))
+if (length(pairsCond) >1 ){
+  for (l in 1:dim(deltapsi)[1]){ #if there are more than 2 conditions, we take the maximum of the deltaPSI of all pairs
+    mindex <- which.max(abs(deltapsi[l,]))
+    condA <- as.character(pairsCond[[mindex]][[1]][1])
+    condB <- as.character(pairsCond[[mindex]][[1]][2])
+    dP <- round(deltapsi[l,mindex],4)
+    dP[which(is.nan(dP))] <- 0
+    dPvector1[l] <- dP
+    dPvector2[l] <-paste(as.character(dP),"(Cond",condB,",",condA,")",sep="")#we also return for which pair of conditions we found this max deltaPSI
+  }
+} else {
+  dPvector1 <- round(deltapsi,4)
+  dPvector1[which(is.nan(dPvector1))] <- 0
+  dPvector2<-as.character(dPvector1)
+}
+
+signifVariants <- cbind(signifVariants, dPvector1)
+signifVariants.sorted <- signifVariants[order( abs(dPvector1), decreasing=T), ]#sorting by delta psi
+dPvector2.sorted <- dPvector2[order(abs(dPvector1), decreasing=T)]
+signifVariants.sorted[dim(signifVariants.sorted)[2]] <- dPvector2
+
+  colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))] <- 'Deltaf/DeltaPSI'# renaming last columns
+  colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))-1] <- 'Adjusted_pvalue'# renaming last columns
+######################################################################################
 
 
-
-  lowcounts <- c()
- 
 ###################################################
 ### Low counts
 ###################################################
 #Condition to flag a low count for an event :
    # if at least n-1 conditions have counts <10 
-
+lowcounts <- c()
+ 
 
 #conditions
 todo1 <- 3
