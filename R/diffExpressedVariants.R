@@ -634,6 +634,7 @@ for ( i in 1:n) {
     j <- j+1
   }
 }
+sumLowCond <- matrix(nrow=dim(signifVariants)[1],ncol=n)
 sumup <- rep(0,dim(signifVariants)[1])
 sumlow <- rep(0,dim(signifVariants)[1])
 deltapsi <- matrix(data=rep(sumup/(sumup+sumlow),length(pairsCond)), ncol=length(pairsCond))
@@ -656,6 +657,7 @@ for (pair in pairsCond) { #delta psi calculated for pairs of conditions
       sumlow <- sumlow +signifVariants[, paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')]#sum excl. isoform for 1 condition (all replicates)
     }
     indexlist <- indexlist +1
+    sumLowCond[,nb] <- sumup+sumlow
   }
   deltapsi[,indexdelta] = sumup/(sumup+sumlow) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
   indexdelta <- indexdelta+1
@@ -695,28 +697,32 @@ signifVariants.sorted[dim(signifVariants.sorted)[2]] <- dPvector2.sorted
 lowcounts <- c()
  
 
-#conditions
-todo1 <- 3
-todo2 <- 0
-done <- 0
-vectCond <- c()
-for (i in 1:length(nr)) { #calculating the total count per condition (summing by variants and replicates) per event
-  todo1 <- todo1 + done
-  done <- nr[i]
-  todo2 <- todo1 + done - 1
+# #conditions
+# todo1 <- 3
+# todo2 <- 0
+# done <- 0
+# vectCond <- c()
+# for (i in 1:length(nr)) { #calculating the total count per condition (summing by variants and replicates) per event
+#   todo1 <- todo1 + done
+#   done <- nr[i]
+#   todo2 <- todo1 + done - 1
 
- sums <- apply(signifVariants.sorted[,todo1:todo2],1,sum) + apply(signifVariants.sorted[,(todo1 + sum(nr)):(todo2 + sum(nr))],1,sum) #up +low for 1 condition
- vectCond <- c(vectCond,sums)
-}
+#  sums <- apply(signifVariants.sorted[,todo1:todo2],1,sum) + apply(signifVariants.sorted[,(todo1 + sum(nr)):(todo2 + sum(nr))],1,sum) #up +low for 1 condition
+#  vectCond <- c(vectCond,sums)
+# }
 
-m <- matrix(vectCond, ncol = n)
-totCOND <- c()
-for (i in 1:dim(m)[1]){
-  totCOND <- c(totCOND,length(m[i, m[i, ]<flagLowCountsConditions]) >= n-1) #at least n-1 conditions have counts below 10
+# m <- matrix(vectCond, ncol = n)
+# totCOND <- c()
+# for (i in 1:dim(m)[1]){
+#   totCOND <- c(totCOND,length(m[i, m[i, ]<flagLowCountsConditions]) >= n-1) #at least n-1 conditions have counts below 10
+# } 
+
+# # lowcounts <- totUP <10 | totLOW <10 | totCOND
+# lowcounts <- totCOND
+
+for (i in 1:dim(sumLowCond)[1]){
+  lowcounts <- c(lowcounts,length(sumLowCond[i, sumLowCond[i, ]<flagLowCountsConditions]) >= n-1) #at least n-1 conditions have counts below 10
 } 
-
-# lowcounts <- totUP <10 | totLOW <10 | totCOND
-lowcounts <- totCOND
 signifVariants.sorted <- cbind(signifVariants.sorted, lowcounts)
 colnames(signifVariants.sorted[dim(signifVariants.sorted)[2]]) <- 'Low_counts'
 return(signifVariants.sorted)
