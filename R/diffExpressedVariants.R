@@ -632,7 +632,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
 #############################################################################################################
 
 pairsCond <-list()
-namesCond <- unique(conditions)
+namesCond <- unique(sortedconditions)
 for ( i in 1:n) {
   j <- i+1
   while ( j <= n ) {
@@ -712,7 +712,7 @@ if (length(pairsCond) >1 ){
 } else {
   dPvector1 <- round(deltapsi,4)
   dPvector1[which(is.nan(dPvector1))] <- 0
-  dPvector2<-as.character(dPvector1)
+  # dPvector2<-as.character(dPvector1)
 }
 
 signifVariants <- cbind(signifVariants, dPvector1)
