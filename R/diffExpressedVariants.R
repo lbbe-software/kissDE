@@ -385,14 +385,20 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   dataPart2 <- cbind( dataPart[ seq( 1, dim( dataPart )[1], 2 ), ], dataPart[ seq( 2, dim(dataPart)[1] , 2 ), grepl("Norm", names( dataPart) ) ] )
   names(dataPart2)[3:(3+nbAll-1)] <- paste( "UP",names(dataPart2)[3:(3+nbAll-1)], sep="_" )
   names(dataPart2)[(3+nbAll+1):(3+2*nbAll+1-1)] <- paste( "LP", names(dataPart2)[(3+nbAll+1):(3+2*nbAll+1-1)], sep="_" )
-  dataPart2[2] <- dataPart[seq(1,dim(dataPart)[1],2),2]-dataPart[seq(2,dim(dataPart)[1],2),2] # computes the difference of length between the lower and upper paths
+  # upperLengths  <- dataPart[seq(1,dim(dataPart)[1],2),2]
+  # lowerLengths <- dataPart[seq(2,dim(dataPart)[1],2),2]
+  lengths <- data.frame(dataPart[seq(1,dim(dataPart)[1],2),2],dataPart[seq(2,dim(dataPart)[1],2),2])
+  colnames(lengths) <- c("upper","lower")
+  
+  # dataPart2[2] <- dataPart[seq(1,dim(dataPart)[1],2),2]-dataPart[seq(2,dim(dataPart)[1],2),2] # computes the difference of length between the lower and upper paths 
+  dataPart2[2] <- lengths$upper -  lengths$lower # computes the difference of length between the lower and upper paths 
   names(dataPart2)[2] <- "Length_diff"
   dataPart2 <- dataPart2[ ,c(-(3+nbAll))]
   if (anyDuplicated(dataPart2[ ,1]) > 0) {
     dataPart2 <- dataPart2[!duplicated(as.character(dataPart2[ ,1])), ]
   }
   rownames(dataPart2)=as.character(dataPart2[ ,1])
-
+  rownames(lengths) <-rownames(dataPart2) 
   # create list for the complete data set
   allEventtables  <- apply(dataPart2,1,.eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart2)))[1],endPosCol4Counts = ncol(dataPart2))
 
@@ -635,9 +641,20 @@ for ( i in 1:n) {
   }
 }
 sumLowCond <- matrix(nrow=dim(signifVariants)[1],ncol=n)
-sumup <- rep(0,dim(signifVariants)[1])
-sumlow <- rep(0,dim(signifVariants)[1])
-deltapsi <- matrix(data=rep(sumup/(sumup+sumlow),length(pairsCond)), ncol=length(pairsCond))
+
+
+# sumup <- rep(0,dim(signifVariants)[1])
+# sumlow <- rep(0,dim(signifVariants)[1])
+sumdf <- data.frame(rep(0,dim(signifVariants)[1]),rep(0,dim(signifVariants)[1]))
+rownames(sumdf)=rownames(signifVariants)
+rown <-row.names(sumdf)
+sumdf <- data.frame(sumdf,lengths[rown,])
+colnames(sumdf) <- c("up_sum","low_sum","up_length","low_length")
+
+
+# deltapsi <- matrix(data=rep(sumup/(sumup+sumlow),length(pairsCond)), ncol=length(pairsCond))
+# deltapsi <- matrix(data=rep(sumup[,1]/(sumup[,1]+sumlow[,1]),length(pairsCond)), ncol=length(pairsCond))
+deltapsi <- matrix(data=rep(sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum),length(pairsCond)), ncol=length(pairsCond))
 indexdelta <- 1
 for (pair in pairsCond) { #delta psi calculated for pairs of conditions
   index <- pair[[1]]
@@ -647,19 +664,36 @@ for (pair in pairsCond) { #delta psi calculated for pairs of conditions
   lowNames <- list()
   for (nb in 1:length(replicates)) {
     indexlist <- 1
-    deltapsi[,indexdelta] = sumup/(sumup+sumlow)
-    sumup <- rep(0,dim(signifVariants)[1])
-    sumlow <- rep(0,dim(signifVariants)[1])
+    # deltapsi[,indexdelta] = sumup/(sumup+sumlow)
+
+    # sumup <- rep(0,dim(signifVariants)[1])
+    # sumlow <- rep(0,dim(signifVariants)[1])
+
+    # deltapsi[,indexdelta] = sumup[,1]/(sumup[,1]+sumlow[,1])
+    deltapsi[,indexdelta] = sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum)
+    # sumup <- data.frame(rep(0,dim(signifVariants)[1]))
+    # sumlow <- data.frame(rep(0,dim(signifVariants)[1]))
+    sumdf <- data.frame(rep(0,dim(signifVariants)[1]),rep(0,dim(signifVariants)[1]))
+    rownames(sumdf)=rownames(signifVariants)
+    rown <-row.names(sumdf)
+    sumdf <- data.frame(sumdf,lengths[rown,])
+    colnames(sumdf) <- c("up_sum","low_sum","up_length","low_length")
     for (i in 1:replicates[nb]) { 
       upNames[[indexlist]] <- paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')
       lowNames [[indexlist]] <-paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')
-      sumup <- sumup + signifVariants[, paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')] #sum incl. isoform for 1 condition (all replicates)
-      sumlow <- sumlow +signifVariants[, paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')]#sum excl. isoform for 1 condition (all replicates)
+      # sumup <- sumup + signifVariants[, paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')] #sum incl. isoform for 1 condition (all replicates)
+      # sumlow <- sumlow +signifVariants[, paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')]#sum excl. isoform for 1 condition (all replicates)
+      sumdf$up_sum <- sumdf$up_sum + signifVariants[, paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')] #sum incl. isoform for 1 condition (all replicates)
+      sumdf$low_sum <- sumdf$low_sum +signifVariants[, paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')]#sum excl. isoform for 1 condition (all replicates)
     }
-    indexlist <- indexlist +1
-    sumLowCond[,nb] <- sumup+sumlow
+    indexlist <- indexlist + 1
+    # sumLowCond[,nb] <- sumup+sumlow
+    # sumLowCond[,nb] <- sumup[,1] + sumlow[,1]
+    sumLowCond[,nb] <- sumdf$up_sum + sumdf$low_sum
   }
-  deltapsi[,indexdelta] = sumup/(sumup+sumlow) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
+  # deltapsi[,indexdelta] = sumup/(sumup+sumlow) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
+  # deltapsi[,indexdelta] = sumup[,1]/(sumup[,1]+sumlow[,1]) - deltapsi[,indexdelta]
+  deltapsi[,indexdelta] = (sumdf$up_sum/sumdf$up_length)/(sumdf$up_sum/sumdf$up_length+sumdf$low_sum/sumdf$low_length) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
   indexdelta <- indexdelta+1
 }
 
@@ -693,38 +727,15 @@ signifVariants.sorted[dim(signifVariants.sorted)[2]] <- dPvector2.sorted
 ### Low counts
 ###################################################
 #Condition to flag a low count for an event :
-   # if at least n-1 conditions have counts <10 
 lowcounts <- c()
- 
-
-# #conditions
-# todo1 <- 3
-# todo2 <- 0
-# done <- 0
-# vectCond <- c()
-# for (i in 1:length(nr)) { #calculating the total count per condition (summing by variants and replicates) per event
-#   todo1 <- todo1 + done
-#   done <- nr[i]
-#   todo2 <- todo1 + done - 1
-
-#  sums <- apply(signifVariants.sorted[,todo1:todo2],1,sum) + apply(signifVariants.sorted[,(todo1 + sum(nr)):(todo2 + sum(nr))],1,sum) #up +low for 1 condition
-#  vectCond <- c(vectCond,sums)
-# }
-
-# m <- matrix(vectCond, ncol = n)
-# totCOND <- c()
-# for (i in 1:dim(m)[1]){
-#   totCOND <- c(totCOND,length(m[i, m[i, ]<flagLowCountsConditions]) >= n-1) #at least n-1 conditions have counts below 10
-# } 
-
-# # lowcounts <- totUP <10 | totLOW <10 | totCOND
-# lowcounts <- totCOND
 
 for (i in 1:dim(sumLowCond)[1]){
   lowcounts <- c(lowcounts,length(sumLowCond[i, sumLowCond[i, ]<flagLowCountsConditions]) >= n-1) #at least n-1 conditions have counts below 10
 } 
 signifVariants.sorted <- cbind(signifVariants.sorted, lowcounts)
 colnames(signifVariants.sorted[dim(signifVariants.sorted)[2]]) <- 'Low_counts'
+rownames(signifVariants.sorted) <- signifVariants.sorted[,1]# as order may has changed when they were sorted
+
 return(signifVariants.sorted)
 
 }
