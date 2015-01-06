@@ -659,10 +659,10 @@ indexdelta <- 1
 for (pair in pairsCond) { #delta psi calculated for pairs of conditions
   index <- pair[[1]]
   namesC <- namesCond[index]
-  replicates <- nr[index]
+  replicates <- nr[index]#replicates for the pair
   upNames <- list()
   lowNames <- list()
-  for (nb in 1:length(replicates)) {
+  for (nb in 1:length(replicates)) {#for one pair, in replicates
     indexlist <- 1
     # deltapsi[,indexdelta] = sumup/(sumup+sumlow)
 
@@ -689,11 +689,16 @@ for (pair in pairsCond) { #delta psi calculated for pairs of conditions
     indexlist <- indexlist + 1
     # sumLowCond[,nb] <- sumup+sumlow
     # sumLowCond[,nb] <- sumup[,1] + sumlow[,1]
-    sumLowCond[,nb] <- sumdf$up_sum + sumdf$low_sum
+    # sumLowCond[,nb] <- sumdf$up_sum + sumdf$low_sum
+    sumLowCond[,nb] <- sumdf$up_sum/sumdf$up_length + sumdf$low_sum/sumdf$low_length
+    ####
+    sumdf$up_sum <- sumdf$up_sum/sumdf$up_length
+    sumdf$low_sum <-sumdf$low_sum/sumdf$low_length
+    ####
   }
   # deltapsi[,indexdelta] = sumup/(sumup+sumlow) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
   # deltapsi[,indexdelta] = sumup[,1]/(sumup[,1]+sumlow[,1]) - deltapsi[,indexdelta]
-  deltapsi[,indexdelta] = (sumdf$up_sum/sumdf$up_length)/(sumdf$up_sum/sumdf$up_length+sumdf$low_sum/sumdf$low_length) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
+  deltapsi[,indexdelta] = sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
   indexdelta <- indexdelta+1
 }
 
