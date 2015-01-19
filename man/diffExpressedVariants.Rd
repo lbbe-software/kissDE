@@ -3,7 +3,7 @@
 \title{Retrieve condition-specific variants in RNA-seq data.}
 \description{Retrieve condition-specific variants in RNA-seq data. 
 }
-\usage{diffExpressedVariants(countsData, conditions, storeFigs=FALSE, pvalue=0.05)}
+\usage{diffExpressedVariants(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterLowCountsVariants=10, flagLowCountsConditions=10, readLength=75, overlap=42)}
 \arguments{
 	\item{countsData}{a data.frame containing : in its first column the names of the events, in its second column the lengths of the events, in the following columns, the counts corresponding to each pair of condition/replicate}
 	\item{conditions}{a character vector that gives the conditions, it has as much elements as there are pairs of condition/replicates}
@@ -11,6 +11,9 @@
 	\item{pathFigs="None"}{to give a path (string, e.g. '/path/to/figs') where to store the figures. By default the figure directory is called 'kissDEFigures' and created in the currend directory.}
 	\item{filterLowCountsVariants=10}{to change the default value under which events are filtered out. After having computing the overdispersion, we screen out events which both variants have global counts < [filterBoundary](sum of each replicate x condition) in order to gain strength for the models.}
 	\item{flagLowCountsConditions=10}{to change the default value under which we flag events as 'lowCounts' in the final data frame. This column aims to help seeing which event (variant 1 counts + variant 2 counts) has low counts (< [flagLowCountsBoundary=10])for at least n-1 conditions (over n).}
+	\item{readLength=75}{length of the reads from the data set used. This size is used to correct the delta PSI computation.}
+	\item{overlap=42}{mapping seed length, usually k+1 (with k size of the k-mers in KisSplice). The value is used to correct the delta PSI computation.}
+	}
 }
 \details{
 }
@@ -20,7 +23,7 @@
 	\item{Length}{the size of the first variant}
 	\item{UP_Condn_Rm_Norm}{(resp LP_Condn_Rm_Norm) returns the normalised counts for the first variant (UP, resp. second variant : LP), for the condition n (Condn) and the replicate m (Rm)}
 	\item{pALLGlobalPhi.glm}{adjusted pvalue}
-	\item{Deltaf/DeltaPSI}{difference of relative abundance of variants across conditions. For instance if there are 2 conditions, deltaPsi returns relative abudance in condition 2 - relative abundance in condition 1.}
+	\item{Deltaf/DeltaPSI}{difference of relative abundance of variants across conditions. For instance if there are 2 conditions, deltaPsi returns relative abudance in condition 2 - relative abundance in condition 1. If --counts is at 1 or 2, inclusion variants are corrected for the length of the variant so that we do not overestimate the psi value. If --counts is at 0, a less precise correction is applicated on both variants : we divide by the length of the variant + size of a reads - (size of the k-mer in KisSplice+1)  +1}
 	\item{Low_counts}{a column to highlight low counts in data. If 1, at least one replicate shows less than 5 reads, 0 else.}
 }
 \source{
