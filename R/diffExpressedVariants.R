@@ -24,21 +24,26 @@
   return(list(beginning=beginningLineToWrite,countsperCond=s))
 }
 
-
 .countsSet <- function(line, indexStart, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, isQuality) {
   resultParsing <- .lineParse(line, indexStart, isQuality)
   beginningLineInfo <- resultParsing$beginning
   countsperCond<- resultParsing$countsperCond
   nbVec <- rep(0, length(countsperCond))
   countsVec <- rep(0, length(countsperCond))
+  #### psi 12/01 ####
+  psiVec <- rep(0, length(countsperCond))
+  #### ####
   for (i in 1:length(countsperCond)) {
     nbVec[i] <- as.numeric(countsperCond[[i]][1])
     countsVec[i] <- as.numeric(countsperCond[[i]][2])
     if (counts > 1) { #specific issues linked with --counts option
       if (grepl("ASSB", names(countsperCond)[i]) == TRUE) { #so that counts on ASSB junction are not counted twice.
+        #### psi 13/01 ####
+        psiVec[i] <- countsVec[i]
+        #### ####
         countsVec[i] <- - countsVec[i]
-      }
 
+      }
       if ((counts == 2) & (exonicReads == FALSE)) {
         if (grepl("^S[0-9]+", names(countsperCond)[i]) == TRUE) { #when exonic reads are not wanted we must discard reads counted in S_X
           countsVec[i] <- 0
@@ -50,7 +55,11 @@
     d <- data.frame(nbVec,countsVec)
     names(d) <- c("NB", "COUNTS")
     sums <- aggregate(d$COUNTS, by=list(d$NB), sum) #sums the counts for each junction that belongs to the same event
-
+    #### psi 13/01 ####
+    dpsi <- data.frame(nbVec,psiVec)
+    names(dpsi) <- c("NB", "ASSB")
+    assbPsi <- aggregate(dpsi$ASSB, by=list(dpsi$NB), sum)
+    #### ####
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
         order <- rep(1:((dim(sums)[1])/2), rep(2,((dim(sums)[1])/2)))
@@ -60,11 +69,19 @@
         }
       }
       d2 <- data.frame(order, sums)
-      dim(d2)
       names(d2)[3] <- 'sums'
       sums2 <- aggregate(d2$sums, by=list(d2$order), sum) # in case data is paired-end, there is one more sum to do, for each part of the pair
       sums <- sums2
+      #### psi 13/01 ####
+      dpsi2 <- data.frame(order, assbPsi)
+      names(dpsi2) [3] <- 'sums'
+      assbPsi2 <- aggregate(dpsi2$sums, by=list(dpsi2$order), sum)
+      assbPsi <- assbPsi2
+      #### ####
     } 
+    #### psi 13/01 ####
+    listASSB <- t(assbPsi)[2,]
+    #### ####
   } else { ### counts == 0 
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
@@ -80,9 +97,16 @@
     d <- data.frame(order,countsVec)
     names(d) <- c("ORDER", "COUNTS")
     sums <- aggregate(d$COUNTS, by=list(d$ORDER), sum)
+    #### psi 13/01 ####
+    listASSB <- NULL
+    #### ####
   }
     listCounts <- t(sums)[2,]
-    return(list(firstPart=beginningLineInfo, vCounts=listCounts))
+    
+    # return(list(firstPart=beginningLineInfo, vCounts=listCounts))
+     #### psi 13/01 ####
+  return(list(firstPart=beginningLineInfo, vCounts=listCounts, psiCounts= listASSB))
+     #### ####
 }
 
 .addOneCount <- function(df)
@@ -104,13 +128,70 @@
   name <- substr(name, start = 2, stop = nchar(name))
   length <- strsplit(lineFirstPartSplit[5],"_")[[1]][4]
   vCounts <- resultCountsSet$vCounts
-  return (list(eventName=name,variantLength=length,variantCounts=vCounts))
+  # return (list(eventName=name,variantLength=length,variantCounts=vCounts))
+  #### psi 13/01###
+  return (list(eventName=name,variantLength=length,variantCounts=vCounts, psiInfo=resultCountsSet$psiCounts))
+  #### ####
 }
 
+# .readAndPrepareData <- function(countsData,conditions) {
+#   ###################################################
+#   ### code chunk number 1: Read data
+#   ###################################################
+#   sortedconditions <- sort(conditions)
+#   n <- length(unique(sortedconditions))
+#   nr <- rle(sortedconditions)$lengths
+#   sortedindex <- order(conditions)+2
+#   namesData <- c("ID","Length",rep(NA,length(conditions)))
+#   for (k in 1:nr[1]){
+#     namesData[2+k] <- paste(sortedconditions[k],"_r",k,sep="",collapse="")
+#   }
+#   for (i in 2:n) {
+#     for (j in 1:nr[n]) {
+#       namesData[2+cumsum(nr)[i-1]+j] <- paste(sortedconditions[cumsum(nr)[i-1]+j],"_r",j,sep="",collapse="")
+#     }
+#   }
+#   countsData[,-(1:2)] = countsData[,sortedindex]
+#   colnames(countsData) <- namesData
+#   countsData$Path <- gl( 2, 1, dim(countsData)[1], labels = c("UP", "LP"))
+
+#   ###################################################
+#   ### code chunk number 2: Normalisation
+#   ###################################################
+#   # Normalisation with DESeq
+#   conds <- c()
+#   for( i in 1:n ) {
+#     for( j in 1:nr[i] ) {
+#       conds <- c( conds,paste( "Cond", i, sep = "",collapse = "") )
+#     }
+#   } 
+#   cds <- newCountDataSet( countsData[ ,3:(3+length(conds)-1)], conds ) # create object
+#   cdsSF <- estimateSizeFactors(cds)
+#   sizeFactors( cdsSF )
+#   shouldWeNormalise=sum(is.na(sizeFactors(cdsSF))) < 1
+#   dim <- dim(countsData)[2]
+#   countsData[ ,(dim+1):(dim+length(conds)) ] <- round(counts(cdsSF, normalized=shouldWeNormalise))
+#   colnames(countsData)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
+#   return(list(countsData, conds, dim, n, nr, sortedconditions))
+# }
+
+#### psi 13/01####
 .readAndPrepareData <- function(countsData,conditions) {
   ###################################################
   ### code chunk number 1: Read data
   ###################################################
+  if (is.null(countsData$psiInfo)){
+    countsEvents <- countsData #count table provided by the user
+    psiInfo <- NULL
+  } else {
+    countsEvents <- countsData$countsEvents #provided by kissplice2counts
+    if ( dim(countsData$psiInfo)[2] >1 ){
+      psiInfo <- countsData$psiInfo
+    } else {
+      psiInfo <- NULL
+    }
+  }
+
   sortedconditions <- sort(conditions)
   n <- length(unique(sortedconditions))
   nr <- rle(sortedconditions)$lengths
@@ -124,9 +205,38 @@
       namesData[2+cumsum(nr)[i-1]+j] <- paste(sortedconditions[cumsum(nr)[i-1]+j],"_r",j,sep="",collapse="")
     }
   }
-  countsData[,-(1:2)] = countsData[,sortedindex]
-  colnames(countsData) <- namesData
-  countsData$Path <- gl( 2, 1, dim(countsData)[1], labels = c("UP", "LP"))
+  countsEvents[,-(1:2)] <- countsEvents[,sortedindex]
+  
+  colnames(countsEvents) <- namesData
+  
+  
+  # indexCondit <- 0
+  
+  if(! is.null(psiInfo)){
+    psiInfo[,-1] <- psiInfo[,sortedindex-1]
+    colnames(psiInfo) <- c("events.names",namesData[c(-1,-2)])
+    ASSBinfo <- data.frame(psiInfo[,1])
+    
+    # for (k in (1:dim(psiInfo)[1])){
+      indexCondit <- 0
+      for (nbreplic in nr) {
+        indexCondit <- indexCondit+1
+        name <- c()
+          for (replic in (1:nbreplic)) {
+          name <- c(name,paste(unique(sortedconditions)[indexCondit],"_r",replic,sep=""))
+          # sum <- sum(psiInfo[,]
+        } 
+        ASSBinfo<-data.frame(ASSBinfo,rowSums(psiInfo[,name]))
+      }
+    # }
+    colnames(ASSBinfo) <- c("events.names",unique(sortedconditions))
+    colnames(psiInfo) <- namesData[c(-1,-2)]
+  } else {
+    ASSBinfo <- NULL
+  }
+
+  
+  countsEvents$Path <- gl( 2, 1, dim(countsEvents)[1], labels = c("UP", "LP"))
 
   ###################################################
   ### code chunk number 2: Normalisation
@@ -138,15 +248,16 @@
       conds <- c( conds,paste( "Cond", i, sep = "",collapse = "") )
     }
   } 
-  cds <- newCountDataSet( countsData[ ,3:(3+length(conds)-1)], conds ) # create object
+  cds <- newCountDataSet( countsEvents[ ,3:(3+length(conds)-1)], conds ) # create object
   cdsSF <- estimateSizeFactors(cds)
   sizeFactors( cdsSF )
   shouldWeNormalise=sum(is.na(sizeFactors(cdsSF))) < 1
-  dim <- dim(countsData)[2]
-  countsData[ ,(dim+1):(dim+length(conds)) ] <- round(counts(cdsSF, normalized=shouldWeNormalise))
-  colnames(countsData)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
-  return(list(countsData, conds, dim, n, nr, sortedconditions))
+  dim <- dim(countsEvents)[2]
+  countsEvents[ ,(dim+1):(dim+length(conds)) ] <- round(counts(cdsSF, normalized=shouldWeNormalise))
+  colnames(countsEvents)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
+  return(list(countsEvents, conds, dim, n, nr, sortedconditions,ASSBinfo=ASSBinfo))
 }
+#### ####
 
 .eventtable <- function(df,startPosColumn4Counts, endPosCol4Counts){
   eventTab = data.frame(ID=rep(as.factor(df['ID']), endPosCol4Counts-startPosColumn4Counts+1),
@@ -158,11 +269,11 @@
 }
 
 .fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, phiDSScond, phiGlobal, nbAll){
-    # S: simple, A: additive, I : interaction models
-    # Poisson model  
+    
   nbglmA0 <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4,0))
   nbglmI0 <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5,0))  
-
+    # S: simple, A: additive, I : interaction models
+    # Poisson model  
   nbAnov0 <- anova(nbglmA0, nbglmI0)
   nbAIC0 <- c(AIC(nbglmA0,k = log(nbAll))@istats$AIC, AIC(nbglmI0,k = log(nbAll))@istats$AIC)
     # singular.hessian:  true when fitting provided a singular hessian, indicating an overparamaterized model.
@@ -236,6 +347,10 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, ex
   index <- 3
   indexNames <- 2
   firstLineChar <- substr(lines[index], start = 0, stop = 1)
+  #### psi 13/01 ####
+  psiInfo <- matrix(NA,length(lines)/2,length(resultLine1$psiInfo))
+  psiInfo[1,] <- resultLine1$psiInfo
+  #### ####
   if (firstLineChar == '>') {
     while (index <= length(lines)) {
       line <- lines[index]
@@ -246,15 +361,25 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, ex
       events.mat[indexNames,1] <- as.numeric(variantLength)
       events.mat[indexNames,2:dim(events.mat)[2]] <- variantCounts
       events.names[indexNames] <- eventName
+      #### psi 13/01 ####
+      psiInfo[indexNames,] <- resultLine$psiInfo
+      #### ####
       index <- index + 2
       indexNames <- indexNames + 1
+      
     }
   }
   class(events.mat) <- "numeric"
   events.df <- as.data.frame(events.mat)
   events.df <- data.frame(events.names,events.df)
   close(toConvert)
-  return (events.df)
+  
+  #### psi 13/01###
+  # return (events.df)
+  psidf <- as.data.frame(psiInfo)
+  psiInfo.df <-  data.frame(events.names,psidf)
+  return (list(countsEvents=events.df,psiInfo=psiInfo.df))
+  #### ####
 }
 
 qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None") {
@@ -281,6 +406,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   ###################################################
   ### code chunk number 1: Read and prepare data
   ###################################################
+
   listData <-.readAndPrepareData(countsData,conditions)
   countsData <- listData[[1]]
   conds <- listData[[2]]
@@ -346,9 +472,10 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
         void <- dev.off()
     }
 }
+### psi 19/01 ####
+# diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterLowCountsVariants=10, flagLowCountsConditions=10) {
+diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterLowCountsVariants=10, flagLowCountsConditions=10, readLength=75, overlap=42) {
 
-diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterLowCountsVariants=10, flagLowCountsConditions=10) {
- 
   options(warn=-1) # suppress the warning for the users
 
   if (storeFigs == TRUE){
@@ -366,15 +493,28 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   }
 
 
-  ###################################################
-  ### code chunk number 1: Read and prepare data
-  ###################################################
+    ###################################################
+    ### code chunk number 1: Read and prepare data
+    ###################################################
+  
   listData <-.readAndPrepareData(countsData,conditions)
   countsData <- listData[[1]]
   n <- listData[[4]]
   nr <- listData[[5]]
   sortedconditions <- listData[[6]]
+  #### psi 19/01 ####
+  ASSBinfo <-  listData$ASSBinfo
+  if (! is.null(ASSBinfo)) {
+    li<-c()
+    for (i in (1:dim(ASSBinfo)[1])){
+      if (i%%2!=0) {
+        li<-c(li,i)
+      }
+    }
+    ASSBinfo <- ASSBinfo[li,]
+  }
 
+  #### ####
   ##################################################
   ## code chunk number 2: event-list
   ##################################################
@@ -398,6 +538,11 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
     dataPart2 <- dataPart2[!duplicated(as.character(dataPart2[ ,1])), ]
   }
   rownames(dataPart2)=as.character(dataPart2[ ,1])
+  #### psi 19/01 ####
+  if (! is.null(ASSBinfo)) {
+    rownames(ASSBinfo)<-dataPart2[,1]
+  }
+  #### ####
   rownames(lengths) <-rownames(dataPart2) 
   # create list for the complete data set
   allEventtables  <- apply(dataPart2,1,.eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart2)))[1],endPosCol4Counts = ncol(dataPart2))
@@ -470,7 +615,16 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   totLOW <- as.vector(apply(dataPart2[ ,(3 + sum(nr)):(3 + 2 * sum(nr) - 1)],1,sum)) #global counts for each variant (low/up) by event
   totUP <- as.vector(apply(dataPart2[ ,3:(3 + sum(nr) - 1)],1,sum))
 
-  dataPart3 <- dataPart2[-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants),]#after the dispersion estimation, discard the events that have at least one variant with global count <10
+  
+  #### psi 19/01 ####
+  # dataPart3 <- dataPart2[-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants),]#after the dispersion estimation, discard the events that have at least one variant with global count <10
+  ####
+  newindex <- dataPart2[-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants),1]
+  dataPart3 <- dataPart2[newindex,]
+  # if (! is.null(ASSBinfo)) {
+  #   ASSBinfo <- ASSBinfo[newindex,]
+  # }
+  #### ####
   exprs(dispData) <- exprs(dispData)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
   exprs(dispDataMeanCond) <- exprs(dispDataMeanCond)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
   allEventtables  <- apply(dataPart3,1,.eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart3)))[1],endPosCol4Counts = ncol(dataPart3))
@@ -509,17 +663,17 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
                                     "(c)shA","(c)shI")
   if (length(sing.events) != 0) {
     rownames(pALLGlobalPhi.glm.nb) <- dataPart3[ - sing.events, 1]
+    # #### psi 19/01 ####
+    # if (! is.null(ASSBinfo)) {
+    # ASSBinfo <- ASSBinfo[- sing.events,]
+    #   }
+    # #### ####
   } else {
     rownames(pALLGlobalPhi.glm.nb) <- dataPart3[ , 1]
   }
   pALLGlobalPhi.glm.nb = pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[ , 1]), ]
-
-
-  #####
   matrixpALLGlobalPhi <- as.matrix(pALLGlobalPhi.glm.nb)
   storage.mode(matrixpALLGlobalPhi) <- 'numeric'
-  #####
-  #####
 
   ###################################################
   ### code chunk number 10: best model
@@ -544,9 +698,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   ###################################################
   ### code chunk number 11: glmnet
   ###################################################
-  #pALLGlobalPhi.glm.nb.glmnet = pALLGlobalPhi.glm.nb ####
-   pALLGlobalPhi.glm.nb.glmnet = as.data.frame(matrixpALLGlobalPhi)
-
+  pALLGlobalPhi.glm.nb.glmnet = as.data.frame(matrixpALLGlobalPhi)
   pALLGlobalPhi.glm.nb.glmnet$glmnet.pval = 1
   pALLGlobalPhi.glm.nb.glmnet$glmnet.code = 0
   singhes0 = which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == 1)# Variants for which the Poisson model is better
@@ -574,18 +726,6 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
                                                             dispersion(dispData)[i],
                                                             dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
   }
-
-  # sing.events.pseudocounts <- which(grepl("Error",pALLGlobalPhi.glm.nb.pen[ , 1])) ########%%%%%%%%
-  # if (length(sing.events.pseudocounts) != 0) {
-  #     pALLGlobalPhi.glm.nb.pen <- pALLGlobalPhi.glm.nb.pen[ - sing.events.pseudocounts, ]
-  # }
-
-  # matrixpALLGlobalPhi.pen <- as.matrix(pALLGlobalPhi.glm.nb.pen)
-  # storage.mode(matrixpALLGlobalPhi.pen) <- 'numeric'
-  #singhes2 = which(apply(matrixpALLGlobalPhi.pen[ ,c(6,8,10,12)],1,which.min) > 1 & apply(matrixpALLGlobalPhi.pen[ ,c(22,24,26,28)],1,sum) != 0)######%%%%
-
-  ###################################################
-  ###################################################
 
   pALLGlobalPhi.glm.nb <- as.data.frame(matrixpALLGlobalPhi)
   pALLGlobalPhi.glm.nb$final.pval.a.ia = 1
@@ -622,125 +762,132 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   if (length(sing.events) != 0) {
     tmpdataPart3 <- dataPart3[ - sing.events, ] ######## %%%%%%%%%%
     signifVariants <- cbind(tmpdataPart3[ - sing.events.final, ],pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]########### %%%%%%%%
+
   } else {
     signifVariants <- cbind(dataPart3, pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
+
   }
+    #### psi 19/01####
+    ASSBinfo <-subset(ASSBinfo,events.names %in% as.vector(signifVariants[,1])) #select only the lines corresponding to the remaining lines of signifVariants
+    #### ####
 
+  #############################################################################################################
+  ### deltaPSI / deltaF computation
+  #############################################################################################################
 
-#############################################################################################################
-### deltaPSI / deltaF computation
-#############################################################################################################
-
-pairsCond <-list()
-namesCond <- unique(sortedconditions)
-for ( i in 1:n) {
-  j <- i+1
-  while ( j <= n ) {
-    pairsCond[[length(pairsCond)+1]] <- list(c(i,j))#creation of permutation of size 2 in c
-    j <- j+1
-  }
-}
-sumLowCond <- matrix(nrow=dim(signifVariants)[1],ncol=n)
-
-
-# sumup <- rep(0,dim(signifVariants)[1])
-# sumlow <- rep(0,dim(signifVariants)[1])
-sumdf <- data.frame(rep(0,dim(signifVariants)[1]),rep(0,dim(signifVariants)[1]))
-rownames(sumdf)=rownames(signifVariants)
-rown <-row.names(sumdf)
-sumdf <- data.frame(sumdf,lengths[rown,])
-colnames(sumdf) <- c("up_sum","low_sum","up_length","low_length")
-
-
-# deltapsi <- matrix(data=rep(sumup/(sumup+sumlow),length(pairsCond)), ncol=length(pairsCond))
-# deltapsi <- matrix(data=rep(sumup[,1]/(sumup[,1]+sumlow[,1]),length(pairsCond)), ncol=length(pairsCond))
-deltapsi <- matrix(data=rep(sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum),length(pairsCond)), ncol=length(pairsCond))
-indexdelta <- 1
-for (pair in pairsCond) { #delta psi calculated for pairs of conditions
-  index <- pair[[1]]
-  namesC <- namesCond[index]
-  replicates <- nr[index]#replicates for the pair
-  upNames <- list()
-  lowNames <- list()
-  for (nb in 1:length(replicates)) {#for one pair, in replicates
-    indexlist <- 1
-    # deltapsi[,indexdelta] = sumup/(sumup+sumlow)
-
-    # sumup <- rep(0,dim(signifVariants)[1])
-    # sumlow <- rep(0,dim(signifVariants)[1])
-
-    # deltapsi[,indexdelta] = sumup[,1]/(sumup[,1]+sumlow[,1])
-    deltapsi[,indexdelta] = sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum)
-    # sumup <- data.frame(rep(0,dim(signifVariants)[1]))
-    # sumlow <- data.frame(rep(0,dim(signifVariants)[1]))
-    sumdf <- data.frame(rep(0,dim(signifVariants)[1]),rep(0,dim(signifVariants)[1]))
-    rownames(sumdf)=rownames(signifVariants)
-    rown <-row.names(sumdf)
-    sumdf <- data.frame(sumdf,lengths[rown,])
-    colnames(sumdf) <- c("up_sum","low_sum","up_length","low_length")
-    for (i in 1:replicates[nb]) { 
-      upNames[[indexlist]] <- paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')
-      lowNames [[indexlist]] <-paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')
-      # sumup <- sumup + signifVariants[, paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')] #sum incl. isoform for 1 condition (all replicates)
-      # sumlow <- sumlow +signifVariants[, paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')]#sum excl. isoform for 1 condition (all replicates)
-      sumdf$up_sum <- sumdf$up_sum + signifVariants[, paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')] #sum incl. isoform for 1 condition (all replicates)
-      sumdf$low_sum <- sumdf$low_sum +signifVariants[, paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')]#sum excl. isoform for 1 condition (all replicates)
+  pairsCond <-list()
+  namesCond <- unique(sortedconditions)
+  for ( i in 1:n) {
+    j <- i+1
+    while ( j <= n ) {
+      pairsCond[[length(pairsCond)+1]] <- list(c(i,j))#creation of permutation of size 2 in c
+      j <- j+1
     }
-    indexlist <- indexlist + 1
-    # sumLowCond[,nb] <- sumup+sumlow
-    # sumLowCond[,nb] <- sumup[,1] + sumlow[,1]
-    # sumLowCond[,nb] <- sumdf$up_sum + sumdf$low_sum
-    sumLowCond[,nb] <- sumdf$up_sum/sumdf$up_length + sumdf$low_sum/sumdf$low_length
-    ####
-    sumdf$up_sum <- sumdf$up_sum/sumdf$up_length
-    sumdf$low_sum <-sumdf$low_sum/sumdf$low_length
-    ####
   }
-  # deltapsi[,indexdelta] = sumup/(sumup+sumlow) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
-  # deltapsi[,indexdelta] = sumup[,1]/(sumup[,1]+sumlow[,1]) - deltapsi[,indexdelta]
-  deltapsi[,indexdelta] = sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
-  indexdelta <- indexdelta+1
-}
+  sumLowCond <- matrix(nrow=dim(signifVariants)[1],ncol=n)
+  sumdf <- data.frame(rep(0,dim(signifVariants)[1]),rep(0,dim(signifVariants)[1]))
+  rownames(sumdf)=rownames(signifVariants)
+  rown <-row.names(sumdf)
+  sumdf <- data.frame(sumdf,lengths[rown,])
+  colnames(sumdf) <- c("up_sum","low_sum","up_length","low_length")
+  deltapsi <- matrix(data=rep(sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum),length(pairsCond)), ncol=length(pairsCond))
+  # deltapsi <- matrix(data=rep(0,length(pairsCond)), ncol=length(pairsCond))
+  indexdelta <- 1
+  for (pair in pairsCond) { #delta psi calculated for pairs of conditions
+    index <- pair[[1]]
+    namesC <- namesCond[index]
+    replicates <- nr[index]#replicates for the pair
+    upNames <- list()
+    lowNames <- list()
+    for (nb in 1:length(replicates)) {#for one pair, in replicates
+      indexlist <- 1
+      if (! is.null(ASSBinfo)) {
+        newindex <- unlist(sapply(rownames(sumdf),function(x)res <- which(ASSBinfo[,1]==x))) #to put the lines of the 2 data frames in the same order
+        ASSBinfo <- ASSBinfo[newindex,]
+        # sumdf$up_sum <- sumdf$up_sum/2-(ASSBinfo[,namesC[nb]]/sumdf$up_sum)
+      }
+      deltapsi[,indexdelta] = sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum)
+      sumdf <- data.frame(rep(0,dim(signifVariants)[1]),rep(0,dim(signifVariants)[1]))
+      rownames(sumdf)=rownames(signifVariants)
+      rown <-row.names(sumdf)
+      sumdf <- data.frame(sumdf,lengths[rown,])
+      colnames(sumdf) <- c("up_sum","low_sum","up_length","low_length")
+      for (i in 1:replicates[nb]) { 
+        upNames[[indexlist]] <- paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')
+        lowNames [[indexlist]] <-paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')
+        sumdf$up_sum <- sumdf$up_sum + signifVariants[, paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')] #sum incl. isoform for 1 condition (all replicates)
+        # if (! is.null(ASSBinfo)) {
+        #   sumdf$up_sum <- sumdf$up_sum/2-(ASSBinfo[,namesC[nb]]/sumdf$up_sum) 
+        # }
 
-dPvector1 <-c(rep(0,dim(signifVariants)[1]))
-dPvector2 <-c(rep(0,dim(signifVariants)[1]))
-if (length(pairsCond) >1 ){
-  for (l in 1:dim(deltapsi)[1]){ #if there are more than 2 conditions, we take the maximum of the deltaPSI of all pairs
-    mindex <- which.max(abs(deltapsi[l,]))
-    condA <- as.character(pairsCond[[mindex]][[1]][1])
-    condB <- as.character(pairsCond[[mindex]][[1]][2])
-    dP <- round(deltapsi[l,mindex],4)
-    dP[which(is.nan(dP))] <- 0
-    dPvector1[l] <- dP
-    dPvector2[l] <-paste(as.character(dP),"(Cond",condB,",",condA,")",sep="")#we also return for which pair of conditions we found this max deltaPSI
+        sumdf$low_sum <- sumdf$low_sum +signifVariants[, paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')]#sum excl. isoform for 1 condition (all replicates)
+      }
+      indexlist <- indexlist + 1
+      #### psi 13/01 ####
+      # sumLowCond[,nb] <- sumdf$up_sum/sumdf$up_length + sumdf$low_sum/sumdf$low_length
+      # sumdf$up_sum <- sumdf$up_sum/sumdf$up_length
+      # sumdf$low_sum <-sumdf$low_sum/sumdf$low_length
+      if (! is.null(ASSBinfo)) {
+        # newindex <- unlist(sapply(rownames(sumdf),function(x)res <- which(ASSBinfo[,1]==x))) #to put the lines of the 2 data frames in the same order
+        #### psi 19/01 ####
+        # ASSBinfo <- ASSBinfo[newindex,]
+        sumdf$up_sum <- sumdf$up_sum/2-(ASSBinfo[,namesC[nb]]/sumdf$up_sum)
+        #### ####
+        # sumdf$low_sum <-sumdf$low_sum/sumdf$low_length
+      } else { ####CHANGE THIS L+r-2m +1
+        sumLowCond[,nb] <- sumdf$up_sum/sumdf$up_length + sumdf$low_sum/sumdf$low_length
+        #### psi 19/01 ####
+        # sumdf$up_sum <- sumdf$up_sum/sumdf$up_length
+        # sumdf$low_sum <-sumdf$low_sum/sumdf$low_length
+        sumdf$up_sum <- sumdf$up_sum/(sumdf$up_length + readLength -2*overlap +1)
+        sumdf$low_sum <-sumdf$low_sum/(sumdf$low_length + readLength -2*overlap +1)
+        #### ####
+      }
+      #### ####
+    }
+    deltapsi[,indexdelta] = sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
+    indexdelta <- indexdelta+1
   }
-} else {
-  dPvector1 <- round(deltapsi,4)
-  dPvector1[which(is.nan(dPvector1))] <- 0
-  # dPvector2<-as.character(dPvector1)
-}
 
-signifVariants <- cbind(signifVariants, dPvector1)
-signifVariants.sorted <- signifVariants[ order(-abs(dPvector1),signifVariants[dim(signifVariants)[2]-1]), ]#sorting by delta psi then by pvalue
-dPvector2.sorted <- dPvector2[order(-abs(dPvector1),signifVariants.sorted[dim(signifVariants.sorted)[2]-1])]
-signifVariants.sorted[dim(signifVariants.sorted)[2]] <- dPvector2.sorted
+  dPvector1 <-c(rep(0,dim(signifVariants)[1]))
+  dPvector2 <-c(rep(0,dim(signifVariants)[1]))
+  if (length(pairsCond) >1 ){
+    for (l in 1:dim(deltapsi)[1]){ #if there are more than 2 conditions, we take the maximum of the deltaPSI of all pairs
+      mindex <- which.max(abs(deltapsi[l,]))
+      condA <- as.character(pairsCond[[mindex]][[1]][1])
+      condB <- as.character(pairsCond[[mindex]][[1]][2])
+      dP <- round(deltapsi[l,mindex],4)
+      dP[which(is.nan(dP))] <- 0
+      dPvector1[l] <- dP
+      dPvector2[l] <-paste(as.character(dP),"(Cond",condB,",",condA,")",sep="")#we also return for which pair of conditions we found this max deltaPSI
+    }
+  } else {
+    dPvector1 <- round(deltapsi,4)
+    dPvector1[which(is.nan(dPvector1))] <- 0
+    dPvector2 <- dPvector1
+  }
+
+  signifVariants <- cbind(signifVariants, dPvector1)
+  signifVariants.sorted <- signifVariants[ order(-abs(dPvector1),signifVariants[dim(signifVariants)[2]-1]), ]#sorting by delta psi then by pvalue
+  dPvector2.sorted <- dPvector2[order(-abs(dPvector1),signifVariants.sorted[dim(signifVariants.sorted)[2]-1])]
+  signifVariants.sorted[dim(signifVariants.sorted)[2]] <- dPvector2.sorted
 
   colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))] <- 'Deltaf/DeltaPSI'# renaming last columns
   colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))-1] <- 'Adjusted_pvalue'
 
-###################################################
-### Low counts
-###################################################
-#Condition to flag a low count for an event :
-lowcounts <- c()
+  ###################################################
+  ### Low counts
+  ###################################################
+  #Condition to flag a low count for an event :
+  lowcounts <- c()
 
-for (i in 1:dim(sumLowCond)[1]){
-  lowcounts <- c(lowcounts,length(sumLowCond[i, sumLowCond[i, ]<flagLowCountsConditions]) >= n-1) #at least n-1 conditions have counts below 10
-} 
-signifVariants.sorted <- cbind(signifVariants.sorted, lowcounts)
-colnames(signifVariants.sorted[dim(signifVariants.sorted)[2]]) <- 'Low_counts'
-rownames(signifVariants.sorted) <- signifVariants.sorted[,1]# as order may has changed when they were sorted
+  for (i in 1:dim(sumLowCond)[1]){
+    lowcounts <- c(lowcounts,length(sumLowCond[i, sumLowCond[i, ]<flagLowCountsConditions]) >= n-1) #at least n-1 conditions have counts below 10
+  } 
+  signifVariants.sorted <- cbind(signifVariants.sorted, lowcounts)
+  colnames(signifVariants.sorted[dim(signifVariants.sorted)[2]]) <- 'Low_counts'
+  rownames(signifVariants.sorted) <- signifVariants.sorted[,1]# as order may has changed when they were sorted
 
-return(signifVariants.sorted)
+  return(signifVariants.sorted)
 
-}
+  }
