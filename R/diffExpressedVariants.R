@@ -215,22 +215,26 @@
   if(! is.null(psiInfo)){
     psiInfo[,-1] <- psiInfo[,sortedindex-1]
     colnames(psiInfo) <- c("events.names",namesData[c(-1,-2)])
-    ASSBinfo <- data.frame(psiInfo[,1])
     
-    # for (k in (1:dim(psiInfo)[1])){
-      indexCondit <- 0
-      for (nbreplic in nr) {
-        indexCondit <- indexCondit+1
-        name <- c()
-          for (replic in (1:nbreplic)) {
-          name <- c(name,paste(unique(sortedconditions)[indexCondit],"_r",replic,sep=""))
-          # sum <- sum(psiInfo[,]
-        } 
-        ASSBinfo<-data.frame(ASSBinfo,rowSums(psiInfo[,name]))
-      }
-    # }
-    colnames(ASSBinfo) <- c("events.names",unique(sortedconditions))
+     #### new psi 9/02 ####
+     # ASSBinfo <- data.frame(psiInfo[,1])
+      # indexCondit <- 0
+      # for (nbreplic in nr) {
+      #   indexCondit <- indexCondit+1
+      #   name <- c()
+      #     for (replic in (1:nbreplic)) {
+      #     name <- c(name,paste(unique(sortedconditions)[indexCondit],"_r",replic,sep=""))
+      #   } 
+      #   ASSBinfo<-data.frame(ASSBinfo,rowSums(psiInfo[,name]))
+      # }
+    #### new psi 9/02 ####
+    # colnames(ASSBinfo) <- c("events.names",unique(sortedconditions))
+    # colnames(psiInfo) <- namesData[c(-1,-2)]
+    ####
+    ASSBinfo <- data.frame(psiInfo)
+    colnames(ASSBinfo) <- c("events.names",namesData[c(-1,-2)])
     colnames(psiInfo) <- namesData[c(-1,-2)]
+    ####
   } else {
     ASSBinfo <- NULL
   }
@@ -366,7 +370,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, ex
       #### ####
       index <- index + 2
       indexNames <- indexNames + 1
-      
+      # print(index)
     }
   }
   class(events.mat) <- "numeric"
@@ -774,7 +778,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   #############################################################################################################
   ### deltaPSI / deltaF computation
   #############################################################################################################
-
+  sumLowCond <- matrix(data=rep(0,n*dim(signifVariants)[1]),nrow=dim(signifVariants)[1],ncol=n)#to  check later for low counts to flag
   pairsCond <-list()
   namesCond <- unique(sortedconditions)
   for ( i in 1:n) {
@@ -784,69 +788,71 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
       j <- j+1
     }
   }
-  sumLowCond <- matrix(nrow=dim(signifVariants)[1],ncol=n)
-  sumdf <- data.frame(rep(0,dim(signifVariants)[1]),rep(0,dim(signifVariants)[1]))
-  rownames(sumdf)=rownames(signifVariants)
-  rown <-row.names(sumdf)
-  sumdf <- data.frame(sumdf,lengths[rown,])
-  colnames(sumdf) <- c("up_sum","low_sum","up_length","low_length")
-  deltapsi <- matrix(data=rep(sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum),length(pairsCond)), ncol=length(pairsCond))
-  # deltapsi <- matrix(data=rep(0,length(pairsCond)), ncol=length(pairsCond))
-  indexdelta <- 1
+  #### new psi 9/02 ####   
+  namesPsiPairCond <- c()
+  if (! is.null(ASSBinfo)) {
+    newindex <- unlist(sapply(rownames(signifVariants),function(x)res <- which(ASSBinfo[,1]==x))) #to put the lines of the 2 data frames in the same order
+    ASSBinfo <- ASSBinfo[newindex,]
+  } else {
+    rown <-row.names(signifVariants)
+    lengths2 <- lengths[rown,]
+  }
+  deltapsi <- matrix(nrow=dim(signifVariants)[1], ncol=length(pairsCond))
+  rownames(deltapsi) <- rownames(signifVariants)
+  namesDeltaPsi <- c()
   for (pair in pairsCond) { #delta psi calculated for pairs of conditions
-    index <- pair[[1]]
-    namesC <- namesCond[index]
-    replicates <- nr[index]#replicates for the pair
-    upNames <- list()
-    lowNames <- list()
-    for (nb in 1:length(replicates)) {#for one pair, in replicates
-      indexlist <- 1
-      if (! is.null(ASSBinfo)) {
-        newindex <- unlist(sapply(rownames(sumdf),function(x)res <- which(ASSBinfo[,1]==x))) #to put the lines of the 2 data frames in the same order
-        ASSBinfo <- ASSBinfo[newindex,]
-        # sumdf$up_sum <- sumdf$up_sum/2-(ASSBinfo[,namesC[nb]]/sumdf$up_sum)
-      }
-      deltapsi[,indexdelta] = sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum)
-      sumdf <- data.frame(rep(0,dim(signifVariants)[1]),rep(0,dim(signifVariants)[1]))
-      rownames(sumdf)=rownames(signifVariants)
-      rown <-row.names(sumdf)
-      sumdf <- data.frame(sumdf,lengths[rown,])
-      colnames(sumdf) <- c("up_sum","low_sum","up_length","low_length")
-      for (i in 1:replicates[nb]) { 
-        upNames[[indexlist]] <- paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')
-        lowNames [[indexlist]] <-paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')
-        sumdf$up_sum <- sumdf$up_sum + signifVariants[, paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')] #sum incl. isoform for 1 condition (all replicates)
-        # if (! is.null(ASSBinfo)) {
-        #   sumdf$up_sum <- sumdf$up_sum/2-(ASSBinfo[,namesC[nb]]/sumdf$up_sum) 
-        # }
+      index <- pair[[1]]
+      condi <- namesCond[index]
+      replicates <- nr[index]
+      psiPairCond <- matrix(nrow=dim(signifVariants)[1],ncol=sum(replicates))
+      colsPsiPairCond <- c()
+      indexMatrixPsiPairCond <- 1
+      indexdeltapsi <- 1
+      for (nbRepli in 1:length(replicates)) {
+        for (i in 1:replicates[nbRepli]) {
+          colsPsiPairCond <- c(colsPsiPairCond, paste(condi[nbRepli],'_r',i, sep=''))
+          namesUp <- c(paste("UP_",condi[nbRepli],'_r',i,"_Norm", sep=''))
+          namesLow <- c(paste("LP_",condi[nbRepli],'_r',i,"_Norm", sep=''))
+          subsetUp <- signifVariants[namesUp]
+          subsetLow <- signifVariants[namesLow]
+          sumLowCond[,nbRepli] <- sumLowCond[,nbRepli] + as.matrix(subsetUp) + as.matrix(subsetLow)
 
-        sumdf$low_sum <- sumdf$low_sum +signifVariants[, paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')]#sum excl. isoform for 1 condition (all replicates)
-      }
-      indexlist <- indexlist + 1
-      #### psi 13/01 ####
-      # sumLowCond[,nb] <- sumdf$up_sum/sumdf$up_length + sumdf$low_sum/sumdf$low_length
-      # sumdf$up_sum <- sumdf$up_sum/sumdf$up_length
-      # sumdf$low_sum <-sumdf$low_sum/sumdf$low_length
-      if (! is.null(ASSBinfo)) {
-        # newindex <- unlist(sapply(rownames(sumdf),function(x)res <- which(ASSBinfo[,1]==x))) #to put the lines of the 2 data frames in the same order
-        #### psi 19/01 ####
-        # ASSBinfo <- ASSBinfo[newindex,]
-        sumdf$up_sum <- sumdf$up_sum/2-(ASSBinfo[,namesC[nb]]/sumdf$up_sum)
-        #### ####
-        # sumdf$low_sum <-sumdf$low_sum/sumdf$low_length
-      } else { ####CHANGE THIS L+r-2m +1
-        sumLowCond[,nb] <- sumdf$up_sum/sumdf$up_length + sumdf$low_sum/sumdf$low_length
-        #### psi 19/01 ####
-        # sumdf$up_sum <- sumdf$up_sum/sumdf$up_length
-        # sumdf$low_sum <-sumdf$low_sum/sumdf$low_length
-        sumdf$up_sum <- sumdf$up_sum/(sumdf$up_length + readLength -2*overlap +1)
-        sumdf$low_sum <-sumdf$low_sum/(sumdf$low_length + readLength -2*overlap +1)
-        #### ####
-      }
-      #### ####
-    }
-    deltapsi[,indexdelta] = sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
-    indexdelta <- indexdelta+1
+          subsetUp[which(subsetUp[,1] < 10),] <- NaN
+          subsetLow[which(subsetLow[,1] < 10),] <- NaN
+          
+          if (! is.null(ASSBinfo)) {# counts correction
+            nameASSBinfo <- c(paste(condi[nbRepli],'_r',i, sep=''))
+            subsetUp <- subsetUp/2-(ASSBinfo[,nameASSBinfo]/subsetUp)
+          } else {#counts correction if there is no info about the junction counts
+            subsetUp <- subsetUp/(lengths2$upper + readLength - 2*overlap + 1)
+            subsetLow <- subsetLow/(lengths2$lower + readLength - 2*overlap + 1)
+          }
+          psiPairCond[,indexMatrixPsiPairCond] <- as.matrix(subsetUp/(subsetUp+subsetLow))
+          indexMatrixPsiPairCond <- indexMatrixPsiPairCond + 1
+          namesPsiPairCond <- c(namesPsiPairCond, as.character(condi[nbRepli]))
+        }
+      } 
+  colnames(psiPairCond) <- namesPsiPairCond
+  rownames(psiPairCond) <- rownames(signifVariants)
+  # noNaNSums <- rowSums((!is.nan(psiPairCond))+0) #(!is.nan(psiPairCond))+0 pus 1 if no NaN, 0 else
+  # #if there are 2 NaN and 3 values for a bcc, nanSums is at 3
+  # listNoNan <- names(noNaNSums[which(noNaNSums>=dim(psiPairCond)[2]/2)]) #when there is not too many NaN (more values than NaN in the line)
+  # psiPairCond[which(is.nan(psiPairCond[rownames(psiPairCond) %in% listNoNan,]))] = 0 #replace by 0 the NaN when there is not too many NaN so that we can compute the delta psi
+
+  ####
+  psiPairCond <- replace(psiPairCond, is.na(psiPairCond),0)
+  NaNSums <- rowSums(( psiPairCond==0 )+0) #1 if NaN, 0 else
+  #if there are 2 NaN and 3 values for a bcc, nanSums is at 2
+  listNaN <- names(NaNSums[which(NaNSums>dim(psiPairCond)[2]/2)])
+  psiPairCond[listNaN,]=NaN
+  deltaPsiCond <- rowMeans(psiPairCond[,(replicates[1]+1):sum(replicates)]) - rowMeans(psiPairCond[,1:replicates[1]])
+  # deltaPsiCond[listNaN,] = NaN
+  deltapsi[,indexdeltapsi] <- deltaPsiCond
+  indexdeltapsi <- indexdeltapsi + 1
+
+
+
+
   }
 
   dPvector1 <-c(rep(0,dim(signifVariants)[1]))
@@ -857,15 +863,101 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
       condA <- as.character(pairsCond[[mindex]][[1]][1])
       condB <- as.character(pairsCond[[mindex]][[1]][2])
       dP <- round(deltapsi[l,mindex],4)
-      dP[which(is.nan(dP))] <- 0
+      # dP[which(is.nan(dP))] <- 0
       dPvector1[l] <- dP
       dPvector2[l] <-paste(as.character(dP),"(Cond",condB,",",condA,")",sep="")#we also return for which pair of conditions we found this max deltaPSI
     }
   } else {
     dPvector1 <- round(deltapsi,4)
-    dPvector1[which(is.nan(dPvector1))] <- 0
+    # dPvector1[which(is.nan(dPvector1))] <- 0
     dPvector2 <- dPvector1
   }
+
+
+  ####
+
+  # sumLowCond <- matrix(nrow=dim(signifVariants)[1],ncol=n)
+  # sumdf <- data.frame(rep(0,dim(signifVariants)[1]),rep(0,dim(signifVariants)[1]))
+  # rownames(sumdf)=rownames(signifVariants)
+  # rown <-row.names(sumdf)
+  # sumdf <- data.frame(sumdf,lengths[rown,])
+  # colnames(sumdf) <- c("up_sum","low_sum","up_length","low_length")
+  # deltapsi <- matrix(data=rep(sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum),length(pairsCond)), ncol=length(pairsCond))
+  # # deltapsi <- matrix(data=rep(0,length(pairsCond)), ncol=length(pairsCond))
+  # indexdelta <- 1
+  # for (pair in pairsCond) { #delta psi calculated for pairs of conditions
+  #   index <- pair[[1]]
+  #   namesC <- namesCond[index]
+  #   replicates <- nr[index]#replicates for the pair
+  #   upNames <- list()
+  #   lowNames <- list()
+  #   for (nb in 1:length(replicates)) {#for one pair, in replicates
+  #     indexlist <- 1
+  #     if (! is.null(ASSBinfo)) {
+  #       newindex <- unlist(sapply(rownames(sumdf),function(x)res <- which(ASSBinfo[,1]==x))) #to put the lines of the 2 data frames in the same order
+  #       ASSBinfo <- ASSBinfo[newindex,]
+  #       # sumdf$up_sum <- sumdf$up_sum/2-(ASSBinfo[,namesC[nb]]/sumdf$up_sum)
+  #     }
+  #     deltapsi[,indexdelta] = sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum)
+  #     sumdf <- data.frame(rep(0,dim(signifVariants)[1]),rep(0,dim(signifVariants)[1]))
+  #     rownames(sumdf)=rownames(signifVariants)
+  #     rown <-row.names(sumdf)
+  #     sumdf <- data.frame(sumdf,lengths[rown,])
+  #     colnames(sumdf) <- c("up_sum","low_sum","up_length","low_length")
+  #     for (i in 1:replicates[nb]) { 
+  #       upNames[[indexlist]] <- paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')
+  #       lowNames [[indexlist]] <-paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')
+  #       sumdf$up_sum <- sumdf$up_sum + signifVariants[, paste('UP_',namesC[nb],'_r',i,'_Norm', sep='')] #sum incl. isoform for 1 condition (all replicates)
+  #       # if (! is.null(ASSBinfo)) {
+  #       #   sumdf$up_sum <- sumdf$up_sum/2-(ASSBinfo[,namesC[nb]]/sumdf$up_sum) 
+  #       # }
+
+  #       sumdf$low_sum <- sumdf$low_sum +signifVariants[, paste('LP_',namesC[nb],'_r',i,'_Norm', sep='')]#sum excl. isoform for 1 condition (all replicates)
+  #     }
+  #     indexlist <- indexlist + 1
+  #     #### psi 13/01 ####
+  #     # sumLowCond[,nb] <- sumdf$up_sum/sumdf$up_length + sumdf$low_sum/sumdf$low_length
+  #     # sumdf$up_sum <- sumdf$up_sum/sumdf$up_length
+  #     # sumdf$low_sum <-sumdf$low_sum/sumdf$low_length
+  #     if (! is.null(ASSBinfo)) {
+  #       # newindex <- unlist(sapply(rownames(sumdf),function(x)res <- which(ASSBinfo[,1]==x))) #to put the lines of the 2 data frames in the same order
+  #       #### psi 19/01 ####
+  #       # ASSBinfo <- ASSBinfo[newindex,]
+  #       sumdf$up_sum <- sumdf$up_sum/2-(ASSBinfo[,namesC[nb]]/sumdf$up_sum)
+  #       #### ####
+  #       # sumdf$low_sum <-sumdf$low_sum/sumdf$low_length
+  #     } else { ####CHANGE THIS L+r-2m +1
+  #       sumLowCond[,nb] <- sumdf$up_sum/sumdf$up_length + sumdf$low_sum/sumdf$low_length
+  #       #### psi 19/01 ####
+  #       # sumdf$up_sum <- sumdf$up_sum/sumdf$up_length
+  #       # sumdf$low_sum <-sumdf$low_sum/sumdf$low_length
+  #       sumdf$up_sum <- sumdf$up_sum/(sumdf$up_length + readLength -2*overlap +1)
+  #       sumdf$low_sum <-sumdf$low_sum/(sumdf$low_length + readLength -2*overlap +1)
+  #       #### ####
+  #     }
+  #     #### ####
+  #   }
+  #   deltapsi[,indexdelta] = sumdf$up_sum/(sumdf$up_sum+sumdf$low_sum) - deltapsi[,indexdelta] #difference between the PSI of the two conditions
+  #   indexdelta <- indexdelta+1
+  # }
+
+  # dPvector1 <-c(rep(0,dim(signifVariants)[1]))
+  # dPvector2 <-c(rep(0,dim(signifVariants)[1]))
+  # if (length(pairsCond) >1 ){
+  #   for (l in 1:dim(deltapsi)[1]){ #if there are more than 2 conditions, we take the maximum of the deltaPSI of all pairs
+  #     mindex <- which.max(abs(deltapsi[l,]))
+  #     condA <- as.character(pairsCond[[mindex]][[1]][1])
+  #     condB <- as.character(pairsCond[[mindex]][[1]][2])
+  #     dP <- round(deltapsi[l,mindex],4)
+  #     dP[which(is.nan(dP))] <- 0
+  #     dPvector1[l] <- dP
+  #     dPvector2[l] <-paste(as.character(dP),"(Cond",condB,",",condA,")",sep="")#we also return for which pair of conditions we found this max deltaPSI
+  #   }
+  # } else {
+  #   dPvector1 <- round(deltapsi,4)
+  #   dPvector1[which(is.nan(dPvector1))] <- 0
+  #   dPvector2 <- dPvector1
+  # }
 
   signifVariants <- cbind(signifVariants, dPvector1)
   signifVariants.sorted <- signifVariants[ order(-abs(dPvector1),signifVariants[dim(signifVariants)[2]-1]), ]#sorting by delta psi then by pvalue
