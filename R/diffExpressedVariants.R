@@ -815,12 +815,6 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
           colsPsiPairCond <- c(colsPsiPairCond, paste(condi[nbRepli],'_r',i, sep=''))
           namesUp <- c(paste("UP_",condi[nbRepli],'_r',i,"_Norm", sep=''))
           namesLow <- c(paste("LP_",condi[nbRepli],'_r',i,"_Norm", sep=''))
-          subsetUp <- signifVariants[namesUp]
-          subsetLow <- signifVariants[namesLow]
-          sumLowCond[,nbRepli] <- sumLowCond[,nbRepli] + as.matrix(subsetUp) + as.matrix(subsetLow)
-
-          subsetUp[which(subsetUp[,1] < 10),] <- NaN
-          subsetLow[which(subsetLow[,1] < 10),] <- NaN
           
           if (! is.null(ASSBinfo)) {# counts correction
             nameASSBinfo <- c(paste(condi[nbRepli],'_r',i, sep=''))
@@ -829,6 +823,14 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
             subsetUp <- subsetUp/(lengths2$upper + readLength - 2*overlap + 1)
             subsetLow <- subsetLow/(lengths2$lower + readLength - 2*overlap + 1)
           }
+
+          subsetUp <- signifVariants[namesUp]
+          subsetLow <- signifVariants[namesLow]
+          sumLowCond[,nbRepli] <- sumLowCond[,nbRepli] + as.matrix(subsetUp) + as.matrix(subsetLow)
+
+          subsetUp[which(subsetUp[,1] < 10),] <- NaN
+          subsetLow[which(subsetLow[,1] < 10),] <- NaN
+
           psiPairCond[,indexMatrixPsiPairCond] <- as.matrix(subsetUp/(subsetUp+subsetLow))
           indexMatrixPsiPairCond <- indexMatrixPsiPairCond + 1
           namesPsiPairCond <- c(namesPsiPairCond, as.character(condi[nbRepli]))
