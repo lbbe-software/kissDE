@@ -772,7 +772,9 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
 
   }
     #### psi 19/01####
-    ASSBinfo <-subset(ASSBinfo,events.names %in% as.vector(signifVariants[,1])) #select only the lines corresponding to the remaining lines of signifVariants
+   if (! is.null(ASSBinfo)) {
+    ASSBinfo <-subset(ASSBinfo,ASSBinfo$events.names %in% as.vector(signifVariants[,1])) #select only the lines corresponding to the remaining lines of signifVariants
+  }
     #### ####
 
   #############################################################################################################
