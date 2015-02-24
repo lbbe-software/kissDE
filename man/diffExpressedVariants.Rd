@@ -14,7 +14,7 @@
 	\item{readLength=75}{length of the reads from the data set used. This size is used to correct the delta PSI computation.}
 	\item{overlap=42}{mapping seed length, usually k+1 (with k size of the k-mers in KisSplice). The value is used to correct the delta PSI computation.}
 	}
-}
+
 \details{
 }
 \value{
