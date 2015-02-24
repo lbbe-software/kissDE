@@ -708,12 +708,16 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   colnames(psiPairCond) <- namesPsiPairCond
   rownames(psiPairCond) <- rownames(signifVariants)
   rownames(sumLowCond) <- rownames(signifVariants)
-  psiPairCond <- replace(psiPairCond, is.na(psiPairCond),0)
-  NaNSums <- rowSums(( psiPairCond==0 )+0) #1 if NaN, 0 else
+  #### 23/02 ####
+  # psiPairCond <- replace(psiPairCond, is.na(psiPairCond),0)
+  # NaNSums <- rowSums(( psiPairCond==0 )+0) #1 if NaN, 0 else
+  #### 23/02####
+  NaNSums <- rowSums(( is.na(psiPairCond) )+0) #1 if NaN, 0 else
+  #### ####
   #if there are 2 NaN and 3 values for a bcc, nanSums is at 2
   listNaN <- names(NaNSums[which(NaNSums>dim(psiPairCond)[2]/2)]) #when there are more NaN than nb of column/2, we do not calculate the psi
   psiPairCond[listNaN,]=NaN
-  deltaPsiCond <- rowMeans(psiPairCond[,(replicates[1]+1):sum(replicates)]) - rowMeans(psiPairCond[,1:replicates[1]]) #delta psi is the mean of the psis of the 2nd condition (in terms of sorted condition) - the mean of the psis of the 1st condition 
+  deltaPsiCond <- rowMeans(psiPairCond[,(replicates[1]+1):sum(replicates)],na.rm=TRUE) - rowMeans(psiPairCond[,1:replicates[1]],na.rm=TRUE) #delta psi is the mean of the psis of the 2nd condition (in terms of sorted condition) - the mean of the psis of the 1st condition 
   deltapsi[,indexdeltapsi] <- deltaPsiCond 
   indexdeltapsi <- indexdeltapsi + 1
   }
