@@ -511,6 +511,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
 
   newindex <- dataPart2[-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants),1]#we filter out variants which counts do not reach the fixed limit
   dataPart3 <- dataPart2[newindex,]
+
   exprs(dispData) <- exprs(dispData)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
   exprs(dispDataMeanCond) <- exprs(dispDataMeanCond)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
   allEventtables  <- apply(dataPart3,1,.eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart3)))[1],endPosCol4Counts = ncol(dataPart3))
@@ -610,6 +611,9 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   }
 
   pALLGlobalPhi.glm.nb <- as.data.frame(matrixpALLGlobalPhi)
+  #### 9/03 : provide more in the ouptut ####
+  pALLGlobalPhi.glm.nb.res <- pALLGlobalPhi.glm.nb 
+  #### ####
   pALLGlobalPhi.glm.nb$final.pval.a.ia = 1
   i <- 1 #Poisson model
   li.singhes <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i)
@@ -637,7 +641,17 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   if (length(sing.events.final) != 0) {
        pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[ - sing.events.final, ]
   }
+  
+  #### 9/03 output non corrected pval ####
+  noCorrectPVal <- pALLGlobalPhi.glm.nb$final.pval.a.ia
+  names(noCorrectPVal) <- rownames(pALLGlobalPhi.glm.nb)
+  #### ####
   pALLGlobalPhi.glm.nb$final.padj.a.ia <- p.adjust(pALLGlobalPhi.glm.nb$final.pval.a.ia, method="fdr")
+
+  #### 9/03 ### keeping all pvalues after correction
+  correctedPVal <- pALLGlobalPhi.glm.nb$final.padj.a.ia
+  names(correctedPVal) <- rownames(pALLGlobalPhi.glm.nb)
+  #### ####
 
   #keeping only lines below pvalue in signifVariants:
   if (length(sing.events) != 0) {
@@ -698,9 +712,16 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
             subsetLow <- subsetLow/(lengths2$lower + readLength - 2*overlap + 1)
           }
           sumLowCond[,nbRepli] <- sumLowCond[,nbRepli] + as.matrix(subsetUp) + as.matrix(subsetLow)#sumLowCond sums up the counts for each condition
-          subsetUp[which(subsetUp[,1] < 10),] <- NaN #NaN for counts <10
-          subsetLow[which(subsetLow[,1] < 10),] <- NaN
+          #### 11/03 ####
+
+          # subsetUp[which(subsetUp[,1] < 10),] <- NaN #NaN for counts <10
+          # subsetLow[which(subsetLow[,1] < 10),] <- NaN
+          ####
           psiPairCond[,indexMatrixPsiPairCond] <- as.matrix(subsetUp/(subsetUp+subsetLow)) #psi is #incl/(#incl+#exclu) after all corrections
+          indexNan <- intersect(which(subsetUp[,1] <10),which( subsetLow[,1]<10))
+          psiPairCond[indexNan,] <- NaN
+          ####
+
           indexMatrixPsiPairCond <- indexMatrixPsiPairCond + 1
           namesPsiPairCond <- c(namesPsiPairCond, as.character(condi[nbRepli]))
         }
@@ -742,8 +763,15 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   ### code chunk 12 : final table
   ###################################################
   signifVariants <- cbind(signifVariants, dPvector1)
-  signifVariants.sorted <- signifVariants[ order(-abs(dPvector1),signifVariants[dim(signifVariants)[2]-1]), ]#sorting by delta psi then by pvalue
-  dPvector2.sorted <- dPvector2[order(-abs(dPvector1),signifVariants.sorted[dim(signifVariants.sorted)[2]-1])]
+
+  #### 9/03 ####
+  sortOrder <- order(-abs(dPvector1),signifVariants[dim(signifVariants)[2]-1])
+
+  # signifVariants.sorted <- signifVariants[ order(-abs(dPvector1),signifVariants[dim(signifVariants)[2]-1]), ]#sorting by delta psi then by pvalue
+  signifVariants.sorted <- signifVariants[sortOrder, ]#sorting by delta psi then by pvalue
+  # dPvector2.sorted <- dPvector2[order(-abs(dPvector1),signifVariants.sorted[dim(signifVariants.sorted)[2]-1])]
+  dPvector2.sorted <- dPvector2[sortOrder]
+  #### ####
   signifVariants.sorted[dim(signifVariants.sorted)[2]] <- dPvector2.sorted
 
   colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))] <- 'Deltaf/DeltaPSI'# renaming last columns
@@ -761,6 +789,6 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   signifVariants.sorted <- cbind(signifVariants.sorted, lowcounts)
   colnames(signifVariants.sorted[dim(signifVariants.sorted)[2]]) <- 'Low_counts'
   
-  return(signifVariants.sorted)
+  return(list(resultFitNBglmModel=pALLGlobalPhi.glm.nb.res,noCorrectPVal=noCorrectPVal, correctedPVal= correctedPVal, finalTab=signifVariants.sorted))
 
   }
