@@ -708,20 +708,14 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
             nameASSBinfo <- c(paste(condi[nbRepli],'_r',i, sep=''))
             subsetUp <- subsetUp/2-(ASSBinfo[,nameASSBinfo]/subsetUp)
           } else {#counts correction if there is no info about the junction counts
-            subsetUp <- subsetUp/(lengths2$upper + readLength - 2*overlap + 1)
-            subsetLow <- subsetLow/(lengths2$lower + readLength - 2*overlap + 1)
+            correctFactor <- (lengths2$upper + readLength - 2*overlap + 1)/(lengths2$lower + readLength - 2*overlap + 1) #apparent size of upper path other apparent size of lower path
+            subsetUp <- subsetUp/correctFactor
+            # subsetLow <- subsetLow/(lengths2$lower + readLength - 2*overlap + 1)
           }
-          sumLowCond[,nbRepli] <- sumLowCond[,nbRepli] + as.matrix(subsetUp) + as.matrix(subsetLow)#sumLowCond sums up the counts for each condition
-          #### 11/03 ####
-
-          # subsetUp[which(subsetUp[,1] < 10),] <- NaN #NaN for counts <10
-          # subsetLow[which(subsetLow[,1] < 10),] <- NaN
-          ####
+          sumLowCond[,nbRepli] <- sumLowCond[,nbRepli] + as.matrix(subsetUp) + as.matrix(subsetLow)#sumLowCond sums up the counts 
           psiPairCond[,indexMatrixPsiPairCond] <- as.matrix(subsetUp/(subsetUp+subsetLow)) #psi is #incl/(#incl+#exclu) after all corrections
           indexNan <- intersect(which(subsetUp[,1] <10),which( subsetLow[,1]<10))
           psiPairCond[indexNan,] <- NaN
-          ####
-
           indexMatrixPsiPairCond <- indexMatrixPsiPairCond + 1
           namesPsiPairCond <- c(namesPsiPairCond, as.character(condi[nbRepli]))
         }
