@@ -510,10 +510,18 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   totUP <- as.vector(apply(dataPart2[ ,3:(3 + sum(nr) - 1)],1,sum))
 
   newindex <- dataPart2[-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants),1]#we filter out variants which counts do not reach the fixed limit
-  dataPart3 <- dataPart2[newindex,]
+  #### 13/03 ####
+  if ( length(-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants)) > 0 ){
+    dataPart3 <- dataPart2[newindex,]
+    exprs(dispData) <- exprs(dispData)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
+    exprs(dispDataMeanCond) <- exprs(dispDataMeanCond)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
+  } else {
+    dataPart3 <- dataPart2
+  }
+    
 
-  exprs(dispData) <- exprs(dispData)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
-  exprs(dispDataMeanCond) <- exprs(dispDataMeanCond)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
+  # exprs(dispData) <- exprs(dispData)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
+  # exprs(dispDataMeanCond) <- exprs(dispDataMeanCond)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
   allEventtables  <- apply(dataPart3,1,.eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart3)))[1],endPosCol4Counts = ncol(dataPart3))
 
   ###################################################
@@ -549,6 +557,10 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
                                     "(gb)shA","(gb)shI", 
                                     "shA","shI",
                                     "(c)shA","(c)shI")
+ #### 9/03 : provide more in the ouptut ####
+  pALLGlobalPhi.glm.nb.res <- pALLGlobalPhi.glm.nb 
+  #### ####
+  
   if (length(sing.events) != 0) {
     rownames(pALLGlobalPhi.glm.nb) <- dataPart3[ - sing.events, 1]
   } else {
@@ -611,9 +623,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   }
 
   pALLGlobalPhi.glm.nb <- as.data.frame(matrixpALLGlobalPhi)
-  #### 9/03 : provide more in the ouptut ####
-  pALLGlobalPhi.glm.nb.res <- pALLGlobalPhi.glm.nb 
-  #### ####
+ 
   pALLGlobalPhi.glm.nb$final.pval.a.ia = 1
   i <- 1 #Poisson model
   li.singhes <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i)
