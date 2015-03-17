@@ -173,7 +173,7 @@
   dim <- dim(countsEvents)[2]
   countsEvents[ ,(dim+1):(dim+length(conds)) ] <- round(counts(cdsSF, normalized=shouldWeNormalise))
   colnames(countsEvents)[(dim+1):(dim+length(conds))] <- paste(namesData[3:(3+sum(nr)-1)],"_Norm",sep="")
-  return(list(countsEvents, conds, dim, n, nr, sortedconditions,ASSBinfo=ASSBinfo))
+  return(list(countsData=countsEvents, conditions=conds, dim=dim, n=n, nr=nr, sortedconditions=sortedconditions,ASSBinfo=ASSBinfo))
 }
 
 .eventtable <- function(df,startPosColumn4Counts, endPosCol4Counts){
@@ -376,44 +376,10 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
     }
 }
 
-diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterLowCountsVariants=10, flagLowCountsConditions=10, readLength=75, overlap=42) {
 
-  options(warn=-1) # suppress the warning for the users
-
-  if (storeFigs == TRUE){
-    if (pathFigs == "None") {
-      pathToFigs = "kissDEFigures"
-    } else {
-      pathToFigs = paste(pathFigs,"/kissDEFigures",sep="")
-    }
-    find = paste("find",pathToFigs)
-    d<-system(find,TRUE,ignore.stderr=TRUE)
-    if (length(d) == 0) { 
-      command = paste("mkdir", pathToFigs)
-      system(command,ignore.stderr=TRUE)
-    }
-  }
-  ###################################################
-  ### code chunk number 1: Read and prepare data
-  ###################################################
-  listData <-.readAndPrepareData(countsData,conditions)#makes proper names for colums, normalizes data
-  countsData <- listData[[1]]
-  n <- listData[[4]]
-  nr <- listData[[5]]
-  sortedconditions <- listData[[6]]
-  ASSBinfo <-  listData$ASSBinfo #in case counts option in kissplice2counts is at 1 or 2, we have info about junction counts (ASSB), that will be useful to correct the computation of delta psi in the end. They are stored here.
-  if (! is.null(ASSBinfo)) {
-    li<-c()
-    for (i in (1:dim(ASSBinfo)[1])){
-      if (i%%2!=0) {
-        li<-c(li,i)
-      }
-    }
-    ASSBinfo <- ASSBinfo[li,]
-  }
-
+modelFit <-function(countsData, n, nr, ASSBinfo, storeFigs, pathFigs, filterLowCountsVariants){
   ##################################################
-  ## code chunk number 2: event-list
+  ## code chunk number 1: event-list
   ##################################################
   # reduce data frame to the interesting columns
   nbAll <- sum(nr)
@@ -439,7 +405,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   allEventtables  <- apply(dataPart2,1,.eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart2)))[1],endPosCol4Counts = ncol(dataPart2))
 
   ###################################################
-  ### code chunk number 3: DSS dispersion estimation
+  ### code chunk number 2: DSS dispersion estimation
   ###################################################
   dataNormCountsEvent <- as.matrix(dataPart2[ ,3:ncol(dataPart2)]) # the counts matrix
   colnames(dataNormCountsEvent) <- 1:ncol(dataNormCountsEvent)
@@ -447,15 +413,10 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   dispData <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
   dispData <-estDispersion(dispData)
   dispDataMeanCond <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
-  # if (n > 2) {
-  #     dispDataMeanCond <- estDispersion(dispData)
-  #     } else {
-  #       dispDataMeanCond <- estDispersion(dispData,trend=T)
-  #     }
   dispDataMeanCond <- estDispersion(dispData)
 
   ###################################################
-  ### code chunk number 4: variance - mean - Event level1
+  ### code chunk number 3: variance - mean - Event level1
   ###################################################
   # compute mean and variance per Event (instead of per allele)
   event.mean.variance.df <- as.data.frame(cbind(apply(dataPart2[ ,which(grepl("_Norm",names(dataPart2)))],1,mean),apply(dataPart2[ ,which(grepl("_Norm",names(dataPart2)))],1,var)))
@@ -469,7 +430,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   phi <- 1/coef(nls.modelNB) # to be used as fixed parameter later on
 
   ###################################################
-  ### code chunk number 5: plot models
+  ### code chunk number 4: plot models
   ###################################################
 
   #compute model fit
@@ -504,7 +465,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
     }
 
   ###################################################
-  ### code chunk number 6: exclude low counts
+  ### code chunk number 5: exclude low counts
   ###################################################
   totLOW <- as.vector(apply(dataPart2[ ,(3 + sum(nr)):(3 + 2 * sum(nr) - 1)],1,sum)) #global counts for each variant (low/up) by event
   totUP <- as.vector(apply(dataPart2[ ,3:(3 + sum(nr) - 1)],1,sum))
@@ -519,20 +480,17 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
     dataPart3 <- dataPart2
   }
     
-
-  # exprs(dispData) <- exprs(dispData)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
-  # exprs(dispDataMeanCond) <- exprs(dispDataMeanCond)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
   allEventtables  <- apply(dataPart3,1,.eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart3)))[1],endPosCol4Counts = ncol(dataPart3))
 
   ###################################################
-  ### code chunk number 7: pALLGlobalPhi.glm.nb
+  ### code chunk number 6: pALLGlobalPhi.glm.nb
   ###################################################
   pALLGlobalPhi.glm.nb=data.frame(t(rep(NA,28)))
   for (i in 1:length(allEventtables)) {
     pALLGlobalPhi.glm.nb[i, ] = try(.fitNBglmModelsDSSPhi(allEventtables[[i]],dispersion(dispData)[i],dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
   }
   ###################################################
-  ### code chunk number 8: excl_errors
+  ### code chunk number 7: excl_errors
   ###################################################
   sing.events <- which(grepl("Error",pALLGlobalPhi.glm.nb[ , 1]))
   if (length(sing.events) != 0) {
@@ -557,21 +515,21 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
                                     "(gb)shA","(gb)shI", 
                                     "shA","shI",
                                     "(c)shA","(c)shI")
- #### 9/03 : provide more in the ouptut ####
-  pALLGlobalPhi.glm.nb.res <- pALLGlobalPhi.glm.nb 
-  #### ####
-  
-  if (length(sing.events) != 0) {
+ if (length(sing.events) != 0) {
     rownames(pALLGlobalPhi.glm.nb) <- dataPart3[ - sing.events, 1]
   } else {
     rownames(pALLGlobalPhi.glm.nb) <- dataPart3[ , 1]
   }
+  return(list(pALLGlobalPhi.glm.nb=pALLGlobalPhi.glm.nb, sing.events=sing.events,dataPart3=dataPart3, ASSBinfo=ASSBinfo, allEventtables=allEventtables))
+}
+
+bestModelandSing <- function(pALLGlobalPhi.glm.nb,sing.events,dataPart3, allEventtables, pvalue) { 
   pALLGlobalPhi.glm.nb = pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[ , 1]), ]
   matrixpALLGlobalPhi <- as.matrix(pALLGlobalPhi.glm.nb)
   storage.mode(matrixpALLGlobalPhi) <- 'numeric'
 
   ###################################################
-  ### code chunk number 9: best model
+  ### code chunk number 1: best model
   ###################################################
   bestmodel.table.n = apply(matrixpALLGlobalPhi[ ,c(6,8,10,12)],1,which.min)#######"%%%%%"
   bestmodel.table = bestmodel.table.n
@@ -591,7 +549,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   colnames(bestmodel3) = paste(colnames(bestmodel3), "Models")
 
   ###################################################
-  ### code chunk number 10: glmnet
+  ### code chunk number 3: glmnet
   ###################################################
   pALLGlobalPhi.glm.nb.glmnet = as.data.frame(matrixpALLGlobalPhi)
   pALLGlobalPhi.glm.nb.glmnet$glmnet.pval = 1
@@ -610,7 +568,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   storage.mode(matrixpALLGlobalPhi.glmnet) <- 'numeric'
 
   #############################################################################################################
-  ###  code chunk number 10.1 : Pseudo-counts  and glmnet                                                   ###
+  ###  code chunk number 4 : Pseudo-counts  and glmnet                                                   ###
   #############################################################################################################
   singhes = which(apply(matrixpALLGlobalPhi[ ,c(6,8,10,12)],1,which.min) > 1 & apply(matrixpALLGlobalPhi[ ,c(22,24,26,28)],1,sum) != 0) 
   singhes_n = names(singhes) 
@@ -651,29 +609,25 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   if (length(sing.events.final) != 0) {
        pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[ - sing.events.final, ]
   }
-  
-  #### 9/03 output non corrected pval ####
   noCorrectPVal <- pALLGlobalPhi.glm.nb$final.pval.a.ia
   names(noCorrectPVal) <- rownames(pALLGlobalPhi.glm.nb)
-  #### ####
   pALLGlobalPhi.glm.nb$final.padj.a.ia <- p.adjust(pALLGlobalPhi.glm.nb$final.pval.a.ia, method="fdr")
-
-  #### 9/03 ### keeping all pvalues after correction
   correctedPVal <- pALLGlobalPhi.glm.nb$final.padj.a.ia
   names(correctedPVal) <- rownames(pALLGlobalPhi.glm.nb)
-  #### ####
-
-  #keeping only lines below pvalue in signifVariants:
-  if (length(sing.events) != 0) {
-    tmpdataPart3 <- dataPart3[ - sing.events, ]
-    signifVariants <- cbind(tmpdataPart3[ - sing.events.final, ],pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
+  if (length(sing.events.final) != 0) {
+    tmpdataPart3 <- dataPart3[ - sing.events.final, ]
+    signifVariants <- cbind(tmpdataPart3,pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
   } else {
     signifVariants <- cbind(dataPart3, pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
   }
+  return(list(noCorrectPVal=noCorrectPVal, correctedPVal=correctedPVal,signifVariants=signifVariants))
+}
 
-  #############################################################################################################
-  ###  code chunk number 11 :deltaPSI / deltaF computation
-  #############################################################################################################
+
+sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, readLength, overlap) {
+  ###################################################
+  ### code chunk 1 : compute delta PSI/f
+  ###################################################
   if (! is.null(ASSBinfo)) {
     ASSBinfo <-subset(ASSBinfo,ASSBinfo$events.names %in% as.vector(signifVariants[,1])) #select only the lines corresponding to the remaining lines of signifVariants
   }
@@ -720,7 +674,6 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
           } else {#counts correction if there is no info about the junction counts
             correctFactor <- (lengths2$upper + readLength - 2*overlap + 1)/(lengths2$lower + readLength - 2*overlap + 1) #apparent size of upper path other apparent size of lower path
             subsetUp <- subsetUp/correctFactor
-            # subsetLow <- subsetLow/(lengths2$lower + readLength - 2*overlap + 1)
           }
           sumLowCond[,nbRepli] <- sumLowCond[,nbRepli] + as.matrix(subsetUp) + as.matrix(subsetLow)#sumLowCond sums up the counts 
           psiPairCond[,indexMatrixPsiPairCond] <- as.matrix(subsetUp/(subsetUp+subsetLow)) #psi is #incl/(#incl+#exclu) after all corrections
@@ -733,12 +686,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   colnames(psiPairCond) <- namesPsiPairCond
   rownames(psiPairCond) <- rownames(signifVariants)
   rownames(sumLowCond) <- rownames(signifVariants)
-  #### 23/02 ####
-  # psiPairCond <- replace(psiPairCond, is.na(psiPairCond),0)
-  # NaNSums <- rowSums(( psiPairCond==0 )+0) #1 if NaN, 0 else
-  #### 23/02####
   NaNSums <- rowSums(( is.na(psiPairCond) )+0) #1 if NaN, 0 else
-  #### ####
   #if there are 2 NaN and 3 values for a bcc, nanSums is at 2
   listNaN <- names(NaNSums[which(NaNSums>dim(psiPairCond)[2]/2)]) #when there are more NaN than nb of column/2, we do not calculate the psi
   psiPairCond[listNaN,]=NaN
@@ -764,35 +712,116 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   }
 
   ###################################################
-  ### code chunk 12 : final table
+  ### code chunk 2 : final table
   ###################################################
   signifVariants <- cbind(signifVariants, dPvector1)
-
-  #### 9/03 ####
   sortOrder <- order(-abs(dPvector1),signifVariants[dim(signifVariants)[2]-1])
-
-  # signifVariants.sorted <- signifVariants[ order(-abs(dPvector1),signifVariants[dim(signifVariants)[2]-1]), ]#sorting by delta psi then by pvalue
+  #sorting by delta psi then by pvalue
   signifVariants.sorted <- signifVariants[sortOrder, ]#sorting by delta psi then by pvalue
-  # dPvector2.sorted <- dPvector2[order(-abs(dPvector1),signifVariants.sorted[dim(signifVariants.sorted)[2]-1])]
   dPvector2.sorted <- dPvector2[sortOrder]
-  #### ####
   signifVariants.sorted[dim(signifVariants.sorted)[2]] <- dPvector2.sorted
-
   colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))] <- 'Deltaf/DeltaPSI'# renaming last columns
   colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))-1] <- 'Adjusted_pvalue'
   rownames(signifVariants.sorted) <- signifVariants.sorted[,1]
 
   ###################################################
-  ### code chunk 12.1 : flagging low counts
+  ### code chunk 3 : flagging low counts
   ###################################################
   #Condition to flag a low count for an event :
   lowcounts <-apply(sumLowCond,1,function(x) length(which(x<flagLowCountsConditions))) >=n-1
   lowcounts <- lowcounts[rownames(signifVariants.sorted)] #to fit the order with the sorted order
-
   #### final tab ####
   signifVariants.sorted <- cbind(signifVariants.sorted, lowcounts)
   colnames(signifVariants.sorted[dim(signifVariants.sorted)[2]]) <- 'Low_counts'
-  
-  return(list(resultFitNBglmModel=pALLGlobalPhi.glm.nb.res,noCorrectPVal=noCorrectPVal, correctedPVal= correctedPVal, finalTab=signifVariants.sorted))
+  return(signifVariants.sorted)
+}
 
+diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterLowCountsVariants=10, flagLowCountsConditions=10, readLength=75, overlap=42) {
+
+  options(warn=-1) # suppress the warning for the users
+
+  if (storeFigs == TRUE){
+    if (pathFigs == "None") {
+      pathToFigs = "kissDEFigures"
+    } else {
+      pathToFigs = paste(pathFigs,"/kissDEFigures",sep="")
+    }
+    find = paste("find",pathToFigs)
+    d<-system(find,TRUE,ignore.stderr=TRUE)
+    if (length(d) == 0) { 
+      command = paste("mkdir", pathToFigs)
+      system(command,ignore.stderr=TRUE)
+    }
   }
+
+  print("Pre-processing the data...")
+  chunk0 <- tryCatch( {.readAndPrepareData(countsData,conditions)
+    #### chunk 0 var ####
+    #chunk0$countsData
+    #chunk0$n
+    #chunk0$nr
+    #chunk0$sortedconditions
+    #chunk0$ASSBinfo
+  }, error=function(err) {
+    print(err)
+    return(NA)
+  })
+
+  if ( !is.na(chunk0) ){     #no error in chunk 0
+    ASSBinfo <-  chunk0$ASSBinfo #in case counts option in kissplice2counts is at 1 or 2, we have info about junction counts (ASSB), that will be useful to correct the computation of delta psi in the end. They are stored here.
+    if (! is.null(ASSBinfo)) {
+      li<-c()
+      for (i in (1:dim(ASSBinfo)[1])){
+        if (i%%2!=0) {
+          li<-c(li,i)
+        }
+      }
+      ASSBinfo <- ASSBinfo[li,]
+    }
+    print ("Trying to fit models on data...")
+    chunk1 <- tryCatch( { modelFit(chunk0$countsData, chunk0$n, chunk0$nr, ASSBinfo, storeFigs, pathFigs, filterLowCountsVariants)
+  #### chunk 1 var ####
+  # chunk1$pALLGlobalPhi.glm.nb 
+  # chunk1$sing.events 
+  # chunk1$dataPart3 
+  # chunk1$ASSBinfo 
+    }, error=function(err) {
+      print(paste(err, "An error occured, unable to fit models on data." ))
+      return(NA)
+    }) 
+  } else { #error in chunk 0
+    chunk1 <- NA
+  }
+
+  if ( !is.na(chunk1) ) { #no error in chunk 1 nor in chunk 0
+    print("Searching for best model and computing pvalues...")
+    chunk2 <- tryCatch( {bestModelandSing(chunk1$pALLGlobalPhi.glm.nb, chunk1$sing.events, chunk1$dataPart3, chunk1$allEventtables, pvalue) 
+    #### chunk 2 var ####  
+    # chunk2$noCorrectPVal 
+    # chunk2$correctedPVal 
+    # chunk2$signifVariants 
+    },error=function(err) {
+      print(paste(err,"Returning only resultFitNBglmModel and sing. events")) 
+      return(list(resultFitNBglmModel=pALLGlobalPhi.glm.nb,sing.events=sing.events))
+    })
+  } else {
+    chunk2 <- NA
+  }
+  
+  if ( !is.na(chunk2) ) { #no error during chunk1
+    if ( length(chunk2) > 2 ) { #no error during chunk2
+      print("Computing size of the effect and last cutoffs...")
+      chunk3 <- tryCatch( { 
+        signifVariants.sorted <- sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, flagLowCountsConditions, readLength, overlap)
+        return(list(resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb,noCorrectPVal=chunk2$noCorrectPVal, correctedPVal= chunk2$correctedPVal, finalTable=signifVariants.sorted))
+      },error=function(err) {
+        print(paste(err,"Returning only resultFitNBglmModel and pvalues tab"))
+        return(list(resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb, noCorrectPVal=chunk2$noCorrectPVal, correctedPVal= chunk2$correctedPVal))
+      })
+    } else { #error in chunk 2 does not allow to compute chunk 3
+      return(chunk2)
+    }
+  } else {
+    return(NA)
+  }
+}
