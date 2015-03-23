@@ -377,7 +377,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
 }
 
 
-modelFit <-function(countsData, n, nr, ASSBinfo, storeFigs, pathFigs, filterLowCountsVariants){
+.modelFit <-function(countsData, n, nr, ASSBinfo, storeFigs, pathFigs, filterLowCountsVariants){
   ##################################################
   ## code chunk number 1: event-list
   ##################################################
@@ -523,7 +523,7 @@ modelFit <-function(countsData, n, nr, ASSBinfo, storeFigs, pathFigs, filterLowC
   return(list(pALLGlobalPhi.glm.nb=pALLGlobalPhi.glm.nb, sing.events=sing.events,dataPart3=dataPart3, ASSBinfo=ASSBinfo, allEventtables=allEventtables))
 }
 
-bestModelandSing <- function(pALLGlobalPhi.glm.nb,sing.events,dataPart3, allEventtables, pvalue) { 
+.bestModelandSingular <- function(pALLGlobalPhi.glm.nb,sing.events,dataPart3, allEventtables, pvalue) { 
   pALLGlobalPhi.glm.nb = pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[ , 1]), ]
   matrixpALLGlobalPhi <- as.matrix(pALLGlobalPhi.glm.nb)
   storage.mode(matrixpALLGlobalPhi) <- 'numeric'
@@ -624,7 +624,7 @@ bestModelandSing <- function(pALLGlobalPhi.glm.nb,sing.events,dataPart3, allEven
 }
 
 
-sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, readLength, overlap) {
+.sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, readLength, overlap) {
   ###################################################
   ### code chunk 1 : compute delta PSI/f
   ###################################################
@@ -670,7 +670,7 @@ sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, 
           subsetLow <- signifVariants[namesLow]
           if (! is.null(ASSBinfo)) {# counts correction
             nameASSBinfo <- c(paste(condi[nbRepli],'_r',i, sep=''))
-            subsetUp <- subsetUp/2-(ASSBinfo[,nameASSBinfo]/subsetUp)
+            subsetUp <- subsetUp/(2-ASSBinfo[,nameASSBinfo]/subsetUp)
           } else {#counts correction if there is no info about the junction counts
             correctFactor <- (lengths2$upper + readLength - 2*overlap + 1)/(lengths2$lower + readLength - 2*overlap + 1) #apparent size of upper path other apparent size of lower path
             subsetUp <- subsetUp/correctFactor
@@ -779,7 +779,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
       ASSBinfo <- ASSBinfo[li,]
     }
     print ("Trying to fit models on data...")
-    chunk1 <- tryCatch( { modelFit(chunk0$countsData, chunk0$n, chunk0$nr, ASSBinfo, storeFigs, pathFigs, filterLowCountsVariants)
+    chunk1 <- tryCatch( { .modelFit(chunk0$countsData, chunk0$n, chunk0$nr, ASSBinfo, storeFigs, pathFigs, filterLowCountsVariants)
   #### chunk 1 var ####
   # chunk1$pALLGlobalPhi.glm.nb 
   # chunk1$sing.events 
@@ -795,7 +795,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
 
   if ( !is.na(chunk1) ) { #no error in chunk 1 nor in chunk 0
     print("Searching for best model and computing pvalues...")
-    chunk2 <- tryCatch( {bestModelandSing(chunk1$pALLGlobalPhi.glm.nb, chunk1$sing.events, chunk1$dataPart3, chunk1$allEventtables, pvalue) 
+    chunk2 <- tryCatch( {.bestModelandSingular(chunk1$pALLGlobalPhi.glm.nb, chunk1$sing.events, chunk1$dataPart3, chunk1$allEventtables, pvalue) 
     #### chunk 2 var ####  
     # chunk2$noCorrectPVal 
     # chunk2$correctedPVal 
@@ -812,7 +812,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
     if ( length(chunk2) > 2 ) { #no error during chunk2
       print("Computing size of the effect and last cutoffs...")
       chunk3 <- tryCatch( { 
-        signifVariants.sorted <- sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, flagLowCountsConditions, readLength, overlap)
+        signifVariants.sorted <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, flagLowCountsConditions, readLength, overlap)
         return(list(resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb,noCorrectPVal=chunk2$noCorrectPVal, correctedPVal= chunk2$correctedPVal, finalTable=signifVariants.sorted))
       },error=function(err) {
         print(paste(err,"Returning only resultFitNBglmModel and pvalues tab"))
