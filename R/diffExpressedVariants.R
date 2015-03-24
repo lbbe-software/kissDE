@@ -520,7 +520,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   } else {
     rownames(pALLGlobalPhi.glm.nb) <- dataPart3[ , 1]
   }
-  return(list(pALLGlobalPhi.glm.nb=pALLGlobalPhi.glm.nb, sing.events=sing.events,dataPart3=dataPart3, ASSBinfo=ASSBinfo, allEventtables=allEventtables))
+  return(list(pALLGlobalPhi.glm.nb=pALLGlobalPhi.glm.nb, sing.events=sing.events,dataPart3=dataPart3, ASSBinfo=ASSBinfo, allEventtables=allEventtables, lengths=lengths))
 }
 
 .bestModelandSingular <- function(pALLGlobalPhi.glm.nb,sing.events,dataPart3, allEventtables, pvalue) { 
@@ -624,7 +624,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
 }
 
 
-.sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, readLength, overlap) {
+.sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, readLength, overlap, lengths) {
   ###################################################
   ### code chunk 1 : compute delta PSI/f
   ###################################################
@@ -785,6 +785,8 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
   # chunk1$sing.events 
   # chunk1$dataPart3 
   # chunk1$ASSBinfo 
+   # chunk1$length
+  
     }, error=function(err) {
       print(paste(err, "An error occured, unable to fit models on data." ))
       return(NA)
@@ -812,7 +814,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
     if ( length(chunk2) > 2 ) { #no error during chunk2
       print("Computing size of the effect and last cutoffs...")
       chunk3 <- tryCatch( { 
-        signifVariants.sorted <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, flagLowCountsConditions, readLength, overlap)
+        signifVariants.sorted <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, flagLowCountsConditions, readLength, overlap, chunk1$lengths)
         return(list(resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb,noCorrectPVal=chunk2$noCorrectPVal, correctedPVal= chunk2$correctedPVal, finalTable=signifVariants.sorted))
       },error=function(err) {
         print(paste(err,"Returning only resultFitNBglmModel and pvalues tab"))
