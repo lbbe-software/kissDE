@@ -1,7 +1,6 @@
 .lineParse <- function(line, indexStart, isQuality) {
   options(warn=-1)
   beginningLineToWrite <- ""
-
   splitElements <- strsplit(line, "|", fixed=TRUE)[[1]] # splits the line
   if (indexStart == 6) {
     for (k in 1:(indexStart-2)) {
@@ -12,12 +11,9 @@
     beginningLineToWrite <- paste (beginningLineToWrite, splitElements[k], sep="|") #writes the firsts elements of the line : bcc, cycle... 
     }
   }
-
   ElementsNb <- length(splitElements) #number of elements in the line
   splitCounts <- splitElements[indexStart : (length(splitElements) - 1)] # avoids the name of the bcc ... and the rank (last one) to get only the counts
   s <- sapply(splitCounts, function(splitCounts) regmatches(splitCounts[[1]], gregexpr(pattern = "[0-9]+",splitCounts[[1]]))) #gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
-  
-
   if (isQuality == TRUE ) { #if there is a quality information  (for SNPs)
     s<- s[regexpr('Q',names(s)) == -1] # we discard "Q_" information as they are not counts
   } 
@@ -469,9 +465,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   ###################################################
   totLOW <- as.vector(apply(dataPart2[ ,(3 + sum(nr)):(3 + 2 * sum(nr) - 1)],1,sum)) #global counts for each variant (low/up) by event
   totUP <- as.vector(apply(dataPart2[ ,3:(3 + sum(nr) - 1)],1,sum))
-
   newindex <- dataPart2[-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants),1]#we filter out variants which counts do not reach the fixed limit
-  #### 13/03 ####
   if ( length(-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants)) > 0 ){
     dataPart3 <- dataPart2[newindex,]
     exprs(dispData) <- exprs(dispData)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
@@ -479,7 +473,6 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   } else {
     dataPart3 <- dataPart2
   }
-    
   allEventtables  <- apply(dataPart3,1,.eventtable, startPosColumn4Counts = which(grepl("UP",names(dataPart3)))[1],endPosCol4Counts = ncol(dataPart3))
 
   ###################################################
@@ -622,7 +615,6 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   }
   return(list(noCorrectPVal=noCorrectPVal, correctedPVal=correctedPVal,signifVariants=signifVariants))
 }
-
 
 .sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, readLength, overlap, lengths) {
   ###################################################
@@ -780,12 +772,12 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
     }
     print ("Trying to fit models on data...")
     chunk1 <- tryCatch( { .modelFit(chunk0$countsData, chunk0$n, chunk0$nr, ASSBinfo, storeFigs, pathFigs, filterLowCountsVariants)
-  #### chunk 1 var ####
-  # chunk1$pALLGlobalPhi.glm.nb 
-  # chunk1$sing.events 
-  # chunk1$dataPart3 
-  # chunk1$ASSBinfo 
-   # chunk1$length
+    #### chunk 1 var ####
+    # chunk1$pALLGlobalPhi.glm.nb 
+    # chunk1$sing.events 
+    # chunk1$dataPart3 
+    # chunk1$ASSBinfo 
+    # chunk1$length
   
     }, error=function(err) {
       print(paste(err, "An error occured, unable to fit models on data." ))

@@ -12,15 +12,15 @@ kissplice2counts(fileName, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TR
 \tabular{ll}{
 Package: \tab kissDE\cr
 Type: \tab Package\cr
-Version: \tab 0.2.0\cr
-Date: \tab 2014-09-01\cr
+Version: \tab 1.1.0\cr
+Date: \tab 2015-04-03\cr
 License: \tab GPL\cr
 }
 }
 
 \author{
 Lilia Brinza, Vincent Lacroix, Frank Picard, Vincent Miele and Camille Marchet\cr
-Maintainers: vincent.miele@univ-lyon1.fr, camille.marchet@inria.fr
+Maintainers: camille.marchet@inria.fr
 }
 \keyword{ package }
 

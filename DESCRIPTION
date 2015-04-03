@@ -1,10 +1,10 @@
 Package: kissDE
 Type: Package
 Title: kissDE retrieves condition-specific variants in RNA-seq data.
-Version: 1.0.2
-Date: 2015-01-06
+Version: 1.1.0
+Date: 2015-04-03
 Author: Lilia Brinza, Vincent Lacroix, Frank Picard, Vincent Miele and Camille Marchet
-Maintainer: Vincent Miele <vincent.miele@univ-lyon1.fr>, Camille Marchet <camille.marchet@inria.fr>
+Maintainer: Camille Marchet <camille.marchet@inria.fr>
 Depends: DESeq, aod, xtable, DSS, glmnet
 License: GPL
 Description: Retrieves condition-specific variants in RNA-seq data (SNPs, alternative-splicings, indels). It has been developped as a post-treatment of KisSplice but can also be used with your own data.

@@ -8,7 +8,7 @@ kissplice2counts(fileName)
 }
 \arguments{
   \item{fileName}{ a character vector that gives the path to .fa file that must be pre-treated.}
-  \item{counts=0}{ an option to set up if KisSplice --counts option was on. By default, as in KisSplice it is turned to 0, assuming there is no special counting option. If the data used has been produced using --counts 1 or 2, this option sums the counts on the junctions provided by --counts to obtain counts by condition. 
+  \item{counts=0}{ an option to fill in if KisSplice --counts option was on. By default, as in KisSplice it is turned to 0, assuming there is no special counting option. If the data used has been produced using --counts 1 or 2, this option sums the counts on the junctions provided by --counts to obtain counts by condition. 
    In this example, there is a part of a KisSplice output with --counts =2 : |AS1_0|SB1_0|S1_0|ASSB1_0|AS2_27|SB2_41|S2_0|ASSB2_21|AS3_1|SB3_0|S3_0|ASSB3_0|AS4_7|SB4_8|S4_0|ASSB4_2
    In a regular KisSplice output it would be :
    |C1_0|C2_47|C3_0|C4_14 (with 47 = 41+27-21 and 14 = 1+7+8-2)}

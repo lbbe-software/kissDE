@@ -1,0 +1,63 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+
+%opening
+\title{}
+\author{}
+
+\begin{document}
+
+\maketitle
+
+\section{kissDE main steps}
+\begin{itemize}
+ \item Les comptages sont normalisés avec \textbf{DESeq} (utile dans le cas où on observe globalement une plus forte exception dans une condition que dans les autres)
+ \item filtre sur les comptages : si les comptages globaux pour le variant du haut et pour le variant du bas sont trop bas, ils ne sont pas testés
+ \item tests sur les comptages normalisés
+ \item pvalues ajustées pour les tests multiples
+ \item calcul du delta PSI
+ \item flag low counts :\\
+si dans au moins $n-1$ conditions ($n$ nombre de conditions $\geq 2$) un événement a des comptages faibles il est signalé
+\end{itemize}
+
+\section{Retour sur le calcul du delta PSI (delta f si SNP)}
+Correction des comptages :
+\begin{itemize}
+ \item si on a des données en sortie de kissplice avec l'option \texttt{--counts} par défaut (\texttt{--counts 0} qui donne \texttt{...|C1\_25|C2\_1|C3\_14.....} dans les headers) :\\
+  $\Rightarrow$ on n'a pas d'info sur les comptages sur les jonctions
+ \begin{enumerate}
+ \item on calcule un facteur correctif qui prend en compte les longueurs apparentes des reads:\\
+   $correctFactor\:=\: \frac{length\_upper\_path + read\_length - 2 \times overlap + 1}{length\_lower\_path + read\_length - 2\times overlap + 1}$ avec :
+ \begin{itemize}
+  \item \texttt{upper\_path} est toujours l'isoforme d'inclusion (+long)/\texttt{lower\_path} est toujours l'isoforme d'exclusion
+  \item \texttt{overlap} : paramètre dans kissreads, overlap min du read sur la bubble, par défaut \texttt{k+1} (pour couvrir au moins une jonction)
+   \end{itemize}
+            \item on corrige les comptages du chemin du haut (le plus long) car c'est celui sur lequel on est susceptible de voir plus de reads :\\
+            $comptages\_upper\_path \:=\:  \frac{comptages\_upper\_path}{correctFactor} $
+ \end{enumerate}
+ \item si on a des données en sortie de kissplice avec l'option \texttt{--counts} à \texttt{2} (qui donne \texttt{...|AS1\_12|AB1\_7|S1\_0|ASSB1\_1 ou |AB1\_13|.....} dans les headers) :\\
+ $\Rightarrow$ on a des infos sur les comptages sur les jonctions : sur le chemin du haut, le nombre de reads est \texttt{AS+AB-ASSB} (les \texttt{ASSB} sont comptés deux fois, dans \texttt{AS} ou \texttt{AB} et dans \texttt{ASSB})
+  \item si on n'a pas de reads qui couvrent les deux jonctions, on va simplement diviser par 2 le nombre de reads vu sur le chemin du haut (globalement les comptages seront deux fois plus importants car on a deux jonctions sur le chemin du haut contre une seule sur le chemin du bas), 
+  \item si on a des reads sur la jonction ASSB on veut diviser par un peu moins que 2 :
+  \begin{enumerate}
+%    \item \texttt{comptages\_upper\_path <- AS+AB-ASSB }
+    \item avant correction : $comptages\_upper\_path \:=\: AS+AB-ASSB $
+    \item après : $comptages\_upper\_path\:=\:\frac{comptages\_upper\_path}{2-\frac{ASSB}{AS+SB-ASSB}}$
+  \end{enumerate}
+ \end{itemize}
+ 
+ Calcul du delta PSI :
+ \begin{itemize}
+\item calcul des psi individuels par réplicats :\\
+après correction des comptages, si les comptages pour le chemin du haut et pour le chemin du bas sont trop faibles, on ne calcule pas le psi individuel
+\item psi moyens par conditions :\\
+ si plus de la moitié des psi individuels qui servent à calculer le psi moyen n'ont pas été calculés à l'étape précédente, on ne sort pas le psi moyen
+\item delta psi :\\
+non sorti si un des psi moyen n'a pas pu être estimé
+\end{itemize}
+
+
+
+
+
+\end{document}

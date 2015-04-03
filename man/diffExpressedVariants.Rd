@@ -22,9 +22,9 @@
 	\item{ID}{the variation ID}
 	\item{Length}{the size of the first variant}
 	\item{UP_Condn_Rm_Norm}{(resp LP_Condn_Rm_Norm) returns the normalised counts for the first variant (UP, resp. second variant : LP), for the condition n (Condn) and the replicate m (Rm)}
-	\item{pALLGlobalPhi.glm}{adjusted pvalue}
-	\item{Deltaf/DeltaPSI}{difference of relative abundance of variants across conditions. For instance if there are 2 conditions, deltaPsi returns relative abudance in condition 2 - relative abundance in condition 1. If --counts is at 1 or 2, inclusion variants are corrected for the length of the variant so that we do not overestimate the psi value. If --counts is at 0, a less precise correction is applicated on both variants : we divide by the length of the variant + size of a reads - (size of the k-mer in KisSplice+1)  +1}
-	\item{Low_counts}{a column to highlight low counts in data. If 1, at least one replicate shows less than 5 reads, 0 else.}
+	\item{Adjusted_pvalue}{pvalue adjusted for multiple testing with FDR=5\%}
+	\item{Deltaf/DeltaPSI}{difference of relative abundance of variants across conditions. For instance if there are 2 conditions, deltaPsi returns relative abudance in condition 2 - relative abundance in condition 1. If --counts is at 1 or 2, inclusion variants are corrected for the length of the variant so that we do not overestimate the psi value. If --counts is at 0, we correct the longer variant by diving by this correcting factor: (longer_variant_length + readLength - 2*overlap + 1)/(lower_variant_lenght+ readLength - 2*overlap + 1) with readLength and overlap coming from the input options.}
+	\item{Low_counts}{a column to highlight low counts in data. If 1, at least one replicate shows less than 10 reads, 0 else.}
 }
 \source{
 }
