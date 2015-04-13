@@ -411,6 +411,9 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   dispDataMeanCond <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
   dispDataMeanCond <- estDispersion(dispData)
 
+  names(exprs(dispData)) <- rownames(dataPart2)
+  names(exprs(dispDataMeanCond)) <- rownames(dataPart2)
+
   ###################################################
   ### code chunk number 3: variance - mean - Event level1
   ###################################################
@@ -465,9 +468,14 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   ###################################################
   totLOW <- as.vector(apply(dataPart2[ ,(3 + sum(nr)):(3 + 2 * sum(nr) - 1)],1,sum)) #global counts for each variant (low/up) by event
   totUP <- as.vector(apply(dataPart2[ ,3:(3 + sum(nr) - 1)],1,sum))
-  newindex <- dataPart2[-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants),1]#we filter out variants which counts do not reach the fixed limit
+  names(totLOW) <- rownames(dataPart2)
+  names(totUP) <- rownames(dataPart2)
+
+  # newindex <- dataPart2[-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants),1]#we filter out variants which counts do not reach the fixed limit
+  #newindex <- dataPart2[-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants),1]#we filter out variants which counts do not reach the fixed limit
   if ( length(-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants)) > 0 ){
-    dataPart3 <- dataPart2[newindex,]
+    dataPart3 <- dataPart2[-which(totUP <filterLowCountsVariants & totLOW<filterLowCountsVariants),]
+
     exprs(dispData) <- exprs(dispData)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
     exprs(dispDataMeanCond) <- exprs(dispDataMeanCond)[-which(totUP<filterLowCountsVariants & totLOW<filterLowCountsVariants),]
   } else {
@@ -566,8 +574,14 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   singhes = which(apply(matrixpALLGlobalPhi[ ,c(6,8,10,12)],1,which.min) > 1 & apply(matrixpALLGlobalPhi[ ,c(22,24,26,28)],1,sum) != 0) 
   singhes_n = names(singhes) 
 
+  # pALLGlobalPhi.glm.nb.pen = as.data.frame(matrixpALLGlobalPhi)
+  # for(i in singhes){#we add pseudo-count (+1 in counts) for event with singular hessian for which the best model is not the Poisson model 
+  #   pALLGlobalPhi.glm.nb.pen[i, ] = try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
+  #                                                           dispersion(dispData)[i],
+  #                                                           dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
+  # }
   pALLGlobalPhi.glm.nb.pen = as.data.frame(matrixpALLGlobalPhi)
-  for(i in singhes){#we add pseudo-count (+1 in counts) for event with singular hessian for which the best model is not the Poisson model 
+  for(i in singhes_n){#we add pseudo-count (+1 in counts) for event with singular hessian for which the best model is not the Poisson model 
     pALLGlobalPhi.glm.nb.pen[i, ] = try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
                                                             dispersion(dispData)[i],
                                                             dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
@@ -710,11 +724,14 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   sortOrder <- order(-abs(dPvector1),signifVariants[dim(signifVariants)[2]-1])
   #sorting by delta psi then by pvalue
   signifVariants.sorted <- signifVariants[sortOrder, ]#sorting by delta psi then by pvalue
-  dPvector2.sorted <- dPvector2[sortOrder]
+  ####
+  # dPvector2.sorted <- dPvector2[sortOrder]
+  names(dPvector2) <- rownames(signifVariants)
+  dPvector2.sorted <- dPvector2[rownames(signifVariants.sorted)]
   signifVariants.sorted[dim(signifVariants.sorted)[2]] <- dPvector2.sorted
   colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))] <- 'Deltaf/DeltaPSI'# renaming last columns
   colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))-1] <- 'Adjusted_pvalue'
-  rownames(signifVariants.sorted) <- signifVariants.sorted[,1]
+  # rownames(signifVariants.sorted) <- signifVariants.sorted[,1]
 
   ###################################################
   ### code chunk 3 : flagging low counts
