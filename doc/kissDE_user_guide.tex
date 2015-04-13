@@ -9,55 +9,175 @@
 
 \maketitle
 
-\section{kissDE main steps}
+\section*{kissDE main steps}
+\begin{enumerate}
+\item Some prerequisites needed for the analysis.
+ \item Counts are normalized.
+ \item Some events are filtered out based on their counts.
+ \item Tests are performed on normalized counts.
+ \item Pvalues are computed.
+ \item Delta PSI/f are computed.
+ \item Low counts are flagged.
+\end{enumerate}
+
+\section{Prerequisites}
+\begin{enumerate}
+ \item You must build a table with the counts of the pairwise variants you want to test. This can be done with \texttt{kissplice2counts}.
+ \item Once you have provided a table of counts on your own or created by \texttt{kissplice2counts}, you must provide a vector that describes the experimental conditions
+\end{enumerate}
+
+\subsection{Provide a table of counts, use of kissplice2counts}
+If you use output files from KisSplice, a fist step of conversion is required using \texttt{kissplice2counts} function.
+To create an object with \texttt{kissplice2counts}, you will often use one of these lines:\\
+
+  \texttt{myCounts <- kissplice2counts('./path/results\_Kissplice\_typeX.fa')}\\
+
+or \\
+  \texttt{myCounts <- kissplice2counts('./path/results\_Kissplice\_typeX.fa',pairedEnd=TRUE)}\\
+
+or\\
+  \texttt{myCounts <- kissplice2counts('./path/results\_Kissplice\_typeX.fa',pairedEnd=TRUE, counts=2)}\\
+
 \begin{itemize}
- \item Les comptages sont normalisés avec \textbf{DESeq} (utile dans le cas où on observe globalement une plus forte exception dans une condition que dans les autres)
- \item filtre sur les comptages : si les comptages globaux pour le variant du haut et pour le variant du bas sont trop bas, ils ne sont pas testés
- \item tests sur les comptages normalisés
- \item pvalues ajustées pour les tests multiples
- \item calcul du delta PSI
- \item flag low counts :\\
-si dans au moins $n-1$ conditions ($n$ nombre de conditions $\geq 2$) un événement a des comptages faibles il est signalé
+\item with for instance \texttt{results\_Kissplice\_typeX.fa} the file containing your Type1 (alternative splicing events) file from KisSplice,
+ \item  with \texttt{pairedEnd = TRUE} if you have paired-end reads, \texttt{pairedEnd = FALSE} else, 
+ \item  and \texttt{counts = 2} option if you have counts like this in KisSplice output:\\
+ \texttt{AS1\_1|SB1\_2|ASSB1\_1|S1\_0...} for upper path and \texttt{AB1\_3...} for lower,\\
+      or no counts option else ( \texttt{C1\_1|C2\_6...} type).
 \end{itemize}
 
-\section{Retour sur le calcul du delta PSI (delta f si SNP)}
-Correction des comptages :
+The table you have created in \texttt{myCounts} helps to convert information provided in KisSplice output into a table of counts per event that will be used for the tests.\\
+Events are pairwise, made of 2 variants (typically an exon retained and an exon skipped fort 2 variants in alt. splicing, or two SNPs isoforms if you work with SNPs). So now you'd like to test if you have some differentially enriched variants between your conditions (i.e. is my skipped exon isoform is more present in my condition 1 and on the contrary the other isoform more present in my condition 2).
+
+\subsection{Provide an experimental conditions vector}
+The experimental conditions vector helps to make the link between the conditions you want to test and the files input in KisSplice. For instance, if in KisSplice you have entered 4 fasta/q files in this order:\\
+
+\texttt{-r firstCondition\_Replicate1 -r firstCondition\_Replicate2\\
+-r secondCondition\_Replicate1 -r secondCondition\_Replicate2}\\
+
+In this case there are only have two conditions and to replicates for each conditions. It works for other types of sets, but you must always have at least two replicates per conditions. In the example your condition vector will look like :\\
+
+\texttt{myConditions <- c("condition1","condition1","condition2","condition2")}\\
+
+What is important is that this vector matches the order of what you have input. Probably it will be clearer if you give \texttt{condition1} and \texttt{condition2} a more descriptive name. 
+
+\paragraph{If you have paired end data, and entered for instance:\\}
+
+\texttt{-r firstCondition\_Replicate1\_file1 -r firstCondition\_Replicate1\_file2
+-r firstCondition\_Replicate2\_file1  -r firstCondition\_Replicate2\_file2 
+-r secondCondition\_Replicate1\_file1 -r secondCondition\_Replicate1\_file2
+-r secondCondition\_Replicate2\_file1 -r secondCondition\_Replicate2\_file2}
+
+Then you must \textbf{not} have a condition vector like this:\\
+
+\texttt{myConditions <- c("condition1","condition1", "condition1","condition1",\\
+"condition2","condition2","condition2","condition2")}\\
+
+as \texttt{pairedEnd} option must have been already switched to \texttt{TRUE} in \texttt{kissplice2counts}, you can provide a condition vector like this one:\\ 
+
+\texttt{myConditions <- c("condition1","condition1","condition2","condition2")}\\
+
+The function \texttt{diffExpressedVariants} performs the test, based on generalised linear models. Basically it needs only the counts (\texttt{myCounts} table) you got from \texttt{kissplice2counts} function, and your \texttt{myConditions} vector.
+
+\subsection{Launching diffExpressedVariants}
+To start the analyse you just have to run \texttt{diffExpressedVariants}, for a first run we recommand to put \texttt{pvalue=1} so that you will have even not significant results in your final table, in case you want to analyse why some of your favorite genes are not in the head of the list. Important options of \texttt{diffExpressedVariants} are explained below.\\
+
+\texttt{finalTable <- diffExpressedVariants(myCounts,myConditions,pvalue=1)}
 \begin{itemize}
- \item si on a des données en sortie de kissplice avec l'option \texttt{--counts} par défaut (\texttt{--counts 0} qui donne \texttt{...|C1\_25|C2\_1|C3\_14.....} dans les headers) :\\
-  $\Rightarrow$ on n'a pas d'info sur les comptages sur les jonctions
+ \item You will obtain in finalTable the list of the events with their pvalue and the size of the effect (in the column \texttt{DeltaF/DeltaPSI}). 
+  \item The difference of length between the two variants is also provided, which can be interesting if you are dealing with alternative splicing or indels.
+ \item Events with low counts ($<$ 10 by default) in at least n-1 conditions over n are flagged in the column \texttt{LowCounts} (more details below).
+\end{itemize}
+
+
+
+
+
+\section{Counts normalization}
+Counts are normalized with \textbf{DESeq}. It is meaningful if a greater expression is observed in one condition compared to the others.
+
+\section{Filtering low counts before the tests}
+ If global counts for both variants are too low (option \texttt{filterLowCountsVariants}), the event is not tested.
+Here we present two examples to explain how \texttt{filterLowCountsVariants} option works. Let's assume that there are two conditions and two replicates (rep1 and rep2) per condition. \texttt{filterLowCountsVariants} has its default value: 10.\\
+
+\begin{tabular}{r|c|c|c}
+  \hline
+   & Condition 1 & Condition 2& Sum by variant \\
+  \hline
+  Variant 1 &	rep1:1, rep2:2 & rep1:3, rep2:2& 1+2+3+2=8 $<$ 10  \\
+ Variant 2 &	rep1:8, rep2:0 & rep1:1, rep2:0& 8+0+1+0=9 $<$ 10 \\
+  \hline
+\end{tabular}
+\paragraph{}In this first example the two variants have global counts less than 10, this event will be used to compute the overdispersion, but will not be used to compute the models. It will neither appear in the final table. On the contrary in the second example below, the event will be taken into account for tests.\\
+
+\begin{tabular}{r|c|c|c}
+  \hline
+   & Condition 1 & Condition 2& Sum by variant \\
+  \hline
+  Variant 1 &	rep1:11, rep2:15 & rep1:3, rep2:2&  11+15+3+2=31 $>$ 10 \\
+ Variant 2 &	rep1:8, rep2:0 & rep1:1, rep2:0& 8+0+1+0=9 $<$ 10 \\
+  \hline
+\end{tabular}
+
+
+\section{Tests}
+We use a negative binomial distribution to represent the read counts as in standard RNA-Seq analysis. We test for significant interaction between \textit{variants} and \textit{experimental conditions} as main effects, with a generalised linear model framework.
+\section{Pvalues}
+Pvalues are adjusted for multiple testing (FRD=5\%).
+
+\section{Delta PSI (delta f if SNP) computation}
+The  percent spliced in (PSI) is not used to perform tests but we output it to give information about the size of the effect. Indeed, with highly expressed genes pvalues can be significant even if for smal switches of variant presence, because there are a lot of reads to assess it. Intuitively percent spliced in are the ratio of the quantity of counts witnessing the presence of the inclusion isoform over the total counts sum for both isoforms. The delta PSI is simply the subtraction of the PSI calculated for each condition. A high delta PSI (in absolute) shows that the main isoform has changed between the two conditions.\\ 
+However this value is biased because the inclusion isoform is longer (in case of indels and alternative splicing) and more reads are prone to maping on it. That is why we introduced a correction of the counts to compute the delta PSI:
+\begin{itemize}
+ \item if the results from KisSplice were obtained with \texttt{--counts} option by default (\texttt{--counts 0} which gives \texttt{...|C1\_25|C2\_1|C3\_14.....} in the headers) :\\
+  $\Rightarrow$ no information is provided about junction counts. In this case:
  \begin{enumerate}
- \item on calcule un facteur correctif qui prend en compte les longueurs apparentes des reads:\\
-   $correctFactor\:=\: \frac{length\_upper\_path + read\_length - 2 \times overlap + 1}{length\_lower\_path + read\_length - 2\times overlap + 1}$ avec :
+ \item a correction factor is calculated, taking into account the apparent length of the each path (which is where the reads can actually map):\\
+   $correctFactor\:=\: \frac{length\_upper\_path + readLength - 2 \times overlap + 1}{length\_lower\_path + readLength - 2\times overlap + 1}$ with :
  \begin{itemize}
-  \item \texttt{upper\_path} est toujours l'isoforme d'inclusion (+long)/\texttt{lower\_path} est toujours l'isoforme d'exclusion
-  \item \texttt{overlap} : paramètre dans kissreads, overlap min du read sur la bubble, par défaut \texttt{k+1} (pour couvrir au moins une jonction)
+  \item \texttt{upper\_path} which is always the inclusion isoform (the longer one)/\texttt{lower\_path} which is the exclusion isoform,
+  \item \texttt{overlap}: which is set to \texttt{k+1} (the \texttt{k} value used in KisSplice) and \texttt{readLength} (default: 75) are two option in \texttt{diffExpressedVariants} to estimate the area where read can map on each path
    \end{itemize}
-            \item on corrige les comptages du chemin du haut (le plus long) car c'est celui sur lequel on est susceptible de voir plus de reads :\\
-            $comptages\_upper\_path \:=\:  \frac{comptages\_upper\_path}{correctFactor} $
+            \item counts of the upper path are corrected because we expect to find more reads mapped on it:\\
+            $\#counts\_upper\_path \:=\:  \frac{\#counts\_upper\_path}{correctFactor} $
  \end{enumerate}
- \item si on a des données en sortie de kissplice avec l'option \texttt{--counts} à \texttt{2} (qui donne \texttt{...|AS1\_12|AB1\_7|S1\_0|ASSB1\_1 ou |AB1\_13|.....} dans les headers) :\\
- $\Rightarrow$ on a des infos sur les comptages sur les jonctions : sur le chemin du haut, le nombre de reads est \texttt{AS+AB-ASSB} (les \texttt{ASSB} sont comptés deux fois, dans \texttt{AS} ou \texttt{AB} et dans \texttt{ASSB})
-  \item si on n'a pas de reads qui couvrent les deux jonctions, on va simplement diviser par 2 le nombre de reads vu sur le chemin du haut (globalement les comptages seront deux fois plus importants car on a deux jonctions sur le chemin du haut contre une seule sur le chemin du bas), 
-  \item si on a des reads sur la jonction ASSB on veut diviser par un peu moins que 2 :
+ \item if the results were obtained with \texttt{--counts 2} in KisSplice (which gives \texttt{...|AS1\_12|AB1\_7|S1\_0|ASSB1\_1 ou |AB1\_13|.....} in the headers) :\\
+ $\Rightarrow$ information about junction counts is provided: on the upper path, the number of reads mapped is equal to \texttt{AS+AB-ASSB} (\texttt{ASSB} reads are counted twice, in \texttt{AS} or \texttt{AB} and in \texttt{ASSB})
+  \item if there is no read overlapping the junction, we only divide by 2 the number of reads seen on the upper path (as globally the counts on the upper path are twice the the counts on the lower path because there are two junctions in the first versus only one in the second), 
+  \item if there are reads on ASSB junction, the idea is to divide by a bit less than two (having counts over the spliced exon means it is quite small):
   \begin{enumerate}
 %    \item \texttt{comptages\_upper\_path <- AS+AB-ASSB }
-    \item avant correction : $comptages\_upper\_path \:=\: AS+AB-ASSB $
-    \item après : $comptages\_upper\_path\:=\:\frac{comptages\_upper\_path}{2-\frac{ASSB}{AS+SB-ASSB}}$
+    \item before correction : $counts\_upper\_path \:=\: AS+AB-ASSB $
+    \item after correction : $counts\_upper\_path\:=\:\frac{comptages\_upper\_path}{2-\frac{ASSB}{AS+SB-ASSB}}$
   \end{enumerate}
  \end{itemize}
  
- Calcul du delta PSI :
+The the delta PSI is computed:
  \begin{itemize}
-\item calcul des psi individuels par réplicats :\\
-après correction des comptages, si les comptages pour le chemin du haut et pour le chemin du bas sont trop faibles, on ne calcule pas le psi individuel
-\item psi moyens par conditions :\\
- si plus de la moitié des psi individuels qui servent à calculer le psi moyen n'ont pas été calculés à l'étape précédente, on ne sort pas le psi moyen
-\item delta psi :\\
-non sorti si un des psi moyen n'a pas pu être estimé
+\item individual (per replicate) PSI are calculated:\\
+after the counts are corrected, if counts for both upper and lower path are too low ($<10$) the individual PSI is not computed.
+\item Then mean PSI are computed:\\
+they are the mean of individual PSI for one condition. If more than the half of individual PSI were not calculated at the latter step, the mean PSI is not computed.
+\item Finally, we output delta PSI:\\
+unless one of the mean PSI of a condition could not be estimate. Delta PSI is calculated subtracting one condition PSI from another. This does not always follow the order of the conditions you entered in the first place. To know the order, you must report to the output file, delta PSI are calculated subtracting the first condition appearing in the header from the one after.
 \end{itemize}
 
 
+\section{Low counts flag and final table}
+If in at least $n-1$ conditions (be $n$ the number of conditions $\geq 2$) an event has low counts (option \texttt{filagLowCountsConditions}) it is flagged (\texttt{TRUE} in the last column of the output).\\
+In the example table, we can see that the counts are quite contrasted, variant 1 seemed more expressed in condition 1 and variant 2 in condition 2. Moreover, this event has enough counts for each variant not to be filtered out by \texttt{filterLowCountsVariants} option:\\
 
+\begin{tabular}{r|c|c|c}
+  \hline
+   & Condition 1 & Condition 2& Sum by variant \\
+  \hline
+  Variant 1 &	rep1:1, rep2:0 & rep1:6, rep2:7&  1+0+6+7=14 $>$ 10 \\
+ Variant 2 &	rep1:5, rep2:3 & rep1:1, rep2:2&  5+3+1+2=11 $>$ 10 \\
+  \hline
+ Sum by condition &	\textbf{9} $<$ 10 	&16 $>$ 10 & \\ 	
+  \hline
+\end{tabular}
 
+\paragraph{}However, in $n-1$ (here 1) condition, the global count for one condition is less than 10 (9 for condition 1), so \texttt{flagLowCountsConditions} option will classify this in event in \texttt{'Low\_Counts'} column with a \texttt{TRUE} value. 
 
 \end{document}

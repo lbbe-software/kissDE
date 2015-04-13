@@ -1,5 +1,5 @@
 devtests
 tags
-kissDE_doc.*x
-kissDE_doc.log
-kissDE_doc.tex.backup
+./doc/kissDE_doc.*x
+./dockissDE_doc.log
+./doc/kissDE_doc.tex.backup
