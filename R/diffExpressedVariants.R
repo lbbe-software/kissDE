@@ -824,10 +824,10 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
       print("Computing size of the effect and last cutoffs...")
       chunk3 <- tryCatch( { 
         signifVariants.sorted <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, flagLowCountsConditions, readLength, overlap, chunk1$lengths)
-        return(list(resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb,noCorrectPVal=chunk2$noCorrectPVal, correctedPVal= chunk2$correctedPVal, finalTable=signifVariants.sorted))
+        return(list(resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb,uncorrectedPVal=chunk2$noCorrectPVal, correctedPVal= chunk2$correctedPVal, finalTable=signifVariants.sorted))
       },error=function(err) {
         print(paste(err,"Returning only resultFitNBglmModel and pvalues tab"))
-        return(list(resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb, noCorrectPVal=chunk2$noCorrectPVal, correctedPVal= chunk2$correctedPVal))
+        return(list(resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb, uncorrectedPVal=chunk2$noCorrectPVal, correctedPVal= chunk2$correctedPVal))
       })
     } else { #error in chunk 2 does not allow to compute chunk 3
       return(chunk2)
