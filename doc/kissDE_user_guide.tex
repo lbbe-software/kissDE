@@ -2,33 +2,52 @@
 \usepackage[utf8]{inputenc}
 
 %opening
-\title{}
+\title{kissDE Reference Manual}
 \author{}
 
 \begin{document}
 
 \maketitle
 
-\section*{kissDE main steps}
-\begin{enumerate}
-\item Some prerequisites needed for the analysis.
- \item Counts are normalized.
- \item Some events are filtered out based on their counts.
- \item Tests are performed on normalized counts.
- \item Pvalues are computed.
- \item Delta PSI/f are computed.
- \item Low counts are flagged.
-\end{enumerate}
+\section{What kissDE does}
+kissDE enables to test if a variant is specific to a condition.
+It takes as input read counts for each variant in each replicate of each condition, and outputs a p-value (adjusted for multiple testing) and a metric (Df/Dpsi) which indicates the magnitude of the effect.
+
+The term ``variant'' applies both to genomic variants and splicing variants.
+In both cases, the same gene gives rise to two RNA molecules, which differ in their sequence.
+
+When a gene gives rise to more than two RNA molecules, we assume the set of all transcripts can be split in two groups.
+In the case of splicing, the two groups are: the ones that include the exon of interest, and the ones that exclude the exon of interest.
+In the case of genomic polymorphism, the two groups are: the ones that contain the first allele, the ones that contain the second allele.
+
+The statistical framework is the same as for DESeq.
+The main difference is that for gene expression, you have one value per gene. 
+When dealing with polymorphism or alternative spicing, you have two values. One per variant.
+
+
+%\section*{kissDE main steps}
+%\begin{enumerate}
+%\item Some prerequisites needed for the analysis.
+% \item Counts are normalized.
+% \item Some events are filtered out based on their counts.
+% \item Tests are performed on normalized counts.
+% \item Pvalues are computed.
+% \item Delta PSI/f are computed.
+% \item Low counts are flagged.
+%\end{enumerate}
 
 \section{Prerequisites}
-\begin{enumerate}
- \item You must build a table with the counts of the pairwise variants you want to test. This can be done with \texttt{kissplice2counts}.
- \item Once you have provided a table of counts on your own or created by \texttt{kissplice2counts}, you must provide a vector that describes the experimental conditions
-\end{enumerate}
+For running kissDE, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
+You can provide your own table of counts, or simply us KisSplice's output.
 
-\subsection{Provide a table of counts, use of kissplice2counts}
-If you use output files from KisSplice, a fist step of conversion is required using \texttt{kissplice2counts} function.
-To create an object with \texttt{kissplice2counts}, you will often use one of these lines:\\
+%\begin{enumerate}
+% \item You must build a table with the counts of the pairwise variants you want to test. This can be done with \texttt{kissplice2counts}.
+% \item Once you have provided a table of counts on your own or created by \texttt{kissplice2counts}, you must provide a vector that describes the experimental conditions
+%\end{enumerate}
+
+\subsection{Providing a table of counts using kissplice2counts}
+If you use output files from KisSplice, you can directly import your counts using \texttt{kissplice2counts} function.
+To create an object with \texttt{kissplice2counts}, you will probably use one of these lines:\\
 
   \texttt{myCounts <- kissplice2counts('./path/results\_Kissplice\_typeX.fa')}\\
 
@@ -49,7 +68,7 @@ or\\
 The table you have created in \texttt{myCounts} helps to convert information provided in KisSplice output into a table of counts per event that will be used for the tests.\\
 Events are pairwise, made of 2 variants (typically an exon retained and an exon skipped fort 2 variants in alt. splicing, or two SNPs isoforms if you work with SNPs). So now you'd like to test if you have some differentially enriched variants between your conditions (i.e. is my skipped exon isoform is more present in my condition 1 and on the contrary the other isoform more present in my condition 2).
 
-\subsection{Provide an experimental conditions vector}
+\subsection{Providing an experimental conditions vector}
 The experimental conditions vector helps to make the link between the conditions you want to test and the files input in KisSplice. For instance, if in KisSplice you have entered 4 fasta/q files in this order:\\
 
 \texttt{-r firstCondition\_Replicate1 -r firstCondition\_Replicate2\\
@@ -59,7 +78,10 @@ In this case there are only have two conditions and to replicates for each condi
 
 \texttt{myConditions <- c("condition1","condition1","condition2","condition2")}\\
 
-What is important is that this vector matches the order of what you have input. Probably it will be clearer if you give \texttt{condition1} and \texttt{condition2} a more descriptive name. 
+What is important is that this vector matches the order of what you have input. Probably it will be clearer if you give \texttt{condition1} and \texttt{condition2} a more descriptive name. For instance :
+
+\texttt{myConditions <- c("control","control","treatment","treatment")}\\
+ 
 
 \paragraph{If you have paired end data, and entered for instance:\\}
 
@@ -121,13 +143,29 @@ Here we present two examples to explain how \texttt{filterLowCountsVariants} opt
 
 
 \section{Tests}
-We use a negative binomial distribution to represent the read counts as in standard RNA-Seq analysis. We test for significant interaction between \textit{variants} and \textit{experimental conditions} as main effects, with a generalised linear model framework.
-\section{Pvalues}
-Pvalues are adjusted for multiple testing (FRD=5\%).
+Our statistical analysis adopts the framework of count regression with Negative Binomial distribution as in standard RNA-Seq analysis. We consider 2-way design with interaction with \textit{alleles} and \textit{experimental conditions} as main effects. Following the Generalized Linear Model framework, the expected intensity of the signal is denoted by $\lambda_{ij}$ and is decomposed such that
+$$
+\log \lambda_{ij} = \mu + \alpha_{i} +\beta_{j} + \left(\alpha \beta \right)_{ij}
+$$
+where $\mu$ is the local mean expression of the gene that contains the SNP, $\alpha_{i}$ the effect of allele $i$ on expression, $\beta_{j}$ the contribution of condition $j$ to total expression and $\left(\alpha \beta \right)_{ij}$ the interaction term. The target hypothesis is $H_0:\{\left(\alpha \beta \right)_{ij}=0\}$ (no interaction between allele and condition) that is tested using a Likelihood Ratio Test with a 5\% FDR to account for multiple testing.
 
-\section{Delta PSI (delta f if SNP) computation}
-The  percent spliced in (PSI) is not used to perform tests but we output it to give information about the size of the effect. Indeed, with highly expressed genes pvalues can be significant even if for smal switches of variant presence, because there are a lot of reads to assess it. Intuitively percent spliced in are the ratio of the quantity of counts witnessing the presence of the inclusion isoform over the total counts sum for both isoforms. The delta PSI is simply the subtraction of the PSI calculated for each condition. A high delta PSI (in absolute) shows that the main isoform has changed between the two conditions.\\ 
-However this value is biased because the inclusion isoform is longer (in case of indels and alternative splicing) and more reads are prone to maping on it. That is why we introduced a correction of the counts to compute the delta PSI:
+\section{Delta PSI / Delta f computation}
+When a gene is found to be differentially spliced between two conditions, or an allele is found to be differentially present in two populations, one concern which remains is to quantify the magnitude of this effect.
+Indeed, especially in RNAseq, where some genes are very highly expressed (and hence have very high read counts), it is often the case that we detect significant (p<0.05) but weak effects. 
+
+When dealing with genomic variants, we quantify the magnitude of the effect using the difference of allele frequencies between the two conditions.
+When dealing with splicing variants, we quantify the magnitude of the effect using the difference of Percent Spliced In (PSI) between the two conditions.
+These two measures turn out to be equivalent and can be summarised using the following formula :
+
+$$PSI \:=\: f  \:=\:  \frac{\#counts\_variant_1}{\#counts\_variant_1 + \#counts\_variant_2} $$ \\
+$DeltaPSI \:=\: PSI_{cond1} - PSI_{cond2}$ \\
+$Deltaf \:=\: f_{cond1} - f_{cond2}$
+
+%The  percent spliced in (PSI) is not used to perform tests but we output it to give information about the magnitude of the effect. Indeed, with highly expressed genes pvalues can be significant even if for smal switches of variant presence, because there are a lot of reads to assess it. Intuitively percent spliced in are the ratio of the quantity of counts witnessing the presence of the inclusion isoform over the total counts sum for both isoforms. The delta PSI is simply the subtraction of the PSI calculated for each condition. A high delta PSI (in absolute) shows that the main isoform has changed between the two conditions.\\ 
+
+In the case where the two variants do not have the same length (genomic indels or splice variants), then this formula is not correct, since the abundance of the longer variant will be over-estimated. We therefore need to introduce a correction factor.
+This correction factor is not the same if the counts that were input to kissDE correspond to a- junction reads only or b- junction reads + exonic reads.
+%However this value is biased because the inclusion isoform is longer (in case of indels and alternative splicing) and more reads are prone to mapping on it. That is why we introduced a correction of the counts to compute the delta PSI:
 \begin{itemize}
  \item if the results from KisSplice were obtained with \texttt{--counts} option by default (\texttt{--counts 0} which gives \texttt{...|C1\_25|C2\_1|C3\_14.....} in the headers) :\\
   $\Rightarrow$ no information is provided about junction counts. In this case:
@@ -152,7 +190,7 @@ However this value is biased because the inclusion isoform is longer (in case of
   \end{enumerate}
  \end{itemize}
  
-The the delta PSI is computed:
+The delta PSI is computed:
  \begin{itemize}
 \item individual (per replicate) PSI are calculated:\\
 after the counts are corrected, if counts for both upper and lower path are too low ($<10$) the individual PSI is not computed.
