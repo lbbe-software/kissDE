@@ -496,6 +496,9 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   sing.events <- which(grepl("Error",pALLGlobalPhi.glm.nb[ , 1]))
   if (length(sing.events) != 0) {
       pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[ - sing.events, ]
+      #### 
+      # dataPart3 <- dataPart3[ - sing.events, ]
+      ####
   }
   colnames(pALLGlobalPhi.glm.nb) <- c("(0)I vs A",
                                     "(gb)I vs A",
@@ -521,6 +524,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   } else {
     rownames(pALLGlobalPhi.glm.nb) <- dataPart3[ , 1]
   }
+
   return(list(pALLGlobalPhi.glm.nb=pALLGlobalPhi.glm.nb, sing.events=sing.events,dataPart3=dataPart3, ASSBinfo=ASSBinfo, allEventtables=allEventtables, lengths=lengths))
 }
 
@@ -621,8 +625,14 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   pALLGlobalPhi.glm.nb$final.padj.a.ia <- p.adjust(pALLGlobalPhi.glm.nb$final.pval.a.ia, method="fdr")
   correctedPVal <- pALLGlobalPhi.glm.nb$final.padj.a.ia
   names(correctedPVal) <- rownames(pALLGlobalPhi.glm.nb)
+  #### 
+  tmpdataPart3_1 <-  dataPart3[ - sing.events, ]
+  ####
   if (length(sing.events.final) != 0) {
-    tmpdataPart3 <- dataPart3[ - sing.events.final, ]
+    ####
+    tmpdataPart3 <- tmpdataPart3_1[ - sing.events.final, ]
+    # tmpdataPart3 <- dataPart3[ - sing.events.final, ]
+    ####
     signifVariants <- cbind(tmpdataPart3,pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
   } else {
     signifVariants <- cbind(dataPart3, pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
@@ -661,12 +671,23 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   for (pair in pairsCond) { #delta psi calculated for pairs of conditions, psi are calcuted for each replicateXcondition
       #for one pair
       index <- pair[[1]]
-      condi <- namesCond[index]
-      replicates <- nr[index]
+      ####
+      if ( is.list(index) ) {
+        condi <- namesCond[index[[1]]]
+        replicates <- nr[index[[1]]]
+      } else {
+        condi <- namesCond[index]
+        replicates <- nr[index]
+      }
+      # condi <- namesCond[index]
+      # replicates <- nr[index]
+      ####
+      
       psiPairCond <- matrix(nrow=dim(signifVariants)[1],ncol=sum(replicates))
       colsPsiPairCond <- c()
       indexMatrixPsiPairCond <- 1
       indexdeltapsi <- 1
+      namesPsiPairCond <- c()
       for (nbRepli in 1:length(replicates)) {# for a given condition in the pair
         for (i in 1:replicates[nbRepli]) {# for each replicate (i) of the condition
           colsPsiPairCond <- c(colsPsiPairCond, paste(condi[nbRepli],'_r',i, sep=''))
@@ -706,11 +727,18 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   if (length(pairsCond) >1 ){
     for (l in 1:dim(deltapsi)[1]){ #if there are more than 2 conditions, we take the maximum of the deltaPSI of all pairs
       mindex <- which.max(abs(deltapsi[l,]))
-      condA <- as.character(pairsCond[[mindex]][[1]][1])
-      condB <- as.character(pairsCond[[mindex]][[1]][2])
-      dP <- round(deltapsi[l,mindex],4)
-      dPvector1[l] <- dP
-      dPvector2[l] <-paste(as.character(dP),"(Cond",condB,",",condA,")",sep="")#we also return for which pair of conditions we found this max deltaPSI
+      if ( length(mindex) != 0 ) {
+        condA <- as.character(pairsCond[[mindex]][[1]][1])
+        condB <- as.character(pairsCond[[mindex]][[1]][2])
+        dP <- round(deltapsi[l,mindex],4)
+        dPvector1[l] <- dP
+        dPvector2[l] <-paste(as.character(dP),"(Cond",condB,",",condA,")",sep="")#we also return
+      }
+      # condA <- as.character(pairsCond[[mindex]][[1]][1])
+      # condB <- as.character(pairsCond[[mindex]][[1]][2])
+      # dP <- round(deltapsi[l,mindex],4)
+      # dPvector1[l] <- dP
+      # dPvector2[l] <-paste(as.character(dP),"(Cond",condB,",",condA,")",sep="")#we also return for which pair of conditions we found this max deltaPSI
     }
   } else {
     dPvector1 <- round(deltapsi,4)
