@@ -13,6 +13,9 @@
   }
   ElementsNb <- length(splitElements) #number of elements in the line
   splitCounts <- splitElements[indexStart : (length(splitElements) - 1)] # avoids the name of the bcc ... and the rank (last one) to get only the counts
+  #### discoSNP
+  splitCounts <- splitCounts[1:(length(splitCounts)/2)]
+  ####
   s <- sapply(splitCounts, function(splitCounts) regmatches(splitCounts[[1]], gregexpr(pattern = "[0-9]+",splitCounts[[1]]))) #gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
   if (isQuality == TRUE ) { #if there is a quality information  (for SNPs)
     s<- s[regexpr('Q',names(s)) == -1] # we discard "Q_" information as they are not counts
@@ -95,16 +98,22 @@
 }
 
 .getInfoLine <- function(line, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, isQuality) {
-  if ( grepl("branching_nodes", line) ) { 
-    indexStart <- 6 
-    } else {
-    indexStart <- 5
-  }
+  #### disco SNP
+  # if ( grepl("branching_nodes", line) ) { 
+  #   indexStart <- 6 
+  #   } else {
+  #   indexStart <- 5
+  # }
+  indexStart <- 5
+  ####
   resultCountsSet <- .countsSet(line, indexStart, counts, pairedEnd, order, exonicReads, isQuality)
   lineFirstPart <- resultCountsSet$firstPart
   lineFirstPartSplit <- strsplit(lineFirstPart,"|",fixed=TRUE)[[1]]
-  name <- paste(lineFirstPartSplit[2],lineFirstPartSplit[3],sep="|")
-  name <- substr(name, start = 2, stop = nchar(name))
+  #### discoSNP 
+  # name <- paste(lineFirstPartSplit[2],lineFirstPartSplit[3],sep="|")
+  # name <- substr(name, start = 2, stop = nchar(name))
+  name <- strsplit(lineFirstPartSplit[2], "_", fixed=TRUE)[[1]][4]
+  ####
   length <- strsplit(lineFirstPartSplit[5],"_")[[1]][4]
   vCounts <- resultCountsSet$vCounts
   return (list(eventName=name,variantLength=length,variantCounts=vCounts, psiInfo=resultCountsSet$psiCounts))
@@ -530,114 +539,118 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
 
 .bestModelandSingular <- function(pALLGlobalPhi.glm.nb,sing.events,dataPart3, allEventtables, pvalue) { 
   pALLGlobalPhi.glm.nb = pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[ , 1]), ]
-  matrixpALLGlobalPhi <- as.matrix(pALLGlobalPhi.glm.nb)
-  storage.mode(matrixpALLGlobalPhi) <- 'numeric'
+  if ( dim(pALLGlobalPhi.glm.nb)[1] > 0 ){
+    matrixpALLGlobalPhi <- as.matrix(pALLGlobalPhi.glm.nb)
+    storage.mode(matrixpALLGlobalPhi) <- 'numeric'
 
-  ###################################################
-  ### code chunk number 1: best model
-  ###################################################
-  bestmodel.table.n = apply(matrixpALLGlobalPhi[ ,c(6,8,10,12)],1,which.min)#######"%%%%%"
-  bestmodel.table = bestmodel.table.n
-  bestmodel.table[bestmodel.table == 1] = "Poisson"
-  bestmodel.table[bestmodel.table == 2] = "NB, global phi"
-  bestmodel.table[bestmodel.table == 3] = "NB, DSS phi"
-  bestmodel.table[bestmodel.table == 4] = "NB, cond DSS phi"
-  bestmodel.singhes = c()
-  for (i in 1:length(bestmodel.table.n)) {
-    bestmodel.singhes[i] = c(matrixpALLGlobalPhi[i,c(22,24,26,28)])[bestmodel.table.n[i]]##########%%%%%%%%%%
-  }
-  bestmodel.singhes = unlist(bestmodel.singhes)
-  bestmodel = table(bestmodel.table)
-  bestmodel2 = table(bestmodel.table,bestmodel.singhes)
-  colnames(bestmodel2) = c("F","T")
-  bestmodel3 = table(bestmodel.table,apply(matrixpALLGlobalPhi[ ,c(22,24,26,28)],1,sum),dnn=c("best model","singular hessian"))
-  colnames(bestmodel3) = paste(colnames(bestmodel3), "Models")
+    ###################################################
+    ### code chunk number 1: best model
+    ###################################################
+    bestmodel.table.n = apply(matrixpALLGlobalPhi[ ,c(6,8,10,12)],1,which.min)#######"%%%%%"
+    bestmodel.table = bestmodel.table.n
+    bestmodel.table[bestmodel.table == 1] = "Poisson"
+    bestmodel.table[bestmodel.table == 2] = "NB, global phi"
+    bestmodel.table[bestmodel.table == 3] = "NB, DSS phi"
+    bestmodel.table[bestmodel.table == 4] = "NB, cond DSS phi"
+    bestmodel.singhes = c()
+    for (i in 1:length(bestmodel.table.n)) {
+      bestmodel.singhes[i] = c(matrixpALLGlobalPhi[i,c(22,24,26,28)])[bestmodel.table.n[i]]##########%%%%%%%%%%
+    }
+    bestmodel.singhes = unlist(bestmodel.singhes)
+    bestmodel = table(bestmodel.table)
+    bestmodel2 = table(bestmodel.table,bestmodel.singhes)
+    colnames(bestmodel2) = c("F","T")
+    bestmodel3 = table(bestmodel.table,apply(matrixpALLGlobalPhi[ ,c(22,24,26,28)],1,sum),dnn=c("best model","singular hessian"))
+    colnames(bestmodel3) = paste(colnames(bestmodel3), "Models")
 
-  ###################################################
-  ### code chunk number 3: glmnet
-  ###################################################
-  pALLGlobalPhi.glm.nb.glmnet = as.data.frame(matrixpALLGlobalPhi)
-  pALLGlobalPhi.glm.nb.glmnet$glmnet.pval = 1
-  pALLGlobalPhi.glm.nb.glmnet$glmnet.code = 0
-  singhes0 = which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == 1)# Variants for which the Poisson model is better
-  for (i in singhes0) {
-    Xinter   = model.matrix(~cond*path,data= allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]); 
-    outinter = glmnet(Xinter,allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
-    Xprinc   = model.matrix(~path+cond,data= allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]); 
-    outprinc = glmnet(Xprinc,allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
-    Pv       = 1-pchisq(deviance(outprinc) - deviance(outinter),df=1)
-    pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[i] = Pv
-    pALLGlobalPhi.glm.nb.glmnet$glmnet.code[i] = outinter$jerr
-  }
-  matrixpALLGlobalPhi.glmnet <- as.matrix(pALLGlobalPhi.glm.nb.glmnet)
-  storage.mode(matrixpALLGlobalPhi.glmnet) <- 'numeric'
+    ###################################################
+    ### code chunk number 3: glmnet
+    ###################################################
+    pALLGlobalPhi.glm.nb.glmnet = as.data.frame(matrixpALLGlobalPhi)
+    pALLGlobalPhi.glm.nb.glmnet$glmnet.pval = 1
+    pALLGlobalPhi.glm.nb.glmnet$glmnet.code = 0
+    singhes0 = which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == 1)# Variants for which the Poisson model is better
+    for (i in singhes0) {
+      Xinter   = model.matrix(~cond*path,data= allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]); 
+      outinter = glmnet(Xinter,allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
+      Xprinc   = model.matrix(~path+cond,data= allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]); 
+      outprinc = glmnet(Xprinc,allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
+      Pv       = 1-pchisq(deviance(outprinc) - deviance(outinter),df=1)
+      pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[i] = Pv
+      pALLGlobalPhi.glm.nb.glmnet$glmnet.code[i] = outinter$jerr
+    }
+    matrixpALLGlobalPhi.glmnet <- as.matrix(pALLGlobalPhi.glm.nb.glmnet)
+    storage.mode(matrixpALLGlobalPhi.glmnet) <- 'numeric'
 
-  #############################################################################################################
-  ###  code chunk number 4 : Pseudo-counts  and glmnet                                                   ###
-  #############################################################################################################
-  singhes = which(apply(matrixpALLGlobalPhi[ ,c(6,8,10,12)],1,which.min) > 1 & apply(matrixpALLGlobalPhi[ ,c(22,24,26,28)],1,sum) != 0) 
-  singhes_n = names(singhes) 
+    #############################################################################################################
+    ###  code chunk number 4 : Pseudo-counts  and glmnet                                                   ###
+    #############################################################################################################
+    singhes = which(apply(matrixpALLGlobalPhi[ ,c(6,8,10,12)],1,which.min) > 1 & apply(matrixpALLGlobalPhi[ ,c(22,24,26,28)],1,sum) != 0) 
+    singhes_n = names(singhes) 
 
-  # pALLGlobalPhi.glm.nb.pen = as.data.frame(matrixpALLGlobalPhi)
-  # for(i in singhes){#we add pseudo-count (+1 in counts) for event with singular hessian for which the best model is not the Poisson model 
-  #   pALLGlobalPhi.glm.nb.pen[i, ] = try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
-  #                                                           dispersion(dispData)[i],
-  #                                                           dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
-  # }
-  pALLGlobalPhi.glm.nb.pen = as.data.frame(matrixpALLGlobalPhi)
-  for(i in singhes_n){#we add pseudo-count (+1 in counts) for event with singular hessian for which the best model is not the Poisson model 
-    pALLGlobalPhi.glm.nb.pen[i, ] = try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
-                                                            dispersion(dispData)[i],
-                                                            dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
-  }
+    # pALLGlobalPhi.glm.nb.pen = as.data.frame(matrixpALLGlobalPhi)
+    # for(i in singhes){#we add pseudo-count (+1 in counts) for event with singular hessian for which the best model is not the Poisson model 
+    #   pALLGlobalPhi.glm.nb.pen[i, ] = try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
+    #                                                           dispersion(dispData)[i],
+    #                                                           dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
+    # }
+    pALLGlobalPhi.glm.nb.pen = as.data.frame(matrixpALLGlobalPhi)
+    for(i in singhes_n){#we add pseudo-count (+1 in counts) for event with singular hessian for which the best model is not the Poisson model 
+      pALLGlobalPhi.glm.nb.pen[i, ] = try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
+                                                              dispersion(dispData)[i],
+                                                              dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
+    }
 
-  pALLGlobalPhi.glm.nb <- as.data.frame(matrixpALLGlobalPhi)
- 
-  pALLGlobalPhi.glm.nb$final.pval.a.ia = 1
-  i <- 1 #Poisson model
-  li.singhes <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i)
-  pALLGlobalPhi.glm.nb$final.pval.a.ia[li.singhes] = pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[li.singhes]
-  
-  i  <- 2 # negative binomial model, with global phi
-  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) == 0)
-  pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,2]
-  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) != 0)
-  pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li,2]
+    pALLGlobalPhi.glm.nb <- as.data.frame(matrixpALLGlobalPhi)
+   
+    pALLGlobalPhi.glm.nb$final.pval.a.ia = 1
+    i <- 1 #Poisson model
+    li.singhes <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i)
+    pALLGlobalPhi.glm.nb$final.pval.a.ia[li.singhes] = pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[li.singhes]
+    
+    i  <- 2 # negative binomial model, with global phi
+    li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) == 0)
+    pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,2]
+    li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) != 0)
+    pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li,2]
 
-  i  <- 3 # negative binomial model, phi estimated with DSS
-  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) == 0)
-  pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,3]
-  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) != 0)
-  pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li,3]
+    i  <- 3 # negative binomial model, phi estimated with DSS
+    li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) == 0)
+    pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,3]
+    li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) != 0)
+    pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li,3]
 
-  i  <- 4 # negative binomial model, phi estimated with DSS, conditionally to the expression mean
-  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) == 0)
-  pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,4]
-  li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) != 0)
-  pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li,4]
-  
-  sing.events.final <- which(grepl("Error",pALLGlobalPhi.glm.nb[ , 29])) 
-  if (length(sing.events.final) != 0) {
-       pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[ - sing.events.final, ]
-  }
-  noCorrectPVal <- pALLGlobalPhi.glm.nb$final.pval.a.ia
-  names(noCorrectPVal) <- rownames(pALLGlobalPhi.glm.nb)
-  pALLGlobalPhi.glm.nb$final.padj.a.ia <- p.adjust(pALLGlobalPhi.glm.nb$final.pval.a.ia, method="fdr")
-  correctedPVal <- pALLGlobalPhi.glm.nb$final.padj.a.ia
-  names(correctedPVal) <- rownames(pALLGlobalPhi.glm.nb)
-  #### 
-  tmpdataPart3_1 <-  dataPart3[ - sing.events, ]
-  ####
-  if (length(sing.events.final) != 0) {
+    i  <- 4 # negative binomial model, phi estimated with DSS, conditionally to the expression mean
+    li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) == 0)
+    pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li,4]
+    li <- which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == i & apply(pALLGlobalPhi.glm.nb[ ,c(22,24,26,28)],1,sum) != 0)
+    pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li,4]
+    
+    sing.events.final <- which(grepl("Error",pALLGlobalPhi.glm.nb[ , 29])) 
+    if (length(sing.events.final) != 0) {
+         pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[ - sing.events.final, ]
+    }
+    noCorrectPVal <- pALLGlobalPhi.glm.nb$final.pval.a.ia
+    names(noCorrectPVal) <- rownames(pALLGlobalPhi.glm.nb)
+    pALLGlobalPhi.glm.nb$final.padj.a.ia <- p.adjust(pALLGlobalPhi.glm.nb$final.pval.a.ia, method="fdr")
+    correctedPVal <- pALLGlobalPhi.glm.nb$final.padj.a.ia
+    names(correctedPVal) <- rownames(pALLGlobalPhi.glm.nb)
+    #### 
+    tmpdataPart3_1 <-  dataPart3[ - sing.events, ]
     ####
-    tmpdataPart3 <- tmpdataPart3_1[ - sing.events.final, ]
-    # tmpdataPart3 <- dataPart3[ - sing.events.final, ]
-    ####
-    signifVariants <- cbind(tmpdataPart3,pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
-  } else {
-    signifVariants <- cbind(dataPart3, pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
-  }
-  return(list(noCorrectPVal=noCorrectPVal, correctedPVal=correctedPVal,signifVariants=signifVariants))
+    if (length(sing.events.final) != 0) {
+      ####
+      tmpdataPart3 <- tmpdataPart3_1[ - sing.events.final, ]
+      # tmpdataPart3 <- dataPart3[ - sing.events.final, ]
+      ####
+      signifVariants <- cbind(tmpdataPart3,pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
+    } else {
+      signifVariants <- cbind(dataPart3, pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
+    }
+    return(list(noCorrectPVal=noCorrectPVal, correctedPVal=correctedPVal,signifVariants=signifVariants))
+    } else {
+      return(NA)
+    }
 }
 
 .sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, readLength, overlap, lengths) {
