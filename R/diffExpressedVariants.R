@@ -1,4 +1,4 @@
-.lineParse <- function(line, indexStart, isQuality) {
+.lineParse <- function(line, indexStart, isQuality, discoSNP=FALSE) {
   options(warn=-1)
   beginningLineToWrite <- ""
   splitElements <- strsplit(line, "|", fixed=TRUE)[[1]] # splits the line
@@ -13,9 +13,9 @@
   }
   ElementsNb <- length(splitElements) #number of elements in the line
   splitCounts <- splitElements[indexStart : (length(splitElements) - 1)] # avoids the name of the bcc ... and the rank (last one) to get only the counts
-  #### discoSNP
-  splitCounts <- splitCounts[1:(length(splitCounts)/2)]
-  ####
+  if ( discoSNP == TRUE ){
+    splitCounts <- splitCounts[1:(length(splitCounts)/2)]    
+  }
   s <- sapply(splitCounts, function(splitCounts) regmatches(splitCounts[[1]], gregexpr(pattern = "[0-9]+",splitCounts[[1]]))) #gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
   if (isQuality == TRUE ) { #if there is a quality information  (for SNPs)
     s<- s[regexpr('Q',names(s)) == -1] # we discard "Q_" information as they are not counts
@@ -23,8 +23,8 @@
   return(list(beginning=beginningLineToWrite,countsperCond=s))
 }
 
-.countsSet <- function(line, indexStart, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, isQuality) {
-  resultParsing <- .lineParse(line, indexStart, isQuality)
+.countsSet <- function(line, indexStart, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, isQuality, discoSNP=FALSE) {
+  resultParsing <- .lineParse(line, indexStart, isQuality, discoSNP)
   beginningLineInfo <- resultParsing$beginning
   countsperCond<- resultParsing$countsperCond
   nbVec <- rep(0, length(countsperCond))
@@ -97,24 +97,23 @@
   return (df)
 }
 
-.getInfoLine <- function(line, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, isQuality) {
-  #### disco SNP
-  # if ( grepl("branching_nodes", line) ) { 
-  #   indexStart <- 6 
-  #   } else {
-  #   indexStart <- 5
-  # }
-  indexStart <- 5
-  ####
-  resultCountsSet <- .countsSet(line, indexStart, counts, pairedEnd, order, exonicReads, isQuality)
+.getInfoLine <- function(line, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, isQuality, discoSNP=FALSE) {
+  if ( grepl("branching_nodes", line) ) { 
+    indexStart <- 6 
+    } else {
+    indexStart <- 5
+  }
+  resultCountsSet <- .countsSet(line, indexStart, counts, pairedEnd, order, exonicReads, isQuality, discoSNP)
   lineFirstPart <- resultCountsSet$firstPart
   lineFirstPartSplit <- strsplit(lineFirstPart,"|",fixed=TRUE)[[1]]
-  #### discoSNP 
-  # name <- paste(lineFirstPartSplit[2],lineFirstPartSplit[3],sep="|")
-  # name <- substr(name, start = 2, stop = nchar(name))
-  name <- strsplit(lineFirstPartSplit[2], "_", fixed=TRUE)[[1]][4]
-  ####
-  length <- strsplit(lineFirstPartSplit[5],"_")[[1]][4]
+  if ( discoSNP == TRUE ) {
+      name <- strsplit(lineFirstPartSplit[2], "_", fixed=TRUE)[[1]][4]
+      length <- "0"
+  } else {
+      name <- paste(lineFirstPartSplit[2],lineFirstPartSplit[3],sep="|")
+      name <- substr(name, start = 2, stop = nchar(name))
+      length <- strsplit(lineFirstPartSplit[5],"_")[[1]][4]
+  }
   vCounts <- resultCountsSet$vCounts
   return (list(eventName=name,variantLength=length,variantCounts=vCounts, psiInfo=resultCountsSet$psiCounts))
 }
@@ -191,7 +190,6 @@
 }
 
 .fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, phiDSScond, phiGlobal, nbAll){
-    
   nbglmA0 <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4,0))
   nbglmI0 <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5,0))  
     # S: simple, A: additive, I : interaction models
@@ -252,12 +250,12 @@
   return(rslts)  
 }
 
-kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, exonicReads =TRUE) {
+kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, discoSNP=FALSE) {
   toConvert <- file(fileName, open = "r")
   lines <- readLines(toConvert)
   line <- lines[1]
   isQuality <- grepl("Q",line[1])
-  resultLine1 <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, isQuality)#get all the informations for the 1st line
+  resultLine1 <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, isQuality, discoSNP)#get all the informations for the 1st line
   eventName <- resultLine1$eventName
   variantLength <- resultLine1$variantLength
   variantCounts <- resultLine1$variantCounts
@@ -274,7 +272,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, ex
   if (firstLineChar == '>') { #same for all other lines, ignore lines with sequences
     while (index <= length(lines)) {
       line <- lines[index]
-      resultLine <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, isQuality)
+      resultLine <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, isQuality, discoSNP)
       eventName <- resultLine$eventName
       variantLength <- resultLine$variantLength
       variantCounts <- resultLine$variantCounts
@@ -292,7 +290,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, ex
   close(toConvert)
   psidf <- as.data.frame(psiInfo)
   psiInfo.df <-  data.frame(events.names,psidf)
-  return (list(countsEvents=events.df,psiInfo=psiInfo.df))
+  return (list(countsEvents=events.df,discoInfo=discoSNP,psiInfo=psiInfo.df))
 }
 
 qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None") {
@@ -587,13 +585,6 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
     #############################################################################################################
     singhes = which(apply(matrixpALLGlobalPhi[ ,c(6,8,10,12)],1,which.min) > 1 & apply(matrixpALLGlobalPhi[ ,c(22,24,26,28)],1,sum) != 0) 
     singhes_n = names(singhes) 
-
-    # pALLGlobalPhi.glm.nb.pen = as.data.frame(matrixpALLGlobalPhi)
-    # for(i in singhes){#we add pseudo-count (+1 in counts) for event with singular hessian for which the best model is not the Poisson model 
-    #   pALLGlobalPhi.glm.nb.pen[i, ] = try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
-    #                                                           dispersion(dispData)[i],
-    #                                                           dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
-    # }
     pALLGlobalPhi.glm.nb.pen = as.data.frame(matrixpALLGlobalPhi)
     for(i in singhes_n){#we add pseudo-count (+1 in counts) for event with singular hessian for which the best model is not the Poisson model 
       pALLGlobalPhi.glm.nb.pen[i, ] = try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
@@ -636,7 +627,11 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
     correctedPVal <- pALLGlobalPhi.glm.nb$final.padj.a.ia
     names(correctedPVal) <- rownames(pALLGlobalPhi.glm.nb)
     #### 
-    tmpdataPart3_1 <-  dataPart3[ - sing.events, ]
+    if (length(sing.events) != 0) {
+      tmpdataPart3_1 <-  dataPart3[ - sing.events, ]
+    } else {
+      tmpdataPart3_1 <-  dataPart3
+    }
     ####
     if (length(sing.events.final) != 0) {
       ####
@@ -648,12 +643,12 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
       signifVariants <- cbind(dataPart3, pALLGlobalPhi.glm.nb$final.padj.a.ia )[ pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
     }
     return(list(noCorrectPVal=noCorrectPVal, correctedPVal=correctedPVal,signifVariants=signifVariants))
-    } else {
-      return(NA)
-    }
+  } else {
+    return(NA)
+  }
 }
 
-.sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, readLength, overlap, lengths) {
+.sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, readLength, overlap, lengths, discoSNP=FALSE) {
   ###################################################
   ### code chunk 1 : compute delta PSI/f
   ###################################################
@@ -708,12 +703,14 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
           namesLow <- c(paste("LP_",condi[nbRepli],'_r',i,"_Norm", sep=''))
           subsetUp <- signifVariants[namesUp]#the subsets are the counts we are going to use to compute all psis
           subsetLow <- signifVariants[namesLow]
-          if (! is.null(ASSBinfo)) {# counts correction
-            nameASSBinfo <- c(paste(condi[nbRepli],'_r',i, sep=''))
-            subsetUp <- subsetUp/(2-ASSBinfo[,nameASSBinfo]/subsetUp)
-          } else {#counts correction if there is no info about the junction counts
-            correctFactor <- (lengths2$upper + readLength - 2*overlap + 1)/(lengths2$lower + readLength - 2*overlap + 1) #apparent size of upper path other apparent size of lower path
-            subsetUp <- subsetUp/correctFactor
+          if (discoSNP == FALSE) {
+            if (! is.null(ASSBinfo)) {# counts correction
+              nameASSBinfo <- c(paste(condi[nbRepli],'_r',i, sep=''))
+              subsetUp <- subsetUp/(2-ASSBinfo[,nameASSBinfo]/subsetUp)
+            } else {#counts correction if there is no info about the junction counts
+              correctFactor <- (lengths2$upper + readLength - 2*overlap + 1)/(lengths2$lower + readLength - 2*overlap + 1) #apparent size of upper path other apparent size of lower path
+              subsetUp <- subsetUp/correctFactor
+            }
           }
           sumLowCond[,nbRepli] <- sumLowCond[,nbRepli] + as.matrix(subsetUp) + as.matrix(subsetLow)#sumLowCond sums up the counts 
           psiPairCond[,indexMatrixPsiPairCond] <- as.matrix(subsetUp/(subsetUp+subsetLow)) #psi is #incl/(#incl+#exclu) after all corrections
@@ -786,7 +783,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   return(signifVariants.sorted)
 }
 
-diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterLowCountsVariants=10, flagLowCountsConditions=10, readLength=75, overlap=42) {
+diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterLowCountsVariants=10, flagLowCountsConditions=10, readLength=75, overlap=42, discoSNP=FALSE) {
 
   options(warn=-1) # suppress the warning for the users
 
@@ -864,7 +861,12 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
     if ( length(chunk2) > 2 ) { #no error during chunk2
       print("Computing size of the effect and last cutoffs...")
       chunk3 <- tryCatch( { 
-        signifVariants.sorted <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, flagLowCountsConditions, readLength, overlap, chunk1$lengths)
+        if ( is.na(countsData$discoInfo) ){
+          discoSNP <- FALSE
+        } else {
+          discoSNP <- countsData$discoInfo
+        }
+        signifVariants.sorted <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, flagLowCountsConditions, readLength, overlap, chunk1$lengths, discoSNP)
         return(list(resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb,uncorrectedPVal=chunk2$noCorrectPVal, correctedPVal= chunk2$correctedPVal, finalTable=signifVariants.sorted))
       },error=function(err) {
         print(paste(err,"Returning only resultFitNBglmModel and pvalues tab"))
