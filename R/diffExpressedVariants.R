@@ -532,10 +532,11 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
     rownames(pALLGlobalPhi.glm.nb) <- dataPart3[ , 1]
   }
 
-  return(list(pALLGlobalPhi.glm.nb=pALLGlobalPhi.glm.nb, sing.events=sing.events,dataPart3=dataPart3, ASSBinfo=ASSBinfo, allEventtables=allEventtables, lengths=lengths))
+  return(list(pALLGlobalPhi.glm.nb=pALLGlobalPhi.glm.nb, sing.events=sing.events,dataPart3=dataPart3, ASSBinfo=ASSBinfo, allEventtables=allEventtables, lengths=lengths, phi=phi, dispData=dispData, dispDataMeanCond=dispDataMeanCond))
 }
 
-.bestModelandSingular <- function(pALLGlobalPhi.glm.nb,sing.events,dataPart3, allEventtables, pvalue) { 
+.bestModelandSingular <- function(pALLGlobalPhi.glm.nb,sing.events,dataPart3, allEventtables, pvalue, phi, nr, dispData, dispDataMeanCond) { 
+  nbAll <- sum(nr)
   pALLGlobalPhi.glm.nb = pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[ , 1]), ]
   if ( dim(pALLGlobalPhi.glm.nb)[1] > 0 ){
     matrixpALLGlobalPhi <- as.matrix(pALLGlobalPhi.glm.nb)
@@ -568,14 +569,25 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
     pALLGlobalPhi.glm.nb.glmnet$glmnet.pval = 1
     pALLGlobalPhi.glm.nb.glmnet$glmnet.code = 0
     singhes0 = which(apply(pALLGlobalPhi.glm.nb[ ,c(6,8,10,12)],1,which.min) == 1)# Variants for which the Poisson model is better
-    for (i in singhes0) {
-      Xinter   = model.matrix(~cond*path,data= allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]); 
-      outinter = glmnet(Xinter,allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
-      Xprinc   = model.matrix(~path+cond,data= allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]); 
-      outprinc = glmnet(Xprinc,allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
+    #### 30/06
+    singhes0_n = names(singhes0)
+    # for (i in singhes0) {
+    for (i in singhes0_n) {
+      # Xinter   = model.matrix(~cond*path,data= allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]); 
+      Xinter   = model.matrix(~cond*path,data= allEventtables[[which(rownames(dataPart3) == i)]]) 
+      # outinter = glmnet(Xinter,allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
+      outinter = glmnet(Xinter,allEventtables[[which(rownames(dataPart3) == i)]]$counts,family="poisson",lambda=1e-4,alpha=0)
+      # Xprinc   = model.matrix(~path+cond,data= allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]); 
+      Xprinc   = model.matrix(~path+cond,data= allEventtables[[which(rownames(dataPart3) == i)]])
+      # outprinc = glmnet(Xprinc,allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
+      outprinc = glmnet(Xprinc,allEventtables[[which(rownames(dataPart3) == i)]]$counts,family="poisson",lambda=1e-4,alpha=0)
       Pv       = 1-pchisq(deviance(outprinc) - deviance(outinter),df=1)
-      pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[i] = Pv
-      pALLGlobalPhi.glm.nb.glmnet$glmnet.code[i] = outinter$jerr
+      ####
+      i_num <- as.numeric(i)
+      # pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[i] = Pv
+      # pALLGlobalPhi.glm.nb.glmnet$glmnet.code[i] = outinter$jerr
+      pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[i_num] = Pv
+      pALLGlobalPhi.glm.nb.glmnet$glmnet.code[i_num] = outinter$jerr
     }
     matrixpALLGlobalPhi.glmnet <- as.matrix(pALLGlobalPhi.glm.nb.glmnet)
     storage.mode(matrixpALLGlobalPhi.glmnet) <- 'numeric'
@@ -583,10 +595,12 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
     #############################################################################################################
     ###  code chunk number 4 : Pseudo-counts  and glmnet                                                   ###
     #############################################################################################################
-    singhes = which(apply(matrixpALLGlobalPhi[ ,c(6,8,10,12)],1,which.min) > 1 & apply(matrixpALLGlobalPhi[ ,c(22,24,26,28)],1,sum) != 0) 
-    singhes_n = names(singhes) 
+    singhes = which(apply(matrixpALLGlobalPhi[ ,c(6,8,10,12)],1,which.min) > 1 & apply(matrixpALLGlobalPhi[ ,c(22,24,26,28)],1,sum) != 0)
+    ##### 30/06
+    #singhes_n = names(singhes) 
     pALLGlobalPhi.glm.nb.pen = as.data.frame(matrixpALLGlobalPhi)
-    for(i in singhes_n){#we add pseudo-count (+1 in counts) for event with singular hessian for which the best model is not the Poisson model 
+    #for(i in singhes_n){#we add pseudo-count (+1 in counts) for event with singular hessian for which the best model is not the Poisson model 
+    for (i in singhes){
       pALLGlobalPhi.glm.nb.pen[i, ] = try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
                                                               dispersion(dispData)[i],
                                                               dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
@@ -844,7 +858,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
 
   if ( !is.na(chunk1) ) { #no error in chunk 1 nor in chunk 0
     print("Searching for best model and computing pvalues...")
-    chunk2 <- tryCatch( {.bestModelandSingular(chunk1$pALLGlobalPhi.glm.nb, chunk1$sing.events, chunk1$dataPart3, chunk1$allEventtables, pvalue) 
+    chunk2 <- tryCatch( {.bestModelandSingular(chunk1$pALLGlobalPhi.glm.nb, chunk1$sing.events, chunk1$dataPart3, chunk1$allEventtables, pvalue, chunk1$phi, chunk0$nr, chunk1$dispDataMeanCond, chunk1$dispDataMeanCond) 
     #### chunk 2 var ####  
     # chunk2$noCorrectPVal 
     # chunk2$correctedPVal 
