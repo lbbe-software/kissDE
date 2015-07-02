@@ -12,14 +12,17 @@
     }
   }
   ElementsNb <- length(splitElements) #number of elements in the line
-  splitCounts <- splitElements[indexStart : (length(splitElements) - 1)] # avoids the name of the bcc ... and the rank (last one) to get only the counts
-  if ( discoSNP == TRUE ){
-    splitCounts <- splitCounts[1:(length(splitCounts)/2)]    
-  }
-  s <- sapply(splitCounts, function(splitCounts) regmatches(splitCounts[[1]], gregexpr(pattern = "[0-9]+",splitCounts[[1]]))) #gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
-  if (isQuality == TRUE ) { #if there is a quality information  (for SNPs)
-    s<- s[regexpr('Q',names(s)) == -1] # we discard "Q_" information as they are not counts
-  } 
+  #### 1/07 #####
+  allcondi <- gregexpr("C[[:digit:]]+_[[:digit:]]+",line,perl=T)
+  # splitCounts <- splitElements[indexStart : (length(splitElements) - 1)] # avoids the name of the bcc ... and the rank (last one) to get only the counts
+  splittedCounts <- regmatches(line,allcondi)
+  # if ( discoSNP == TRUE ){
+  #   splitCounts <- splitCounts[1:(length(splitCounts)/2)]    
+  # }
+  s <- sapply(splittedCounts[[1]], function(splittedCounts) regmatches(splittedCounts[[1]], gregexpr(pattern = "[0-9]+",splittedCounts[[1]]))) #gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
+  # if (isQuality == TRUE ) { #if there is a quality information  (for SNPs)
+  #   s<- s[regexpr('Q',names(s)) == -1] # we discard "Q_" information as they are not counts
+  # } 
   return(list(beginning=beginningLineToWrite,countsperCond=s))
 }
 
