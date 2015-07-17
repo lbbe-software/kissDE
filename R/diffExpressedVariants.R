@@ -14,6 +14,10 @@
   ElementsNb <- length(splitElements) #number of elements in the line
   #### 1/07 #####
   allcondi <- gregexpr("C[[:digit:]]+_[[:digit:]]+",line,perl=T)
+  #### 17/07 ####
+  if (allcondi[[1]][1] == -1) {  # no C in the header => ASSB counts
+    allcondi <- gregexpr("[ASB]{1,4}[[:digit:]]+_[[:digit:]]+",line,perl=T)
+  }
   # splitCounts <- splitElements[indexStart : (length(splitElements) - 1)] # avoids the name of the bcc ... and the rank (last one) to get only the counts
   splittedCounts <- regmatches(line,allcondi)
   # if ( discoSNP == TRUE ){
@@ -560,10 +564,10 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
     }
     bestmodel.singhes = unlist(bestmodel.singhes)
     bestmodel = table(bestmodel.table)
-    bestmodel2 = table(bestmodel.table,bestmodel.singhes)
-    colnames(bestmodel2) = c("F","T")
-    bestmodel3 = table(bestmodel.table,apply(matrixpALLGlobalPhi[ ,c(22,24,26,28)],1,sum),dnn=c("best model","singular hessian"))
-    colnames(bestmodel3) = paste(colnames(bestmodel3), "Models")
+    #bestmodel2 = table(bestmodel.table,bestmodel.singhes)
+    #colnames(bestmodel2) = c("F","T")
+    #bestmodel3 = table(bestmodel.table,apply(matrixpALLGlobalPhi[ ,c(22,24,26,28)],1,sum),dnn=c("best model","singular hessian"))
+    #colnames(bestmodel3) = paste(colnames(bestmodel3), "Models")
 
     ###################################################
     ### code chunk number 3: glmnet
@@ -730,8 +734,8 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
             }
           }
           sumLowCond[,nbRepli] <- sumLowCond[,nbRepli] + as.matrix(subsetUp) + as.matrix(subsetLow)#sumLowCond sums up the counts 
-          psiPairCond[,indexMatrixPsiPairCond] <- as.matrix(subsetUp/(subsetUp+subsetLow)) #psi is #incl/(#incl+#exclu) after all corrections
-          indexNan <- intersect(which(subsetUp[,1] <10),which( subsetLow[,1]<10))
+          psiPairCond[,indexMatrixPsiPairCond] <- as.matrix(subsetUp/(subsetUp+subsetLow)) #psi is #incl/(#incl+#exclu) after all corrections for each replicate
+          indexNan <- intersect(which(subsetUp[,1] <10),which( subsetLow[,1]<10)) # if counts are too low we will put NaN
           psiPairCond[indexNan,] <- NaN
           indexMatrixPsiPairCond <- indexMatrixPsiPairCond + 1
           namesPsiPairCond <- c(namesPsiPairCond, as.character(condi[nbRepli]))
@@ -878,11 +882,14 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs=FALSE, pathF
     if ( length(chunk2) > 2 ) { #no error during chunk2
       print("Computing size of the effect and last cutoffs...")
       chunk3 <- tryCatch( { 
-        if ( is.na(countsData$discoInfo) ){
-          discoSNP <- FALSE
-        } else {
-          discoSNP <- countsData$discoInfo
-        }
+        if ( discoSNP != FALSE ){
+           if ( is.na(countsData$discoInfo) ){
+             discoSNP <- FALSE
+           } else {
+             discoSNP <- countsData$discoInfo
+           }
+        } 
+       
         signifVariants.sorted <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, flagLowCountsConditions, readLength, overlap, chunk1$lengths, discoSNP)
         return(list(resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb,uncorrectedPVal=chunk2$noCorrectPVal, correctedPVal= chunk2$correctedPVal, finalTable=signifVariants.sorted))
       },error=function(err) {
