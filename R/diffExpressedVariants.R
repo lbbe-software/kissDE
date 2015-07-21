@@ -597,7 +597,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
       # print(Pv)
       # pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[i] = Pv
       pALLGlobalPhi.glm.nb.glmnet[i,"glmnet.pval"] = Pv
-      pALLGlobalPhi.glm.nb.glmnet[i,"glmnet.code"] = Pv
+      pALLGlobalPhi.glm.nb.glmnet[i,"glmnet.code"] = outinter$jerr
       # pALLGlobalPhi.glm.nb.glmnet$glmnet.code[i] = outinter$jerr
     }
     matrixpALLGlobalPhi.glmnet <- as.matrix(pALLGlobalPhi.glm.nb.glmnet)
@@ -607,16 +607,21 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
     ###  code chunk number 4 : Pseudo-counts  and glmnet                                                   ###
     #############################################################################################################
     singhes = which(apply(matrixpALLGlobalPhi[ ,c(6,8,10,12)],1,which.min) > 1 & apply(matrixpALLGlobalPhi[ ,c(22,24,26,28)],1,sum) != 0)
+
     ##### 30/06
-    #singhes_n = names(singhes) 
+    singhes_n = names(singhes) 
     pALLGlobalPhi.glm.nb.pen = as.data.frame(matrixpALLGlobalPhi)
     #for(i in singhes_n){#we add pseudo-count (+1 in counts) for event with singular hessian for which the best model is not the Poisson model 
-    for (i in singhes){
+    # for (i in singhes){
+    #   pALLGlobalPhi.glm.nb.pen[i, ] = try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
+    #                                                           dispersion(dispData)[i],
+    #                                                           dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
+    # }
+    for (i in singhes_n){
       pALLGlobalPhi.glm.nb.pen[i, ] = try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
                                                               dispersion(dispData)[i],
                                                               dispersion(dispDataMeanCond)[i], phi, nbAll) ,silent=T)
     }
-
     pALLGlobalPhi.glm.nb <- as.data.frame(matrixpALLGlobalPhi)
    
     pALLGlobalPhi.glm.nb$final.pval.a.ia = 1
