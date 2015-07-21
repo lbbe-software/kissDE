@@ -580,6 +580,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
     singhes0_n = names(singhes0)
     # for (i in singhes0) {
     for (i in singhes0_n) {
+      # print(i)
       # Xinter   = model.matrix(~cond*path,data= allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]); 
       Xinter   = model.matrix(~cond*path,data= allEventtables[[which(rownames(dataPart3) == i)]]) 
       # outinter = glmnet(Xinter,allEventtables[[which(rownames(dataPart3) == rownames(pALLGlobalPhi.glm.nb)[i])]]$counts,family="poisson",lambda=1e-4,alpha=0)
@@ -590,11 +591,14 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
       outprinc = glmnet(Xprinc,allEventtables[[which(rownames(dataPart3) == i)]]$counts,family="poisson",lambda=1e-4,alpha=0)
       Pv       = 1-pchisq(deviance(outprinc) - deviance(outinter),df=1)
       ####
-      i_num <- as.numeric(i)
+      #i_num <- as.numeric(i)
       # pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[i] = Pv
       # pALLGlobalPhi.glm.nb.glmnet$glmnet.code[i] = outinter$jerr
-      pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[i_num] = Pv
-      pALLGlobalPhi.glm.nb.glmnet$glmnet.code[i_num] = outinter$jerr
+      # print(Pv)
+      # pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[i] = Pv
+      pALLGlobalPhi.glm.nb.glmnet[i,"glmnet.pval"] = Pv
+      pALLGlobalPhi.glm.nb.glmnet[i,"glmnet.code"] = Pv
+      # pALLGlobalPhi.glm.nb.glmnet$glmnet.code[i] = outinter$jerr
     }
     matrixpALLGlobalPhi.glmnet <- as.matrix(pALLGlobalPhi.glm.nb.glmnet)
     storage.mode(matrixpALLGlobalPhi.glmnet) <- 'numeric'
