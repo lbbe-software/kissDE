@@ -3,7 +3,7 @@
 \title{Retrieve condition-specific variants in RNA-seq data.}
 \description{Retrieve condition-specific variants in RNA-seq data. 
 }
-\usage{diffExpressedVariants(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterLowCountsVariants=10, flagLowCountsConditions=10, readLength=75, overlap=42)}
+\usage{diffExpressedVariants(countsData, conditions, storeFigs=FALSE, pathFigs="None", pvalue=0.05, filterLowCountsVariants=10, flagLowCountsConditions=10, readLength=75, overlap=42, discoSNP=FALSE)}
 \arguments{
 	\item{countsData}{a data.frame containing : in its first column the names of the events, in its second column the lengths of the events, in the following columns, the counts corresponding to each pair of condition/replicate}
 	\item{conditions}{a character vector that gives the conditions, it has as much elements as there are pairs of condition/replicates}
@@ -14,6 +14,7 @@
 	\item{readLength=75}{length of the reads from the data set used. This size is used to correct the delta PSI computation.}
 	\item{overlap=42}{mapping seed length, usually k+1 (with k size of the k-mers in KisSplice). The value is used to correct the delta PSI computation.}
 	}
+	\item{discoSNP=FALSE}{ put to TRUE if you are using discoSNP++'s output file instead of KisSplice's file}
 
 \details{
 }
