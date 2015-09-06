@@ -316,11 +316,11 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, ex
   sortedindex <- order(conditions)+2
   namesData <- c("ID","Length",rep(NA,length(conditions)))
   for (k in 1:nr[1]){
-    namesData[2+k] <- paste(sortedconditions[k],"_r",k,sep="",collapse="")
+    namesData[2+k] <- paste(sortedconditions[k],"_repl",k,sep="",collapse="")
   }
   for (i in 2:n) {
     for (j in 1:nr[n]) {
-      namesData[2+cumsum(nr)[i-1]+j] <- paste(sortedconditions[cumsum(nr)[i-1]+j],"_r",j,sep="",collapse="")
+      namesData[2+cumsum(nr)[i-1]+j] <- paste(sortedconditions[cumsum(nr)[i-1]+j],"_repl",j,sep="",collapse="")
     }
   }#proper names for conditionsXrelicates
   countsEvents[,-(1:2)] <- countsEvents[,sortedindex]
@@ -831,14 +831,14 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
       namesPsiPairCond <- c()
       for (nbRepli in 1:length(replicates)) {# for a given condition in the pair
         for (i in 1:replicates[nbRepli]) {# for each replicate (i) of the condition
-          colsPsiPairCond <- c(colsPsiPairCond, paste(condi[nbRepli],'_r',i, sep=''))
-          namesUp <- c(paste("UP_",condi[nbRepli],'_r',i,"_Norm", sep=''))
-          namesLow <- c(paste("LP_",condi[nbRepli],'_r',i,"_Norm", sep=''))
+          colsPsiPairCond <- c(colsPsiPairCond, paste(condi[nbRepli],'_repl',i, sep=''))
+          namesUp <- c(paste("UP_",condi[nbRepli],'_repl',i,"_Norm", sep=''))
+          namesLow <- c(paste("LP_",condi[nbRepli],'_repl',i,"_Norm", sep=''))
           subsetUp <- signifVariants[namesUp]#the subsets are the counts we are going to use to compute all psis
           subsetLow <- signifVariants[namesLow]
           if (discoSNP == FALSE) {
             if (! is.null(ASSBinfo)) {# counts correction
-              nameASSBinfo <- c(paste(condi[nbRepli],'_r',i, sep=''))
+              nameASSBinfo <- c(paste(condi[nbRepli],'_repl',i, sep=''))
               subsetUp <- subsetUp/(2-ASSBinfo[,nameASSBinfo]/subsetUp)
             } else {#counts correction if there is no info about the junction counts
               correctFactor <- (lengths2$upper + readLength - 2*overlap + 1)/(lengths2$lower + readLength - 2*overlap + 1) #apparent size of upper path other apparent size of lower path
@@ -864,6 +864,7 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
   deltapsi[,indexdeltapsi] <- deltaPsiCond 
   indexdeltapsi <- indexdeltapsi + 1
   }
+
   #### when there are more than 2 conditions, we want to simplify the output :
   dPvector1 <-c(rep(0,dim(signifVariants)[1]))
   dPvector2 <-c(rep(0,dim(signifVariants)[1]))
@@ -882,7 +883,8 @@ qualityControl <- function(countsData,conditions,storeFigs=FALSE, pathFigs="None
     dPvector1 <- round(deltapsi,4)
     dPvector2 <- dPvector1
   }
-
+  colnames(signifVariants)<-gsub("UP","Variant1",colnames(signifVariants))
+  colnames(signifVariants)<-gsub("LP","Variant2",colnames(signifVariants))
   ###################################################
   ### code chunk 2 : final table
   ###################################################

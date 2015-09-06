@@ -13,8 +13,9 @@
 	\item{flagLowCountsConditions=10}{to change the default value under which we flag events as 'lowCounts' in the final data frame. This column aims to help seeing which event (variant 1 counts + variant 2 counts) has low counts (< [flagLowCountsBoundary=10])for at least n-1 conditions (over n).}
 	\item{readLength=75}{length of the reads from the data set used. This size is used to correct the delta PSI computation.}
 	\item{overlap=42}{mapping seed length, usually k+1 (with k size of the k-mers in KisSplice). The value is used to correct the delta PSI computation.}
-	}
 	\item{discoSNP=FALSE}{ put to TRUE if you are using discoSNP++'s output file instead of KisSplice's file}
+	}
+	
 
 \details{
 }

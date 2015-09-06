@@ -4,7 +4,7 @@
 \description{Converts KisSplice .fa outputs to data.frame objects that can be used by others functions of the package.
 }
 \usage{
-kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, discoSNP=FALSE)
+kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, discoSNP=FALSE, k2rg=FALSE)
 }
 \arguments{
   \item{fileName}{ a character vector that gives the path to .fa file that must be pre-treated.}
@@ -19,7 +19,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, ex
  order=c(1,2,1,2). }
  \item{exonicReads=TRUE}{ if this option is turned to FALSE, exonic reads will no be taken into account in the counts. It is valid to use this function only if the counts option is at 2 as the information about junction and exonic reads is needed.}
  \item{discoSNP=FALSE}{ put to TRUE if you are using discoSNP++'s output file instead of KisSplice's file}
-
+ \item{k2rg=FALSE}{ put to TRUE if you are using kissplice2refgenome's output file instead of KisSplice's file}
 } 
 \details{
 }
