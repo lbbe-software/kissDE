@@ -62,7 +62,28 @@ You can provide your own table of counts, or simply us KisSplice's output.
 % \item Once you have provided a table of counts on your own or created by \texttt{kissplice2counts}, you must provide a vector that describes the experimental conditions
 %\end{enumerate}
 
-\subsection{Providing a table of counts using kissplice2counts}
+\subsection{Providing a table of counts}
+kissDE is a tool from KisSplice's suite but you still can use it independantly if you have counts for your variants coming from another methods. kissDE's main function takes a table of counts as an input. It must be provided as a data frame as such:\\
+\begin{verbatim}
+head(dataframekissDE)
+              X0   X1   X2  X3  X4  X5
+1     variation1  127  955 897 302 443
+2     variation1  80   17  20   5   2
+3     variation2 1543  450 599 400 325
+4     variation2 1201    1   5   4   0
+5     variation3  221 1192 881 479 587
+6     variation3  219   83  48  50  37
+...
+\end{verbatim}
+\begin{itemize}
+ \item One variation is represented by two lines, one for each variant.
+ \item Each line has a first column (X0) with the name of the variation, a second (X1) with the size of the variant, then all others columns (X2... Xn) show counts for each replicate in each condition for the variant.
+\end{itemize}
+
+
+
+\subsubsection{You work with your own data: data frame format}
+\subsubsection{You work with KisSplice/kissplice2refgenome/discoSNP's output: kissplice2counts function}
 If you use output files from KisSplice, you can directly import your counts using \texttt{kissplice2counts} function.
 To create an object with \texttt{kissplice2counts}, you will probably use one of these lines:\\
 
@@ -84,6 +105,11 @@ or\\
 
 The table you have created in \texttt{myCounts} helps to convert information provided in KisSplice output into a table of counts per event that will be used for the tests.\\
 Events are pairwise, made of 2 variants (typically an exon retained and an exon skipped fort 2 variants in alt. splicing, or two SNPs isoforms if you work with SNPs). So now you'd like to test if you have some differentially enriched variants between your conditions (i.e. is my skipped exon isoform is more present in my condition 1 and on the contrary the other isoform more present in my condition 2).
+
+\paragraph{Alpha options : discoSNP and kissplice2refgenome\\}
+If you have runned DiscoSNP to find SNPs in your data, you can also use kissDE with this data. You have to put \texttt{discoSNP} option to \texttt{TRUE} in kissplice2counts and in the main function.\\
+If you have used kissplice2refgenome on top of your KisSplice's run, you can directly use the kissplice2refgenome's output in kissDE. You have to put the option \texttt{k2rg} to \texttt{TRUE}.
+
 
 \subsection{Providing an experimental conditions vector}
 The experimental conditions vector helps to make the link between the conditions you want to test and the files input in KisSplice. For instance, if in KisSplice you have entered 4 fasta/q files in this order:\\

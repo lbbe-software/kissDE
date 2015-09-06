@@ -255,7 +255,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, ex
     events.mat[1,1] <- as.numeric(variantLength)
     events.mat[1,2:dim(events.mat)[2]] <- variantCountsUp
     events.names[1] <- eventName
-    events.mat[2,1] <- as.numeric(variantLength)
+    events.mat[2,1] <- 0
     events.mat[2,2:dim(events.mat)[2]] <- variantCountsLow
     events.names[2] <- eventName
     psiInfo <- matrix(NA,length(lines)*2-2,length(resultLine$psiInfoUp))
@@ -274,7 +274,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, ex
       events.mat[indexNames,2:dim(events.mat)[2]] <- variantCountsUp
       events.names[indexNames] <- eventName
       psiInfo[indexNames,] <- resultLine$psiInfoUp
-      events.mat[indexNames+1,1] <- as.numeric(variantLength)
+      events.mat[indexNames+1,1] <- 0
       events.mat[indexNames+1,2:dim(events.mat)[2]] <- variantCountsLow
       events.names[indexNames+1] <- eventName
       psiInfo[indexNames+1,] <- resultLine$psiInfoLow
