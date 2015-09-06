@@ -20,7 +20,7 @@ License: \tab GPL\cr
 
 \author{
 Lilia Brinza, Vincent Lacroix, Frank Picard, Vincent Miele and Camille Marchet\cr
-Maintainers: camille.marchet@gmail.com
+Maintainers: marchetcamille@gmail.com
 }
 \keyword{ package }
 
