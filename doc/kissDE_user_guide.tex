@@ -54,8 +54,7 @@ When dealing with polymorphism or alternative spicing, you have two values. One 
 %\end{enumerate}
 
 \section{Prerequisites}
-For running kissDE, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
-You can provide your own table of counts, or simply us KisSplice's output.
+
 
 %\begin{enumerate}
 % \item You must build a table with the counts of the pairwise variants you want to test. This can be done with \texttt{kissplice2counts}.
@@ -63,7 +62,14 @@ You can provide your own table of counts, or simply us KisSplice's output.
 %\end{enumerate}
 
 \subsection{Providing a table of counts}
-kissDE is a tool from KisSplice's suite but you still can use it independantly if you have counts for your variants coming from another methods. kissDE's main function takes a table of counts as an input. It must be provided as a data frame as such:\\
+For running kissDE, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
+You can provide your own table of counts, or simply us KisSplice's output. Since version 1.2.0 you have also the choice to 
+input a kissplice2refgenome file or a discoSNP file.
+
+
+
+\subsubsection{You work with your own data: data frame format}
+kissDE is a tool from KisSplice's suite but you still can use it independantly if you have counts for your variants coming from another method. kissDE's main function takes a table of counts as an input. It must be provided as a data frame as such:\\
 \begin{verbatim}
 head(dataframekissDE)
               X0   X1   X2  X3  X4  X5
@@ -80,9 +86,6 @@ head(dataframekissDE)
  \item Each line has a first column (X0) with the name of the variation, a second (X1) with the size of the variant, then all others columns (X2... Xn) show counts for each replicate in each condition for the variant.
 \end{itemize}
 
-
-
-\subsubsection{You work with your own data: data frame format}
 \subsubsection{You work with KisSplice/kissplice2refgenome/discoSNP's output: kissplice2counts function}
 If you use output files from KisSplice, you can directly import your counts using \texttt{kissplice2counts} function.
 To create an object with \texttt{kissplice2counts}, you will probably use one of these lines:\\
