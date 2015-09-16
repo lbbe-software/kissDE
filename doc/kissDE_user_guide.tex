@@ -37,9 +37,9 @@ When a gene gives rise to more than two RNA molecules, we assume the set of all 
 In the case of splicing, the two groups are: the ones that include the exon of interest, and the ones that exclude the exon of interest.
 In the case of genomic polymorphism, the two groups are: the ones that contain the first allele, the ones that contain the second allele.
 
-The statistical framework is the same as for DESeq.
+The statistical framework is similar to DESeq.
 The main difference is that for gene expression, you have one value per gene. 
-When dealing with polymorphism or alternative spicing, you have two values. One per variant.
+When dealing with polymorphism or alternative splicing, you have two values. One per variant.
 
 
 %\section*{kissDE main steps}
@@ -63,13 +63,13 @@ When dealing with polymorphism or alternative spicing, you have two values. One 
 
 \subsection{Providing a table of counts}
 For running kissDE, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
-You can provide your own table of counts, or simply us KisSplice's output. Since version 1.2.0 you have also the choice to 
+You can provide your own table of counts, or simply use KisSplice's output. Since version 1.2.0 you have also the choice to 
 input a kissplice2refgenome file or a discoSNP file.
 
 
 
 \subsubsection{You work with your own data: data frame format}
-kissDE is a tool from KisSplice's suite but you still can use it independantly if you have counts for your variants coming from another method. kissDE's main function takes a table of counts as an input. It must be provided as a data frame as such:\\
+kissDE is a tool from KisSplice's suite but you still can use it independantly if you have counts for your variants coming from another method. kissDE's main function takes a table of counts as input. It must be provided as a data frame such as:\\
 \begin{verbatim}
 head(dataframekissDE)
               X0   X1   X2  X3  X4  X5
@@ -83,7 +83,8 @@ head(dataframekissDE)
 \end{verbatim}
 \begin{itemize}
  \item One variation is represented by two lines, one for each variant.
- \item Each line has a first column (X0) with the name of the variation, a second (X1) with the size of the variant, then all others columns (X2... Xn) show counts for each replicate in each condition for the variant.
+ \item Each line has a first column (X0) with the name of the variation, a second (X1) with the size of the variant, then all others columns (X2... Xn) show counts for each replicate in each condition for the variant.\\
+ For instance \verb|X1|:Cond1Repl1, \verb|X2|:Cond1Repl2...
 \end{itemize}
 
 \subsubsection{You work with KisSplice/kissplice2refgenome/discoSNP's output: kissplice2counts function}
@@ -103,15 +104,15 @@ or\\
  \item  with \texttt{pairedEnd = TRUE} if you have paired-end reads, \texttt{pairedEnd = FALSE} else, 
  \item  and \texttt{counts = 2} option if you have counts like this in KisSplice output:\\
  \texttt{AS1\_1|SB1\_2|ASSB1\_1|S1\_0...} for upper path and \texttt{AB1\_3...} for lower,\\
-      or no counts option else ( \texttt{C1\_1|C2\_6...} type).
+      or no counts option otherwise ( \texttt{C1\_1|C2\_6...} type).
 \end{itemize}
 
 The table you have created in \texttt{myCounts} helps to convert information provided in KisSplice output into a table of counts per event that will be used for the tests.\\
-Events are pairwise, made of 2 variants (typically an exon retained and an exon skipped fort 2 variants in alt. splicing, or two SNPs isoforms if you work with SNPs). So now you'd like to test if you have some differentially enriched variants between your conditions (i.e. is my skipped exon isoform is more present in my condition 1 and on the contrary the other isoform more present in my condition 2).
+Events are pairwise, made of 2 variants (typically an exon retained and an exon skipped fort 2 variants in alt. splicing, or two genomic variants if you work with SNPs or indels). So now you'd like to test if you have some differentially enriched variants between your conditions (i.e. is my skipped exon isoform is more present in my condition 1 and on the contrary the other isoform more present in my condition 2).
 
 \paragraph{Alpha options : discoSNP and kissplice2refgenome\\}
-If you have runned DiscoSNP to find SNPs in your data, you can also use kissDE with this data. You have to put \texttt{discoSNP} option to \texttt{TRUE} in kissplice2counts and in the main function.\\
-If you have used kissplice2refgenome on top of your KisSplice's run, you can directly use the kissplice2refgenome's output in kissDE. You have to put the option \texttt{k2rg} to \texttt{TRUE}.
+If you have run DiscoSNP to find SNPs in your data, you can also use kissDE. You have to put \texttt{discoSNP} option to \texttt{TRUE} in kissplice2counts and in the main function.\\
+If you have used kissplice2refgenome on top of your KisSplice's run, you can directly use the kissplice2refgenome's output in kissDE. You have to put the option \texttt{k2rg} to \texttt{TRUE}. This option is particularly interesting if you have an (annotated) reference genome.
 
 
 \subsection{Providing an experimental conditions vector}
@@ -120,7 +121,7 @@ The experimental conditions vector helps to make the link between the conditions
 \texttt{-r firstCondition\_Replicate1 -r firstCondition\_Replicate2\\
 -r secondCondition\_Replicate1 -r secondCondition\_Replicate2}\\
 
-In this case there are only have two conditions and to replicates for each conditions. It works for other types of sets, but you must always have at least two replicates per conditions. In the example your condition vector will look like :\\
+In this case there are only have two conditions and to replicates for each conditions. Any number of replicates is allowed, even an unequal number across conditions, provided there are at least 2 replicates per condition. In the example your condition vector will look like :\\
 
 \texttt{myConditions <- c("condition1","condition1","condition2","condition2")}\\
 
@@ -129,7 +130,7 @@ What is important is that this vector matches the order of what you have input. 
 \texttt{myConditions <- c("control","control","treatment","treatment")}\\
  
 
-\paragraph{If you have paired end data, and entered for instance:\\}
+\paragraph{If you have paired end data, and entered in KisSplice for instance:\\}
 
 \texttt{-r firstCondition\_Replicate1\_file1 -r firstCondition\_Replicate1\_file2
 -r firstCondition\_Replicate2\_file1  -r firstCondition\_Replicate2\_file2 
@@ -148,12 +149,12 @@ as \texttt{pairedEnd} option must have been already switched to \texttt{TRUE} in
 The function \texttt{diffExpressedVariants} performs the test, based on generalised linear models. Basically it needs only the counts (\texttt{myCounts} table) you got from \texttt{kissplice2counts} function, and your \texttt{myConditions} vector.
 
 \subsection{Launching diffExpressedVariants}
-To start the analyse you just have to run \texttt{diffExpressedVariants}, for a first run we recommand to put \texttt{pvalue=1} so that you will have even not significant results in your final table, in case you want to analyse why some of your favorite genes are not in the head of the list. Important options of \texttt{diffExpressedVariants} are explained below.\\
+To start the analyse you just have to run \texttt{diffExpressedVariants}, for a first run we recommand to put \texttt{pvalue=1}, your final table will also include non significant events. In case you want to analyse why some of your favorite genes are not in the head of the list. Important options of \texttt{diffExpressedVariants} are explained below.\\
 
 \texttt{finalTable <- diffExpressedVariants(myCounts,myConditions,pvalue=1)}
 \begin{itemize}
  \item You will obtain in finalTable the list of the events with their pvalue and the size of the effect (in the column \texttt{DeltaF/DeltaPSI}). 
-  \item The difference of length between the two variants is also provided, which can be interesting if you are dealing with alternative splicing or indels.
+  \item The difference of length between the two variants is also provided, which can be interesting if you are dealing with alternative splicing or indels. A difference of length which is not a multiple of 3 is particularly interesting if located in a CDS.
  \item Events with low counts ($<$ 10 by default) in at least n-1 conditions over n are flagged in the column \texttt{LowCounts} (more details below).
 \end{itemize}
 
@@ -162,7 +163,7 @@ To start the analyse you just have to run \texttt{diffExpressedVariants}, for a 
 
 
 \section{Counts normalization}
-Counts are normalized with \textbf{DESeq}. It is meaningful if a greater expression is observed in one condition compared to the others.
+Counts are normalized with the default normalization methods provided in the \textbf{DESeq} package. In particular, if some replicate has been sequenced with a higher depth, this is properly taken care of.
 
 \section{Filtering low counts before the tests}
  If global counts for both variants are too low (option \texttt{filterLowCountsVariants}), the event is not tested.
@@ -196,6 +197,7 @@ $$
 where $\mu$ is the local mean expression of the gene that contains the SNP, $\alpha_{i}$ the effect of allele $i$ on expression, $\beta_{j}$ the contribution of condition $j$ to total expression and $\left(\alpha \beta \right)_{ij}$ the interaction term. The target hypothesis is $H_0:\{\left(\alpha \beta \right)_{ij}=0\}$ (no interaction between allele and condition) that is tested using a Likelihood Ratio Test with a 5\% FDR to account for multiple testing.
 
 \section{Delta PSI / Delta f computation}
+\subsection{Magnitude of the effect}
 When a gene is found to be differentially spliced between two conditions, or an allele is found to be differentially present in two populations, one concern which remains is to quantify the magnitude of this effect.
 Indeed, especially in RNAseq, where some genes are very highly expressed (and hence have very high read counts), it is often the case that we detect significant (p<0.05) but weak effects. 
 
@@ -208,7 +210,7 @@ $DeltaPSI \:=\: PSI_{cond1} - PSI_{cond2}$ \\
 $Deltaf \:=\: f_{cond1} - f_{cond2}$
 
 %The  percent spliced in (PSI) is not used to perform tests but we output it to give information about the magnitude of the effect. Indeed, with highly expressed genes pvalues can be significant even if for smal switches of variant presence, because there are a lot of reads to assess it. Intuitively percent spliced in are the ratio of the quantity of counts witnessing the presence of the inclusion isoform over the total counts sum for both isoforms. The delta PSI is simply the subtraction of the PSI calculated for each condition. A high delta PSI (in absolute) shows that the main isoform has changed between the two conditions.\\ 
-
+\subsection{Correction with respect to the length}
 In the case where the two variants do not have the same length (genomic indels or splice variants), then this formula is not correct, since the abundance of the longer variant will be over-estimated. We therefore need to introduce a correction factor.
 This correction factor is not the same if the counts that were input to kissDE correspond to a- junction reads only or b- junction reads + exonic reads.
 %However this value is biased because the inclusion isoform is longer (in case of indels and alternative splicing) and more reads are prone to mapping on it. That is why we introduced a correction of the counts to compute the delta PSI:
@@ -225,9 +227,9 @@ This correction factor is not the same if the counts that were input to kissDE c
             \item counts of the upper path are corrected because we expect to find more reads mapped on it:\\
             $\#counts\_upper\_path \:=\:  \frac{\#counts\_upper\_path}{correctFactor} $
  \end{enumerate}
- \item if the results were obtained with \texttt{--counts 2} in KisSplice (which gives \texttt{...|AS1\_12|AB1\_7|S1\_0|ASSB1\_1 ou |AB1\_13|.....} in the headers) :\\
+ \item if there is no read overlapping the junction, we only divide by 2 the number of reads seen on the upper path (as globally the counts on the upper path are twice the the counts on the lower path because there are two junctions in the first versus only one in the second), 
+ \item if the results were obtained with \texttt{--counts 2} in KisSplice (which gives \texttt{...|AS1\_12|AB1\_7|S1\_0|ASSB1\_1 ou |AB1\_13|.....} in the headers) \textbf{see KisSplice manual about --counts option}:\\
  $\Rightarrow$ information about junction counts is provided: on the upper path, the number of reads mapped is equal to \texttt{AS+AB-ASSB} (\texttt{ASSB} reads are counted twice, in \texttt{AS} or \texttt{AB} and in \texttt{ASSB})
-  \item if there is no read overlapping the junction, we only divide by 2 the number of reads seen on the upper path (as globally the counts on the upper path are twice the the counts on the lower path because there are two junctions in the first versus only one in the second), 
   \item if there are reads on ASSB junction, the idea is to divide by a bit less than two (having counts over the spliced exon means it is quite small):
   \begin{enumerate}
 %    \item \texttt{comptages\_upper\_path <- AS+AB-ASSB }
@@ -236,14 +238,15 @@ This correction factor is not the same if the counts that were input to kissDE c
   \end{enumerate}
  \end{itemize}
  
-The delta PSI is computed:
+\subsection{Computation}
+The delta PSI/delta f is computed:
  \begin{itemize}
 \item individual (per replicate) PSI are calculated:\\
 after the counts are corrected, if counts for both upper and lower path are too low ($<10$) the individual PSI is not computed.
 \item Then mean PSI are computed:\\
 they are the mean of individual PSI for one condition. If more than the half of individual PSI were not calculated at the latter step, the mean PSI is not computed.
 \item Finally, we output delta PSI:\\
-unless one of the mean PSI of a condition could not be estimate. Delta PSI is calculated subtracting one condition PSI from another. This does not always follow the order of the conditions you entered in the first place. To know the order, you must report to the output file, delta PSI are calculated subtracting the first condition appearing in the header from the one after.
+unless one of the mean PSI of a condition could not be estimated. Delta PSI is calculated subtracting one condition PSI from another. This does not always follow the order of the conditions you entered in the first place. To know the order, you must report to the output file, delta PSI are calculated subtracting the first condition appearing in the header from the one after.
 \end{itemize}
 
 
