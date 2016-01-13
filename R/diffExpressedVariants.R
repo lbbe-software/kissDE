@@ -381,7 +381,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, ex
   nbAIC0 <- c(AIC(nbglmA0,k = log(nbAll))@istats$AIC, AIC(nbglmI0,k = log(nbAll))@istats$AIC)
     # singular.hessian:  true when fitting provided a singular hessian, indicating an overparamaterized model.
   nbSingHes0 <- c(nbglmA0@singular.hessian, nbglmI0@singular.hessian)
-    # code: ‘code’ An integer (returned by ‘optim’) indicating why the optimization process terminated.
+    # code: 'code' An integer (returned by 'optim') indicating why the optimization process terminated.
   nbCode0 <- c(nbglmA0@code, nbglmI0@code)  
   
     # binomial negative model, with global phi
