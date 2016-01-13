@@ -22,22 +22,12 @@ exonicReads=TRUE, discoSNP=FALSE, k2rg=FALSE)
  \item{discoSNP}{ put to TRUE if you are using discoSNP++'s output file instead of KisSplice's file}
  \item{k2rg}{ put to TRUE if you are using kissplice2refgenome's output file instead of KisSplice's file}
 } 
-\details{
-}
 \value{kissplice2counts returns a data.frame object that contains several columns :
   \item{events.names}{the name of the event based on KisSplice notation}
   \item{V1}{contains the length of the event}
   \item{V2 ... to Vn}{contain the counts corresponding to the replicates of the conditions}
  }
-\references{
-}
-\author{
-}
-\note{
-}
 
-\seealso{
-}
 % \examples{
 % ##---- Should be DIRECTLY executable !! ----
 % ##-- ==>  Define data, use random,

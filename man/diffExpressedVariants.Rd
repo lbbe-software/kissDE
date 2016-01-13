@@ -20,8 +20,6 @@ overlap=42, discoSNP=FALSE)}
 	}
 	
 
-\details{
-}
 \value{
 	code{diffExpressedVariants} returns several data.table. 
 	finalTable with :
@@ -34,14 +32,8 @@ overlap=42, discoSNP=FALSE)}
 	uncorrectedPVal with pvalues before correction for multiple testing, correctedPval with pvalues after correction for multiple testing, and resultFitNBglmModel with the results of the fitting of models to the data.
 
 }
-\source{
-}
-\author{
-}
 
 
-\references{
-}
 % \examples{
 % conditions <- c("treated","treated","untreated","untreated")
 % file <- ("myresults.fa")
@@ -49,4 +41,3 @@ overlap=42, discoSNP=FALSE)}
 % events <- diffExpressedVariants(counts, conditions)
 
 % % }
-\keyword{}

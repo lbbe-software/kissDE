@@ -12,18 +12,6 @@ qualityControl(countsData,conditions,storeFigs=FALSE, pathFigs="None")
     \item{storeFigs}{if this function is needed to be used into an automatised worflow, setting this option to TRUE will create a directory where plots are stored in .png format. By default (FALSE) the figures are plotted one at time when Enter is pressed. }
     \item{pathFigs}{to give a path (string, e.g. '/path/to/figs') where to store the figures. By default the figure directory is called 'kissDEFigures' and created in the currend directory.}
 }
-\details{
-}
-\value{
-}
-\references{
-}
-\author{
-}
-\note{
-}
-\seealso{
-}
 % \examples{
 % ##---- Should be DIRECTLY executable !! ----
 % ##-- ==>  Define data, use random,
