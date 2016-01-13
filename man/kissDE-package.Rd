@@ -10,16 +10,17 @@
 
 \details{Main functions:
 
-  diffExpressedVariants(countsData, conditions, storeFigs = FALSE, pathFigs = "None", 
-  pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, 
+  diffExpressedVariants(countsData, conditions, storeFigs = FALSE, pathFigs = "None",
+  pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10,
   readLength = 75, overlap = 42, discoSNP = FALSE)
 
   qualityControl(countsData, conditions, storeFigs = FALSE, pathFigs = "None")
   
-  kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE)
+  kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL,
+  exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE)
   
   \tabular{ll}{
-    Package: \tab kissDE\cr
+    Package: \tab \code{kissDE}\cr
     Type: \tab Package\cr
     Version: \tab 1.2.0\cr
     Date: \tab 2016-01-13\cr

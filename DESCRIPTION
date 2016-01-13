@@ -8,5 +8,4 @@ Maintainer: Camille Marchet <marchetcamille@gmail.com>
 Depends: DESeq, aod, xtable, DSS, glmnet
 Imports: Biobase
 License: GPL
-Description: Retrieves condition-specific variants in RNA-seq data (SNPs, alternative-splicings, indels). It has been developped as a post-treatment 
-  of KisSplice but can also be used with your own data.
+Description: Retrieves condition-specific variants in RNA-seq data (SNPs, alternative-splicings, indels). It has been developped as a post-treatment of KisSplice but can also be used with your own data.
