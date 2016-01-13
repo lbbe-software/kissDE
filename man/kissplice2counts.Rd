@@ -4,7 +4,8 @@
 \description{Converts KisSplice .fa outputs to data.frame objects that can be used by others functions of the package.
 }
 \usage{
-kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, discoSNP=FALSE, k2rg=FALSE)
+kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, 
+exonicReads=TRUE, discoSNP=FALSE, k2rg=FALSE)
 }
 \arguments{
   \item{fileName}{ a character vector that gives the path to .fa file that must be pre-treated.}
