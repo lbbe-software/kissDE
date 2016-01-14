@@ -1,3 +1,6 @@
 exportPattern("^[[:alpha:]]+")
 export(diffExpressedVariants, kissplice2counts, qualityControl)
 import(DESeq, aod, xtable, DSS, glmnet, Biobase)
+importFrom("grDevices", "dev.off", "png")
+importFrom("graphics", "abline", "legend", "lines", "par", "plot")
+importFrom("stats", "aggregate", "as.dist", "cor", "hclust", "heatmap", "lm", "model.matrix", "nls", "p.adjust", "pchisq", "var")
