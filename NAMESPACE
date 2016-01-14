@@ -1,4 +1,3 @@
-exportPattern("^[[:alpha:]]+")
 export(diffExpressedVariants, kissplice2counts, qualityControl)
 import(DESeq, aod, xtable, DSS, glmnet, Biobase)
 importFrom("grDevices", "dev.off", "png")

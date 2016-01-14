@@ -533,7 +533,7 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs =
   ##################################################
   # reduce data frame to the interesting columns
   nbAll <- sum(nr)
-  dataPart <- countsData[, c(1:2, which(grepl("_Norm",names(countsData))))]
+  dataPart <- countsData[, c(1:2, which(grepl("_Norm", names(countsData))))]
   dataPart$Path <- gl(2, 1, dim(countsData)[1], labels = c("UP","LP"))
   dataPart2 <- cbind(dataPart[seq(1, dim(dataPart)[1], 2), ], dataPart[seq(2, dim(dataPart)[1], 2), grepl("Norm", names(dataPart))])
   names(dataPart2)[3:(3 + nbAll - 1)] <- paste("UP", names(dataPart2)[3:(3 + nbAll - 1)], sep = "_")
@@ -737,8 +737,8 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs =
     pALLGlobalPhi.glm.nb.pen <- as.data.frame(matrixpALLGlobalPhi)
     for (i in singhes_n){
       pALLGlobalPhi.glm.nb.pen[i, ] <- try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
-                                                                dispersion(dispData)[i],
-                                                                dispersion(dispDataMeanCond)[i], phi, nbAll), silent = TRUE)
+                                                                 dispersion(dispData)[i],
+                                                                 dispersion(dispDataMeanCond)[i], phi, nbAll), silent = TRUE)
     }
     pALLGlobalPhi.glm.nb <- as.data.frame(matrixpALLGlobalPhi)
     
