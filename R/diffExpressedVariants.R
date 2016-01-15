@@ -990,7 +990,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pat
       # chunk2$signifVariants 
     }, error = function(err) {
       print(paste(err, "Returning only resultFitNBglmModel and sing. events")) 
-      return(list(resultFitNBglmModel = pALLGlobalPhi.glm.nb, sing.events = sing.events))
+      return(list(resultFitNBglmModel = chunk1$pALLGlobalPhi.glm.nb, sing.events = chunk1$sing.events))
     })
   } else {
     chunk2 <- NA
