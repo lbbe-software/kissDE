@@ -1,18 +1,22 @@
-install.packages("../kissDE_0.1.tar.gz")
 library("kissDE")
 
-conditions <- c("C1","C1","C2","C2")
-file <- ("resultsKissSknsh10M.fa")
+conditions <- c("C1", "C1", "C2", "C2")
+file_fa <- "devtests/resultsKissSknsh10M.fa"
+file_df <- "devtests/pretraitement.txt"
+
 #### test for input = data.frame ####
-# counts <- read.table("pretraitement.txt")
+counts_df <- read.table(file_df)
+# qualityControl(counts_df, conditions)
+signifVariantsKis_df <- diffExpressedVariants(counts_df, conditions)
+# save(signifVariantsKis_df, file = "signifVariantsKis_df_save.rdata")
+# load("signifVariantsKis_df_save.rdata")
+# signifVariantsRef == signifVariantsKis
 
 #### test for input = .fa file from KisSplice ####
-# signifEventsRef <-diffExpressedEvents(2,c(2,2),data)
-counts <- kissplice2counts(file)
-
-qualityControl(counts,conditions)
-signifVariantsKis <- diffExpressedVariants(counts,conditions)
+counts_fa <- kissplice2counts(file_fa)
+qualityControl(counts_fa, conditions)
+signifVariantsKis_fa <- diffExpressedVariants(counts_fa, conditions)
 
 # save(signifEventsRef,file="signifEventsRef.RData")
-load("signifEventsRef.RData")
-signifVariantsRef == signifVariantsKis
+# load("signifEventsRef.RData")
+# signifVariantsRef == signifVariantsKis
