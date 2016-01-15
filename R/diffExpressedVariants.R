@@ -440,12 +440,12 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
 }
 
 
-qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs = "None") {
+qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs = NA) {
   
   options(warn = -1)  # suppress the warning for the users
   
   if (storeFigs == TRUE){
-    if (pathFigs == "None") {
+    if (is.na(pathFigs)) {
       pathToFigs <- "kissDEFigures"
     } else {
       pathToFigs <- paste(pathFigs, "/kissDEFigures", sep = "")
@@ -602,7 +602,7 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs =
     lines(x, yNB, col = 6, lwd = 2)
     legend("topleft", c("Poisson", "Quasi-Poisson", "Negative Binomial"), text.col = c(2, 3, 6), box.lty = 0)
   } else {
-    filename <- paste(pathToFigs, "/models.png", sep = "")
+    filename <- paste(pathFigs, "/models.png", sep = "")
     png(filename)
     plot(event.mean.variance.df$Mean, event.mean.variance.df$Variance, 
          xlab = "Mean Event count", 
@@ -920,23 +920,26 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs =
 }
 
 
-diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pathFigs = "None", pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, readLength = 75, overlap = 42, discoSNP = FALSE) {
+diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pathFigs = NA, pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, readLength = 75, overlap = 42, discoSNP = FALSE) {
   
   options(warn = -1)  # suppress the warning for the users
-  
+  pathToFigs <-  NA
   if (storeFigs == TRUE){
-    if (pathFigs == "None") {
-      pathToFigs <- "kissDEFigures"
-    } else {
-      pathToFigs <- paste(pathFigs, "/kissDEFigures", sep = "")
-    }
-    find <- paste("find", pathToFigs)
-    d <- system(find, TRUE, ignore.stderr = TRUE)
-    if (length(d) == 0) { 
-      command <- paste("mkdir", pathToFigs)
-      system(command, ignore.stderr = TRUE)
-    }
-  }
+   if (is.na(pathFigs)) {
+     pathToFigs <- "kissDEFigures"
+   } else {
+     pathToFigs <- paste(pathFigs, "/kissDEFigures", sep = "")
+   }
+   find <- paste("find", pathToFigs)
+   d <- system(find, TRUE, ignore.stderr = TRUE)
+   if (length(d) == 0) { 
+     command <- paste("mkdir", pathToFigs)
+     system(command, ignore.stderr = TRUE)
+   }
+  }  
+
+
+
   
   print("Pre-processing the data...")
   chunk0 <- tryCatch({.readAndPrepareData(countsData,conditions)
@@ -963,7 +966,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pat
       ASSBinfo <- ASSBinfo[li, ]
     }
     print("Trying to fit models on data...")
-    chunk1 <- tryCatch({.modelFit(chunk0$countsData, chunk0$n, chunk0$nr, ASSBinfo, storeFigs, pathFigs, filterLowCountsVariants)
+    chunk1 <- tryCatch({.modelFit(chunk0$countsData, chunk0$n, chunk0$nr, ASSBinfo, storeFigs, pathToFigs, filterLowCountsVariants)
       #### chunk 1 var ####
       # chunk1$pALLGlobalPhi.glm.nb 
       # chunk1$sing.events 
