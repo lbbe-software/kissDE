@@ -4,7 +4,7 @@
   splitElements <- strsplit(line, "|", fixed = TRUE)[[1]]  # splits the line
   if (indexStart == 6) {
     for (k in 1:(indexStart - 2)) {
-      beginningLineToWrite <- paste (beginningLineToWrite, splitElements[k], sep = "|")  # writes the firsts elements of the line : bcc, cycle... but NOT branching_nodes
+      beginningLineToWrite <- paste(beginningLineToWrite, splitElements[k], sep = "|")  # writes the firsts elements of the line : bcc, cycle... but NOT branching_nodes
     }
   } else {
     for (k in 1:(indexStart - 1)) {
@@ -139,7 +139,7 @@
   } else {  # counts == 0 
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
-        order <- rep(1:(length(countsperCond) / 2), rep(2, length(countsperCond)/2))  # for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) (assuming data is ordered)
+        order <- rep(1:(length(countsperCond) / 2), rep(2, length(countsperCond) / 2))  # for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) (assuming data is ordered)
       } else {
         if (!is.vector(order)) {
           print("Error, order vector seems to be in a wrong format.")
@@ -471,12 +471,12 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs =
   ### code chunk number 2: dendrogram
   ###################################################
   if (storeFigs == FALSE) {
-    plot(hclust(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))])), "ward"))
+    plot(hclust(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))])), "ward.D"))
     par(ask = TRUE)
   } else {
     filename <- paste(pathToFigs, "/dendrogram.png", sep = "")
     png(filename)
-    plot(hclust(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))])), "ward"))
+    plot(hclust(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))])), "ward.D"))
     void <- dev.off()
   }
   
@@ -681,7 +681,7 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs =
 }
 
 
-.bestModelandSingular <- function(pALLGlobalPhi.glm.nb, sing.events, dataPart3, allEventtables, pvalue, phi, nr, dispData, dispDataMeanCond) { 
+.bestModelandSingular <- function(pALLGlobalPhi.glm.nb, sing.events, dataPart3, allEventtables, pvalue, phi, nr, dispData, dispDataMeanCond) {
   nbAll <- sum(nr)
   pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[, 1]), ]
   if (dim(pALLGlobalPhi.glm.nb)[1] > 0){
@@ -938,13 +938,12 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pat
    }
   }  
 
-
-
-  
   print("Pre-processing the data...")
-  chunk0 <- tryCatch({.readAndPrepareData(countsData,conditions)
+  chunk0 <- tryCatch({.readAndPrepareData(countsData, conditions)
     #### chunk 0 var ####
     # chunk0$countsData
+    # chunk0$conditions
+    # chunk0$dim
     # chunk0$n
     # chunk0$nr
     # chunk0$sortedconditions
@@ -969,10 +968,14 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pat
     chunk1 <- tryCatch({.modelFit(chunk0$countsData, chunk0$n, chunk0$nr, ASSBinfo, storeFigs, pathToFigs, filterLowCountsVariants)
       #### chunk 1 var ####
       # chunk1$pALLGlobalPhi.glm.nb 
-      # chunk1$sing.events 
-      # chunk1$dataPart3 
-      # chunk1$ASSBinfo 
+      # chunk1$sing.events
+      # chunk1$dataPart3
+      # chunk1$ASSBinfo
+      # chunk1$allEventtables
       # chunk1$length
+      # chunk1$phi
+      # chunk1$dispData
+      # chunk1$dispDataMeanCond 
     }, error = function(err) {
       print(paste(err, "An error occured, unable to fit models on data." ))
       return(NA)
@@ -985,11 +988,11 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pat
     print("Searching for best model and computing pvalues...")
     chunk2 <- tryCatch({.bestModelandSingular(chunk1$pALLGlobalPhi.glm.nb, chunk1$sing.events, chunk1$dataPart3, chunk1$allEventtables, pvalue, chunk1$phi, chunk0$nr, chunk1$dispData, chunk1$dispDataMeanCond)
       #### chunk 2 var ####  
-      # chunk2$noCorrectPVal 
-      # chunk2$correctedPVal 
-      # chunk2$signifVariants 
+      # chunk2$noCorrectPVal
+      # chunk2$correctedPVal
+      # chunk2$signifVariants
     }, error = function(err) {
-      print(paste(err, "Returning only resultFitNBglmModel and sing. events")) 
+      print(paste(err, "Returning only resultFitNBglmModel and sing.events")) 
       return(list(resultFitNBglmModel = chunk1$pALLGlobalPhi.glm.nb, sing.events = chunk1$sing.events))
     })
   } else {
