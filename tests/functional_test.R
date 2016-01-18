@@ -1,8 +1,8 @@
 library("kissDE")
 
 conditions <- c("C1", "C1", "C2", "C2")
-file_fa <- "devtests/resultsKissSknsh10M.fa"
-file_df <- "devtests/pretraitement.txt"
+file_fa <- "tests/resultsKissSknsh10M.fa"
+file_df <- "tests/pretraitement.txt"
 
 #### test for input = data.frame ####
 counts_df <- read.table(file_df)
