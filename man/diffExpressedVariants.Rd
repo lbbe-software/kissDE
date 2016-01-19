@@ -6,7 +6,7 @@
 \description{Retrieve condition-specific variants in RNA-seq data.}
 
 \usage{
-  diffExpressedVariants(countsData, conditions, storeFigs = FALSE, pathFigs = "None", 
+  diffExpressedVariants(countsData, conditions, storeFigs = FALSE, pathFigs = NA, 
   pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, 
   readLength = 75, overlap = 42, discoSNP = FALSE)
 }

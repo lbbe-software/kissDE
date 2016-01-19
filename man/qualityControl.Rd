@@ -7,7 +7,7 @@
   function is meant to be used before launching diffExpressedEvents, to validate the data.}
 
 \usage{
-  qualityControl(countsData, conditions, storeFigs = FALSE, pathFigs = "None")
+  qualityControl(countsData, conditions, storeFigs = FALSE, pathFigs = NA)
 }
 
 \arguments{
