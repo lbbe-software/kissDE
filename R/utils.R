@@ -299,7 +299,6 @@
   # binomial negative model, with global phi
   nbglmAgb <- negbin(counts~cond + path, data = eventdata, random = ~1, fixpar = list(4, phiGlobal))
   nbglmIgb <- negbin(counts~cond * path, data = eventdata, random = ~1, fixpar = list(5, phiGlobal)) 
-  
   nbAnovgb <- anova(nbglmAgb, nbglmIgb)
   nbAICgb <- c(AIC(nbglmAgb, k = log(nbAll))@istats$AIC, AIC(nbglmIgb, k = log(nbAll))@istats$AIC)
   # the BIC in fact, since we use k = log(nobs)
@@ -452,7 +451,7 @@
   } else {
     dataPart3 <- dataPart2
   }
-  allEventtables  <- apply(dataPart3, 1, .eventtable, startPosColumn4Counts = which(grepl("UP", names(dataPart3)))[1], endPosCol4Counts = ncol(dataPart3))
+  allEventtables <- apply(dataPart3, 1, .eventtable, startPosColumn4Counts = which(grepl("UP", names(dataPart3)))[1], endPosCol4Counts = ncol(dataPart3))
   
   ###################################################
   ### code chunk number 6: pALLGlobalPhi.glm.nb
@@ -619,10 +618,10 @@
   ### code chunk 1 : compute delta PSI/f
   ###################################################
   if (!is.null(ASSBinfo)) {
-    ASSBinfo <-subset(ASSBinfo, ASSBinfo$events.names %in% as.vector(signifVariants[, 1]))  # select only the lines corresponding to the remaining lines of signifVariants
+    ASSBinfo <- subset(ASSBinfo, ASSBinfo$events.names %in% as.vector(signifVariants[, 1]))  # select only the lines corresponding to the remaining lines of signifVariants
   }
   sumLowCond <- matrix(data = rep(0, n * dim(signifVariants)[1]), nrow = dim(signifVariants)[1], ncol = n)  # to check later for low counts to flag
-  pairsCond <-list()
+  pairsCond <- list()
   namesCond <- unique(sortedconditions)
   for (i in 1:n) {
     j <- i + 1
@@ -636,7 +635,7 @@
     newindex <- unlist(sapply(rownames(signifVariants), function(x) res <- which(ASSBinfo[, 1] == x)))  # to put the lines of the 2 data frames in the same order
     ASSBinfo <- ASSBinfo[newindex, ]
   } else {
-    rown <-row.names(signifVariants)
+    rown <- row.names(signifVariants)
     lengths2 <- lengths[rown, ]
   }
   deltapsi <- matrix(nrow = dim(signifVariants)[1], ncol = length(pairsCond))

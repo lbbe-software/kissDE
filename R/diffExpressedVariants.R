@@ -121,7 +121,7 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs =
   ###################################################
   ### code chunk number 1: Read and prepare data
   ###################################################
-  listData <-.readAndPrepareData(countsData, conditions)
+  listData <- .readAndPrepareData(countsData, conditions)
   countsData <- listData[[1]]
   conds <- listData[[2]]
   dim <- listData[[3]]
@@ -223,7 +223,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pat
   })
   
   if (!is.na(chunk0)){  # no error in chunk 0
-    ASSBinfo <-  chunk0$ASSBinfo  # in case counts option in kissplice2counts is at 1 or 2, we have info about junction counts (ASSB), that will be useful to correct the computation of delta psi in the end. They are stored here.
+    ASSBinfo <- chunk0$ASSBinfo  # in case counts option in kissplice2counts is at 1 or 2, we have info about junction counts (ASSB), that will be useful to correct the computation of delta psi in the end. They are stored here.
     if (!is.null(ASSBinfo)) {
       li <- c()
       for (i in (1:dim(ASSBinfo)[1])){
