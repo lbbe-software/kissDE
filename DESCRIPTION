@@ -5,7 +5,6 @@ Version: 1.2.0
 Date: 2016-01-13
 Author: Lilia Brinza, Vincent Lacroix, Frank Picard, Vincent Miele and Camille Marchet
 Maintainer: Camille Marchet <marchetcamille@gmail.com>
-Depends: DESeq, aod, xtable, DSS, glmnet
-Imports: Biobase, graphics, grDevices, stats
+Imports: aod, Biobase, DESeq, DSS, glmnet, graphics, grDevices, stats
 License: GPL
 Description: Retrieves condition-specific variants in RNA-seq data (SNPs, alternative-splicings, indels). It has been developped as a post-treatment of KisSplice but can also be used with your own data.
