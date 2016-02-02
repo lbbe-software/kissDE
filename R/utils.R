@@ -323,24 +323,24 @@
   nbSingHescond <- c(nbglmAcond@singular.hessian, nbglmIcond@singular.hessian) 
   nbCodecond <- c(nbglmAcond@code, nbglmIcond@code) 
   
-  rslts <- c(nbAnov0@anova.table$'P(> Chi2)'[2],
-             nbAnovgb@anova.table$'P(> Chi2)'[2],
-             nbAnov@anova.table$'P(> Chi2)'[2],
-             nbAnovcond@anova.table$'P(> Chi2)'[2],
-             nbAIC0,
-             nbAICgb, 
-             nbAIC,
-             nbAICcond,
+  rslts <- c(nbAnov0@anova.table$'P(> Chi2)'[2],      # [1]
+             nbAnovgb@anova.table$'P(> Chi2)'[2],      # [2]
+             nbAnov@anova.table$'P(> Chi2)'[2],      # [3]
+             nbAnovcond@anova.table$'P(> Chi2)'[2],      # [4]
+             nbAIC0,      # [5:6]
+             nbAICgb,       # [7:8]
+             nbAIC,      # [9:10]
+             nbAICcond,      # [11:12]
              
-             nbCode0,
-             nbCodegb,
-             nbCode,
-             nbCodecond,
+             nbCode0,      # [13:14]
+             nbCodegb,      # [15:16]
+             nbCode,      # [17:18]
+             nbCodecond,      # [19:20]
              
-             nbSingHes0,
-             nbSingHesgb,
-             nbSingHes,
-             nbSingHescond)
+             nbSingHes0,      # [21:22]
+             nbSingHesgb,      # [23:24]
+             nbSingHes,      # [25:26]
+             nbSingHescond)      # [27:28]
   return(rslts)  
 }
 

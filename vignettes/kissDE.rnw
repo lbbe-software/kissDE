@@ -1,4 +1,4 @@
-\documentclass[english, a4paper, 12pt]{article}
+\documentclass{article}
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage{geometry}
@@ -18,12 +18,14 @@
 \hypersetup{
     	   pdfborder={0 0 0},
 }
+
 %\VignetteIndexEntry{kissDE Reference Manual}
-%opening
 \title{kissDE Reference Manual}
-\author{}
+\author{Lilia Brinza, Vincent Lacroix, Frank Picard, Vincent Miele and Camille Marchet}
+
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 \maketitle
 
@@ -267,5 +269,6 @@ In the example table, we can see that the counts are quite contrasted, variant 1
 \end{tabular}
 
 \paragraph{}However, in $n-1$ (here 1) condition, the global count for one condition is less than 10 (9 for condition 1), so \texttt{flagLowCountsConditions} option will classify this in event in \texttt{'Low\_Counts'} column with a \texttt{TRUE} value. 
+
 
 \end{document}
