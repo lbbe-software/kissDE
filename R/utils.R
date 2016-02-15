@@ -666,7 +666,7 @@
         if (discoSNP == FALSE) {
           if (!is.null(ASSBinfo)) {  # counts correction
             nameASSBinfo <- c(paste(condi[nbRepli], "_repl", i, sep = ""))
-            subsetUp <- subsetUp / (2 - ASSBinfo[, nameASSBinfo] / subsetUp)
+            subsetUp[which(subsetUp>0),] <- subsetUp / (2 - ASSBinfo[, nameASSBinfo] / subsetUp)
           } else {  #counts correction if there is no info about the junction counts
             correctFactor <- (lengths2$upper + readLength - 2 * overlap + 1) / (lengths2$lower + readLength - 2 * overlap + 1)  # apparent size of upper path other apparent size of lower path
             subsetUp <- subsetUp / correctFactor
