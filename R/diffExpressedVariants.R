@@ -101,16 +101,16 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
 
 
 
-qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs = NA) {
+qualityControl <- function(countsData, conditions, storeFigs = NA) {
   
   options(warn = -1)  # suppress the warning for the users
   
-  if (storeFigs == TRUE){
-    if (is.na(pathFigs)) {
-      pathToFigs <- "kissDEFigures"
-    } else {
-      pathToFigs <- paste(pathFigs, "/kissDEFigures", sep = "")
-    }
+  if (is.na(storeFigs)){
+    # if (is.na(pathFigs)) {
+    pathToFigs <- "kissDEFigures"
+    # } else {
+    #   pathToFigs <- paste(pathFigs, "/kissDEFigures", sep = "")
+    # }
     find <- paste("find", pathToFigs)
     d <- system(find, TRUE, ignore.stderr = TRUE)
     if (length(d) == 0) { 
@@ -131,11 +131,11 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs =
   ###################################################
   ### code chunk number 2: dendrogram
   ###################################################
-  if (storeFigs == FALSE) {
+  if (is.na(storeFigs)) {
     plot(hclust(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))])), "ward.D"))
     par(ask = TRUE)
   } else {
-    filename <- paste(pathToFigs, "/dendrogram.png", sep = "")
+    filename <- paste(storeFigs, "/dendrogram.png", sep = "")
     png(filename)
     plot(hclust(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))])), "ward.D"))
     void <- dev.off()
@@ -144,10 +144,10 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs =
   ###################################################
   ### code chunk number 3: replicates
   ###################################################
-  if (storeFigs == FALSE) {
+  if (is.na(storeFigs)) {
     heatmap(as.matrix(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))]))), margins = c(10, 10))
   } else {
-    filename <- paste(pathToFigs, "/heatmap.png", sep = "")
+    filename <- paste(storeFigs, "/heatmap.png", sep = "")
     png(filename)
     heatmap(as.matrix(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))]))), margins = c(10, 10))
     void <- dev.off()
@@ -175,11 +175,11 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs =
   ###################################################
   ### code chunk number 5: intra-vs-inter
   ###################################################
-  if (storeFigs == FALSE) {
+  if (is.na(storeFigs)) {
     plot(x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
     abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
   } else {
-    filename <- paste(pathToFigs, "/InterIntraVariability.png", sep = "")
+    filename <- paste(storeFigs, "/InterIntraVariability.png", sep = "")
     png(filename)
     plot(x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
     abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
@@ -189,23 +189,25 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE, pathFigs =
 
 
 
-diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pathFigs = NA, pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, readLength = 75, overlap = 42, discoSNP = FALSE) {
+diffExpressedVariants <- function(countsData, conditions, storeFigs = NA, pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, readLength = 75, overlap = 42, discoSNP = FALSE) {
   
   options(warn = -1)  # suppress the warning for the users
-  pathToFigs <-  NA
-  if (storeFigs == TRUE){
-   if (is.na(pathFigs)) {
-     pathToFigs <- "kissDEFigures"
-   } else {
-     pathToFigs <- paste(pathFigs, "/kissDEFigures", sep = "")
-   }
-   find <- paste("find", pathToFigs)
-   d <- system(find, TRUE, ignore.stderr = TRUE)
-   if (length(d) == 0) { 
-     command <- paste("mkdir", pathToFigs)
-     system(command, ignore.stderr = TRUE)
-   }
-  }  
+  # pathToFigs <-  NA
+  if (is.na(storeFigs)){
+   # if (is.na(pathFigs)) {
+    pathToFigs <- "kissDEFigures"
+   # } else {
+     # pathToFigs <- paste(pathFigs, "/kissDEFigures", sep = "")
+   # }
+   # find <- paste("find", pathToFigs)
+   # d <- system(find, TRUE, ignore.stderr = TRUE)
+   # if (length(d) == 0) { 
+   #   command <- paste("mkdir", pathToFigs)
+   #   system(command, ignore.stderr = TRUE)
+   # }
+  }  else {
+    pathToFigs <- storeFigs
+  }
 
   print("Pre-processing the data...")
   chunk0 <- tryCatch({.readAndPrepareData(countsData, conditions)
