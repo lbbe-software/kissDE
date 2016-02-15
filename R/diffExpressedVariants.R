@@ -189,7 +189,7 @@ qualityControl <- function(countsData, conditions, storeFigs = NA) {
 
 
 
-diffExpressedVariants <- function(countsData, conditions, storeFigs = NA, pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, readLength = 75, overlap = 42, discoSNP = FALSE) {
+diffExpressedVariants <- function(countsData, conditions, storeFigs = NA, pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE) {
   
   options(warn = -1)  # suppress the warning for the users
   # pathToFigs <-  NA
@@ -283,7 +283,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = NA, pvalue
         } 
         
         signifVariants.sorted <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, 
-                                                   flagLowCountsConditions, readLength, overlap, chunk1$lengths, discoSNP)
+                                                   flagLowCountsConditions, chunk1$lengths, discoSNP)
         return(list(resultFitNBglmModel = chunk1$pALLGlobalPhi.glm.nb, uncorrectedPVal = chunk2$noCorrectPVal, correctedPVal = chunk2$correctedPVal, 
                     finalTable = signifVariants.sorted))
       }, error = function(err) {
