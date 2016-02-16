@@ -3,7 +3,7 @@
 
 \title{Retrieve condition-specific variants in RNA-seq data}
 
-\description{Retrieve condition-specific variants in RNA-seq data.}
+\description{Function that retrieves condition-specific variants in RNA-seq data.}
 
 \usage{
   diffExpressedVariants(countsData, conditions, storeFigs = FALSE, pvalue = 0.05, 

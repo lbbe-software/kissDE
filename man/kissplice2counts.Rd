@@ -3,7 +3,7 @@
 
 \title{Pre-treatment of \code{KisSplice} outputs}
 
-\description{Converts \code{KisSplice} \code{.fa} outputs to data frame that can be used by others functions of the \code{KissDE} package.
+\description{Function that converts \code{KisSplice} \code{.fa} outputs to data frame that can be used by others functions of the \code{KissDE} package.
 }
 
 \usage{
