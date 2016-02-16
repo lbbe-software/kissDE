@@ -10,6 +10,10 @@ stopifnot(
   all(mySNPcounts$countsEvents[, 1] == mySNPcounts$psiInfo[, 1])
 )
 
+## tests 'diffExpressedVariants'
+diffSNP <- diffExpressedVariants(mySNPcounts, mySNPconditions)
+
+
 
 # 
 # conditions <- c("C1", "C1", "C2", "C2")

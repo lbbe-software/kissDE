@@ -10,7 +10,7 @@
 }
 
 \arguments{
-  \item{countsData}{the output of the \code{kissplice2counts} function or a data frame containing in its first column, the lengths of the events and in the following columns, the counts corresponding to each pair of condition/replicate}
+  	\item{countsData}{the output of the \code{kissplice2counts} function or a data frame containing in its first column the names of the events, in its second column the lengths of the events, and in the following columns, the counts corresponding to each pair of condition/replicate}
   
   \item{conditions}{a character vector that gives the conditions, it has as much elements as there are pairs of condition/replicates}
   
@@ -21,6 +21,12 @@
 	Plots are stored in .png format. 
 	If the \code{qualityControl} function is a part of an automatised worflow, we recommand to set this option to \code{TRUE} or to a personal value.}
 }
+
+
+\value{
+The figures are stored or displayed in the R session.
+}
+
 
 \examples{
 fpath <- system.file("extdata", "output_kissplice_SNP.fa", package = "kissDE")
