@@ -3,19 +3,23 @@
 
 \title{Some helpful plots about the experimental plan}
 
-\description{Function that ensures that the experimental plan passed to diffExpressedEvents has no error, by providing some helpful plots about the data. This
-  function is meant to be used before launching diffExpressedEvents, to validate the data.}
+\description{Function that ensures that the experimental plan passed to diffExpressedEvents has no error, by providing some helpful plots about the data. This function is meant to be used before launching diffExpressedEvents, to validate the data.}
 
 \usage{
-  qualityControl(countsData, conditions, storeFigs = FALSE, pathFigs = NA)
+  qualityControl(countsData, conditions, storeFigs = FALSE)
 }
 
 \arguments{
-  \item{countsData}{a data.frame containing: in its first column, the lengths of the events, in the following columns, the counts corresponding to each pair of           condition/replicate}
+  \item{countsData}{a data.frame containing: in its first column, the lengths of the events, in the following columns, the counts corresponding to each pair of condition/replicate}
+  
   \item{conditions}{a character vector that gives the conditions, it has as much elements as there are pairs of condition/replicates}
-  \item{storeFigs}{if this function is needed to be used into an automatised worflow, setting this option to TRUE will create a directory where plots are stored in       .png format. By default (FALSE) the figures are plotted one at time when Enter is pressed. }
-  \item{pathFigs}{to give a path (string, e.g. '/path/to/figs') where to store the figures. 
-    By default the figure directory is called  \code{kissDEFigures} and created in the currend directory.}
+  
+	\item{storeFigs}{a logical or a string indicating if the plots should be stored and in which directory.
+	By default (\code{FALSE}), the figures are not stored but plotted one at time when Enter is pressed.
+	If \code{storeFigs} is \code{TRUE}, the figures are stored in a \code{kissDEFigures} directory which is created in the current directory.
+	If \code{storeFigs} is a path (string, e.g. '/path/to/figs'), a new directory called with this value is created to store the figures.
+	Plots are stored in .png format. 
+	If the \code{diffExpressedVariants} function is a part of an automatised worflow, we recommand to set this option to \code{TRUE} or to a personal value.}
 }
 
 % \examples{

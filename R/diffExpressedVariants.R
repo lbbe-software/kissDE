@@ -90,27 +90,29 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
       # events.df <- as.data.frame(events.mat)
       # events.df <- data.frame(events.names, events.df)
     }
-    events.df <- data.frame(events.names,events.mat)
+    events.df <- data.frame(events.names, events.mat)
   }
   
   close(toConvert)
   psidf <- as.data.frame(psiInfo)
-  psiInfo.df <- data.frame(events.names,psidf)
+  psiInfo.df <- data.frame(events.names, psidf)
   return(list(countsEvents = events.df, discoInfo = discoSNP, psiInfo = psiInfo.df))
 }
 
 
 
-qualityControl <- function(countsData, conditions, storeFigs = NA) {
+qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   
   options(warn = -1)  # suppress the warning for the users
   
-  if (is.na(storeFigs)){
-    # if (is.na(pathFigs)) {
+  pathToFigs <- NA
+  if (isTRUE(storeFigs))
     pathToFigs <- "kissDEFigures"
-    # } else {
-    #   pathToFigs <- paste(pathFigs, "/kissDEFigures", sep = "")
-    # }
+  else
+    pathToFigs <- storeFigs
+  
+  # create a new folder if it doesn't exist
+  if (!is.na(pathToFigs)){
     find <- paste("find", pathToFigs)
     d <- system(find, TRUE, ignore.stderr = TRUE)
     if (length(d) == 0) { 
@@ -118,6 +120,7 @@ qualityControl <- function(countsData, conditions, storeFigs = NA) {
       system(command, ignore.stderr = TRUE)
     }
   }
+  
   ###################################################
   ### code chunk number 1: Read and prepare data
   ###################################################
@@ -131,7 +134,7 @@ qualityControl <- function(countsData, conditions, storeFigs = NA) {
   ###################################################
   ### code chunk number 2: dendrogram
   ###################################################
-  if (is.na(storeFigs)) {
+  if (storeFigs == FALSE) {
     plot(hclust(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))])), "ward.D"))
     par(ask = TRUE)
   } else {
@@ -144,7 +147,7 @@ qualityControl <- function(countsData, conditions, storeFigs = NA) {
   ###################################################
   ### code chunk number 3: replicates
   ###################################################
-  if (is.na(storeFigs)) {
+  if (storeFigs == FALSE) {
     heatmap(as.matrix(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))]))), margins = c(10, 10))
   } else {
     filename <- paste(storeFigs, "/heatmap.png", sep = "")
@@ -175,7 +178,7 @@ qualityControl <- function(countsData, conditions, storeFigs = NA) {
   ###################################################
   ### code chunk number 5: intra-vs-inter
   ###################################################
-  if (is.na(storeFigs)) {
+  if (storeFigs == FALSE) {
     plot(x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
     abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
   } else {
@@ -189,25 +192,14 @@ qualityControl <- function(countsData, conditions, storeFigs = NA) {
 
 
 
-diffExpressedVariants <- function(countsData, conditions, storeFigs = NA, pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE) {
+diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE) {
   
   options(warn = -1)  # suppress the warning for the users
-  # pathToFigs <-  NA
-  if (is.na(storeFigs)){
-   # if (is.na(pathFigs)) {
+  pathToFigs <- NA
+  if (isTRUE(storeFigs))
     pathToFigs <- "kissDEFigures"
-   # } else {
-     # pathToFigs <- paste(pathFigs, "/kissDEFigures", sep = "")
-   # }
-   # find <- paste("find", pathToFigs)
-   # d <- system(find, TRUE, ignore.stderr = TRUE)
-   # if (length(d) == 0) { 
-   #   command <- paste("mkdir", pathToFigs)
-   #   system(command, ignore.stderr = TRUE)
-   # }
-  }  else {
+  else
     pathToFigs <- storeFigs
-  }
 
   print("Pre-processing the data...")
   chunk0 <- tryCatch({.readAndPrepareData(countsData, conditions)

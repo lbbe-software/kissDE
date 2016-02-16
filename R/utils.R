@@ -412,7 +412,7 @@
   yQP <- x * coef(lm.D)
   yNB <- x + 1 / coef(nls.modelNB) * x^2
   
-  if (is.na(storeFigs)) {
+  if (storeFigs == FALSE) {
     plot(event.mean.variance.df$Mean, event.mean.variance.df$Variance, 
          xlab = "Mean Event count", 
          ylab = "Variance Event count",
@@ -422,13 +422,13 @@
     lines(x, yNB, col = 6, lwd = 2)
     legend("topleft", c("Poisson", "Quasi-Poisson", "Negative Binomial"), text.col = c(2, 3, 6), box.lty = 0)
   } else {
-    filename <- paste(pathFigs, "/models.png", sep = "")
     find <- paste("find", pathFigs)
     d <- system(find, TRUE, ignore.stderr = TRUE)
     if (length(d) == 0) { 
       command <- paste("mkdir", pathFigs)
       system(command, ignore.stderr = TRUE)
     }
+    filename <- paste(pathFigs, "/models.png", sep = "")
     png(filename)
     plot(event.mean.variance.df$Mean, event.mean.variance.df$Variance, 
          xlab = "Mean Event count", 
