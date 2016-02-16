@@ -105,8 +105,9 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   
   options(warn = -1)  # suppress the warning for the users
   
-  pathToFigs <- NA
-  if (isTRUE(storeFigs))
+  if(storeFigs == FALSE)
+    pathToFigs <- NA
+  else if (isTRUE(storeFigs))
     pathToFigs <- "kissDEFigures"
   else
     pathToFigs <- storeFigs
@@ -195,8 +196,9 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
 diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE) {
   
   options(warn = -1)  # suppress the warning for the users
-  pathToFigs <- NA
-  if (isTRUE(storeFigs))
+  if(storeFigs == FALSE)
+    pathToFigs <- NA
+  else if (isTRUE(storeFigs))
     pathToFigs <- "kissDEFigures"
   else
     pathToFigs <- storeFigs
