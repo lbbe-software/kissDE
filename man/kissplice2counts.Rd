@@ -55,8 +55,8 @@
 
 \value{\code{kissplice2counts} returns a list of 3 objects:
   \item{countsEvents}{a data frame containing several columns: a first column (\code{events.names}) containing the name of the event based on \code{KisSplice} notation, a second one (\code{X1}) containing the length of the event, and several others (\code{X2} to \code{Xn}) containing the counts corresponding to the replicates of the conditions.}
-  \item{discoInfo}{a logical indicating if you are using discoSNP++'s output file instead of \code{KisSplice}'s file}
   \item{psiInfo}{a data frame containing only one column (\code{events.names}) containing the name of the event based on \code{KisSplice} notation, as in the first column of the \code{countsEvents} output.}
+  \item{discoInfo}{a logical indicating if you are using discoSNP++'s output file instead of \code{KisSplice}'s file}
 }
 
 

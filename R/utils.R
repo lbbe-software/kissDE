@@ -379,9 +379,11 @@
   dataNormCountsEvent <- as.matrix(dataPart2[, 3:ncol(dataPart2)])  # the counts matrix
   colnames(dataNormCountsEvent) <- 1:ncol(dataNormCountsEvent)
   designs <- rep(c(1:(n * 2)), c(nr, nr))  # the design matrix
+  
   dispData <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
   set.seed(40)  ## fix the seed to avoid the stochastic outputs of the DSS:estDispersion function
   dispData <- estDispersion(dispData)
+  
   dispDataMeanCond <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
   dispDataMeanCond <- estDispersion(dispData)
   

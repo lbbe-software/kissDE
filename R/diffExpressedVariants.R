@@ -96,7 +96,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
   close(toConvert)
   psidf <- as.data.frame(psiInfo)
   psiInfo.df <- data.frame(events.names, psidf)
-  return(list(countsEvents = events.df, discoInfo = discoSNP, psiInfo = psiInfo.df))
+  return(list(countsEvents = events.df, psiInfo = psiInfo.df, discoInfo = discoSNP))
 }
 
 
