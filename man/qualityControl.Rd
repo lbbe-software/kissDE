@@ -3,16 +3,16 @@
 
 \title{Some helpful plots about the experimental plan}
 
-\description{Function that ensures that the experimental plan passed to diffExpressedEvents has no error, by providing some helpful plots about the data. This function is meant to be used before launching diffExpressedEvents, to validate the data.}
+\description{Function that ensures that the experimental plan passed to \code{diffExpressedVariants} has no error, by providing some helpful plots about the data. This function is meant to be used before launching \code{diffExpressedVariants}, to validate the data.}
 
 \usage{
   qualityControl(countsData, conditions, storeFigs = FALSE)
 }
 
 \arguments{
-  	\item{countsData}{the output of the \code{kissplice2counts} function or a data frame containing in its first column the names of the events, in its second column the lengths of the events, and in the following columns, the counts corresponding to each pair of condition/replicate}
+  	\item{countsData}{the output of the \code{kissplice2counts} function or a data frame containing in its first column the names of the events, in its second column the lengths of the events, and in the following columns, the counts corresponding to each pair of conditions/replicates}
   
-  \item{conditions}{a character vector that gives the conditions, it has as much elements as there are pairs of condition/replicates}
+  \item{conditions}{a character vector that gives the conditions, it has as much elements as there are pairs of conditions/replicates}
   
 	\item{storeFigs}{a logical or a string indicating if the plots should be stored and in which directory.
 	By default (\code{FALSE}), the figures are not stored but plotted one at time when Enter is pressed.

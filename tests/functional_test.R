@@ -6,12 +6,12 @@ fpath <- system.file("extdata", "output_kissplice_SNP.fa", package = "kissDE")
 mySNPcounts <- kissplice2counts(fpath, pairedEnd = TRUE)
 
 stopifnot(
-  all(names(mySNPcounts) == c("countsEvents", "discoInfo", "psiInfo")),
+  all(names(mySNPcounts) == c("countsEvents", "psiInfo", "discoInfo")),
   all(mySNPcounts$countsEvents[, 1] == mySNPcounts$psiInfo[, 1])
 )
 
 ## tests 'diffExpressedVariants'
-diffSNP <- diffExpressedVariants(mySNPcounts, mySNPconditions)
+# diffSNP <- diffExpressedVariants(mySNPcounts, mySNPconditions)
 
 
 

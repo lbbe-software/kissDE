@@ -267,7 +267,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
   if (!is.na(chunk2)) {  # no error during chunk1
     if (length(chunk2) > 2) {  # no error during chunk2
       print("Computing size of the effect and last cutoffs...")
-      chunk3 <- tryCatch({ 
+      chunk3 <- tryCatch({
         if (discoSNP != FALSE){
           if (is.na(countsData$discoInfo)){
             discoSNP <- FALSE
@@ -278,11 +278,15 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
         
         signifVariants.sorted <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, 
                                                    flagLowCountsConditions, chunk1$lengths, discoSNP)
-        return(list(resultFitNBglmModel = chunk1$pALLGlobalPhi.glm.nb, uncorrectedPVal = chunk2$noCorrectPVal, correctedPVal = chunk2$correctedPVal, 
-                    finalTable = signifVariants.sorted))
+        return(list(finalTable = signifVariants.sorted, 
+                    correctedPVal = chunk2$correctedPVal, 
+                    uncorrectedPVal = chunk2$noCorrectPVal, 
+                    resultFitNBglmModel = chunk1$pALLGlobalPhi.glm.nb))
       }, error = function(err) {
         print(paste(err, "Returning only resultFitNBglmModel and pvalues tab"))
-        return(list(resultFitNBglmModel = chunk1$pALLGlobalPhi.glm.nb, uncorrectedPVal = chunk2$noCorrectPVal, correctedPVal = chunk2$correctedPVal))
+        return(list(correctedPVal = chunk2$correctedPVal,
+                    uncorrectedPVal = chunk2$noCorrectPVal,
+                    resultFitNBglmModel = chunk1$pALLGlobalPhi.glm.nb))
       })
     } else {  # error in chunk 2 does not allow to compute chunk 3
       return(chunk2)
