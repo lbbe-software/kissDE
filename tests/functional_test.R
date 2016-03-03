@@ -13,7 +13,7 @@ stopifnot(
 ## tests 'diffExpressedVariants'
 # diffSNP <- diffExpressedVariants(mySNPcounts, mySNPconditions)
 
-
+res <- diffExpressedVariants(table_counts_alt_splicing, c(rep("condition1", 2), rep("condition2", 2)))
 
 # 
 # conditions <- c("C1", "C1", "C2", "C2")

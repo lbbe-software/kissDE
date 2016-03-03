@@ -13,7 +13,7 @@
 \arguments{
 	\item{countsData}{the output of the \code{kissplice2counts} function or a data frame containing in its first column the names of the events, in its second column the lengths of the events, and in the following columns, the counts corresponding to each pair of condition/replicate}
 	
-	\item{conditions}{a character vector that gives the conditions, it has as much elements as there are pairs of condition/replicates}
+	\item{conditions}{a character vector that gives the conditions, it has as many elements as there are replicates in total.}
 	
 	\item{storeFigs}{a logical or a string indicating if the plots should be stored and in which directory.
 	By default (\code{FALSE}), the figures are not stored but plotted one at time when Enter is pressed.
@@ -22,11 +22,11 @@
 	Plots are stored in .png format. 
 	If the \code{diffExpressedVariants} function is a part of an automatised worflow, we recommand to set this option to \code{TRUE} or to a personal value.}
 
-	\item{pvalue}{pvalue}
+	\item{pvalue}{a numerical value indicating the threshold below which the pvalues are selected.}
 	
-	\item{filterLowCountsVariants}{a numeric indicating the value under which events are filtered out. After having computing the overdispersion, we screen out events which both variants have global counts < [filterLowCountsVariants] (sum of each replicate x condition) in order to gain strength for the models.}
+	\item{filterLowCountsVariants}{a numeric indicating the value below which events are filtered out. After having computing the overdispersion, we screen out events which both variants have global counts < [filterLowCountsVariants] (sum of each replicate x condition) in order to gain strength for the models.}
 	
-	\item{flagLowCountsConditions}{a numeric indicating the value under which we flag events as 'lowCounts' in the final data frame. This column aims to help seeing which event (variant 1 counts + variant 2 counts) has low counts (< [flagLowCountsBoundary = 10]) for at least n-1 conditions (over n).}
+	\item{flagLowCountsConditions}{a numeric indicating the value below which we flag events as 'lowCounts' in the final data frame. This column aims to help seeing which event (variant 1 counts + variant 2 counts) has low counts (< [flagLowCountsBoundary = 10]) for at least n-1 conditions (over n).}
 	
 	\item{discoSNP}{a logical indicating if you are using discoSNP++'s output file instead of \code{KisSplice}'s file}
 	}

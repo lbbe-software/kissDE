@@ -12,7 +12,7 @@
 \arguments{
   	\item{countsData}{the output of the \code{kissplice2counts} function or a data frame containing in its first column the names of the events, in its second column the lengths of the events, and in the following columns, the counts corresponding to each pair of conditions/replicates}
   
-  \item{conditions}{a character vector that gives the conditions, it has as much elements as there are pairs of conditions/replicates}
+  \item{conditions}{a character vector that gives the conditions, it has as many elements as there are replicates in total.}
   
 	\item{storeFigs}{a logical or a string indicating if the plots should be stored and in which directory.
 	By default (\code{FALSE}), the figures are not stored but plotted one at time when Enter is pressed.

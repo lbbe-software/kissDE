@@ -25,7 +25,7 @@
     
     In a regular \code{KisSplice} output, it would be
     
-    |C1_0|C2_47|C3_0|C4_14 (with 47 = 41+27-21 and 14 = 1+7+8-2)}
+    |C1_0|C2_47|C3_1|C4_13 (with 47 = 41+27-21 and 14 = 1+7+8-2)}
   
   \item{pairedEnd}{a logical indicating if the data is paired-end (not by default), this function realises the sum of the counts from the two reads of the pair. 
     It can be used along with \code{counts} option. 
