@@ -206,7 +206,7 @@ Indeed, especially in RNAseq, where some genes are very highly expressed (and he
 
 When dealing with genomic variants, we quantify the magnitude of the effect using the difference of allele frequencies between the two conditions.
 When dealing with splicing variants, we quantify the magnitude of the effect using the difference of Percent Spliced In (PSI) between the two conditions.
-These two measures turn out to be equivalent and can be summarised using the following formula :
+These two measures turn out to be equivalent and can be summarized using the following formula :
 
 $$PSI \:=\: f  \:=\:  \frac{\#counts\_variant_1}{\#counts\_variant_1 + \#counts\_variant_2} $$ \\
 $DeltaPSI \:=\: PSI_{cond1} - PSI_{cond2}$ \\

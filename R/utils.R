@@ -245,9 +245,9 @@
   countsEvents$Path <- gl(2, 1, dim(countsEvents)[1], labels = c("UP", "LP"))
   
   ###################################################
-  ### code chunk number 2: Normalisation
+  ### code chunk number 2: Normalization
   ###################################################
-  # Normalisation with DESeq
+  # Normalization with DESeq
   conds <- c()
   for(i in 1:n) {
     for(j in 1:nr[i]) {
@@ -257,9 +257,9 @@
   cds <- newCountDataSet(countsEvents[, 3:(3 + length(conds) - 1)], conds) # create object
   cdsSF <- estimateSizeFactors(cds)
   sizeFactors(cdsSF)
-  shouldWeNormalise <- sum(is.na(sizeFactors(cdsSF))) < 1
+  shouldWeNormalize <- sum(is.na(sizeFactors(cdsSF))) < 1
   dim <- dim(countsEvents)[2]
-  countsEvents[, (dim + 1):(dim + length(conds))] <- round(counts(cdsSF, normalized = shouldWeNormalise))
+  countsEvents[, (dim + 1):(dim + length(conds))] <- round(counts(cdsSF, normalized = shouldWeNormalize))
   colnames(countsEvents)[(dim + 1):(dim + length(conds))] <- paste(namesData[3:(3 + sum(nr) - 1)], "_Norm", sep = "")
   return(list(countsData = countsEvents, conditions = conds, dim = dim, n = n, nr = nr, sortedconditions = sortedconditions, ASSBinfo = ASSBinfo))
 }

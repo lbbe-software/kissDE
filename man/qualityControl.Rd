@@ -34,4 +34,3 @@ mySNPcounts <- kissplice2counts(fpath, pairedEnd = TRUE)
 mySNPconditions <- c("EUR", "EUR", "TSC", "TSC")
 qualityControl(mySNPcounts, mySNPconditions)
 }
-
