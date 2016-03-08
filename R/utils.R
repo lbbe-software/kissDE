@@ -245,9 +245,9 @@
   countsEvents$Path <- gl(2, 1, dim(countsEvents)[1], labels = c("UP", "LP"))
   
   ###################################################
-  ### code chunk number 2: Normalization
+  ### code chunk number 2: Normalisation
   ###################################################
-  # Normalization with DESeq
+  # Normalisation with DESeq
   conds <- c()
   for(i in 1:n) {
     for(j in 1:nr[i]) {
@@ -257,9 +257,10 @@
   cds <- newCountDataSet(countsEvents[, 3:(3 + length(conds) - 1)], conds) # create object
   cdsSF <- estimateSizeFactors(cds)
   sizeFactors(cdsSF)
-  shouldWeNormalize <- sum(is.na(sizeFactors(cdsSF))) < 1
+  shouldWeNormalise <- sum(is.na(sizeFactors(cdsSF))) < 1
+  #shouldWeNormalise=FALSE
   dim <- dim(countsEvents)[2]
-  countsEvents[, (dim + 1):(dim + length(conds))] <- round(counts(cdsSF, normalized = shouldWeNormalize))
+  countsEvents[, (dim + 1):(dim + length(conds))] <- round(counts(cdsSF, normalized = shouldWeNormalise))
   colnames(countsEvents)[(dim + 1):(dim + length(conds))] <- paste(namesData[3:(3 + sum(nr) - 1)], "_Norm", sep = "")
   return(list(countsData = countsEvents, conditions = conds, dim = dim, n = n, nr = nr, sortedconditions = sortedconditions, ASSBinfo = ASSBinfo))
 }
@@ -379,11 +380,9 @@
   dataNormCountsEvent <- as.matrix(dataPart2[, 3:ncol(dataPart2)])  # the counts matrix
   colnames(dataNormCountsEvent) <- 1:ncol(dataNormCountsEvent)
   designs <- rep(c(1:(n * 2)), c(nr, nr))  # the design matrix
-  
   dispData <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
   set.seed(40)  ## fix the seed to avoid the stochastic outputs of the DSS:estDispersion function
   dispData <- estDispersion(dispData)
-  
   dispDataMeanCond <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
   dispDataMeanCond <- estDispersion(dispData)
   
@@ -665,8 +664,10 @@
     indexMatrixPsiPairCond <- 1
     indexdeltapsi <- 1
     namesPsiPairCond <- c()
+    nbLoop=0
     for (nbRepli in 1:length(replicates)) {  # for a given condition in the pair
       for (i in 1:replicates[nbRepli]) {  # for each replicate (i) of the condition
+        nbLoop=nbLoop+1
         colsPsiPairCond <- c(colsPsiPairCond, paste(condi[nbRepli], "_repl", i, sep = ""))
         namesUp <- c(paste("UP_", condi[nbRepli], "_repl", i, "_Norm", sep = ""))
         namesLow <- c(paste("LP_", condi[nbRepli], "_repl", i, "_Norm", sep = ""))
@@ -675,7 +676,7 @@
         if (discoSNP == FALSE) {
           if (!is.null(ASSBinfo)) {  # counts correction
             nameASSBinfo <- c(paste(condi[nbRepli], "_repl", i, sep = ""))
-            subsetUp[which(subsetUp>0),] <- subsetUp / (2 - ASSBinfo[, nameASSBinfo] / subsetUp)
+            subsetUp[which(subsetUp>0),] <- subsetUp[which(subsetUp>0),] / (2 - ASSBinfo[which(subsetUp>0), nameASSBinfo] / subsetUp[which(subsetUp>0),])
           } else {  #counts correction if there is no info about the junction counts
             # correctFactor <- (lengths2$upper + readLength - 2 * overlap + 1) / (lengths2$lower + readLength - 2 * overlap + 1)  # apparent size of upper path other apparent size of lower path
             correctFactor <- lengths2$upper / lengths2$lower   # apparent size of upper path other apparent size of lower path
@@ -685,7 +686,7 @@
         sumLowCond[, nbRepli] <- sumLowCond[, nbRepli] + as.matrix(subsetUp) + as.matrix(subsetLow)  # sumLowCond sums up the counts 
         psiPairCond[, indexMatrixPsiPairCond] <- as.matrix(subsetUp / (subsetUp + subsetLow))  # psi is #incl/(#incl+#exclu) after all corrections for each replicate
         indexNan <- intersect(which(subsetUp[, 1] < 10), which(subsetLow[, 1] < 10))  # if counts are too low we will put NaN
-        psiPairCond[indexNan, ] <- NaN
+        psiPairCond[indexNan, nbLoop] <- NaN
         indexMatrixPsiPairCond <- indexMatrixPsiPairCond + 1
         namesPsiPairCond <- c(namesPsiPairCond, as.character(condi[nbRepli]))
       }
