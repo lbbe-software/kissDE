@@ -29,6 +29,49 @@
 
 \maketitle
 
+
+
+\section{Abstract}
+Main goal
+\section{Prerequisites}
+\subsection{Dependencies}
+Aurélie
+\subsection{Data}
+either counts table or data KisSplice run
+\section{kissDE content}
+schema du workflow
+\subsection{Options}
+\subsection{Normalization}
+\subsection{Statistical tests}
+\subsubsection{Estimation of dispersion}
+\subsubsection{Models}
+\subsubsection{Likelihood ratio test}
+correction multiple tests
+\subsection{Filtering}
+\subsection{Magnitude of the effect}
+\section{Examples}
+\subsection{Input data}
+\subsubsection{KisSplice}
+ref manual - possible for all types (0, 1, 2, 3)
+\subsubsection{Counts table: howto}
+\subsection{Data visualization}
+plots qualityControl
++ plot models dans la fonction ppale
+\subsection{kissDE on SNP data}
+vecteur condition
+lancement test
+export données
+results
+\subsection{kissDE on alternative splicing data}
+vecteur condition
+lancement test
+export données
+results
+\section{Session info}
+Aurélie
+% section biblio ?
+\end{document}
+
 \section{What kissDE does}
 kissDE enables to test if a variant is specific to a condition.
 It takes as input read counts for each variant in each replicate of each condition, and outputs a p-value (adjusted for multiple testing) and a metric (Df/Dpsi) which indicates the magnitude of the effect.
@@ -269,6 +312,3 @@ In the example table, we can see that the counts are quite contrasted, variant 1
 \end{tabular}
 
 \paragraph{}However, in $n-1$ (here 1) condition, the global count for one condition is less than 10 (9 for condition 1), so \texttt{flagLowCountsConditions} option will classify this in event in \texttt{'Low\_Counts'} column with a \texttt{TRUE} value. 
-
-
-\end{document}
