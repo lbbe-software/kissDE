@@ -25,7 +25,7 @@
 
 %\VignetteIndexEntry{kissDE Reference Manual}
 \title{kissDE Reference Manual}
-\author{Lilia Brinza, Vincent Lacroix, Frank Picard, Vincent Miele and Camille Marchet}
+\author{}
 
 
 \begin{document}
@@ -36,16 +36,23 @@
 
 
 \section{Abstract}
-Main goal
+\kde was developed in the scope of NGS data post-processing, and in particular RNA-seq data. Many experiments include several biological conditions to decypher their influence on the present transcripts. After one have found a collection of variants by analyzing its reads, it is natural to focus on the biological relevance of what is in the list, which can be thousands of variants. \kde helps to sort interesting variants by testing if a variant is specific to a condition. It takes as input read counts for each variant in each replicate of each condition, and outputs a p-value (adjusted for multiple testing) and a metric (Df/Dpsi) which indicates the magnitude of the effect.\\
+The term "variant" applies both to genomic variants and splicing variants. In both cases, the same gene gives rise to two RNA molecules, which differ in their sequence.\\
+When a gene gives rise to more than two RNA molecules, we assume the set of all transcripts can be split in two groups.
+In the case of alternative splicing, the two groups are: the ones that include the exon of interest, and the ones that exclude the exon of interest.
+In the case of genomic polymorphism, the two groups are: the ones that contain the first allele, the ones that contain the second allele.\\
+The statistical framework is similar to DESeq. The main difference is that for gene expression, one value per gene is provided, although in the case of \kde, dealing with polymorphism or alternative splicing means providing two values: one per variant. Read counts are pre-processed, several models are tested to fit the data and keep the best to perform the LRT and output the p-value jointly to several metrics and flags. The model and the package's workflow are further detailed in \textbf{section 3}.
+
 \section{Prerequisites}
 \subsection{Dependencies}
 Aurélie
 \subsection{Data}
 \kde is meant to work on pairs of alternative variants that have been quantified across different conditions. Such variants can be found with different bioformatics workflows, variant callers,... Among them, \kde was at first designed to work with \kp, which performs local assembly on RNA-seq data in order to find and quantify alternative variants. When one have found a list of variants with \kp, we provide a function within this packages that makes easy to convert \kp's fasta files into a format than can be used for testing with \kde. Although \kde is a tool from \kp's suite, it can be used independantly from \kp with counts for each variants obtained with any other method.\\
-The user must keep in mind that \kde was designed to work with at least one replicate for each condition, which means that the minimal input is variants quantified for 4 different individuals, two that represent .\\
+The user must keep in mind that \kde was designed to work with at least one replicate for each condition, which means that the minimal input is variants quantified for 4 different individuals, each couple representing a condition. There can be more replicates and more conditions, it is also not mandatory to have an equal number of replicates in each condition.\\
 For running \kde, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
 You can provide your own table of counts, or simply use \kp's output. Raw table of counts format is described at \textbf{section 4.1: Input data}.
 %Since version 1.2.0 you have also the choice to input a kissplice2refgenome file or a discoSNP file.
+
 \section{kissDE content}
 schema du workflow
 \subsection{Options}
@@ -57,6 +64,7 @@ schema du workflow
 correction multiple tests
 \subsection{Filtering}
 \subsection{Magnitude of the effect}
+
 \section{Examples}
 \subsection{Input data}
 \subsubsection{KisSplice}
@@ -75,37 +83,13 @@ vecteur condition
 lancement test
 export données
 results
+
 \section{Session info}
 Aurélie
 % section biblio ?
 \end{document}
 
 \section{What kissDE does}
-kissDE enables to test if a variant is specific to a condition.
-It takes as input read counts for each variant in each replicate of each condition, and outputs a p-value (adjusted for multiple testing) and a metric (Df/Dpsi) which indicates the magnitude of the effect.
-
-The term ``variant'' applies both to genomic variants and splicing variants.
-In both cases, the same gene gives rise to two RNA molecules, which differ in their sequence.
-
-When a gene gives rise to more than two RNA molecules, we assume the set of all transcripts can be split in two groups.
-In the case of splicing, the two groups are: the ones that include the exon of interest, and the ones that exclude the exon of interest.
-In the case of genomic polymorphism, the two groups are: the ones that contain the first allele, the ones that contain the second allele.
-
-The statistical framework is similar to DESeq.
-The main difference is that for gene expression, you have one value per gene. 
-When dealing with polymorphism or alternative splicing, you have two values. One per variant.
-
-
-%\section*{kissDE main steps}
-%\begin{enumerate}
-%\item Some prerequisites needed for the analysis.
-% \item Counts are normalized.
-% \item Some events are filtered out based on their counts.
-% \item Tests are performed on normalized counts.
-% \item Pvalues are computed.
-% \item Delta PSI/f are computed.
-% \item Low counts are flagged.
-%\end{enumerate}
 
 \section{Prerequisites}
 
