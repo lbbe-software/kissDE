@@ -40,7 +40,7 @@
 The term "variant" applies both to genomic variants and splicing variants. In both cases, the same gene gives rise to two RNA molecules, which differ in their sequence.\\
 When a gene gives rise to more than two RNA molecules, we assume the set of all transcripts can be split in two groups.
 In the case of alternative splicing, the two groups are: the ones that include the exon of interest, and the ones that exclude the exon of interest.
-In the case of genomic polymorphism, the two groups are: the ones that contain the first allele, the ones that contain the second allele.\\
+In the case of genomic polymorphism, the two groups are: the ones that contain the first allele, and the ones that contain the second allele.\\
 The statistical framework is similar to DESeq. The main difference is that for gene expression, one value per gene is provided, although in the case of \kde, dealing with polymorphism or alternative splicing means providing two values: one per variant. Read counts are pre-processed, several models are tested to fit the data and keep the best to perform the LRT and output the p-value jointly to several metrics and flags. The model and the package's workflow are further detailed in \textbf{section 3}.
 
 \section{Prerequisites}
@@ -87,7 +87,7 @@ head(tableCounts)
  \item \textbf{Columns:}
  \begin{itemize}
  \item Each line has a first column (\texttt{V1}) with the name of the variation.
- \item The second column (\texttt{V2}) is the size of the variant. Is this size is unknown, the value can be set to 0. Note that the size is used only in the case of alternative splicing, to give the indication wether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a switch in the ORF).
+ \item The second column (\texttt{V2}) is the size of the variant. If this size is unknown, the value can be set to 0. Note that the size is used only in the case of alternative splicing, to give the indication wether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a switch in the ORF).
  \item  All others columns (\texttt{V3... Vn}) show counts for each replicate in each condition for the variant. For instance, let's assume we work with two conditions $(condition_1, condition_2)$. \verb|V3| is the counts corresponding to reads from the first replicate in $condition_1$, \verb|V4| is the counts of reads sequenced for replicate 2 in $condition_1$, \verb|V5| and \verb|V6| are counts for replicates 1 and 2 of $condition_2$.
  \end{itemize}
 
@@ -115,10 +115,31 @@ head(myCounts$countsEvents)
 The counts are extracted from \kp header.
 %|C_...
 %|ASSB_...
+
+% parler des données pairées ??
  
 \subsection{Data visualization}
-plots qualityControl
-+ plot models dans la fonction ppale
+
+\subsubsection{Quality Control plots}
+\kde contain a function that allow the user to control the quality of the data and to check if no error was done at the data loading step.
+The function \texttt{qualityControl} produce 3 plots :
+\begin{itemize}
+\item{dendrogram}
+\item{heatmap of the sample-to-sample distances}
+\item{comparison of the variance inter-group and intra-group}
+\end{itemize}
+<<qualityControl_howto>>=
+qualityControl(myCounts,myConditions)
+ @
+With the dendrogram and the heatmap, the user can check if a replicate seem to be very different from the others.
+% interpretation of these plots
+
+The created figures can be saved by setting the \texttt{storeFigs} option to \texttt{TRUE} or to the path where the figures are to be stored.
+
+\subsubsection{Models plot}
+In the main function of \kde called \texttt{diffExpressedVariants}, the different models tested are plotted on the data.
+% goal of this plot ?
+
 \subsection{kissDE on SNP data}
 vecteur condition
 lancement test
