@@ -66,6 +66,11 @@ correction multiple tests
 \subsection{Magnitude of the effect}
 
 \section{Examples}
+\subsection{Installation and library loading}
+<<install>>=
+install.packages("kissDE_x.y.z.tar.gz",repos=NULL, type="source")
+library("kissDE") 
+@
 \subsection{Input data}
 \kde's input is a table of raw counts and a vector describing the number of conditions and replicates. Two options are possible, either to work directly with \kp's output, or to provide a table of counts.
 %Since version 1.2.0 you have also the choice to input a kissplice2refgenome file or a discoSNP file.
@@ -90,11 +95,27 @@ head(tableCounts)
  <<conditionVector_howto>>=
   myConditions <- c(rep("condition_1",2),rep("condition_2",2))
  @
- because (\texttt{X2, X3, X4, X5}) have been put in an order that represents first two replicates of $condition_1$, then two replicates of $condition_2$.
+ because (\texttt{V3, V4, V5, V6}) have been put in an order that represents first two replicates of $condition_1$, then two replicates of $condition_2$.
 \end{itemize}
 \subsubsection{KisSplice}
-ref manual - possible for all types (0, 1, 2, 3)
-
+The user must refer to \kp manual for any question about \kp format and output. \kde can be used on any type output by \kp (0: SNP, 1: alternative splicing events, 2: indels,...). It is possible to obtain a table of counts to perform the tests of \kde directly from \kp's output, using the function \texttt{kissplice2counts}.
+ <<kissplice2counts_howto>>=
+myCounts <- kissplice2counts("output_kissplice_alt_splicing.fa")
+names(myCounts)
+head(myCounts$countsEvents)
+ @
+ \item \textbf{Lines:} one variation is represented by two lines, one for each variant. For instance for SNPs, one allele is described in the first line, and the other in the second line.
+ For alternative splicing events (like in this example), the inclusion form and the exclusion forms has one line each.
+ \item \textbf{Columns:}
+ \begin{itemize}
+ \item Each line has a first column (\texttt{events.names}) with the name of the variation, from \kp notation.
+ \item The second column (\texttt{X1}) is the size of the variant, extracted from \kp header. It gives the indication wether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a switch in the ORF).
+ \item  All others columns (\texttt{X2, X3, X4, X5}) show counts for each replicate in each condition for the variant.
+ \end{itemize}
+The counts are extracted from \kp header.
+%|C_...
+%|ASSB_...
+ 
 \subsection{Data visualization}
 plots qualityControl
 + plot models dans la fonction ppale
