@@ -51,7 +51,7 @@ Aurélie
 The user must keep in mind that \kde was designed to work with at least one replicate for each condition, which means that the minimal input is variants quantified for 4 different individuals, each couple representing a condition. There can be more replicates and more conditions, it is also not mandatory to have an equal number of replicates in each condition.\\
 For running \kde, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
 You can provide your own table of counts, or simply use \kp's output. Raw table of counts format is described at \textbf{section 4.1: Input data}.
-%Since version 1.2.0 you have also the choice to input a kissplice2refgenome file or a discoSNP file.
+
 
 \section{kissDE content}
 schema du workflow
@@ -67,6 +67,36 @@ correction multiple tests
 
 \section{Examples}
 \subsection{Input data}
+\kde's input is a table of raw counts and a vector describing the number of conditions and replicates. Two options are possible, either to work directly with \kp's output, or to provide a table of counts.
+%Since version 1.2.0 you have also the choice to input a kissplice2refgenome file or a discoSNP file.
+
+\subsubsection{You work with your own data (without KisSplice): table of counts format}
+The proper input table is in the following format:
+\begin{verbatim}
+head(dataframekissDE)
+                  X0    X1   X2  X3  X4  X5
+1     variant1_gene1   127  955 897 302 443
+2     variant2_gene1    80   17  20   5   2
+3     variant1_gene2  1543  450 599 400 325
+4     variant2_gene2  1201    1   5   4   0
+5     variant1_gene3   221 1192 881 479 587
+6     variant2_gene3   219   83  48  50  37
+...
+\end{verbatim}
+\begin{itemize}
+ \item \textbf{Lines:} one variation is represented by two lines, one for each variant. For instance for SNPs, one allele is described in the first line, and the other in the second line.
+ For alternative splicing events, the inclusion form and the exclusion forms has one line each.
+ \item \textbf{Columns:}
+ \begin{itemize}
+ \item Each line has a first column (\texttt{X0}) with the name of the variation.
+ \item The second column (\texttt{X1}) is the size of the variant. Is this size is unknown, the value can be set to 0. Note that the size is used only in the case of alternative splicing, to give the indication wether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a switch in the ORF).
+ \item  All others columns (\texttt{X2... Xn}) show counts for each replicate in each condition for the variant. For instance, let's assume we work with two conditions $(condition_1, condition_2)$. \verb|X2| is the counts corresponding to reads from the first replicate in $condition_1$, \verb|X3| is the counts of reads sequenced for replicate 2 in $condition_1$, \verb|X4| and \verb|X5| are counts for replicates 1 and 2 of $condition_2$.
+ \end{itemize}
+
+ The second item to provide is the condition vector that describes the order in which the counts are given. Following our example, the condition vector will be:\\
+ \verb|myConditions <- c(rep("condition_1",2),rep("condition_2",2))|\\
+ because (\texttt{X2, X3, X4, X5}) have been put in an order that represents first two replicates of $condition_1$, then two replicates of $condition_2$.
+\end{itemize}
 \subsubsection{KisSplice}
 ref manual - possible for all types (0, 1, 2, 3)
 \subsubsection{Counts table: howto}
@@ -89,9 +119,8 @@ Aurélie
 % section biblio ?
 \end{document}
 
-\section{What kissDE does}
 
-\section{Prerequisites}
+
 
 
 %\begin{enumerate}
@@ -100,30 +129,7 @@ Aurélie
 %\end{enumerate}
 
 \subsection{Providing a table of counts}
-For running kissDE, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
-You can provide your own table of counts, or simply use KisSplice's output. Since version 1.2.0 you have also the choice to 
-input a kissplice2refgenome file or a discoSNP file.
 
-
-
-\subsubsection{You work with your own data: data frame format}
-kissDE is a tool from KisSplice's suite but you still can use it independantly if you have counts for your variants coming from another method. kissDE's main function takes a table of counts as input. It must be provided as a data frame such as:\\
-\begin{verbatim}
-head(dataframekissDE)
-              X0   X1   X2  X3  X4  X5
-1     variation1  127  955 897 302 443
-2     variation1  80   17  20   5   2
-3     variation2 1543  450 599 400 325
-4     variation2 1201    1   5   4   0
-5     variation3  221 1192 881 479 587
-6     variation3  219   83  48  50  37
-...
-\end{verbatim}
-\begin{itemize}
- \item One variation is represented by two lines, one for each variant.
- \item Each line has a first column (X0) with the name of the variation, a second (X1) with the size of the variant, then all others columns (X2... Xn) show counts for each replicate in each condition for the variant.\\
- For instance \verb|X1|:Cond1Repl1, \verb|X2|:Cond1Repl2...
-\end{itemize}
 
 \subsubsection{You work with KisSplice/kissplice2refgenome/discoSNP's output: kissplice2counts function}
 If you use output files from KisSplice, you can directly import your counts using \texttt{kissplice2counts} function.
