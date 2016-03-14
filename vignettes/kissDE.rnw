@@ -15,6 +15,10 @@
 \usepackage{amsthm}
 \usepackage{fancyvrb}
 \usepackage{listings}
+
+\newcommand{\kde}{\textsc{kissDE}}
+\newcommand{\kp}{\textsc{KisSplice}}
+
 \hypersetup{
     	   pdfborder={0 0 0},
 }
@@ -37,7 +41,11 @@ Main goal
 \subsection{Dependencies}
 Aurélie
 \subsection{Data}
-either counts table or data KisSplice run
+\kde is meant to work on pairs of alternative variants that have been quantified across different conditions. Such variants can be found with different bioformatics workflows, variant callers,... Among them, \kde was at first designed to work with \kp, which performs local assembly on RNA-seq data in order to find and quantify alternative variants. When one have found a list of variants with \kp, we provide a function within this packages that makes easy to convert \kp's fasta files into a format than can be used for testing with \kde. Although \kde is a tool from \kp's suite, it can be used independantly from \kp with counts for each variants obtained with any other method.\\
+The user must keep in mind that \kde was designed to work with at least one replicate for each condition, which means that the minimal input is variants quantified for 4 different individuals, two that represent .\\
+For running \kde, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
+You can provide your own table of counts, or simply use \kp's output. Raw table of counts format is described at \textbf{section 4.1: Input data}.
+%Since version 1.2.0 you have also the choice to input a kissplice2refgenome file or a discoSNP file.
 \section{kissDE content}
 schema du workflow
 \subsection{Options}
