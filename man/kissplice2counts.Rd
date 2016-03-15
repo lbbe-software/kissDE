@@ -21,11 +21,11 @@
     
     |AS1_0|SB1_0|S1_0|ASSB1_0|AS2_27|SB2_41|S2_0|ASSB2_21| 
     
-    AS3_1|SB3_0|S3_0|ASSB3_0|AS4_7|SB4_8|S4_0|ASSB4_2
+    AS3_0|SB3_0|S3_0|ASSB3_0|AS4_7|SB4_8|S4_0|ASSB4_2
     
     In a regular \code{KisSplice} output, it would be
     
-    |C1_0|C2_47|C3_1|C4_13 (with 47 = 41+27-21 and 14 = 1+7+8-2)}
+    |C1_0|C2_47|C3_1|C4_13 (with 47 = 27+41-0-21 and 13 = 7+8-0-2)}
   
   \item{pairedEnd}{a logical indicating if the data is paired-end (not by default), this function realises the sum of the counts from the two reads of the pair. 
     It can be used along with \code{counts} option. 
