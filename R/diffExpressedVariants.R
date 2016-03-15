@@ -186,14 +186,31 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   ###################################################
   ### code chunk number 5: intra-vs-inter
   ###################################################
+  varcounts <- countsData[, c(1, 16, 19)]
+  
   if (storeFigs == FALSE) {
-    plot(x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
+    plot(x = varcounts$varIntra, y = varcounts$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
     abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
   } else {
     filename <- paste(storeFigs, "/InterIntraVariability.png", sep = "")
     png(filename)
-    plot(x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
+    plot(x = varcounts$varIntra, y = varcounts$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
     abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
+    void <- dev.off()
+  }
+  
+  if (storeFigs == FALSE) {
+    plot(x = varcounts$varIntra, y = varcounts$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
+    abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
+    for (i in seq(1, nrow(varcounts), 2))
+      segments(varcounts[i, 3], varcounts[i, 2], varcounts[i + 1, 3], varcounts[i + 1, 2], log = "xy")
+  } else {
+    filename <- paste(storeFigs, "/PairedInterIntraVariability.png", sep = "")
+    png(filename)
+    plot(x = varcounts$varIntra, y = varcounts$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
+    abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
+    for (i in seq(1, nrow(varcounts), 2))
+      segments(varcounts[i, 3], varcounts[i, 2], varcounts[i + 1, 3], varcounts[i + 1, 2], log = "xy")
     void <- dev.off()
   }
 }
