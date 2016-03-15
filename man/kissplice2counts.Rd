@@ -60,8 +60,14 @@
 }
 
 
+\details{
+  The \code{kissplice2counts} function returns a list of 3 elements but only the \code{countsEvents} one is showed when the output is printed.
+}
+
+
 \examples{
   fpath <- system.file("extdata", "output_kissplice_SNP.fa", package = "kissDE")
   mySNPcounts <- kissplice2counts(fpath, pairedEnd = TRUE)
+  head(mySNPcounts)
   names(mySNPcounts)
 }

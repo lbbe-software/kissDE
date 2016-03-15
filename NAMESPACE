@@ -1,4 +1,3 @@
-export(diffExpressedVariants, kissplice2counts, qualityControl)
 importFrom("aod", "AIC", "anova", "deviance", "negbin")
 importFrom("Biobase", "exprs", "exprs<-")
 importFrom("DESeq", "counts", "estimateSizeFactors", "newCountDataSet", "sizeFactors")
@@ -7,3 +6,6 @@ importFrom("glmnet", "glmnet")
 importFrom("grDevices", "dev.off", "png")
 importFrom("graphics", "abline", "legend", "lines", "par", "plot")
 importFrom("stats", "aggregate", "as.dist", "coef", "cor", "hclust", "heatmap", "lm", "model.matrix", "nls", "p.adjust", "pchisq", "var")
+
+export(diffExpressedVariants, kissplice2counts, qualityControl)
+S3method("print","countsData")

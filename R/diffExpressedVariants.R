@@ -96,9 +96,16 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
   close(toConvert)
   psidf <- as.data.frame(psiInfo)
   psiInfo.df <- data.frame(events.names, psidf)
-  return(list(countsEvents = events.df, psiInfo = psiInfo.df, discoInfo = discoSNP))
+  
+  output <- list(countsEvents = events.df, psiInfo = psiInfo.df, discoInfo = discoSNP)
+  class(output) <- c("list", "countsData")
+  return(output)
 }
 
+
+print.countsData <- function(x, ...){
+  print(x$countsEvents)
+}
 
 
 qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
