@@ -275,7 +275,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
   
   if (!is.na(chunk1)) {  # no error in chunk 1 nor in chunk 0
     print("Searching for best model and computing pvalues...")
-    chunk2 <- tryCatch({.bestModelandSingular(chunk1$pALLGlobalPhi.glm.nb, chunk1$sing.events, chunk1$dataPart3, chunk1$allEventtables, pvalue, chunk1$phi, chunk0$nr, chunk1$dispData, chunk1$dispDataMeanCond)
+    chunk2 <- tryCatch({.bestModelandSingular(chunk1$pALLGlobalPhi.glm.nb, chunk1$sing.events, chunk1$dataPart3, chunk1$allEventtables, pvalue, chunk1$phi, chunk0$nr, chunk1$dispData)
       #### chunk 2 var ####  
       # chunk2$noCorrectPVal
       # chunk2$correctedPVal

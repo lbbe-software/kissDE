@@ -258,7 +258,6 @@
   cdsSF <- estimateSizeFactors(cds)
   sizeFactors(cdsSF)
   shouldWeNormalize <- sum(is.na(sizeFactors(cdsSF))) < 1
-  #shouldWeNormalize <- FALSE
   dim <- dim(countsEvents)[2]
   countsEvents[, (dim + 1):(dim + length(conds))] <- round(counts(cdsSF, normalized = shouldWeNormalize))
   colnames(countsEvents)[(dim + 1):(dim + length(conds))] <- paste(namesData[3:(3 + sum(nr) - 1)], "_Norm", sep = "")
@@ -383,11 +382,7 @@
   dispData <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
   set.seed(40)  ## fix the seed to avoid the stochastic outputs of the DSS:estDispersion function
   dispData <- estDispersion(dispData)
-  dispDataMeanCond <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
-  dispDataMeanCond <- estDispersion(dispData)
-  
   names(exprs(dispData)) <- rownames(dataPart2)
-  names(exprs(dispDataMeanCond)) <- rownames(dataPart2)
   
   ###################################################
   ### code chunk number 3: variance - mean - Event level1
@@ -450,12 +445,9 @@
   names(totLOW) <- rownames(dataPart2)
   names(totUP) <- rownames(dataPart2)
   
-  # newindex <- dataPart2[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), 1]  # we filter out variants which counts do not reach the fixed limit
-  # newindex <- dataPart2[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), 1]  # we filter out variants which counts do not reach the fixed limit
   if (length(-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants)) > 0){
     dataPart3 <- dataPart2[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), ]
     exprs(dispData) <- exprs(dispData)[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), ]
-    exprs(dispDataMeanCond) <- exprs(dispDataMeanCond)[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), ]
   } else {
     dataPart3 <- dataPart2
   }
@@ -466,7 +458,7 @@
   ###################################################
   pALLGlobalPhi.glm.nb <- data.frame(t(rep(NA, 28)))
   for (i in 1:length(allEventtables)) {
-    pALLGlobalPhi.glm.nb[i, ] <- try(.fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i], dispersion(dispDataMeanCond)[i], phi, nbAll), silent = TRUE)
+    pALLGlobalPhi.glm.nb[i, ] <- try(.fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i], dispersion(dispData)[i], phi, nbAll), silent = TRUE)
   }
   ###################################################
   ### code chunk number 7: excl_errors
@@ -474,9 +466,6 @@
   sing.events <- which(grepl("Error", pALLGlobalPhi.glm.nb[, 1]))
   if (length(sing.events) != 0) {
     pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[-sing.events, ]
-    #### 
-    # dataPart3 <- dataPart3[-sing.events, ]
-    ####
   }
   colnames(pALLGlobalPhi.glm.nb) <- c("(0)I vs A",
                                       "(gb)I vs A",
@@ -502,14 +491,13 @@
   } else {
     rownames(pALLGlobalPhi.glm.nb) <- dataPart3[, 1]
   }
-  
   return(list(pALLGlobalPhi.glm.nb = pALLGlobalPhi.glm.nb, sing.events = sing.events, dataPart3 = dataPart3, ASSBinfo = ASSBinfo, 
-              allEventtables = allEventtables, lengths = lengths, phi = phi, dispData = dispData, dispDataMeanCond = dispDataMeanCond))
+              allEventtables = allEventtables, lengths = lengths, phi = phi, dispData = dispData))
 }
 
 
 
-.bestModelandSingular <- function(pALLGlobalPhi.glm.nb, sing.events, dataPart3, allEventtables, pvalue, phi, nr, dispData, dispDataMeanCond) {
+.bestModelandSingular <- function(pALLGlobalPhi.glm.nb, sing.events, dataPart3, allEventtables, pvalue, phi, nr, dispData) {
   nbAll <- sum(nr)
   pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[, 1]), ]
   if (dim(pALLGlobalPhi.glm.nb)[1] > 0){
@@ -531,10 +519,6 @@
     }
     bestmodel.singhes <- unlist(bestmodel.singhes)
     bestmodel <- table(bestmodel.table)
-    # bestmodel2 <- table(bestmodel.table, bestmodel.singhes)
-    # colnames(bestmodel2) <- c("FALSE", "TRUE")
-    # bestmodel3 <- table(bestmodel.table, apply(matrixpALLGlobalPhi[, c(22, 24, 26, 28)], 1, sum), dnn = c("best model", "singular hessian"))
-    # colnames(bestmodel3) <- paste(colnames(bestmodel3), "Models")
     
     ###################################################
     ### code chunk number 3: glmnet
@@ -566,7 +550,7 @@
     for (i in singhes_n){
       pALLGlobalPhi.glm.nb.pen[i, ] <- try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
                                                                  dispersion(dispData)[i],
-                                                                 dispersion(dispDataMeanCond)[i], phi, nbAll), silent = TRUE)
+                                                                 dispersion(dispData)[i], phi, nbAll), silent = TRUE)
     }
     pALLGlobalPhi.glm.nb <- as.data.frame(matrixpALLGlobalPhi)
     
