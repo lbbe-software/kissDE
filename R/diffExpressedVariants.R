@@ -1,6 +1,7 @@
-kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE) {
+kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE, keepInDel = TRUE) {
   toConvert <- file(fileName, open = "r")
   lines <- readLines(toConvert)
+  cDupBcc=c()
   if (k2rg == FALSE) {
     line <- lines[1]
     isQuality <- grepl("Q", line[1])
@@ -49,44 +50,98 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     events.df <- data.frame(events.names, events.mat)
     
   } else {
+    GENEID=1
+    GENENAME=2
+    POS=3
+    STRAND=4
+    EVENT=5
+    VARPARTLENGTH=6
+    FRAMESHIFT=7
+    CDS=8
+    GENEBIOTYPE=9
+    SPLICESITE=10
+    BLOCSIZEUP=11
+    SPLICESITEPOSUP=12
+    PARALOGS=13
+    COMPLEX=14
+    SNPVARREGION=15
+    EVENTNAME=16
+    BLOCSIZELOW=17
+    SPLICESITEPOSLOW=18
+    PSIS=19
+    COVERAGEUP=20
+    COVERAGELOW=21
+    CANONICAL=22
+    if(keepInDel){
+      FILESUFIX="_no_duplicate"
+    }
+    else{
+      FILESUFIX="_no_indel_no_duplicate"
+    }
+    fileSplit=strsplit(fileName,split="\\.")
+    if(length(fileSplit[[1]])>1) {
+      FILE=paste(fileSplit[[1]][1],FILESUFIX,".",fileSplit[[1]][2],sep="")
+    }
+    else {
+      FILE=paste(fileSplit[[1]][1],FILESUFIX,sep="")
+    }
+    i <- 1
+    line <- lines[i]
+    write(line,file=FILE)
     i <- 2
     line <- lines[i]
+    filterOut=c("deletion","insertion")
     resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, exonicReads)
-    eventName <- resultLine$eventName
-    variantLength <- resultLine$variantLength
     variantCountsUp <- resultLine$variantCountsUp
-    variantCountsLow <- resultLine$variantCountsLow
-    events.mat <- matrix(NA, length(lines) * 2 - 2, length(variantCountsUp) + 1)
-    events.names <- rep(NA, length(lines) * 2 - 2)
-    events.mat[1, 1] <- as.numeric(variantLength)
-    events.mat[1, 2:dim(events.mat)[2]] <- variantCountsUp
-    events.names[1] <- eventName
-    events.mat[2, 1] <- 0
-    events.mat[2, 2:dim(events.mat)[2]] <- variantCountsLow
-    events.names[2] <- eventName
-    psiInfo <- matrix(NA, length(lines) * 2 - 2, length(resultLine$psiInfoUp))
-    psiInfo[1, ] <- resultLine$psiInfoUp
-    psiInfo[2, ] <- resultLine$psiInfoLow
-    i <- i + 1
-    indexNames <- 3
+    iBcc=1
+    lBcc=list()
+    while (i <= length(lines)) {
+      if (!strsplit(line,split="\t")[[1]][16]%in%lBcc && (keepInDel || !strsplit(line,split="\t")[[1]][5]%in%filterOut)) {
+        lBcc[iBcc]=strsplit(line,split="\t")[[1]][16]
+        iBcc=iBcc+1
+        write(line,file=FILE,append=TRUE)
+      }
+      i=i+1
+      line <- lines[i]
+    }
+    events.mat <- matrix(NA, iBcc * 2 - 2, length(variantCountsUp) + 1)
+    events.names <- rep(NA, iBcc * 2 - 2)
+    psiInfo <- matrix(NA, iBcc * 2 - 2, length(resultLine$psiInfoUp))
+    indexNames=1
+    matBccApp=matrix(0,nrow = length(lBcc)) # nombre d'apparition pour chaque BCC
+    rownames(matBccApp)=lBcc
+    iDupBcc=1
+    i=2
     while (i <= length(lines)){
       line <- lines[i]
-      resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, exonicReads)
-      eventName <- resultLine$eventName
-      variantLength <- resultLine$variantLength
-      variantCountsUp <- resultLine$variantCountsUp
-      variantCountsLow <- resultLine$variantCountsLow
-      events.mat[indexNames, 1] <- as.numeric(variantLength)
-      events.mat[indexNames, 2:dim(events.mat)[2]] <- variantCountsUp
-      events.names[indexNames] <- eventName
-      psiInfo[indexNames, ] <- resultLine$psiInfoUp
-      events.mat[indexNames + 1, 1] <- 0
-      events.mat[indexNames + 1, 2:dim(events.mat)[2]] <- variantCountsLow
-      events.names[indexNames + 1] <- eventName
-      psiInfo[indexNames + 1, ] <- resultLine$psiInfoLow
+      if(keepInDel || !strsplit(line,split="\t")[[1]][5]%in%filterOut){
+        bcc=strsplit(line,split="\t")[[1]][16]
+        matBccApp[bcc,1]=matBccApp[bcc,1]+1
+        if (matBccApp[bcc,1]>1) {
+          if(!bcc%in%cDupBcc) {
+            cDupBcc[iDupBcc]=bcc
+            iDupBcc=iDupBcc+1
+          }
+        }
+        else {
+          resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, exonicReads)
+          eventName <- resultLine$eventName
+          variantLength <- resultLine$variantLength
+          variantCountsUp <- resultLine$variantCountsUp
+          variantCountsLow <- resultLine$variantCountsLow
+          events.mat[indexNames, 1] <- as.numeric(variantLength)
+          events.mat[indexNames, 2:dim(events.mat)[2]] <- variantCountsUp
+          events.names[indexNames] <- eventName
+          psiInfo[indexNames, ] <- resultLine$psiInfoUp
+          events.mat[indexNames + 1, 1] <- 0
+          events.mat[indexNames + 1, 2:dim(events.mat)[2]] <- variantCountsLow
+          events.names[indexNames + 1] <- eventName
+          psiInfo[indexNames + 1, ] <- resultLine$psiInfoLow
+          class(events.mat) <- "numeric"
+          indexNames <- indexNames + 2
+        }
+      }
       i <- i + 1
-      indexNames <- indexNames + 2
-      class(events.mat) <- "numeric"
       # events.df <- as.data.frame(events.mat)
       # events.df <- data.frame(events.names, events.df)
     }
@@ -96,16 +151,15 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
   close(toConvert)
   psidf <- as.data.frame(psiInfo)
   psiInfo.df <- data.frame(events.names, psidf)
-  
-  output <- list(countsEvents = events.df, psiInfo = psiInfo.df, discoInfo = discoSNP)
-  class(output) <- c("list", "countsData")
-  return(output)
+  if (length(cDupBcc)>0){
+    dupBcc.df = data.frame(matBccApp[cDupBcc,1])
+  }
+  else {
+    dupBcc.df=data.frame()
+  }
+  return(list(countsEvents = events.df, psiInfo = psiInfo.df, discoInfo = discoSNP,dupBcc=dupBcc.df))
 }
 
-
-print.countsData <- function(x, ...){
-  print(x$countsEvents)
-}
 
 
 qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
@@ -186,31 +240,14 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   ###################################################
   ### code chunk number 5: intra-vs-inter
   ###################################################
-  varcounts <- countsData[, c(1, 16, 19)]
-  
   if (storeFigs == FALSE) {
-    plot(x = varcounts$varIntra, y = varcounts$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
+    plot(x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
     abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
   } else {
     filename <- paste(storeFigs, "/InterIntraVariability.png", sep = "")
     png(filename)
-    plot(x = varcounts$varIntra, y = varcounts$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
+    plot(x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
     abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
-    void <- dev.off()
-  }
-  
-  if (storeFigs == FALSE) {
-    plot(x = varcounts$varIntra, y = varcounts$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
-    abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
-    for (i in seq(1, nrow(varcounts), 2))
-      segments(varcounts[i, 3], varcounts[i, 2], varcounts[i + 1, 3], varcounts[i + 1, 2], log = "xy")
-  } else {
-    filename <- paste(storeFigs, "/PairedInterIntraVariability.png", sep = "")
-    png(filename)
-    plot(x = varcounts$varIntra, y = varcounts$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
-    abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
-    for (i in seq(1, nrow(varcounts), 2))
-      segments(varcounts[i, 3], varcounts[i, 2], varcounts[i + 1, 3], varcounts[i + 1, 2], log = "xy")
     void <- dev.off()
   }
 }
@@ -226,7 +263,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
     pathToFigs <- "kissDEFigures"
   else
     pathToFigs <- storeFigs
-
+  
   print("Pre-processing the data...")
   chunk0 <- tryCatch({.readAndPrepareData(countsData, conditions)
     #### chunk 0 var ####
@@ -275,7 +312,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
   
   if (!is.na(chunk1)) {  # no error in chunk 1 nor in chunk 0
     print("Searching for best model and computing pvalues...")
-    chunk2 <- tryCatch({.bestModelandSingular(chunk1$pALLGlobalPhi.glm.nb, chunk1$sing.events, chunk1$dataPart3, chunk1$allEventtables, pvalue, chunk1$phi, chunk0$nr, chunk1$dispData)
+    chunk2 <- tryCatch({.bestModelandSingular(chunk1$pALLGlobalPhi.glm.nb, chunk1$sing.events, chunk1$dataPart3, chunk1$allEventtables, pvalue, chunk1$phi, chunk0$nr, chunk1$dispData, chunk1$dispDataMeanCond)
       #### chunk 2 var ####  
       # chunk2$noCorrectPVal
       # chunk2$correctedPVal
