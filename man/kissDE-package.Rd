@@ -22,7 +22,7 @@
     Package: \tab \code{kissDE}\cr
     Type: \tab Package\cr
     Version: \tab 1.3.0\cr
-    Date: \tab 2016-03-16\cr
+    Date: \tab 2016-05-23\cr
     License: \tab GPL (>=2)\cr
   }
 }

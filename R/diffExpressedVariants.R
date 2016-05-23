@@ -192,11 +192,11 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   ### code chunk number 1: Read and prepare data
   ###################################################
   listData <- .readAndPrepareData(countsData, conditions)
-  countsData <- listData[[1]]
-  conds <- listData[[2]]
-  dim <- listData[[3]]
-  n <- listData[[4]]
-  nr <- listData[[5]]
+  countsData <- listData$countsData
+  conds <- listData$conditions
+  dim <- listData$dim
+  n <- listData$n
+  nr <- listData$nr
   
   ###################################################
   ### code chunk number 2: dendrogram

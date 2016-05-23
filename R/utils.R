@@ -52,7 +52,7 @@
     assbPsi <- aggregate(dpsi$ASSB, by = list(dpsi$NB), sum)
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
-        order <- rep(1:((dim(sums)[1]) / 2), rep(2, ((dim(sums)[1]) / 2)))
+        order <- rep(1:((NROW(sums)) / 2), rep(2, ((NROW(sums)) / 2)))
       } else {
         if (!is.vector(order)) {
           print("Error, order vector seems to be in a wrong format.")
@@ -122,7 +122,7 @@
     assbPsi <- aggregate(dpsi$ASSB, by = list(dpsi$NB), sum)
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
-        order <- rep(1:((dim(sums)[1]) / 2), rep(2, ((dim(sums)[1]) / 2)))
+        order <- rep(1:((NROW(sums)) / 2), rep(2, ((NROW(sums)) / 2)))
       } else {
         if (!is.vector(order)) {
           print("Error, order vector seems to be in a wrong format.")
@@ -212,11 +212,10 @@
     psiInfo <- NULL
   } else {
     countsEvents <- countsData$countsEvents  # provided by kissplice2counts
-    if (dim(countsData$psiInfo)[2] > 1){
+    if (NCOL(countsData$psiInfo) > 1)
       psiInfo <- countsData$psiInfo  # info about ASSB counts
-    } else {
+    else
       psiInfo <- NULL
-    }
   }
   sortedconditions <- sort(conditions)
   n <- length(unique(sortedconditions))
@@ -242,7 +241,7 @@
   } else {
     ASSBinfo <- NULL
   }
-  countsEvents$Path <- gl(2, 1, dim(countsEvents)[1], labels = c("UP", "LP"))
+  countsEvents$Path <- gl(2, 1, NROW(countsEvents), labels = c("UP", "LP"))
   
   ###################################################
   ### code chunk number 2: Normalization
@@ -258,10 +257,10 @@
   cdsSF <- estimateSizeFactors(cds)
   sizeFactors(cdsSF)
   shouldWeNormalize <- sum(is.na(sizeFactors(cdsSF))) < 1
-  dim <- dim(countsEvents)[2]
-  countsEvents[, (dim + 1):(dim + length(conds))] <- round(counts(cdsSF, normalized = shouldWeNormalize))
-  colnames(countsEvents)[(dim + 1):(dim + length(conds))] <- paste(namesData[3:(3 + sum(nr) - 1)], "_Norm", sep = "")
-  return(list(countsData = countsEvents, conditions = conds, dim = dim, n = n, nr = nr, sortedconditions = sortedconditions, ASSBinfo = ASSBinfo))
+  dimns <- NCOL(countsEvents)
+  countsEvents[, (dimns + 1):(dimns + length(conds))] <- round(counts(cdsSF, normalized = shouldWeNormalize))
+  colnames(countsEvents)[(dimns + 1):(dimns + length(conds))] <- paste(namesData[3:(3 + sum(nr) - 1)], "_Norm", sep = "")
+  return(list(countsData = countsEvents, conditions = conds, dim = dimns, n = n, nr = nr, sortedconditions = sortedconditions, ASSBinfo = ASSBinfo))
 }
 
 
@@ -353,11 +352,11 @@
   # reduce data frame to the interesting columns
   nbAll <- sum(nr)
   dataPart <- countsData[, c(1:2, which(grepl("_Norm", names(countsData))))]
-  dataPart$Path <- gl(2, 1, dim(countsData)[1], labels = c("UP","LP"))
-  dataPart2 <- cbind(dataPart[seq(1, dim(dataPart)[1], 2), ], dataPart[seq(2, dim(dataPart)[1], 2), grepl("Norm", names(dataPart))])
+  dataPart$Path <- gl(2, 1, NROW(countsData), labels = c("UP","LP"))
+  dataPart2 <- cbind(dataPart[seq(1, NROW(dataPart), 2), ], dataPart[seq(2, NROW(dataPart), 2), grepl("Norm", names(dataPart))])
   names(dataPart2)[3:(3 + nbAll - 1)] <- paste("UP", names(dataPart2)[3:(3 + nbAll - 1)], sep = "_")
   names(dataPart2)[(3 + nbAll + 1):(3 + 2 * nbAll + 1 - 1)] <- paste("LP", names(dataPart2)[(3 + nbAll + 1):(3 + 2 * nbAll + 1 - 1)], sep = "_")
-  lengths <- data.frame(dataPart[seq(1, dim(dataPart)[1], 2), 2], dataPart[seq(2, dim(dataPart)[1], 2), 2])
+  lengths <- data.frame(dataPart[seq(1, NROW(dataPart), 2), 2], dataPart[seq(2, NROW(dataPart), 2), 2])
   colnames(lengths) <- c("upper", "lower")
   dataPart2[2] <- lengths$upper - lengths$lower  # computes the difference of length between the lower and upper paths 
   names(dataPart2)[2] <- "Length_diff"
@@ -500,7 +499,7 @@
 .bestModelandSingular <- function(pALLGlobalPhi.glm.nb, sing.events, dataPart3, allEventtables, pvalue, phi, nr, dispData) {
   nbAll <- sum(nr)
   pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[, 1]), ]
-  if (dim(pALLGlobalPhi.glm.nb)[1] > 0){
+  if (NROW(pALLGlobalPhi.glm.nb) > 0){
     matrixpALLGlobalPhi <- as.matrix(pALLGlobalPhi.glm.nb)
     storage.mode(matrixpALLGlobalPhi) <- "numeric"
     
@@ -612,7 +611,7 @@
   if (!is.null(ASSBinfo)) {
     ASSBinfo <- subset(ASSBinfo, ASSBinfo$events.names %in% as.vector(signifVariants[, 1]))  # select only the lines corresponding to the remaining lines of signifVariants
   }
-  sumLowCond <- matrix(data = rep(0, n * dim(signifVariants)[1]), nrow = dim(signifVariants)[1], ncol = n)  # to check later for low counts to flag
+  sumLowCond <- matrix(data = rep(0, n * NROW(signifVariants)), nrow = NROW(signifVariants), ncol = n)  # to check later for low counts to flag
   pairsCond <- list()
   namesCond <- unique(sortedconditions)
   for (i in 1:n) {
@@ -630,7 +629,7 @@
     rown <- row.names(signifVariants)
     lengths2 <- lengths[rown, ]
   }
-  deltapsi <- matrix(nrow = dim(signifVariants)[1], ncol = length(pairsCond))
+  deltapsi <- matrix(nrow = NROW(signifVariants), ncol = length(pairsCond))
   rownames(deltapsi) <- rownames(signifVariants)
   namesDeltaPsi <- c()
   for (pair in pairsCond) {  # delta psi calculated for pairs of conditions, psi are calcuted for each replicateXcondition
@@ -643,7 +642,7 @@
       condi <- namesCond[index]
       replicates <- nr[index]
     }
-    psiPairCond <- matrix(nrow = dim(signifVariants)[1], ncol = sum(replicates))
+    psiPairCond <- matrix(nrow = NROW(signifVariants), ncol = sum(replicates))
     colsPsiPairCond <- c()
     indexMatrixPsiPairCond <- 1
     indexdeltapsi <- 1
@@ -680,7 +679,7 @@
     rownames(sumLowCond) <- rownames(signifVariants)
     NaNSums <- rowSums((is.na(psiPairCond)) + 0)  # 1 if NaN, 0 else
     # if there are 2 NaN and 3 values for a bcc, nanSums is at 2
-    listNaN <- names(NaNSums[which(NaNSums > dim(psiPairCond)[2] / 2)]) # when there are more NaN than nb of column/2, we do not calculate the psi
+    listNaN <- names(NaNSums[which(NaNSums > NCOL(psiPairCond) / 2)]) # when there are more NaN than nb of column/2, we do not calculate the psi
     psiPairCond[listNaN, ] <- NaN
     deltaPsiCond <- rowMeans(psiPairCond[, (replicates[1] + 1):sum(replicates)], na.rm = TRUE) - rowMeans(psiPairCond[, 1:replicates[1]], na.rm = TRUE)  # delta psi is the mean of the psis of the 2nd condition (in terms of sorted condition) - the mean of the psis of the 1st condition 
     deltapsi[, indexdeltapsi] <- deltaPsiCond 
@@ -688,10 +687,10 @@
   }
   
   # when there are more than 2 conditions, we want to simplify the output :
-  dPvector1 <- c(rep(0, dim(signifVariants)[1]))
-  dPvector2 <- c(rep(0, dim(signifVariants)[1]))
+  dPvector1 <- c(rep(0, NROW(signifVariants)))
+  dPvector2 <- c(rep(0, NROW(signifVariants)))
   if (length(pairsCond) > 1){
-    for (l in 1:dim(deltapsi)[1]){  # if there are more than 2 conditions, we take the maximum of the deltaPSI of all pairs
+    for (l in 1:NROW(deltapsi)){  # if there are more than 2 conditions, we take the maximum of the deltaPSI of all pairs
       mindex <- which.max(abs(deltapsi[l, ]))
       if (length(mindex) != 0) {
         condA <- as.character(pairsCond[[mindex]][[1]][1])
@@ -712,13 +711,13 @@
   ### code chunk 2 : final table
   ###################################################
   signifVariants <- cbind(signifVariants, dPvector1)
-  sortOrder <- order(-abs(dPvector1), signifVariants[dim(signifVariants)[2] - 1])
+  sortOrder <- order(-abs(dPvector1), signifVariants[NCOL(signifVariants) - 1])
   # sorting by delta psi then by pvalue
   signifVariants.sorted <- signifVariants[sortOrder, ]  # sorting by delta psi then by pvalue
   ####
   names(dPvector2) <- rownames(signifVariants)
   dPvector2.sorted <- dPvector2[rownames(signifVariants.sorted)]
-  signifVariants.sorted[dim(signifVariants.sorted)[2]] <- dPvector2.sorted
+  signifVariants.sorted[NCOL(signifVariants.sorted)] <- dPvector2.sorted
   colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))] <- "Deltaf/DeltaPSI"  # renaming last columns
   colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted)) - 1] <- "Adjusted_pvalue"
   # rownames(signifVariants.sorted) <- signifVariants.sorted[, 1]
@@ -731,6 +730,6 @@
   lowcounts <- lowcounts[rownames(signifVariants.sorted)]  # to fit the order with the sorted order
   #### final tab ####
   signifVariants.sorted <- cbind(signifVariants.sorted, lowcounts)
-  colnames(signifVariants.sorted[dim(signifVariants.sorted)[2]]) <- "Low_counts"
+  colnames(signifVariants.sorted[NCOL(signifVariants.sorted)]) <- "Low_counts"
   return(signifVariants.sorted)
 }
