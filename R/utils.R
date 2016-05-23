@@ -162,24 +162,22 @@
 
 
 .getInfoLine <- function(line, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, isQuality, discoSNP = FALSE) {
-  if (grepl("branching_nodes", line)) { 
+  if (grepl("branching_nodes", line))
     indexStart <- 6 
-  } else {
+  else
     indexStart <- 5
-  }
   resultCountsSet <- .countsSet(line, indexStart, counts, pairedEnd, order, exonicReads, isQuality, discoSNP)
   lineFirstPart <- resultCountsSet$firstPart
   lineFirstPartSplit <- strsplit(lineFirstPart, "|", fixed = TRUE)[[1]]
   if (discoSNP == TRUE) {
-    name <- strsplit(lineFirstPartSplit[2], "_", fixed = TRUE)[[1]][4]
-    length <- "0"
+    eventName <- strsplit(lineFirstPartSplit[2], "_", fixed = TRUE)[[1]][4]
+    variantLength <- "0"
   } else {
-    name <- paste(lineFirstPartSplit[2], lineFirstPartSplit[3], sep = "|")
-    name <- substr(name, start = 2, stop = nchar(name))
-    length <- strsplit(lineFirstPartSplit[5], "_")[[1]][4]
+    eventName <- paste(lineFirstPartSplit[2], lineFirstPartSplit[3], sep = "|")
+    eventName <- substr(eventName, start = 2, stop = nchar(eventName))
+    variantLength <- strsplit(lineFirstPartSplit[5], "_")[[1]][4]
   }
-  vCounts <- resultCountsSet$vCounts
-  return(list(eventName = name, variantLength = length, variantCounts = vCounts, psiInfo = resultCountsSet$psiCounts))
+  return(list(eventName = eventName, variantLength = variantLength, variantCounts = resultCountsSet$vCounts, psiInfo = resultCountsSet$psiCounts))
 }
 
 
@@ -188,16 +186,13 @@
   splitElements <- strsplit(line, "\t", fixed = TRUE)[[1]]
   firstPart <- splitElements[16]
   firstPartSplit <- strsplit(firstPart, "|", fixed = TRUE)[[1]]
-  name <- paste(firstPartSplit[1], firstPartSplit[2], sep = "|")
-  length <- splitElements[6]
+  eventName <- paste(firstPartSplit[1], firstPartSplit[2], sep = "|")
   countsUp <- strsplit(splitElements[20], ",")
   countsLow <- strsplit(splitElements[21], ",")
   resultCountsSetUp <- .countsSetk2rg(countsUp, counts, pairedEnd, order, exonicReads)
   resultCountsSetLow <- .countsSetk2rg(countsLow, counts, pairedEnd, order, exonicReads)
-  vCountsUp <- resultCountsSetUp$vCounts
-  vCountsLow <- resultCountsSetLow$vCounts
   
-  return (list(eventName = name, variantLength = length, variantCountsUp = resultCountsSetUp$vCounts, 
+  return (list(eventName = eventName, variantLength = splitElements[6], variantCountsUp = resultCountsSetUp$vCounts, 
                variantCountsLow = resultCountsSetLow$vCounts, psiInfoUp = resultCountsSetUp$psiCounts, psiInfoLow = resultCountsSetLow$psiCounts))
 }
 
@@ -222,9 +217,9 @@
   nr <- rle(sortedconditions)$lengths
   sortedindex <- order(conditions) + 2
   namesData <- c("ID", "Length", rep(NA, length(conditions)))
-  for (k in 1:nr[1]){
+  for (k in 1:nr[1])
     namesData[2 + k] <- paste(sortedconditions[k], "_repl", k, sep = "", collapse = "")
-  }
+
   for (i in 2:n) {
     for (j in 1:nr[n]) {
       namesData[2 + cumsum(nr)[i - 1] + j] <- paste(sortedconditions[cumsum(nr)[i - 1] + j], "_repl", j, sep = "", collapse = "")
@@ -232,6 +227,7 @@
   }  # proper names for conditionsXrelicates
   countsEvents[, -(1:2)] <- countsEvents[, sortedindex]
   colnames(countsEvents) <- namesData
+  
   if(!is.null(psiInfo)){
     psiInfo[, -1] <- psiInfo[, sortedindex - 1]
     colnames(psiInfo) <- c("events.names", namesData[c(-1, -2)])
@@ -361,13 +357,11 @@
   dataPart2[2] <- lengths$upper - lengths$lower  # computes the difference of length between the lower and upper paths 
   names(dataPart2)[2] <- "Length_diff"
   dataPart2 <- dataPart2[, c(-(3 + nbAll))]
-  if (anyDuplicated(dataPart2[, 1]) > 0) {
+  if (anyDuplicated(dataPart2[, 1]) > 0)
     dataPart2 <- dataPart2[!duplicated(as.character(dataPart2[, 1])), ]
-  }
   rownames(dataPart2) <- as.character(dataPart2[, 1])
-  if (!is.null(ASSBinfo)) {
+  if (!is.null(ASSBinfo))
     rownames(ASSBinfo) <- dataPart2[, 1]
-  }
   rownames(lengths) <- rownames(dataPart2) 
   # create list for the complete data set
   allEventtables <- apply(dataPart2, 1, .eventtable, startPosColumn4Counts = which(grepl("UP", names(dataPart2)))[1], endPosCol4Counts = ncol(dataPart2))

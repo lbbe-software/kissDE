@@ -12,7 +12,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     events.mat <- matrix(NA, length(lines) / 2, length(variantCounts) + 1)
     events.names <- rep(NA, length(lines) / 2)
     events.mat[1, 1] <- as.numeric(variantLength)
-    events.mat[1, 2:dim(events.mat)[2]] <- variantCounts
+    events.mat[1, 2:NCOL(events.mat)] <- variantCounts
     events.names[1] <- eventName
     index <- 3
     indexNames <- 2
@@ -31,7 +31,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
         variantLength <- resultLine$variantLength
         variantCounts <- resultLine$variantCounts
         events.mat[indexNames, 1] <- as.numeric(variantLength)
-        events.mat[indexNames, 2:dim(events.mat)[2]] <- variantCounts
+        events.mat[indexNames, 2:NCOL(events.mat)] <- variantCounts
         events.names[indexNames] <- eventName
         psiInfo[indexNames, ] <- resultLine$psiInfo
         index <- index + 2
@@ -130,11 +130,11 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
           variantCountsUp <- resultLine$variantCountsUp
           variantCountsLow <- resultLine$variantCountsLow
           events.mat[indexNames, 1] <- as.numeric(variantLength)
-          events.mat[indexNames, 2:dim(events.mat)[2]] <- variantCountsUp
+          events.mat[indexNames, 2:NCOL(events.mat)] <- variantCountsUp
           events.names[indexNames] <- eventName
           psiInfo[indexNames, ] <- resultLine$psiInfoUp
           events.mat[indexNames + 1, 1] <- 0
-          events.mat[indexNames + 1, 2:dim(events.mat)[2]] <- variantCountsLow
+          events.mat[indexNames + 1, 2:NCOL(events.mat)] <- variantCountsLow
           events.names[indexNames + 1] <- eventName
           psiInfo[indexNames + 1, ] <- resultLine$psiInfoLow
           class(events.mat) <- "numeric"
@@ -194,7 +194,7 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   listData <- .readAndPrepareData(countsData, conditions)
   countsData <- listData$countsData
   conds <- listData$conditions
-  dim <- listData$dim
+  dimns <- listData$dim
   n <- listData$n
   nr <- listData$nr
   
@@ -202,12 +202,12 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   ### code chunk number 2: dendrogram
   ###################################################
   if (storeFigs == FALSE) {
-    plot(hclust(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))])), "ward.D"))
+    plot(hclust(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))])), "ward.D"))
     par(ask = TRUE)
   } else {
     filename <- paste(storeFigs, "/dendrogram.png", sep = "")
     png(filename)
-    plot(hclust(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))])), "ward.D"))
+    plot(hclust(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))])), "ward.D"))
     void <- dev.off()
   }
   
@@ -215,11 +215,11 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   ### code chunk number 3: replicates
   ###################################################
   if (storeFigs == FALSE) {
-    heatmap(as.matrix(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))]))), margins = c(10, 10))
+    heatmap(as.matrix(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))]))), margins = c(10, 10))
   } else {
     filename <- paste(storeFigs, "/heatmap.png", sep = "")
     png(filename)
-    heatmap(as.matrix(as.dist(1 - cor(countsData[, (dim + 1):(dim + length(conds))]))), margins = c(10, 10))
+    heatmap(as.matrix(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))]))), margins = c(10, 10))
     void <- dev.off()
   }
   
@@ -227,19 +227,19 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   ### code chunk number 4: intra-group and inter-group-variance
   ###################################################
   # Mean and variance over all conditions and replicates (normalized counts!) 
-  countsData$mn <- apply(countsData[, (dim + 1):(dim + length(conds))], 1, mean)
-  countsData$var <- apply(countsData[, (dim + 1):(dim + length(conds))], 1, var)
+  countsData$mn <- apply(countsData[, (dimns + 1):(dimns + length(conds))], 1, mean)
+  countsData$var <- apply(countsData[, (dimns + 1):(dimns + length(conds))], 1, var)
   # correction term
   nbAll <- sum(nr)  # number of all observations in all groups
-  countsData$ct <- apply(countsData[, (dim + 1):(dim + length(conds))], 1, sum)^2 / nbAll
+  countsData$ct <- apply(countsData[, (dimns + 1):(dimns + length(conds))], 1, sum)^2 / nbAll
   # sum of squares between groups
-  countsData$ss <- apply(countsData[, (dim + 1):(dim + length(conds) / n)], 1, sum)^2 / nr[1] + apply(countsData[, ((dim + 1) + length(conds) / n):(dim + length(conds))], 1, sum)^2 / nr[2] 
+  countsData$ss <- apply(countsData[, (dimns + 1):(dimns + length(conds) / n)], 1, sum)^2 / nr[1] + apply(countsData[, ((dimns + 1) + length(conds) / n):(dimns + length(conds))], 1, sum)^2 / nr[2] 
   # substract the correction term from the SS and divide by the degrees of 
   df <- 1 # freedom(groups); here: df=2-1=1
   countsData$varInter <- (countsData$ss - countsData$ct) / df
   # intra-variability 
-  countsData$varC1 <- apply(countsData[, (dim + 1):(dim + nr[1])], 1, var)
-  countsData$varC2 <- apply(countsData[, ((dim + 1) + nr[1]):(dim + nr[2] + nr[1])], 1, var)
+  countsData$varC1 <- apply(countsData[, (dimns + 1):(dimns + nr[1])], 1, var)
+  countsData$varC2 <- apply(countsData[, ((dimns + 1) + nr[1]):(dimns + nr[2] + nr[1])], 1, var)
   countsData$varIntra <- apply(data.frame(countsData$varC1, countsData$varC2), 1, mean)
   
   ###################################################
@@ -288,7 +288,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
     ASSBinfo <- chunk0$ASSBinfo  # in case counts option in kissplice2counts is at 1 or 2, we have info about junction counts (ASSB), that will be useful to correct the computation of delta psi in the end. They are stored here.
     if (!is.null(ASSBinfo)) {
       li <- c()
-      for (i in (1:dim(ASSBinfo)[1])){
+      for (i in (1:NROW(ASSBinfo))){
         if (i%%2 != 0) {
           li <- c(li, i)
         }
