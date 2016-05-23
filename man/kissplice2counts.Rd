@@ -8,7 +8,7 @@
 
 \usage{
   kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL, 
-  exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE)
+  exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE, keepInDel = TRUE)
 }
 
 \arguments{
@@ -50,6 +50,8 @@
   \item{discoSNP}{a logical indicating if you are using discoSNP++'s output file instead of \code{KisSplice}'s file}
   
   \item{k2rg}{a logical indicating if you are using kissplice2refgenome's output file instead of \code{KisSplice}'s file}
+  
+  \item{keepInDel}{blabla}
 }
 
 
