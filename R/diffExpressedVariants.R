@@ -100,7 +100,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
         iBcc <- iBcc + 1
         write(line, file = FILE, append = TRUE)
       }
-      i <- i+1
+      i <- i + 1
       line <- lines[i]
     }
     events.mat <- matrix(NA, iBcc * 2 - 2, length(variantCountsUp) + 1)
