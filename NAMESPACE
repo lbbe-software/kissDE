@@ -8,4 +8,4 @@ importFrom("graphics", "abline", "legend", "lines", "par", "plot")
 importFrom("stats", "aggregate", "as.dist", "coef", "cor", "hclust", "heatmap", "lm", "model.matrix", "nls", "p.adjust", "pchisq", "var")
 
 export(diffExpressedVariants, kissplice2counts, qualityControl)
-S3method("print","countsData")
+S3method("print", "countsData")
