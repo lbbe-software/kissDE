@@ -51,66 +51,66 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     
   } else {
     GENEID <- 1
-    GENENAME -> 2
-    POS -> 3
-    STRAND -> 4
-    EVENT -> 5
-    VARPARTLENGTH -> 6
-    FRAMESHIFT -> 7
-    CDS -> 8
-    GENEBIOTYPE -> 9
-    SPLICESITE -> 10
-    BLOCSIZEUP -> 11
-    SPLICESITEPOSUP -> 12
-    PARALOGS -> 13
-    COMPLEX -> 14
-    SNPVARREGION -> 15
-    EVENTNAME -> 16
-    BLOCSIZELOW -> 17
-    SPLICESITEPOSLOW -> 18
-    PSIS -> 19
-    COVERAGEUP -> 20
-    COVERAGELOW -> 21
-    CANONICAL -> 22
+    GENENAME <- 2
+    POS <- 3
+    STRAND <- 4
+    EVENT <- 5
+    VARPARTLENGTH <- 6
+    FRAMESHIFT <- 7
+    CDS <- 8
+    GENEBIOTYPE <- 9
+    SPLICESITE <- 10
+    BLOCSIZEUP <- 11
+    SPLICESITEPOSUP <- 12
+    PARALOGS <- 13
+    COMPLEX <- 14
+    SNPVARREGION <- 15
+    EVENTNAME <- 16
+    BLOCSIZELOW <- 17
+    SPLICESITEPOSLOW <- 18
+    PSIS <- 19
+    COVERAGEUP <- 20
+    COVERAGELOW <- 21
+    CANONICAL <- 22
     
     if(keepInDel)
-      FILESUFIX -> "_no_duplicate"
+      FILESUFIX <- "_no_duplicate"
     else
-      FILESUFIX -> "_no_indel_no_duplicate"
-    fileSplit -> strsplit(fileName, split = "\\.")
+      FILESUFIX <- "_no_indel_no_duplicate"
+    fileSplit <- strsplit(fileName, split = "\\.")
 
     if(length(fileSplit[[1]]) > 1)
-      FILE -> paste(fileSplit[[1]][1], FILESUFIX, ".", fileSplit[[1]][2], sep = "")
+      FILE <- paste(fileSplit[[1]][1], FILESUFIX, ".", fileSplit[[1]][2], sep = "")
     else
-      FILE -> paste(fileSplit[[1]][1], FILESUFIX, sep = "")
+      FILE <- paste(fileSplit[[1]][1], FILESUFIX, sep = "")
     
     i <- 1
     line <- lines[i]
     write(line, file = FILE)
     i <- 2
     line <- lines[i]
-    filterOut -> c("deletion", "insertion")
+    filterOut <- c("deletion", "insertion")
     resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, exonicReads)
     variantCountsUp <- resultLine$variantCountsUp
-    iBcc -> 1
-    lBcc -> list()
+    iBcc <- 1
+    lBcc <- list()
     while (i <= length(lines)) {
       if (!strsplit(line, split = "\t")[[1]][16] %in% lBcc && (keepInDel || !strsplit(line, split = "\t")[[1]][5] %in% filterOut)) {
-        lBcc[iBcc] -> strsplit(line, split = "\t")[[1]][16]
-        iBcc -> iBcc + 1
+        lBcc[iBcc] <- strsplit(line, split = "\t")[[1]][16]
+        iBcc <- iBcc + 1
         write(line, file = FILE, append = TRUE)
       }
-      i -> i+1
+      i <- i+1
       line <- lines[i]
     }
     events.mat <- matrix(NA, iBcc * 2 - 2, length(variantCountsUp) + 1)
     events.names <- rep(NA, iBcc * 2 - 2)
     psiInfo <- matrix(NA, iBcc * 2 - 2, length(resultLine$psiInfoUp))
-    indexNames -> 1
-    matBccApp -> matrix(0,nrow = length(lBcc)) # nombre d'apparition pour chaque BCC
-    rownames(matBccApp) -> lBcc
-    iDupBcc -> 1
-    i -> 2
+    indexNames <- 1
+    matBccApp <- matrix(0,nrow = length(lBcc)) # nombre d'apparition pour chaque BCC
+    rownames(matBccApp) <- lBcc
+    iDupBcc <- 1
+    i <- 2
     while (i <= length(lines)) {
       line <- lines[i]
       if(keepInDel || !strsplit(line, split = "\t")[[1]][5] %in% filterOut){
