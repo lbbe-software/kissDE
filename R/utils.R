@@ -3,7 +3,7 @@
   beginningLineToWrite <- ""
   splitElements <- strsplit(line, "|", fixed = TRUE)[[1]]  # splits the line
   if (indexStart == 6) {
-    for (k in 1:(indexStart - 2)) {
+    for (k in 1:4) { # indexStart - 2 = 4
       beginningLineToWrite <- paste(beginningLineToWrite, splitElements[k], sep = "|")  # writes the firsts elements of the line : bcc, cycle... but NOT branching_nodes
     }
   } else {
@@ -11,14 +11,13 @@
       beginningLineToWrite <- paste(beginningLineToWrite, splitElements[k], sep = "|")  # writes the firsts elements of the line : bcc, cycle... 
     }
   }
-  ElementsNb <- length(splitElements)  # number of elements in the line
-  allcondi <- gregexpr("C[[:digit:]]+_[[:digit:]]+", line, perl = TRUE)
+  allcondi <- gregexpr(pattern = "C[[:digit:]]+_[[:digit:]]+", text = line, perl = TRUE)
   if (allcondi[[1]][1] == -1) {  # no C in the header => ASSB counts
-    allcondi <- gregexpr("[ASB]{1,4}[[:digit:]]+_[[:digit:]]+", line, perl = TRUE)
+    allcondi <- gregexpr(pattern = "[ASB]{1,4}[[:digit:]]+_[[:digit:]]+", text = line, perl = TRUE)
   }
-  splittedCounts <- regmatches(line, allcondi)
-  s <- sapply(splittedCounts[[1]], function(splittedCounts) regmatches(splittedCounts[[1]], gregexpr(pattern = "[0-9]+", splittedCounts[[1]])))  # gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
-  return(list(beginning = beginningLineToWrite, countsperCond = s))
+  splittedCounts <- regmatches(x = line, m = allcondi)
+  countsperCond <- sapply(splittedCounts[[1]], function(splittedCounts) regmatches(x = splittedCounts[[1]], m = gregexpr(pattern = "[0-9]+", text = splittedCounts[[1]])))  # gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
+  return(list(beginning = beginningLineToWrite, countsperCond = countsperCond))
 }
 
 
@@ -95,9 +94,9 @@
   resultParsing <- .lineParse(line, indexStart, isQuality, discoSNP)
   beginningLineInfo <- resultParsing$beginning
   countsperCond <- resultParsing$countsperCond
-  nbVec <- rep(0, length(countsperCond))
-  countsVec <- rep(0, length(countsperCond))
-  psiVec <- rep(0, length(countsperCond))
+  nbVec <- rep.int(0, length(countsperCond))
+  countsVec <- rep.int(0, length(countsperCond))
+  psiVec <- rep.int(0, length(countsperCond))
   for (i in 1:length(countsperCond)) {
     nbVec[i] <- as.numeric(countsperCond[[i]][1])
     countsVec[i] <- as.numeric(countsperCond[[i]][2])
