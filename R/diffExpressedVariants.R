@@ -73,16 +73,18 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     COVERAGELOW <- 21
     CANONICAL <- 22
     
-    if(keepInDel)
+    if (keepInDel) {
       FILESUFIX <- "_no_duplicate"
-    else
+    } else {
       FILESUFIX <- "_no_indel_no_duplicate"
+    }
     fileSplit <- strsplit(fileName, split = "\\.")
 
-    if(length(fileSplit[[1]]) > 1)
+    if (length(fileSplit[[1]]) > 1) {
       FILE <- paste(fileSplit[[1]][1], FILESUFIX, ".", fileSplit[[1]][2], sep = "")
-    else
+    } else {
       FILE <- paste(fileSplit[[1]][1], FILESUFIX, sep = "")
+    }
     
     i <- 1
     line <- lines[i]
@@ -113,12 +115,12 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     i <- 2
     while (i <= length(lines)) {
       line <- lines[i]
-      if(keepInDel || !(strsplit(line, split = "\t")[[1]][5] %in% filterOut)){
+      if (keepInDel || !(strsplit(line, split = "\t")[[1]][5] %in% filterOut)) {
         bcc <- strsplit(line, split = "\t")[[1]][16]
         matBccApp[bcc, 1] <- matBccApp[bcc, 1] + 1
         
         if (matBccApp[bcc, 1] > 1) {
-          if(!bcc %in% cDupBcc) {
+          if (!bcc %in% cDupBcc) {
             cDupBcc[iDupBcc] <- bcc
             iDupBcc <- iDupBcc + 1
           }
@@ -150,10 +152,11 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
   
   close(toConvert)
   psiInfo <- data.frame(events.names, as.data.frame(psiInfo))
-  if (length(cDupBcc) > 0)
+  if (length(cDupBcc) > 0) {
     dupBcc.df <- data.frame(matBccApp[cDupBcc, 1])
-  else
+  } else {
     dupBcc.df <- data.frame()
+  }
 
   output <- list(countsEvents = events.df, psiInfo = psiInfo, discoInfo = discoSNP, dupBcc = dupBcc.df)
   class(output) <- c("list", "countsData")
@@ -161,7 +164,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
 }
 
 
-print.countsData <- function(x, ...){
+print.countsData <- function(x, ...) {
   print(x$countsEvents)
 }
 
@@ -170,15 +173,18 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   
   options(warn = -1)  # suppress the warning for the users
   
-  if(storeFigs == FALSE)
+  if (storeFigs == FALSE) {
     pathToFigs <- NA
-  else if (isTRUE(storeFigs))
-    pathToFigs <- "kissDEFigures"
-  else
-    pathToFigs <- storeFigs
+  } else {
+    if (isTRUE(storeFigs)) {
+      pathToFigs <- "kissDEFigures"
+    } else {
+      pathToFigs <- storeFigs
+    }
+  }
   
   # create a new folder if it doesn't exist
-  if (!is.na(pathToFigs)){
+  if (!is.na(pathToFigs)) {
     find <- paste("find", pathToFigs)
     d <- system(find, TRUE, ignore.stderr = TRUE)
     if (length(d) == 0) { 
@@ -261,12 +267,15 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
 diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE) {
   
   options(warn = -1)  # suppress the warning for the users
-  if(storeFigs == FALSE)
+  if (storeFigs == FALSE) {
     pathToFigs <- NA
-  else if (isTRUE(storeFigs))
-    pathToFigs <- "kissDEFigures"
-  else
-    pathToFigs <- storeFigs
+  } else {
+    if (isTRUE(storeFigs)) {
+      pathToFigs <- "kissDEFigures"
+    } else {
+      pathToFigs <- storeFigs
+    }
+  }
   
   print("Pre-processing the data...")
   chunk0 <- tryCatch({.readAndPrepareData(countsData, conditions)
@@ -283,11 +292,11 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
     return(NA)
   })
   
-  if (!is.na(chunk0)){  # no error in chunk 0
+  if (!is.na(chunk0)) {  # no error in chunk 0
     ASSBinfo <- chunk0$ASSBinfo  # in case counts option in kissplice2counts is at 1 or 2, we have info about junction counts (ASSB), that will be useful to correct the computation of delta psi in the end. They are stored here.
     if (!is.null(ASSBinfo)) {
       li <- c()
-      for (i in (1:NROW(ASSBinfo))){
+      for (i in (1:NROW(ASSBinfo))) {
         if (i%%2 != 0) {
           li <- c(li, i)
         }
@@ -332,8 +341,8 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
     if (length(chunk2) > 2) {  # no error during chunk2
       print("Computing size of the effect and last cutoffs...")
       chunk3 <- tryCatch({
-        if (discoSNP != FALSE){
-          if (is.na(countsData$discoInfo)){
+        if (discoSNP != FALSE) {
+          if (is.na(countsData$discoInfo)) {
             discoSNP <- FALSE
           } else {
             discoSNP <- countsData$discoInfo

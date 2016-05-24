@@ -162,10 +162,11 @@
 
 
 .getInfoLine <- function(line, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, isQuality, discoSNP = FALSE) {
-  if (grepl("branching_nodes", line))
+  if (grepl("branching_nodes", line)) {
     indexStart <- 6 
-  else
+  } else {
     indexStart <- 5
+  }
   resultCountsSet <- .countsSet(line, indexStart, counts, pairedEnd, order, exonicReads, isQuality, discoSNP)
   lineFirstPart <- resultCountsSet$firstPart
   lineFirstPartSplit <- strsplit(lineFirstPart, "|", fixed = TRUE)[[1]]
@@ -207,18 +208,20 @@
     psiInfo <- NULL
   } else {
     countsEvents <- countsData$countsEvents  # provided by kissplice2counts
-    if (NCOL(countsData$psiInfo) > 1)
+    if (NCOL(countsData$psiInfo) > 1) {
       psiInfo <- countsData$psiInfo  # info about ASSB counts
-    else
+    } else {
       psiInfo <- NULL
+    }
   }
   sortedconditions <- sort(conditions)
   n <- length(unique(sortedconditions))
   nr <- rle(sortedconditions)$lengths
   sortedindex <- order(conditions) + 2
   namesData <- c("ID", "Length", rep(NA, length(conditions)))
-  for (k in 1:nr[1])
+  for (k in 1:nr[1]) {
     namesData[2 + k] <- paste(sortedconditions[k], "_repl", k, sep = "", collapse = "")
+  }
 
   for (i in 2:n) {
     for (j in 1:nr[n]) {
@@ -228,7 +231,7 @@
   countsEvents[, -(1:2)] <- countsEvents[, sortedindex]
   colnames(countsEvents) <- namesData
   
-  if(!is.null(psiInfo)){
+  if (!is.null(psiInfo)){
     psiInfo[, -1] <- psiInfo[, sortedindex - 1]
     colnames(psiInfo) <- c("events.names", namesData[c(-1, -2)])
     ASSBinfo <- data.frame(psiInfo)
@@ -244,8 +247,8 @@
   ###################################################
   # Normalization with DESeq
   conds <- c()
-  for(i in 1:n) {
-    for(j in 1:nr[i]) {
+  for (i in 1:n) {
+    for (j in 1:nr[i]) {
       conds <- c(conds, paste("Cond", i, sep = "", collapse = ""))
     }
   } 
@@ -318,24 +321,24 @@
   nbSingHescond <- c(nbglmAcond@singular.hessian, nbglmIcond@singular.hessian) 
   nbCodecond <- c(nbglmAcond@code, nbglmIcond@code) 
   
-  rslts <- c(nbAnov0@anova.table$'P(> Chi2)'[2],      # [1]
+  rslts <- c(nbAnov0@anova.table$'P(> Chi2)'[2],       # [1]
              nbAnovgb@anova.table$'P(> Chi2)'[2],      # [2]
-             nbAnov@anova.table$'P(> Chi2)'[2],      # [3]
-             nbAnovcond@anova.table$'P(> Chi2)'[2],      # [4]
-             nbAIC0,      # [5:6]
-             nbAICgb,       # [7:8]
-             nbAIC,      # [9:10]
-             nbAICcond,      # [11:12]
+             nbAnov@anova.table$'P(> Chi2)'[2],        # [3]
+             nbAnovcond@anova.table$'P(> Chi2)'[2],    # [4]
+             nbAIC0,       # [5:6]
+             nbAICgb,      # [7:8]
+             nbAIC,        # [9:10]
+             nbAICcond,    # [11:12]
              
              nbCode0,      # [13:14]
-             nbCodegb,      # [15:16]
-             nbCode,      # [17:18]
-             nbCodecond,      # [19:20]
+             nbCodegb,     # [15:16]
+             nbCode,       # [17:18]
+             nbCodecond,   # [19:20]
              
-             nbSingHes0,      # [21:22]
-             nbSingHesgb,      # [23:24]
-             nbSingHes,      # [25:26]
-             nbSingHescond)      # [27:28]
+             nbSingHes0,   # [21:22]
+             nbSingHesgb,  # [23:24]
+             nbSingHes,    # [25:26]
+             nbSingHescond)# [27:28]
   return(rslts)  
 }
 
@@ -357,11 +360,13 @@
   dataPart2[2] <- lengths$upper - lengths$lower  # computes the difference of length between the lower and upper paths 
   names(dataPart2)[2] <- "Length_diff"
   dataPart2 <- dataPart2[, c(-(3 + nbAll))]
-  if (anyDuplicated(dataPart2[, 1]) > 0)
+  if (anyDuplicated(dataPart2[, 1]) > 0) {
     dataPart2 <- dataPart2[!duplicated(as.character(dataPart2[, 1])), ]
+  }
   rownames(dataPart2) <- as.character(dataPart2[, 1])
-  if (!is.null(ASSBinfo))
+  if (!is.null(ASSBinfo)) {
     rownames(ASSBinfo) <- dataPart2[, 1]
+  }
   rownames(lengths) <- rownames(dataPart2) 
   # create list for the complete data set
   allEventtables <- apply(dataPart2, 1, .eventtable, startPosColumn4Counts = which(grepl("UP", names(dataPart2)))[1], endPosCol4Counts = ncol(dataPart2))
@@ -420,9 +425,7 @@
     filename <- paste(pathFigs, "/models.png", sep = "")
     png(filename)
     plot(event.mean.variance.df$Mean, event.mean.variance.df$Variance, 
-         xlab = "Mean Event count", 
-         ylab = "Variance Event count",
-         log = "xy", las = 1)
+         xlab = "Mean Event count", ylab = "Variance Event count", log = "xy", las = 1)
     abline(a = 0, b = 1, col = 2, lwd = 2)
     lines(x, yQP, col = 3, lwd = 2)
     lines(x, yNB, col = 6, lwd = 2)
@@ -493,7 +496,7 @@
 .bestModelandSingular <- function(pALLGlobalPhi.glm.nb, sing.events, dataPart3, allEventtables, pvalue, phi, nr, dispData) {
   nbAll <- sum(nr)
   pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[!is.na(pALLGlobalPhi.glm.nb[, 1]), ]
-  if (NROW(pALLGlobalPhi.glm.nb) > 0){
+  if (NROW(pALLGlobalPhi.glm.nb) > 0) {
     matrixpALLGlobalPhi <- as.matrix(pALLGlobalPhi.glm.nb)
     storage.mode(matrixpALLGlobalPhi) <- "numeric"
     
@@ -540,7 +543,7 @@
     
     singhes_n <- names(singhes)
     pALLGlobalPhi.glm.nb.pen <- as.data.frame(matrixpALLGlobalPhi)
-    for (i in singhes_n){
+    for (i in singhes_n) {
       pALLGlobalPhi.glm.nb.pen[i, ] <- try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
                                                                  dispersion(dispData)[i],
                                                                  dispersion(dispData)[i], phi, nbAll), silent = TRUE)
@@ -683,8 +686,8 @@
   # when there are more than 2 conditions, we want to simplify the output :
   dPvector1 <- c(rep(0, NROW(signifVariants)))
   dPvector2 <- c(rep(0, NROW(signifVariants)))
-  if (length(pairsCond) > 1){
-    for (l in 1:NROW(deltapsi)){  # if there are more than 2 conditions, we take the maximum of the deltaPSI of all pairs
+  if (length(pairsCond) > 1) {
+    for (l in 1:NROW(deltapsi)) {  # if there are more than 2 conditions, we take the maximum of the deltaPSI of all pairs
       mindex <- which.max(abs(deltapsi[l, ]))
       if (length(mindex) != 0) {
         condA <- as.character(pairsCond[[mindex]][[1]][1])
