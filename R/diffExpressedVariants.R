@@ -95,7 +95,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     iBcc <- 1
     lBcc <- list()
     while (i <= length(lines)) {
-      if (!strsplit(line, split = "\t")[[1]][16] %in% lBcc && (keepInDel || !strsplit(line, split = "\t")[[1]][5] %in% filterOut)) {
+      if ((!strsplit(line, split = "\t")[[1]][16] %in% lBcc) && (keepInDel || !strsplit(line, split = "\t")[[1]][5] %in% filterOut)) {
         lBcc[iBcc] <- strsplit(line, split = "\t")[[1]][16]
         iBcc <- iBcc + 1
         write(line, file = FILE, append = TRUE)
@@ -113,7 +113,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     i <- 2
     while (i <= length(lines)) {
       line <- lines[i]
-      if(keepInDel || !strsplit(line, split = "\t")[[1]][5] %in% filterOut){
+      if(keepInDel || !(strsplit(line, split = "\t")[[1]][5] %in% filterOut)){
         bcc <- strsplit(line, split = "\t")[[1]][16]
         matBccApp[bcc, 1] <- matBccApp[bcc, 1] + 1
         
@@ -149,14 +149,13 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
   }
   
   close(toConvert)
-  psidf <- as.data.frame(psiInfo)
-  psiInfo.df <- data.frame(events.names, psidf)
+  psiInfo <- data.frame(events.names, as.data.frame(psiInfo))
   if (length(cDupBcc) > 0)
     dupBcc.df <- data.frame(matBccApp[cDupBcc, 1])
   else
     dupBcc.df <- data.frame()
 
-  output <- list(countsEvents = events.df, psiInfo = psiInfo.df, discoInfo = discoSNP, dupBcc = dupBcc.df)
+  output <- list(countsEvents = events.df, psiInfo = psiInfo, discoInfo = discoSNP, dupBcc = dupBcc.df)
   class(output) <- c("list", "countsData")
   return(output)
 }

@@ -224,7 +224,7 @@
     for (j in 1:nr[n]) {
       namesData[2 + cumsum(nr)[i - 1] + j] <- paste(sortedconditions[cumsum(nr)[i - 1] + j], "_repl", j, sep = "", collapse = "")
     }
-  }  # proper names for conditionsXrelicates
+  }  # proper names for conditionsXreplicates
   countsEvents[, -(1:2)] <- countsEvents[, sortedindex]
   colnames(countsEvents) <- namesData
   
@@ -263,9 +263,9 @@
 
 .eventtable <- function(df, startPosColumn4Counts, endPosCol4Counts){
   eventTab <- data.frame(ID = rep(as.factor(df["ID"]), endPosCol4Counts - startPosColumn4Counts + 1),
-                         cond = as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "_"), FUN = function(d){d[2]}))),
+                         cond = as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "_"), FUN = function(d){d[2]}), use.names = FALSE)),
                          counts = as.numeric(df[startPosColumn4Counts:endPosCol4Counts]),
-                         path = as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "|"), FUN = function(d){d[1]}))),
+                         path = as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "|"), FUN = function(d){d[1]}), use.names = FALSE)),
                          row.names = NULL)
   return(eventTab)
 }
@@ -273,7 +273,7 @@
 
 
 .addOneCount <- function(df){
-  df$counts <- unlist(lapply(df[, "counts"], function(x){x + 1}))
+  df$counts <- unlist(lapply(df[, "counts"], function(x){x + 1}), use.names = FALSE)
   return(df)
 }
 
@@ -510,7 +510,7 @@
     for (i in 1:length(bestmodel.table.n)) {
       bestmodel.singhes[i] <- c(matrixpALLGlobalPhi[i, c(22, 24, 26, 28)])[bestmodel.table.n[i]]  ##########%%%%%%%%%%
     }
-    bestmodel.singhes <- unlist(bestmodel.singhes)
+    bestmodel.singhes <- unlist(bestmodel.singhes, use.names = FALSE)
     bestmodel <- table(bestmodel.table)
     
     ###################################################
@@ -617,7 +617,7 @@
   } 
   namesPsiPairCond <- c()
   if (!is.null(ASSBinfo)) {
-    newindex <- unlist(sapply(rownames(signifVariants), function(x) res <- which(ASSBinfo[, 1] == x)))  # to put the lines of the 2 data frames in the same order
+    newindex <- unlist(sapply(rownames(signifVariants), function(x) res <- which(ASSBinfo[, 1] == x)), use.names = FALSE)  # to put the lines of the 2 data frames in the same order
     ASSBinfo <- ASSBinfo[newindex, ]
   } else {
     rown <- row.names(signifVariants)
