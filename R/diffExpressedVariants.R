@@ -226,20 +226,20 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   ### code chunk number 4: intra-group and inter-group-variance
   ###################################################
   # Mean and variance over all conditions and replicates (normalized counts!)
-  countsData$mn <- apply(countsData[, (dimns + 1):(dimns + length(conds))], 1, mean.default)
+  countsData$mn <- rowMeans(countsData[, (dimns + 1):(dimns + length(conds))])
   countsData$var <- apply(countsData[, (dimns + 1):(dimns + length(conds))], 1, var)
   # correction term
   nbAll <- sum(nr)  # number of all observations in all groups
-  countsData$ct <- apply(countsData[, (dimns + 1):(dimns + length(conds))], 1, sum)^2 / nbAll
+  countsData$ct <- rowSums(countsData[, (dimns + 1):(dimns + length(conds))])^2 / nbAll
   # sum of squares between groups
-  countsData$ss <- apply(countsData[, (dimns + 1):(dimns + length(conds) / n)], 1, sum)^2 / nr[1] + apply(countsData[, ((dimns + 1) + length(conds) / n):(dimns + length(conds))], 1, sum)^2 / nr[2] 
+  countsData$ss <- rowSums(countsData[, (dimns + 1):(dimns + length(conds) / n)])^2 / nr[1] + rowSums(countsData[, ((dimns + 1) + length(conds) / n):(dimns + length(conds))])^2 / nr[2]
   # substract the correction term from the SS and divide by the degrees of 
   df <- 1 # freedom(groups); here: df=2-1=1
   countsData$varInter <- (countsData$ss - countsData$ct) / df
   # intra-variability 
   countsData$varC1 <- apply(countsData[, (dimns + 1):(dimns + nr[1])], 1, var)
   countsData$varC2 <- apply(countsData[, ((dimns + 1) + nr[1]):(dimns + nr[2] + nr[1])], 1, var)
-  countsData$varIntra <- apply(data.frame(countsData$varC1, countsData$varC2), 1, mean.default)
+  countsData$varIntra <- rowMeans(data.frame(countsData$varC1, countsData$varC2))
   
   ###################################################
   ### code chunk number 5: intra-vs-inter
