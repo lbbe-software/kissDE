@@ -8,7 +8,7 @@
 
 \usage{
   kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL, 
-  exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE, keepInDel = TRUE)
+  exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE, keep = c("All"), remove = NULL)
 }
 
 \arguments{
@@ -51,7 +51,17 @@
   
   \item{k2rg}{a logical indicating if you are using kissplice2refgenome's output file instead of \code{KisSplice}'s file}
   
-  \item{keepInDel}{blabla}
+  \item{keep}{a character vector indicating the names of the events to keep for the statistical test. The test will be more sensitive for those events, the other ones will not be tested.
+    Event(s) name(s) must be : deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified, unclassifiedSNP, -. If you only want to work with intron retention events and altAD events, the vector should be \code{keep = c("IR","altAD")}.
+    If you want to work on specific ES events (ie : ES_MULTI), the vector should be \code{keep = c("ES")} and the \code{remove} option should be used too.
+    By default, all events are kept.
+    This option goes only with \code{k2rg} option.}
+    
+  \item{remove}{a character vector indicating the names of the events to remove for the statistical test. The test will be more sensitive for the other events.
+    Event(s) name(s) must be : deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified, unclassifiedSNP, -, MULTI. If you want to work on all events except insertions and deletions, the vector should be \code{remove = c("insertion","deletion")}.
+    This option can not be used if the \code{keep} option is used, unless ES is one of the event(s) to be kept. In this case, the \code{remove} option will work on specific ES events. If you want to work on ES_MULTI, then you should do \code{keep=c("ES")} with \code{remove = c("alt","altA","altD","altAD")}.
+    By default, none events are removed.
+    This option goes only with \code{k2rg} option.}
 }
 
 
