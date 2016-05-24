@@ -225,8 +225,8 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   ###################################################
   ### code chunk number 4: intra-group and inter-group-variance
   ###################################################
-  # Mean and variance over all conditions and replicates (normalized counts!) 
-  countsData$mn <- apply(countsData[, (dimns + 1):(dimns + length(conds))], 1, mean)
+  # Mean and variance over all conditions and replicates (normalized counts!)
+  countsData$mn <- apply(countsData[, (dimns + 1):(dimns + length(conds))], 1, mean.default)
   countsData$var <- apply(countsData[, (dimns + 1):(dimns + length(conds))], 1, var)
   # correction term
   nbAll <- sum(nr)  # number of all observations in all groups
@@ -239,7 +239,7 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   # intra-variability 
   countsData$varC1 <- apply(countsData[, (dimns + 1):(dimns + nr[1])], 1, var)
   countsData$varC2 <- apply(countsData[, ((dimns + 1) + nr[1]):(dimns + nr[2] + nr[1])], 1, var)
-  countsData$varIntra <- apply(data.frame(countsData$varC1, countsData$varC2), 1, mean)
+  countsData$varIntra <- apply(data.frame(countsData$varC1, countsData$varC2), 1, mean.default)
   
   ###################################################
   ### code chunk number 5: intra-vs-inter
