@@ -157,51 +157,52 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
   return(output)
 }
 
-wantedEvents <- function(keep = c("All"),remove = NULL){
-  EVENTS <- c("deletion", "insertion","IR","ES","altA","altD","altAD","alt","unclassified","-"," ","","unclassifiedSNP")
-  ES_EVENTS <- c("MULTI","alt","altA","altD","altAD")
+wantedEvents <- function(keep = c("All"), remove = NULL){
+  EVENTS <- c("deletion", "insertion", "IR", "ES", "altA", "altD", "altAD", "alt", "unclassified", "-", " ", "", "unclassifiedSNP")
+  ES_EVENTS <- c("MULTI", "alt", "altA", "altD", "altAD")
   wEvents <- c()
-  if (keep==c("All") && is.null(remove)){
+  if (keep == c("All") && is.null(remove)) {
     wEvents <- EVENTS
     for (i in 1:length(ES_EVENTS)) {
-      wEvents <- append(wEvents,paste("ES_",ES_EVENTS[i],sep=""))
+      wEvents <- append(wEvents, paste("ES_", ES_EVENTS[i], sep = ""))
     }
     return(wEvents)
   }
+  
   if (!is.null(remove)) {
-    for (i in 1:length(remove)){
-      if (!remove[i] %in% append(EVENTS,"MULTI")) {
-        print(paste("In remove : couldn't find",remove[i]))
+    for (i in 1:length(remove)) {
+      if (!remove[i] %in% append(EVENTS, "MULTI")) {
+        print(paste("In remove : couldn't find", remove[i]))
         stop("One of the element(s) of the remove vector is not part of : deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified, -, MULTI, , unclassifiedSNP")
       }
     }
   }
   ES <- FALSE
-  if (keep[1]=="All") {
+  if (keep[1] == "All") {
     for (i in 1:length(EVENTS)) {
       if (!EVENTS[i] %in% remove) {
-        wEvents <- append(wEvents,EVENTS[i])
+        wEvents <- append(wEvents, EVENTS[i])
       }
     }
     if ("ES" %in% remove) {
       ES <- TRUE
     }
-    if (ES==FALSE) {
+    if (ES == FALSE) {
       for (i in 1:length(ES_EVENTS)) {
-        wEvents <- append(wEvents,paste("ES_",ES_EVENTS[i],sep=""))
+        wEvents <- append(wEvents, paste("ES_", ES_EVENTS[i], sep = ""))
       }
     }
     return(wEvents)
   }
   for (i in 1:length(keep)) {
     if (!keep[i] %in% EVENTS) {
-      print(paste("In keep : couldn't find",keep[i]))
+      print(paste("In keep : couldn't find", keep[i]))
       stop("One of the element(s) of the keep vector is not part of : deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified, -, , unclassifiedSNP")
     }
-    if (ES == FALSE && keep[i]=="ES") {
+    if (ES == FALSE && keep[i] == "ES") {
       ES <- TRUE
     }
-    wEvents <- append(wEvents,keep[i])
+    wEvents <- append(wEvents, keep[i])
   }
   if (ES == FALSE && !is.null(remove)) {
     stop("Keep and remove can not be set together, unless keep contain ES (in that case, remove will act on ES events)")
@@ -211,7 +212,7 @@ wantedEvents <- function(keep = c("All"),remove = NULL){
   }
   if (is.null(remove)) {
     for (i in 1:length(ES_EVENTS)) {
-      wEvents <- append(wEvents,paste("ES_",ES_EVENTS[i],sep=""))
+      wEvents <- append(wEvents, paste("ES_", ES_EVENTS[i], sep = ""))
     }
     return(wEvents)
   }
@@ -223,7 +224,7 @@ wantedEvents <- function(keep = c("All"),remove = NULL){
   }
   for (i in 1:length(ES_EVENTS)) {
     if (!ES_EVENTS[i] %in% remove) {
-      wEvents <- append(wEvents,paste("ES_",ES_EVENTS[i],sep=""))
+      wEvents <- append(wEvents, paste("ES_", ES_EVENTS[i], sep = ""))
     }
   }
   return(wEvents)
