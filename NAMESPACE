@@ -7,5 +7,5 @@ importFrom("grDevices", "dev.off", "png")
 importFrom("graphics", "abline", "legend", "lines", "par", "plot")
 importFrom("stats", "aggregate", "as.dist", "coef", "cor", "hclust", "heatmap", "lm", "model.matrix", "nls", "p.adjust", "pchisq", "var")
 
-export(diffExpressedVariants, kissplice2counts, qualityControl)
+export(diffExpressedVariants, kissplice2counts, qualityControl, wantedEvents)
 S3method("print", "countsData")
