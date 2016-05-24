@@ -1,4 +1,4 @@
-kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE, keepInDel = TRUE) {
+kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE, keep = c("All"), remove = NULL) {
   toConvert <- file(fileName, open = "r")
   lines <- readLines(toConvert)
   cDupBcc <- c()
@@ -73,32 +73,26 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     COVERAGELOW <- 21
     CANONICAL <- 22
     
-    if (keepInDel) {
-      FILESUFIX <- "_no_duplicate"
-    } else {
-      FILESUFIX <- "_no_indel_no_duplicate"
-    }
+    keepEvents <- wantedEvents(keep,remove)
+    
     fileSplit <- strsplit(fileName, split = "\\.")
-
-    if (length(fileSplit[[1]]) > 1) {
-      FILE <- paste(fileSplit[[1]][1], FILESUFIX, ".", fileSplit[[1]][2], sep = "")
-    } else {
-      FILE <- paste(fileSplit[[1]][1], FILESUFIX, sep = "")
-    }
+    if(length(fileSplit[[1]]) > 1)
+      FILE <- paste(fileSplit[[1]][1], "_kDE", ".", fileSplit[[1]][2], sep = "")
+    else
+      FILE <- paste(fileSplit[[1]][1], "_kDE", sep = "")
     
     i <- 1
     line <- lines[i]
     write(line, file = FILE)
     i <- 2
     line <- lines[i]
-    filterOut <- c("deletion", "insertion")
     resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, exonicReads)
     variantCountsUp <- resultLine$variantCountsUp
     iBcc <- 1
     lBcc <- list()
     while (i <= length(lines)) {
-      if ((!strsplit(line, split = "\t")[[1]][16] %in% lBcc) && (keepInDel || !strsplit(line, split = "\t")[[1]][5] %in% filterOut)) {
-        lBcc[iBcc] <- strsplit(line, split = "\t")[[1]][16]
+      if (!strsplit(line, split = "\t")[[1]][EVENTNAME] %in% lBcc && strsplit(line, split = "\t")[[1]][EVENT] %in% keepEvents) {
+        lBcc[iBcc] <- strsplit(line, split = "\t")[[1]][EVENTNAME]
         iBcc <- iBcc + 1
         write(line, file = FILE, append = TRUE)
       }
@@ -115,8 +109,8 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     i <- 2
     while (i <= length(lines)) {
       line <- lines[i]
-      if (keepInDel || !(strsplit(line, split = "\t")[[1]][5] %in% filterOut)) {
-        bcc <- strsplit(line, split = "\t")[[1]][16]
+      if(strsplit(line, split = "\t")[[1]][EVENT] %in% keepEvents){
+        bcc <- strsplit(line, split = "\t")[[1]][EVENTNAME]
         matBccApp[bcc, 1] <- matBccApp[bcc, 1] + 1
         
         if (matBccApp[bcc, 1] > 1) {
@@ -161,6 +155,78 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
   output <- list(countsEvents = events.df, psiInfo = psiInfo, discoInfo = discoSNP, dupBcc = dupBcc.df)
   class(output) <- c("list", "countsData")
   return(output)
+}
+
+wantedEvents <- function(keep = c("All"),remove = NULL){
+  EVENTS <- c("deletion", "insertion","IR","ES","altA","altD","altAD","alt","unclassified","-"," ","","unclassifiedSNP")
+  ES_EVENTS <- c("MULTI","alt","altA","altD","altAD")
+  wEvents <- c()
+  if (keep==c("All") && is.null(remove)){
+    wEvents <- EVENTS
+    for (i in 1:length(ES_EVENTS)) {
+      wEvents <- append(wEvents,paste("ES_",ES_EVENTS[i],sep=""))
+    }
+    return(wEvents)
+  }
+  if (!is.null(remove)) {
+    for (i in 1:length(remove)){
+      if (!remove[i] %in% append(EVENTS,"MULTI")) {
+        print(paste("In remove : couldn't find",remove[i]))
+        stop("One of the element(s) of the remove vector is not part of : deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified, -, MULTI, , unclassifiedSNP")
+      }
+    }
+  }
+  ES <- FALSE
+  if (keep[1]=="All") {
+    for (i in 1:length(EVENTS)) {
+      if (!EVENTS[i] %in% remove) {
+        wEvents <- append(wEvents,EVENTS[i])
+      }
+    }
+    if ("ES" %in% remove) {
+      ES <- TRUE
+    }
+    if (ES==FALSE) {
+      for (i in 1:length(ES_EVENTS)) {
+        wEvents <- append(wEvents,paste("ES_",ES_EVENTS[i],sep=""))
+      }
+    }
+    return(wEvents)
+  }
+  for (i in 1:length(keep)) {
+    if (!keep[i] %in% EVENTS) {
+      print(paste("In keep : couldn't find",keep[i]))
+      stop("One of the element(s) of the keep vector is not part of : deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified, -, , unclassifiedSNP")
+    }
+    if (ES == FALSE && keep[i]=="ES") {
+      ES <- TRUE
+    }
+    wEvents <- append(wEvents,keep[i])
+  }
+  if (ES == FALSE && !is.null(remove)) {
+    stop("Keep and remove can not be set together, unless keep contain ES (in that case, remove will act on ES events)")
+  }
+  if (ES == FALSE) {
+    return(wEvents)
+  }
+  if (is.null(remove)) {
+    for (i in 1:length(ES_EVENTS)) {
+      wEvents <- append(wEvents,paste("ES_",ES_EVENTS[i],sep=""))
+    }
+    return(wEvents)
+  }
+  for (i in 1:length(remove)){
+    if (!remove[i] %in% ES_EVENTS) {
+      print(paste("In remove : couldn't find",remove[i]))
+      stop("One of the element(s) of the remove vector is not part of : altA, altD, altAD, alt,MULTI")
+    }
+  }
+  for (i in 1:length(ES_EVENTS)) {
+    if (!ES_EVENTS[i] %in% remove) {
+      wEvents <- append(wEvents,paste("ES_",ES_EVENTS[i],sep=""))
+    }
+  }
+  return(wEvents)
 }
 
 
