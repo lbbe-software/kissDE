@@ -36,7 +36,7 @@
 
 
 \section{Abstract}
-\kde was developed in the scope of NGS data post-processing, and in particular RNA-seq data. Many experiments include several biological conditions to decypher their influence on the present transcripts. After one have found a collection of variants by analyzing its reads, it is natural to focus on the biological relevance of what is in the list, which can be thousands of variants. \kde helps to sort interesting variants by testing if a variant is specific to a condition. It takes as input read counts for each variant in each replicate of each condition, and outputs a p-value (adjusted for multiple testing) and a metric (Df/Dpsi) which indicates the magnitude of the effect.\\
+\kde~ was developed in the scope of NGS data post-processing, and in particular RNA-seq data. Many experiments include several biological conditions to decypher their influence on the present transcripts. After one have found a collection of variants by analyzing its reads, it is natural to focus on the biological relevance of what is in the list, which can be thousands of variants. \kde~ helps to sort interesting variants by testing if a variant is specific to a condition. It takes as input read counts for each variant in each replicate of each condition, and outputs a p-value (adjusted for multiple testing) and a metric (Df/Dpsi) which indicates the magnitude of the effect.\\
 The term "variant" applies both to genomic variants and splicing variants. In both cases, the same gene gives rise to two RNA molecules, which differ in their sequence.\\
 When a gene gives rise to more than two RNA molecules, we assume the set of all transcripts can be split in two groups.
 In the case of alternative splicing, the two groups are: the ones that include the exon of interest, and the ones that exclude the exon of interest.
@@ -47,8 +47,8 @@ The statistical framework is similar to DESeq. The main difference is that for g
 \subsection{Dependencies}
 Aurélie
 \subsection{Data}
-\kde is meant to work on pairs of alternative variants that have been quantified across different conditions. Such variants can be found with different bioformatics workflows, variant callers,... Among them, \kde was at first designed to work with \kp, which performs local assembly on RNA-seq data in order to find and quantify alternative variants. When one have found a list of variants with \kp, we provide a function within this packages that makes easy to convert \kp's fasta files into a format than can be used for testing with \kde. Although \kde is a tool from \kp's suite, it can be used independantly from \kp with counts for each variants obtained with any other method.\\
-The user must keep in mind that \kde was designed to work with at least one replicate for each condition, which means that the minimal input is variants quantified for 4 different individuals, each couple representing a condition. There can be more replicates and more conditions, it is also not mandatory to have an equal number of replicates in each condition.\\
+\kde~ is meant to work on pairs of alternative variants that have been quantified across different conditions. Such variants can be found with different bioformatics workflows, variant callers,... Among them, \kde~ was at first designed to work with \kp, which performs local assembly on RNA-seq data in order to find and quantify alternative variants. When one have found a list of variants with \kp, we provide a function within this packages that makes easy to convert \kp's fasta files into a format than can be used for testing with \kde. Although \kde~ is a tool from \kp's suite, it can be used independantly from \kp~ with counts for each variants obtained with any other method.\\
+The user must keep in mind that \kde~ was designed to work with at least one replicate for each condition, which means that the minimal input is variants quantified for 4 different individuals, each couple representing a condition. There can be more replicates and more conditions, it is also not mandatory to have an equal number of replicates in each condition.\\
 For running \kde, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
 You can provide your own table of counts, or simply use \kp's output. Raw table of counts format is described at \textbf{section 4.1: Input data}.
 
@@ -101,7 +101,7 @@ myConditions <- c(rep("condition_1",2),rep("condition_2",2))
 because (\texttt{V3, V4, V5, V6}) have been put in an order that represents first two replicates of $condition_1$, then two replicates of $condition_2$.
 \end{itemize}
 \subsubsection{KisSplice}
-The user must refer to \kp manual for any question about \kp format and output. \kde can be used on any type output by \kp (0: SNP, 1: alternative splicing events, 2: indels,...). It is possible to obtain a table of counts to perform the tests of \kde directly from \kp's output, using the function \texttt{kissplice2counts}.
+The user must refer to \kp~ manual for any question about \kp~ format and output. \kde~ can be used on any type output by \kp~ (0: SNP, 1: alternative splicing events, 2: indels,...). It is possible to obtain a table of counts to perform the tests of \kde~ directly from \kp's output, using the function \texttt{kissplice2counts}.
 <<kissplice2counts_howto>>=
 fpath2 <- system.file("extdata", "output_kissplice_alt_splicing.fa", package="kissDE")
 myCounts <- kissplice2counts(fpath2)
@@ -113,11 +113,11 @@ head(myCounts$countsEvents)
  For alternative splicing events (like in this example), the inclusion form and the exclusion forms has one line each.
 \item \textbf{Columns:}
 \begin{itemize}
-\item Each line has a first column (\texttt{events.names}) with the name of the variation, from \kp notation.
-\item The second column (\texttt{X1}) is the size of the variant, extracted from \kp header. It gives the indication wether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a switch in the ORF).
+\item Each line has a first column (\texttt{events.names}) with the name of the variation, from \kp~ notation.
+\item The second column (\texttt{X1}) is the size of the variant, extracted from \kp~ header. It gives the indication wether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a switch in the ORF).
 \item  All others columns (\texttt{X2, X3, X4, X5}) show counts for each replicate in each condition for the variant.
 \end{itemize}
-The counts are extracted from \kp header.
+The counts are extracted from \kp~ header.
 %|C_...
 %|ASSB_...
 \end{itemize}
@@ -127,23 +127,22 @@ The counts are extracted from \kp header.
 \subsection{Data visualization}
 
 \subsubsection{Quality Control plots}
-\kde contain a function that allow the user to control the quality of the data and to check if no error was done at the data loading step.
-The function \texttt{qualityControl} produce 3 plots :
+\kde contain a function that allow the user to control the quality of the data and to check if no error was done at the data loading step. This data quality assessment are essential and should be done before the differential analysis.\\
+The function \texttt{qualityControl} produce 2 plots :
 \begin{itemize}
 \item{dendrogram}
 \item{heatmap of the sample-to-sample distances}
-\item{comparison of the variance inter-group and intra-group}
 \end{itemize}
 <<qualityControl_howto>>=
 qualityControl(myCounts,myConditions)
 @
-With the dendrogram and the heatmap, the user can check if a replicate seem to be very different from the others.
-% interpretation of these plots
+% insert the graphs in the pdf
+With theses plots, the user can see the similarities and the differences between the analyzed samples. If a sample is contaminated or has an abnormality that will influence the differential analysis, it will certainly not be clustered as expected. The user can then go back to the quality control of the raw data to solve the problem or decide to remove the sample from the analysis.\\
 
 The created figures can be saved by setting the \texttt{storeFigs} option to \texttt{TRUE} or to the path where the figures are to be stored.
 
 \subsubsection{Models plot}
-In the main function of \kde called \texttt{diffExpressedVariants}, the different models tested are plotted on the data.
+In the main function of \kde~ called \texttt{diffExpressedVariants}, the different models tested are plotted on the data.
 % goal of this plot ?
 
 \subsection{kissDE on SNP data}
