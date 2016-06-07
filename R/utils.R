@@ -359,12 +359,12 @@
   dataPart2[2] <- lengths$upper - lengths$lower  # computes the difference of length between the lower and upper paths 
   names(dataPart2)[2] <- "Length_diff"
   dataPart2 <- dataPart2[, -which(colnames(dataPart2) == "Path")]
-  if (anyDuplicated(dataPart2[, 1]) > 0) {
-    dataPart2 <- dataPart2[!duplicated(as.character(dataPart2[, 1])), ]
+  if (anyDuplicated(dataPart2$ID) > 0) {
+    dataPart2 <- dataPart2[!duplicated(as.character(dataPart2$ID)), ]
   }
-  rownames(dataPart2) <- as.character(dataPart2[, 1])
+  rownames(dataPart2) <- as.character(dataPart2$ID)
   if (!is.null(ASSBinfo)) {
-    rownames(ASSBinfo) <- dataPart2[, 1]
+    rownames(ASSBinfo) <- dataPart2$ID
   }
   rownames(lengths) <- rownames(dataPart2) 
   # create list for the complete data set
