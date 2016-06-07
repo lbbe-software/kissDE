@@ -358,7 +358,7 @@
   colnames(lengths) <- c("upper", "lower")
   dataPart2[2] <- lengths$upper - lengths$lower  # computes the difference of length between the lower and upper paths 
   names(dataPart2)[2] <- "Length_diff"
-  dataPart2 <- dataPart2[, c(-(3 + nbAll))]
+  dataPart2 <- dataPart2[, -which(colnames(dataPart2) == "Path")]
   if (anyDuplicated(dataPart2[, 1]) > 0) {
     dataPart2 <- dataPart2[!duplicated(as.character(dataPart2[, 1])), ]
   }
@@ -451,18 +451,18 @@
   ###################################################
   ### code chunk number 6: pALLGlobalPhi.glm.nb
   ###################################################
-  pALLGlobalPhi.glm.nb <- data.frame(t(rep(NA, 28)))
+  pALLGlobalPhiGlmNb <- data.frame(t(rep(NA, 28)))
   for (i in 1:length(allEventtables)) {
-    pALLGlobalPhi.glm.nb[i, ] <- try(.fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i], dispersion(dispData)[i], phi, nbAll), silent = TRUE)
+    pALLGlobalPhiGlmNb[i, ] <- try(.fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i], dispersion(dispData)[i], phi, nbAll), silent = TRUE)
   }
   ###################################################
   ### code chunk number 7: excl_errors
   ###################################################
-  sing.events <- which(grepl("Error", pALLGlobalPhi.glm.nb[, 1]))
+  sing.events <- which(grepl("Error", pALLGlobalPhiGlmNb[, 1]))
   if (length(sing.events) != 0) {
-    pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[-sing.events, ]
+    pALLGlobalPhiGlmNb <- pALLGlobalPhiGlmNb[-sing.events, ]
   }
-  colnames(pALLGlobalPhi.glm.nb) <- c("(0)I vs A",
+  colnames(pALLGlobalPhiGlmNb) <- c("(0)I vs A",
                                       "(gb)I vs A",
                                       "I vs A",
                                       "(c)I vs A",
@@ -482,11 +482,11 @@
                                       "shA","shI",
                                       "(c)shA","(c)shI")
   if (length(sing.events) != 0) {
-    rownames(pALLGlobalPhi.glm.nb) <- dataPart3[-sing.events, 1]
+    rownames(pALLGlobalPhiGlmNb) <- dataPart3[-sing.events, 1]
   } else {
-    rownames(pALLGlobalPhi.glm.nb) <- dataPart3[, 1]
+    rownames(pALLGlobalPhiGlmNb) <- dataPart3[, 1]
   }
-  return(list(pALLGlobalPhi.glm.nb = pALLGlobalPhi.glm.nb, sing.events = sing.events, dataPart3 = dataPart3, ASSBinfo = ASSBinfo, 
+  return(list(pALLGlobalPhi.glm.nb = pALLGlobalPhiGlmNb, sing.events = sing.events, dataPart3 = dataPart3, ASSBinfo = ASSBinfo, 
               allEventtables = allEventtables, lengths = lengths, phi = phi, dispData = dispData))
 }
 

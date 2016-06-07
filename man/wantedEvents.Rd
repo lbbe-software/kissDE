@@ -26,7 +26,7 @@ The vector containing the names of the events to work with.
 }
 
 \examples{
-wantedEvents(keep = c("IR","altAD"))
-wantedEvents(remove = c("insertion","deletion"))
-wantedEvents(keep = c("altA","ES"), remove = c("alt","altA","altD","altAD"))
+wantedEvents(keep = c("IR", "altAD"))
+wantedEvents(remove = c("insertion", "deletion"))
+wantedEvents(keep = c("altA", "ES"), remove = c("alt", "altA", "altD", "altAD"))
 }
