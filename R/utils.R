@@ -250,9 +250,9 @@
     conds <- c(conds, rep(paste("Cond", i, sep = "", collapse = ""), nr[i]))
   } 
   
-  dds <- DESeqDataSetFromMatrix(countData = countsEvents[, !(names(countsEvents) %in% c("ID", "Length", "Path"))], 
+  suppressMessages(dds <- DESeqDataSetFromMatrix(countData = countsEvents[, !(names(countsEvents) %in% c("ID", "Length", "Path"))], 
                                 colData = data.frame(condition = conds),
-                                design = ~ condition) # create a DESeqDataSet object
+                                design = ~ condition)) # create a DESeqDataSet object
   ddsSF <- estimateSizeFactors(dds)
   shouldWeNormalize <- sum(is.na(sizeFactors(ddsSF))) < 1
   dimns <- NCOL(countsEvents)
