@@ -221,7 +221,7 @@
   for (k in 1:nr[1]) {
     namesData[2 + k] <- paste(sortedconditions[k], "_repl", k, sep = "", collapse = "")
   }
-
+  
   for (i in 2:n) {
     for (j in 1:nr[n]) {
       namesData[2 + cumsum(nr)[i - 1] + j] <- paste(sortedconditions[cumsum(nr)[i - 1] + j], "_repl", j, sep = "", collapse = "")
@@ -247,16 +247,8 @@
   # Normalization with DESeq2
   conds <- c()
   for (i in 1:n) {
-    for (j in 1:nr[i]) {
-      conds <- c(conds, paste("Cond", i, sep = "", collapse = ""))
-    }
+    conds <- c(conds, rep(paste("Cond", i, sep = "", collapse = ""), nr[i]))
   } 
-  # cds <- newCountDataSet(subset(countsEvents, select = -c(ID, Length, Path)), conds) # create object
-  # cdsSF <- estimateSizeFactors(cds)
-  # shouldWeNormalize <- sum(is.na(sizeFactors(cdsSF))) < 1
-  # dimns <- NCOL(countsEvents)
-  # countsEvents[, (dimns + 1):(dimns + length(conds))] <- round(counts(cdsSF, normalized = shouldWeNormalize))
-  # colnames(countsEvents)[(dimns + 1):(dimns + length(conds))] <- paste(namesData[3:(3 + sum(nr) - 1)], "_Norm", sep = "")
   
   dds <- DESeqDataSetFromMatrix(countData = countsEvents[, !(names(countsEvents) %in% c("ID", "Length", "Path"))], 
                                 colData = data.frame(condition = conds),
@@ -474,24 +466,24 @@
     pALLGlobalPhiGlmNb <- pALLGlobalPhiGlmNb[-sing.events, ]
   }
   colnames(pALLGlobalPhiGlmNb) <- c("(0)I vs A",
-                                      "(gb)I vs A",
-                                      "I vs A",
-                                      "(c)I vs A",
-                                      
-                                      "(0)bicA","(0)bicI",
-                                      "(gb)bicA","(gb)bicI",
-                                      "bicA","bicI",
-                                      "(c)bicA","(c)bicI",
-                                      
-                                      "(0)codeA","(0)codeI",
-                                      "(gb)codeA","(gb)codeI", 
-                                      "codeA","codeI",
-                                      "(c)codeA","(c)codeI",
-                                      
-                                      "(0)shA","(0)shI",
-                                      "(gb)shA","(gb)shI", 
-                                      "shA","shI",
-                                      "(c)shA","(c)shI")
+                                    "(gb)I vs A",
+                                    "I vs A",
+                                    "(c)I vs A",
+                                    
+                                    "(0)bicA","(0)bicI",
+                                    "(gb)bicA","(gb)bicI",
+                                    "bicA","bicI",
+                                    "(c)bicA","(c)bicI",
+                                    
+                                    "(0)codeA","(0)codeI",
+                                    "(gb)codeA","(gb)codeI", 
+                                    "codeA","codeI",
+                                    "(c)codeA","(c)codeI",
+                                    
+                                    "(0)shA","(0)shI",
+                                    "(gb)shA","(gb)shI", 
+                                    "shA","shI",
+                                    "(c)shA","(c)shI")
   if (length(sing.events) != 0) {
     rownames(pALLGlobalPhiGlmNb) <- dataPart3[-sing.events, 1]
   } else {
@@ -639,7 +631,7 @@
   deltapsi <- matrix(nrow = NROW(signifVariants), ncol = length(pairsCond))
   rownames(deltapsi) <- rownames(signifVariants)
   namesDeltaPsi <- c()
-  psi <- data.frame(ID=rownames(signifVariants)) # initialize empty data frame to save the PSI values
+  psi <- data.frame(ID = rownames(signifVariants)) # initialize empty data frame to save the PSI values
   for (pair in pairsCond) {  # delta psi calculated for pairs of conditions, psi are calcuted for each replicateXcondition
     # for one pair
     index <- pair[[1]]
@@ -679,7 +671,7 @@
         indexNan <- intersect(which(subsetUp[, 1] < 10), which(subsetLow[, 1] < 10))  # if counts are too low we will put NaN
         psiPairCond[indexNan, nbLoop] <- NaN
         indexMatrixPsiPairCond <- indexMatrixPsiPairCond + 1
-        namesPsiPairCond <- c(namesPsiPairCond, paste(as.character(condi[nbRepli]), "_repl", i, sep=""))
+        namesPsiPairCond <- c(namesPsiPairCond, paste(as.character(condi[nbRepli]), "_repl", i, sep = ""))
       }
     } 
     colnames(psiPairCond) <- namesPsiPairCond
@@ -692,7 +684,7 @@
     deltaPsiCond <- rowMeans(psiPairCond[, (replicates[1] + 1):sum(replicates)], na.rm = TRUE) - rowMeans(psiPairCond[, 1:replicates[1]], na.rm = TRUE)  # delta psi is the mean of the psis of the 2nd condition (in terms of sorted condition) - the mean of the psis of the 1st condition 
     deltapsi[, indexdeltapsi] <- deltaPsiCond 
     indexdeltapsi <- indexdeltapsi + 1
-    psi <- merge(psi, psiPairCond, by.x="ID", by.y="row.names")  # add the PSI in the data frame
+    psi <- merge(psi, psiPairCond, by.x = "ID", by.y = "row.names")  # add the PSI in the data frame
   }
   
   # when there are more than 2 conditions, we want to simplify the output :
