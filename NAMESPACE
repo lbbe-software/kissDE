@@ -1,6 +1,6 @@
 importFrom("aod", "AIC", "anova", "deviance", "negbin")
 importFrom("Biobase", "exprs", "exprs<-")
-importFrom("DESeq", "counts", "estimateSizeFactors", "newCountDataSet", "sizeFactors")
+importFrom("DESeq2", "counts", "DESeqDataSetFromMatrix", "estimateSizeFactors", "sizeFactors")
 importFrom("DSS", "dispersion", "estDispersion", "newSeqCountSet")
 importFrom("glmnet", "glmnet")
 importFrom("grDevices", "dev.off", "png")

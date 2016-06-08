@@ -244,20 +244,31 @@
   ###################################################
   ### code chunk number 2: Normalization
   ###################################################
-  # Normalization with DESeq
+  # Normalization with DESeq2
   conds <- c()
   for (i in 1:n) {
     for (j in 1:nr[i]) {
       conds <- c(conds, paste("Cond", i, sep = "", collapse = ""))
     }
   } 
-  cds <- newCountDataSet(countsEvents[, 3:(3 + length(conds) - 1)], conds) # create object
-  cdsSF <- estimateSizeFactors(cds)
-  sizeFactors(cdsSF)
-  shouldWeNormalize <- sum(is.na(sizeFactors(cdsSF))) < 1
+  # cds <- newCountDataSet(subset(countsEvents, select = -c(ID, Length, Path)), conds) # create object
+  # cdsSF <- estimateSizeFactors(cds)
+  # shouldWeNormalize <- sum(is.na(sizeFactors(cdsSF))) < 1
+  # dimns <- NCOL(countsEvents)
+  # countsEvents[, (dimns + 1):(dimns + length(conds))] <- round(counts(cdsSF, normalized = shouldWeNormalize))
+  # colnames(countsEvents)[(dimns + 1):(dimns + length(conds))] <- paste(namesData[3:(3 + sum(nr) - 1)], "_Norm", sep = "")
+  
+  dds <- DESeqDataSetFromMatrix(countData = countsEvents[, !(names(countsEvents) %in% c("ID", "Length", "Path"))], 
+                                colData = data.frame(condition = conds),
+                                design = ~ condition) # create a DESeqDataSet object
+  ddsSF <- estimateSizeFactors(dds)
+  shouldWeNormalize <- sum(is.na(sizeFactors(ddsSF))) < 1
   dimns <- NCOL(countsEvents)
-  countsEvents[, (dimns + 1):(dimns + length(conds))] <- round(counts(cdsSF, normalized = shouldWeNormalize))
+  
+  # add columns containing normalized data
+  countsEvents[, (dimns + 1):(dimns + length(conds))] <- round(counts(ddsSF, normalized = shouldWeNormalize))
   colnames(countsEvents)[(dimns + 1):(dimns + length(conds))] <- paste(namesData[3:(3 + sum(nr) - 1)], "_Norm", sep = "")
+  
   return(list(countsData = countsEvents, conditions = conds, dim = dimns, n = n, nr = nr, sortedconditions = sortedconditions, ASSBinfo = ASSBinfo))
 }
 
