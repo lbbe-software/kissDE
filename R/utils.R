@@ -628,6 +628,7 @@
   deltapsi <- matrix(nrow = NROW(signifVariants), ncol = length(pairsCond))
   rownames(deltapsi) <- rownames(signifVariants)
   namesDeltaPsi <- c()
+  psi <- data.frame(ID=rownames(signifVariants)) # initialize empty data frame to save the PSI values
   for (pair in pairsCond) {  # delta psi calculated for pairs of conditions, psi are calcuted for each replicateXcondition
     # for one pair
     index <- pair[[1]]
@@ -667,7 +668,7 @@
         indexNan <- intersect(which(subsetUp[, 1] < 10), which(subsetLow[, 1] < 10))  # if counts are too low we will put NaN
         psiPairCond[indexNan, nbLoop] <- NaN
         indexMatrixPsiPairCond <- indexMatrixPsiPairCond + 1
-        namesPsiPairCond <- c(namesPsiPairCond, as.character(condi[nbRepli]))
+        namesPsiPairCond <- c(namesPsiPairCond, paste(as.character(condi[nbRepli]), "_repl", i, sep=""))
       }
     } 
     colnames(psiPairCond) <- namesPsiPairCond
@@ -680,6 +681,7 @@
     deltaPsiCond <- rowMeans(psiPairCond[, (replicates[1] + 1):sum(replicates)], na.rm = TRUE) - rowMeans(psiPairCond[, 1:replicates[1]], na.rm = TRUE)  # delta psi is the mean of the psis of the 2nd condition (in terms of sorted condition) - the mean of the psis of the 1st condition 
     deltapsi[, indexdeltapsi] <- deltaPsiCond 
     indexdeltapsi <- indexdeltapsi + 1
+    psi <- merge(psi, psiPairCond, by.x="ID", by.y="row.names")  # add the PSI in the data frame
   }
   
   # when there are more than 2 conditions, we want to simplify the output :
@@ -727,5 +729,7 @@
   #### final tab ####
   signifVariants.sorted <- cbind(signifVariants.sorted, lowcounts)
   colnames(signifVariants.sorted[NCOL(signifVariants.sorted)]) <- "Low_counts"
-  return(signifVariants.sorted)
+  # return the final table and the table of PSI
+  return(list(signifVariants.sorted = signifVariants.sorted,
+              psiTable = psi))
 }

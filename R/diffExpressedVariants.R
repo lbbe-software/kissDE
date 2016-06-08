@@ -416,12 +416,13 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
           }
         } 
         
-        signifVariants.sorted <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, 
+        sizeOfEffect <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, 
                                                    flagLowCountsConditions, chunk1$lengths, discoSNP)
-        return(list(finalTable = signifVariants.sorted, 
+        return(list(finalTable = sizeOfEffect$signifVariants.sorted, 
                     correctedPVal = chunk2$correctedPVal, 
                     uncorrectedPVal = chunk2$noCorrectPVal, 
-                    resultFitNBglmModel = chunk1$pALLGlobalPhi.glm.nb))
+                    resultFitNBglmModel = chunk1$pALLGlobalPhi.glm.nb,
+                    psiTable = sizeOfEffect$psiTable))
       }, error = function(err) {
         print(paste(err, "Returning only resultFitNBglmModel and pvalues tab"))
         return(list(correctedPVal = chunk2$correctedPVal,
