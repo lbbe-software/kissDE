@@ -50,6 +50,7 @@ todo : Aurélie ?
 \subsection{Use case}
 3 kinds : from kissplice / from k2rg /user
 just explain the format (4 lines... and the type of question/biological objects)
+If you use output files from KisSplice or Kissplice2RefGenome, you can directly import your counts using \texttt{kissplice2counts} function.
 %\kde~ is meant to work on pairs of alternative variants that have been quantified across different conditions. Such variants can be found with different bioformatics workflows, variant callers,... Among them, \kde~ was at first designed to work with \kp, which performs local assembly on RNA-seq data in order to find and quantify alternative variants. When one have found a list of variants with \kp, we provide a function within this packages that makes easy to convert \kp's fasta files into a format than can be used for testing with \kde. Although \kde~ is a tool from \kp's suite, it can be used independantly from \kp~ with counts for each variants obtained with any other method.\\
 %The user must keep in mind that \kde~ was designed to work with at least one replicate for each condition, which means that the minimal input is variants quantified for 4 different individuals, each couple representing a condition. There can be more replicates and more conditions, it is also not mandatory to have an equal number of replicates in each condition.\\
 %For running \kde, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
@@ -95,8 +96,23 @@ Here we present two examples to explain how \texttt{filterLowCountsVariants} opt
 \end{tabular}
 \subsubsection{Models}
 
+First, we choose a model to describe the counts distribution. When working with biological replicates, the Poisson distribution's variance parameter is in general not flexible enough to describe the data, because replicates add several sources of variance. This overdispersion is often modeled using a Negative Binomial distribution, which we chose for this package. However, due to numerical instabilities associated with the estimation of Negative Binomial parameters, we use a model selection approach to determine which model is the best handle the overdispersion parameter $\phi$.We first estimate a model without overdispersion using the \textsc{glmnet} package (model $\mathcal{M}(\phi=0)$). We then consider two different estimation methods for the parameter $\phi$, namely a global estimation approach using the package \textsc{aod} (model $\mathcal{M}(\phi=\phi_{\text{global}})$), and a variant-specific parameter using the \textsc{DSS} package (model $\mathcal{M}(\phi=\phi^i_{\text{DSS}})$. A BIC is used to choose the best model out of the three. 
+
+%We considered a 2-way design with interaction, with \textit{alleles} and \textit{experimental conditions} as main effects. 
+
+%Following the Generalized Linear Model framework, the expected intensity of the signal was denoted by $\lambda_{ijk}$ and was decomposed as: $$\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j} + \left(\alpha \beta \right)_{ij}$$ where $\mu$ is the local mean expression of the transcript that contains the SNP, $\alpha_{i}$ the effect of allele $i$ on the expression, $\beta_{j}$ the contribution of condition $j$ to the total expression, and $\left(\alpha \beta \right)_{ij}$ the interaction term. 
+
+% In this setting, $Y_{ijk}$ denotes the counts of a sample $k$ with allele $i$ in condition $j$. We assume that: $$ Y_{ijk} \sim NB(\lambda_{ijk},v_{ijk}),$$ with $\lambda_{ijk}$ defined as above. With this model, the variance of the observations becomes : $$ v_{ijk} = \lambda_{ijk} + \phi\times\lambda_{ijk}^2,$$ with $\phi$ the over-dispersion, which is the excess of variance seen in the data in comparison to a Poisson distribution.
+
+
+
+%Pseudo-counts (\textit{i.e.}, systematic random allocation of ones) were considered for SNPs showing many zeros to avoid singular hessian matrices while fitting the generalised linear model. Some events were then filtered out based on their counts: if global counts (for all replicates and all conditions) for both variants were too low ($< 10$), we considered that we did not have enough power to conclude on this event and we did not test it.
+
+
+
 \subsubsection{Likelihood ratio test}
-correction multiple tests
+Then we performed the core test about the association between variant and condition. The target hypothesis was $H_0:\{\left(\alpha \beta \right)_{ij}=0\}$ {\it i.e.} no interaction between allele and condition. If this interaction term is not null, a differential usage of an allele across conditions occurred. The test was performed using a Likelihood Ratio Test with one degree of freedom, which  corresponds to the supplementary interaction parameter that is included in the second model and not in the first . To account for multiple testing, p-values were adjusted with a 5\% false discovery rate (FDR) following a Benjamini-Hochberg procedure
+
 \subsection{Filtering}
 %a table to explain
 If in at least $n-1$ conditions (be $n$ the number of conditions $\geq 2$) an event has low counts (option \texttt{filagLowCountsConditions}) it is flagged (\texttt{TRUE} in the last column of the output).\\
@@ -241,7 +257,7 @@ Aurélie
 
 
 \subsubsection{You work with KisSplice/kissplice2refgenome/discoSNP's output: kissplice2counts function}
-If you use output files from KisSplice, you can directly import your counts using \texttt{kissplice2counts} function.
+
 To create an object with \texttt{kissplice2counts}, you will probably use one of these lines:\\
 
   \texttt{myCounts <- kissplice2counts('./path/results\_Kissplice\_typeX.fa')}\\
