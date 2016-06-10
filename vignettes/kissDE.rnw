@@ -45,34 +45,48 @@ The statistical framework is similar to DESeq. The main difference is that for g
 
 \section{Prerequisites}
 \subsection{Dependencies}
-Aurélie
-\subsection{Data}
-\kde~ is meant to work on pairs of alternative variants that have been quantified across different conditions. Such variants can be found with different bioformatics workflows, variant callers,... Among them, \kde~ was at first designed to work with \kp, which performs local assembly on RNA-seq data in order to find and quantify alternative variants. When one have found a list of variants with \kp, we provide a function within this packages that makes easy to convert \kp's fasta files into a format than can be used for testing with \kde. Although \kde~ is a tool from \kp's suite, it can be used independantly from \kp~ with counts for each variants obtained with any other method.\\
-The user must keep in mind that \kde~ was designed to work with at least one replicate for each condition, which means that the minimal input is variants quantified for 4 different individuals, each couple representing a condition. There can be more replicates and more conditions, it is also not mandatory to have an equal number of replicates in each condition.\\
-For running \kde, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
-You can provide your own table of counts, or simply use \kp's output. Raw table of counts format is described at \textbf{section 4.1: Input data}.
-
-
-\section{kissDE content}
-schema du workflow
-\subsection{Options}
-\subsection{Normalization}
-\subsection{Statistical tests}
-\subsubsection{Estimation of dispersion}
-\subsubsection{Models}
-\subsubsection{Likelihood ratio test}
-correction multiple tests
-\subsection{Filtering}
-\subsection{Magnitude of the effect}
-
-\section{Examples}
-\subsection{Installation and library loading}
+todo : Aurélie ?
+%\subsection{Data}
+\subsection{Use case}
+3 kinds : from kissplice / from k2rg /user
+just explain the format (4 lines... and the type of question/biological objects)
+%\kde~ is meant to work on pairs of alternative variants that have been quantified across different conditions. Such variants can be found with different bioformatics workflows, variant callers,... Among them, \kde~ was at first designed to work with \kp, which performs local assembly on RNA-seq data in order to find and quantify alternative variants. When one have found a list of variants with \kp, we provide a function within this packages that makes easy to convert \kp's fasta files into a format than can be used for testing with \kde. Although \kde~ is a tool from \kp's suite, it can be used independantly from \kp~ with counts for each variants obtained with any other method.\\
+%The user must keep in mind that \kde~ was designed to work with at least one replicate for each condition, which means that the minimal input is variants quantified for 4 different individuals, each couple representing a condition. There can be more replicates and more conditions, it is also not mandatory to have an equal number of replicates in each condition.\\
+%For running \kde, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
+%You can provide your own table of counts, or simply use \kp's output. Raw table of counts format is described at \textbf{section 4.1: Input data}.
+\subsection{Install and load \kde}
 <<install,eval=FALSE>>=
 install.packages("kissDE_x.y.z.tar.gz",repos=NULL, type="source")
 @
 <<library>>=
 library("kissDE") 
 @
+
+
+\section{kissDE's workflow}
+schema du workflow
+%\subsection{Options} maybe in the end ?
+\subsection{Normalization}
+Counts are normalized with the default normalization methods provided in the \textbf{DESeq2} package. In particular, if some replicate has been sequenced with a higher depth, this is properly taken care of.
+\subsection{Statistical tests}
+
+\subsubsection{Estimation of dispersion}
+% a table to explain thta some events are not tested but taken for this estimation
+\subsubsection{Models}
+
+\subsubsection{Likelihood ratio test}
+correction multiple tests
+\subsection{Filtering}
+%a table to explain
+\subsection{Magnitude of the effect}
+%just the main computation, particular correction wrt the length will come with examples
+
+
+
+
+
+\section{Examples}
+
 \subsection{Input data}
 \kde's input is a table of raw counts and a vector describing the number of conditions and replicates. Two options are possible, either to work directly with \kp's output, or to provide a table of counts.
 %Since version 1.2.0 you have also the choice to input a kissplice2refgenome file or a discoSNP file.
@@ -85,21 +99,20 @@ tableCounts <- read.table(fpath1, head = TRUE)
 head(tableCounts)
 @
 \begin{itemize}
- \item \textbf{Lines:} one variation is represented by two lines, one for each variant. For instance for SNPs, one allele is described in the first line, and the other in the second line.
- For alternative splicing events, the inclusion form and the exclusion forms has one line each.
+ \item \textbf{Lines:} one variation is represented by two lines, one for each variant. For instance for SNPs, one allele is described in the first line, and the other in the second line. For alternative splicing events, the inclusion form and the exclusion forms has one line each.
 \item \textbf{Columns:}
 \begin{itemize}
 \item Each line has a first column (\texttt{V1}) with the name of the variation.
 \item The second column (\texttt{V2}) is the size of the variant. If this size is unknown, the value can be set to 0. Note that the size is used only in the case of alternative splicing, to give the indication wether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a switch in the ORF).
 \item  All others columns (\texttt{V3... Vn}) show counts for each replicate in each condition for the variant. For instance, let's assume we work with two conditions $(condition_1, condition_2)$. \verb|V3| is the counts corresponding to reads from the first replicate in $condition_1$, \verb|V4| is the counts of reads sequenced for replicate 2 in $condition_1$, \verb|V5| and \verb|V6| are counts for replicates 1 and 2 of $condition_2$.
 \end{itemize}
-
+\end{itemize}
 The second item to provide is the condition vector that describes the order in which the counts are given. Following our example, the condition vector will be:
 <<conditionVector_howto>>=
 myConditions <- c(rep("condition_1",2),rep("condition_2",2))
 @
 because (\texttt{V3, V4, V5, V6}) have been put in an order that represents first two replicates of $condition_1$, then two replicates of $condition_2$.
-\end{itemize}
+
 \subsubsection{KisSplice}
 The user must refer to \kp~ manual for any question about \kp~ format and output. \kde~ can be used on any type output by \kp~ (0: SNP, 1: alternative splicing events, 2: indels,...). It is possible to obtain a table of counts to perform the tests of \kde~ directly from \kp's output, using the function \texttt{kissplice2counts}.
 <<kissplice2counts_howto>>=
@@ -249,7 +262,7 @@ To start the analyse you just have to run \texttt{diffExpressedVariants}, for a 
 
 
 \section{Counts normalization}
-Counts are normalized with the default normalization methods provided in the \textbf{DESeq} package. In particular, if some replicate has been sequenced with a higher depth, this is properly taken care of.
+
 
 \section{Filtering low counts before the tests}
  If global counts for both variants are too low (option \texttt{filterLowCountsVariants}), the event is not tested.
