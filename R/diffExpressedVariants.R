@@ -465,7 +465,9 @@ plotPSI <- function(diffVariants, conditions, thresholdPvalue = 0.05, thresholdD
   #### Prepare data ####
   ######################
   psi <- diffVariants$psiTable
+  psi <- psi[order(psi$ID),]
   signifVariants <- diffVariants$finalTable
+  signifVariants <- signifVariants[order(signifVariants$ID),]
   nbAll <- length(conditions)
   sortedconditions <- sort(conditions)
   uniqconditions <- unique(sortedconditions)
