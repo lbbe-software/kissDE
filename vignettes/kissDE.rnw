@@ -36,12 +36,12 @@
 
 
 \section{Abstract}
-\kde~ was developed in the scope of NGS data post-processing, and in particular RNA-seq data. Many experiments include several biological conditions to decypher their influence on the present transcripts. After one have found a collection of variants by analyzing its reads, it is natural to focus on the biological relevance of what is in the list, which can be thousands of variants. \kde~ helps to sort interesting variants by testing if a variant is specific to a condition. It takes as input read counts for each variant in each replicate of each condition, and outputs a p-value (adjusted for multiple testing) and a metric (Df/Dpsi) which indicates the magnitude of the effect.\\
-The term "variant" applies both to genomic variants and splicing variants. In both cases, the same gene gives rise to two RNA molecules, which differ in their sequence.\\
+
+\kde is a R-package for the analysis of RNA-seq data in the context of alternative splicing. It is the the continuation of KisSplice but may also be used independently with data from other software to search. \kde detects genomic variants like exon specific events, indels, SNP/mutations, that are specific to a biological condition. Many experiments include several biological conditions to decypher their influence on the present transcripts. After one have found a collection of variants by analyzing its reads, it is natural to focus on the biological relevance of what is in the list, which can be thousands of variants. \kde~ helps to sort interesting variants by testing if a variant is specific to a condition.
 When a gene gives rise to more than two RNA molecules, we assume the set of all transcripts can be split in two groups.
 In the case of alternative splicing, the two groups are: the ones that include the exon of interest, and the ones that exclude the exon of interest.
 In the case of genomic polymorphism, the two groups are: the ones that contain the first allele, and the ones that contain the second allele.\\
-The statistical framework is similar to DESeq. The main difference is that for gene expression, one value per gene is provided, although in the case of \kde, dealing with polymorphism or alternative splicing means providing two values: one per variant. Read counts are pre-processed, several models are tested to fit the data and keep the best to perform the LRT and output the p-value jointly to several metrics and flags. The model and the package's workflow are further detailed in \textbf{section 3}.
+The statistical framework is similar to DESeq. The main difference is that for gene expression, one value per gene is provided, although in the case of \kde, dealing with polymorphism or alternative splicing means providing two values: one per variant. To perform the condition-specific analysis, \kde implements the statistical framework in a user-friendly manner. Read counts are pre-processed, several models are tested to fit the data and keep the best to perform the LRT and output the p-value jointly to several metrics and flags. 
 
 \section{Prerequisites}
 \subsection{Dependencies}
@@ -50,6 +50,7 @@ todo : Aurélie ?
 \subsection{Use case}
 3 kinds : from kissplice / from k2rg /user
 just explain the format (4 lines... and the type of question/biological objects)
+%The input count data to KissDE may come from kissplice, DiscoSNP, kissplice2RefGenome or any other sofware if the counts are transformed into the data structure required for the package.
 If you use output files from KisSplice or Kissplice2RefGenome, you can directly import your counts using \texttt{kissplice2counts} function.
 %\kde~ is meant to work on pairs of alternative variants that have been quantified across different conditions. Such variants can be found with different bioformatics workflows, variant callers,... Among them, \kde~ was at first designed to work with \kp, which performs local assembly on RNA-seq data in order to find and quantify alternative variants. When one have found a list of variants with \kp, we provide a function within this packages that makes easy to convert \kp's fasta files into a format than can be used for testing with \kde. Although \kde~ is a tool from \kp's suite, it can be used independantly from \kp~ with counts for each variants obtained with any other method.\\
 %The user must keep in mind that \kde~ was designed to work with at least one replicate for each condition, which means that the minimal input is variants quantified for 4 different individuals, each couple representing a condition. There can be more replicates and more conditions, it is also not mandatory to have an equal number of replicates in each condition.\\
