@@ -72,16 +72,70 @@ Counts are normalized with the default normalization methods provided in the \te
 
 \subsubsection{Estimation of dispersion}
 % a table to explain thta some events are not tested but taken for this estimation
+ If global counts for both variants are too low (option \texttt{filterLowCountsVariants}), the event is not tested.
+Here we present two examples to explain how \texttt{filterLowCountsVariants} option works. Let's assume that there are two conditions and two replicates (rep1 and rep2) per condition. \texttt{filterLowCountsVariants} has its default value: 10.\\
+
+\begin{tabular}{r|c|c|c}
+  \hline
+   & Condition 1 & Condition 2& Sum by variant \\
+  \hline
+  Variant 1 &	rep1:1, rep2:2 & rep1:3, rep2:2& 1+2+3+2=8 $<$ 10  \\
+ Variant 2 &	rep1:8, rep2:0 & rep1:1, rep2:0& 8+0+1+0=9 $<$ 10 \\
+  \hline
+\end{tabular}
+\paragraph{}In this first example the two variants have global counts less than 10, this event will be used to compute the overdispersion, but will not be used to compute the models. It will neither appear in the final table. On the contrary in the second example below, the event will be taken into account for tests.\\
+
+\begin{tabular}{r|c|c|c}
+  \hline
+   & Condition 1 & Condition 2& Sum by variant \\
+  \hline
+  Variant 1 &	rep1:11, rep2:15 & rep1:3, rep2:2&  11+15+3+2=31 $>$ 10 \\
+ Variant 2 &	rep1:8, rep2:0 & rep1:1, rep2:0& 8+0+1+0=9 $<$ 10 \\
+  \hline
+\end{tabular}
 \subsubsection{Models}
 
 \subsubsection{Likelihood ratio test}
 correction multiple tests
 \subsection{Filtering}
 %a table to explain
+If in at least $n-1$ conditions (be $n$ the number of conditions $\geq 2$) an event has low counts (option \texttt{filagLowCountsConditions}) it is flagged (\texttt{TRUE} in the last column of the output).\\
+In the example table, we can see that the counts are quite contrasted, variant 1 seemed more expressed in condition 1 and variant 2 in condition 2. Moreover, this event has enough counts for each variant not to be filtered out by \texttt{filterLowCountsVariants} option:\\
+
+\begin{tabular}{r|c|c|c}
+  \hline
+   & Condition 1 & Condition 2& Sum by variant \\
+  \hline
+  Variant 1 &	rep1:1, rep2:0 & rep1:6, rep2:7&  1+0+6+7=14 $>$ 10 \\
+ Variant 2 &	rep1:5, rep2:3 & rep1:1, rep2:2&  5+3+1+2=11 $>$ 10 \\
+  \hline
+ Sum by condition &	\textbf{9} $<$ 10 	&16 $>$ 10 & \\ 	
+  \hline
+\end{tabular}
+
+\paragraph{}However, in $n-1$ (here 1) condition, the global count for one condition is less than 10 (9 for condition 1), so \texttt{flagLowCountsConditions} option will classify this in event in \texttt{'Low\_Counts'} column with a \texttt{TRUE} value. 
 \subsection{Magnitude of the effect}
 %just the main computation, particular correction wrt the length will come with examples
+When a gene is found to be differentially spliced between two conditions, or an allele is found to be differentially present in two populations, one concern which remains is to quantify the magnitude of this effect.
+Indeed, especially in RNAseq, where some genes are very highly expressed (and hence have very high read counts), it is often the case that we detect significant (p<0.05) but weak effects. 
 
+When dealing with genomic variants, we quantify the magnitude of the effect using the difference of allele frequencies between the two conditions.
+When dealing with splicing variants, we quantify the magnitude of the effect using the difference of Percent Spliced In (PSI, for alernative splicing) or Delta f (for SNPs) between the two conditions.
+These two measures turn out to be equivalent and can be summarized using the following formula :
 
+$$PSI \:=\: f  \:=\:  \frac{\#counts\_variant_1}{\#counts\_variant_1 + \#counts\_variant_2} $$ \\
+$DeltaPSI \:=\: PSI_{cond1} - PSI_{cond2}$ \\
+$Deltaf \:=\: f_{cond1} - f_{cond2}$
+
+The delta PSI/delta f is computed:
+ \begin{itemize}
+\item individual (per replicate) PSI are calculated:\\
+after the counts are corrected, if counts for both upper and lower path are too low ($<10$) the individual PSI is not computed.
+\item Then mean PSI are computed:\\
+they are the mean of individual PSI for one condition. If more than the half of individual PSI were not calculated at the latter step, the mean PSI is not computed.
+\item Finally, we output delta PSI:\\
+unless one of the mean PSI of a condition could not be estimated. Delta PSI is calculated subtracting one condition PSI from another. This does not always follow the order of the conditions you entered in the first place. To know the order, you must report to the output file, delta PSI are calculated subtracting the first condition appearing in the header from the one after.
+\end{itemize}
 
 
 
@@ -261,31 +315,7 @@ To start the analyse you just have to run \texttt{diffExpressedVariants}, for a 
 
 
 
-\section{Counts normalization}
 
-
-\section{Filtering low counts before the tests}
- If global counts for both variants are too low (option \texttt{filterLowCountsVariants}), the event is not tested.
-Here we present two examples to explain how \texttt{filterLowCountsVariants} option works. Let's assume that there are two conditions and two replicates (rep1 and rep2) per condition. \texttt{filterLowCountsVariants} has its default value: 10.\\
-
-\begin{tabular}{r|c|c|c}
-  \hline
-   & Condition 1 & Condition 2& Sum by variant \\
-  \hline
-  Variant 1 &	rep1:1, rep2:2 & rep1:3, rep2:2& 1+2+3+2=8 $<$ 10  \\
- Variant 2 &	rep1:8, rep2:0 & rep1:1, rep2:0& 8+0+1+0=9 $<$ 10 \\
-  \hline
-\end{tabular}
-\paragraph{}In this first example the two variants have global counts less than 10, this event will be used to compute the overdispersion, but will not be used to compute the models. It will neither appear in the final table. On the contrary in the second example below, the event will be taken into account for tests.\\
-
-\begin{tabular}{r|c|c|c}
-  \hline
-   & Condition 1 & Condition 2& Sum by variant \\
-  \hline
-  Variant 1 &	rep1:11, rep2:15 & rep1:3, rep2:2&  11+15+3+2=31 $>$ 10 \\
- Variant 2 &	rep1:8, rep2:0 & rep1:1, rep2:0& 8+0+1+0=9 $<$ 10 \\
-  \hline
-\end{tabular}
 
 
 \section{Tests}
@@ -297,16 +327,7 @@ where $\mu$ is the local mean expression of the gene that contains the SNP, $\al
 
 \section{Delta PSI / Delta f computation}
 \subsection{Magnitude of the effect}
-When a gene is found to be differentially spliced between two conditions, or an allele is found to be differentially present in two populations, one concern which remains is to quantify the magnitude of this effect.
-Indeed, especially in RNAseq, where some genes are very highly expressed (and hence have very high read counts), it is often the case that we detect significant (p<0.05) but weak effects. 
 
-When dealing with genomic variants, we quantify the magnitude of the effect using the difference of allele frequencies between the two conditions.
-When dealing with splicing variants, we quantify the magnitude of the effect using the difference of Percent Spliced In (PSI) between the two conditions.
-These two measures turn out to be equivalent and can be summarized using the following formula :
-
-$$PSI \:=\: f  \:=\:  \frac{\#counts\_variant_1}{\#counts\_variant_1 + \#counts\_variant_2} $$ \\
-$DeltaPSI \:=\: PSI_{cond1} - PSI_{cond2}$ \\
-$Deltaf \:=\: f_{cond1} - f_{cond2}$
 
 %The  percent spliced in (PSI) is not used to perform tests but we output it to give information about the magnitude of the effect. Indeed, with highly expressed genes pvalues can be significant even if for smal switches of variant presence, because there are a lot of reads to assess it. Intuitively percent spliced in are the ratio of the quantity of counts witnessing the presence of the inclusion isoform over the total counts sum for both isoforms. The delta PSI is simply the subtraction of the PSI calculated for each condition. A high delta PSI (in absolute) shows that the main isoform has changed between the two conditions.\\ 
 \subsection{Correction with respect to the length}
@@ -337,33 +358,6 @@ This correction factor is not the same if the counts that were input to kissDE c
   \end{enumerate}
  \end{itemize}
  
-\subsection{Computation}
-The delta PSI/delta f is computed:
- \begin{itemize}
-\item individual (per replicate) PSI are calculated:\\
-after the counts are corrected, if counts for both upper and lower path are too low ($<10$) the individual PSI is not computed.
-\item Then mean PSI are computed:\\
-they are the mean of individual PSI for one condition. If more than the half of individual PSI were not calculated at the latter step, the mean PSI is not computed.
-\item Finally, we output delta PSI:\\
-unless one of the mean PSI of a condition could not be estimated. Delta PSI is calculated subtracting one condition PSI from another. This does not always follow the order of the conditions you entered in the first place. To know the order, you must report to the output file, delta PSI are calculated subtracting the first condition appearing in the header from the one after.
-\end{itemize}
 
-
-\section{Low counts flag and final table}
-If in at least $n-1$ conditions (be $n$ the number of conditions $\geq 2$) an event has low counts (option \texttt{filagLowCountsConditions}) it is flagged (\texttt{TRUE} in the last column of the output).\\
-In the example table, we can see that the counts are quite contrasted, variant 1 seemed more expressed in condition 1 and variant 2 in condition 2. Moreover, this event has enough counts for each variant not to be filtered out by \texttt{filterLowCountsVariants} option:\\
-
-\begin{tabular}{r|c|c|c}
-  \hline
-   & Condition 1 & Condition 2& Sum by variant \\
-  \hline
-  Variant 1 &	rep1:1, rep2:0 & rep1:6, rep2:7&  1+0+6+7=14 $>$ 10 \\
- Variant 2 &	rep1:5, rep2:3 & rep1:1, rep2:2&  5+3+1+2=11 $>$ 10 \\
-  \hline
- Sum by condition &	\textbf{9} $<$ 10 	&16 $>$ 10 & \\ 	
-  \hline
-\end{tabular}
-
-\paragraph{}However, in $n-1$ (here 1) condition, the global count for one condition is less than 10 (9 for condition 1), so \texttt{flagLowCountsConditions} option will classify this in event in \texttt{'Low\_Counts'} column with a \texttt{TRUE} value. 
 
 \end{document}
