@@ -6,7 +6,8 @@
 \description{Function to plot the PSI for each replicates. This function is meant to be used after launching \code{diffExpressedVariants}, to visualize the significants events.}
 
 \usage{
-  plotPSI(diffVariants, conditions, thresholdPvalue = 0.05, thresholdDeltaPSI = 0.10, show = "PSI", storeFigs = FALSE)
+  plotPSI(diffVariants, conditions, thresholdPvalue = 0.05, thresholdDeltaPSI = 0.10, 
+  show = "PSI", storeFigs = FALSE)
 }
 
 \arguments{
@@ -43,6 +44,6 @@ The figure is stored or displayed in the R session.
 fpath <- system.file("extdata", "table_counts_alt_splicing.txt", package = "kissDE")
 mySplicingconditions <- c("C1", "C1", "C2", "C2")
 mySplicingcounts <- read.table(fpath, header = TRUE)
-# diffSplicing <- diffExpressedVariants(mySplicingcounts, mySplicingconditions, pvalue=1)
+# diffSplicing <- diffExpressedVariants(mySplicingcounts, mySplicingconditions, pvalue = 1)
 # plotPSI(diffSplicing, mySplicingconditions)
 }
