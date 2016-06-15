@@ -266,9 +266,9 @@
 
 
 
-.eventtable <- function(df, startPosColumn4Counts, endPosCol4Counts){
+.eventtable <- function(df, startPosColumn4Counts, endPosCol4Counts) {
   eventTab <- data.frame(ID = rep(as.factor(df["ID"]), endPosCol4Counts - startPosColumn4Counts + 1),
-                         cond = as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "_"), FUN = function(d){d[2]}), use.names = FALSE)),
+                         cond = as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "_"), FUN = function(d){paste(d[2:(length(d) - 2)], collapse = "_")}), use.names = FALSE)), # to manage the conditions names which contains "_"
                          counts = as.numeric(df[startPosColumn4Counts:endPosCol4Counts]),
                          path = as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "|"), FUN = function(d){d[1]}), use.names = FALSE)),
                          row.names = NULL)
