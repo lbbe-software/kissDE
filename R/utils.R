@@ -441,7 +441,7 @@
   ###################################################
   ### code chunk number 6: pALLGlobalPhi.glm.nb
   ###################################################
-  pALLGlobalPhiGlmNb <- data.frame(t(rep(NA, 28)))
+  pALLGlobalPhiGlmNb <- data.frame(t(rep(NA, 21)))
   for (i in 1:length(allEventtables)) {
     pALLGlobalPhiGlmNb[i, ] <- try(.fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i], phi, nbAll), silent = TRUE)
   }
@@ -496,7 +496,7 @@
     #bestmodel.table[bestmodel.table == 4] <- "NB, cond DSS phi"
     bestmodel.singhes <- c()
     for (i in 1:length(bestmodel.table.n)) {
-      bestmodel.singhes[i] <- c(matrixpALLGlobalPhi[i, c(22, 24, 26, 28)])[bestmodel.table.n[i]]  ##########%%%%%%%%%%
+      bestmodel.singhes[i] <- c(matrixpALLGlobalPhi[i, c(17, 19, 21)])[bestmodel.table.n[i]]  ##########%%%%%%%%%%
     }
     bestmodel.singhes <- unlist(bestmodel.singhes, use.names = FALSE)
     bestmodel <- table(bestmodel.table)
