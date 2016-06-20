@@ -314,33 +314,20 @@
   nbSingHes <- c(nbglmA@singular.hessian, nbglmI@singular.hessian)
   nbCode <- c(nbglmA@code, nbglmI@code)
   
-  # binomial negative model, with phi DSS, conditionally to the expression mean  
-  #nbglmAcond <- negbin(counts~cond + path, data = eventdata, random = ~1, fixpar = list(4, phiDSScond))
-  #nbglmIcond <- negbin(counts~cond * path, data = eventdata, random = ~1, fixpar = list(5, phiDSScond))
-  
-  #nbAnovcond <- anova(nbglmAcond, nbglmIcond)
-  #nbAICcond <- c(AIC(nbglmAcond, k = log(nbAll))@istats$AIC, AIC(nbglmIcond, k = log(nbAll))@istats$AIC)
-  #nbSingHescond <- c(nbglmAcond@singular.hessian, nbglmIcond@singular.hessian) 
-  #nbCodecond <- c(nbglmAcond@code, nbglmIcond@code) 
-  
   rslts <- c(nbAnov0@anova.table$'P(> Chi2)'[2],       # [1]
              nbAnovgb@anova.table$'P(> Chi2)'[2],      # [2]
              nbAnov@anova.table$'P(> Chi2)'[2],        # [3]
-             #nbAnovcond@anova.table$'P(> Chi2)'[2],    # [4]
-             nbAIC0,       # [5:6]   [4:5]
-             nbAICgb,      # [7:8]   [6:7]
-             nbAIC,        # [9:10]  [8:9]
-             #nbAICcond,    # [11:12]
+             nbAIC0,       #  [4:5]
+             nbAICgb,      #  [6:7]
+             nbAIC,        #  [8:9]
              
-             nbCode0,      # [13:14] [10:11]
-             nbCodegb,     # [15:16] [12:13]
-             nbCode,       # [17:18] [14:15]
-             #nbCodecond,   # [19:20]
+             nbCode0,      # [10:11]
+             nbCodegb,     # [12:13]
+             nbCode,       # [14:15]
              
-             nbSingHes0,   # [21:22][16:17]
-             nbSingHesgb,  # [23:24][18:19]
-             nbSingHes)    # [25:26][20:21]
-             #nbSingHescond)# [27:28]
+             nbSingHes0,   # [16:17]
+             nbSingHesgb,  # [18:19]
+             nbSingHes)    # [20:21]
   return(rslts)  
 }
 
@@ -565,12 +552,6 @@
     li <- which(apply(pALLGlobalPhi.glm.nb[, c(5, 7, 9)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(17, 19, 21)]) != 0)
     pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li, 3]
     
-    # i <- 4  # negative binomial model, phi estimated with DSS, conditionally to the expression mean
-    # li <- which(apply(pALLGlobalPhi.glm.nb[, c(6, 8, 10, 12)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(22, 24, 26, 28)]) == 0)
-    # pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li, 4]
-    # li <- which(apply(pALLGlobalPhi.glm.nb[, c(6, 8, 10, 12)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(22, 24, 26, 28)]) != 0)
-    # pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li, 4]
-    
     sing.events.final <- which(grepl("Error", pALLGlobalPhi.glm.nb[, 22])) 
     if (length(sing.events.final) != 0) {
       pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[-sing.events.final, ]
@@ -657,7 +638,6 @@
             nameASSBinfo <- c(paste(condi[nbRepli], "_repl", i, sep = ""))
             subsetUp[which(subsetUp > 0), ] <- subsetUp[which(subsetUp > 0), ] / (2 - ASSBinfo[which(subsetUp > 0), nameASSBinfo] / subsetUp[which(subsetUp > 0), ])
           } else {  #counts correction if there is no info about the junction counts
-            # correctFactor <- (lengths2$upper + readLength - 2 * overlap + 1) / (lengths2$lower + readLength - 2 * overlap + 1)  # apparent size of upper path other apparent size of lower path
             correctFactor <- lengths2$upper / lengths2$lower   # apparent size of upper path other apparent size of lower path
             subsetUp <- subsetUp / correctFactor
           }
