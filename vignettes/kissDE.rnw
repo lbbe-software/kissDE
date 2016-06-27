@@ -161,7 +161,7 @@ after the counts are corrected, if counts for both upper and lower path are too 
 \item Then mean PSI are computed:\\
 they are the mean of individual PSI for one condition. If more than the half of individual PSI were not calculated at the latter step, the mean PSI is not computed.
 \item Finally, we output delta PSI:\\
-unless one of the mean PSI of a condition could not be estimated. Delta PSI is calculated subtracting one condition PSI from another. This does not always follow the order of the conditions you entered in the first place. To know the order, you must report to the output file, delta PSI are calculated subtracting the first condition appearing in the header from the one after.
+unless one of the mean PSI of a condition could not be estimated. Delta PSI is calculated subtracting one condition PSI from another. This does not always follow the order of the conditions you entered in the first place. To know the order, you must report to the output file, delta PSI are calculated subtracting the first condition appearing in the header from the one after. The more the $\Delta PSI/f$ is close to 1 in absolute, the more the effect is strong. On he contrary a measure close to 0 shows a low effect.
 \end{itemize}
 
 %TODO: size correction
@@ -240,15 +240,63 @@ In the main function of \kde~called \texttt{diffExpressedVariants}, the differen
 % goal of this plot ?
 
 \subsection{kissDE on SNP data}
-vecteur condition
-lancement test
-export données
-results
+RNA-seq data do not only provide an insight in alternative splicing, it can also be used to study SNPs in expressed regions of the genome. Such SNPs can be detected and reported by KisSplice. Here we use an extract of sequences from the Geuvadis project. We selected two Toscans (TSC) individuals and two Central Europeans (EUR).
+A pair of files represent each replicate (whom have been paired-end sequenced), so eight files have been used for KisSplice input, 4 files representing the two TSC, followed by 4 files representing the two EUR. Paired-end files from a same individual have been input following each other.\\
+We first load the output of KisSplice. It is a fasta file that stores SNPs found in the data set.
+
+<<snp_data>>=
+fileIn <- "inst/extdata/output_kissplice_SNP.fa"
+exampleTable <- read.table(fileIn)
+head(exampleTable, 4)
+@
+
+ By having a look a the 4 first lines, we can see that the fasta file is structurated as follows:
+events are reported in 4 lines, the two first represent one allele of the SNP, the two last the other allele. Thus the sequences only differ from each other by their SNP content. The headers contain useful information:
+\begin{itemize}
+\item elements shared by the headers of the two alleles:
+\begin{itemize}
+  \item \texttt{bcc\_44787|Cycle\_421687} is the event's ID
+  \item \texttt{Type\_0b} means that the sequences contains multiple SNPs, on the contrary \texttt{Type\_0a} is used for refering to single SNPs that could not be phased
+  \item \texttt{upper\_path\_length\_131} and \texttt{lower\_path\_length\_131} give the length of the nucleotide sequences. They are the same for both alleles of a SNP (131 in this example). Upper path and lower path are a denomination for the representation of each allele in KisSplice's graph.
+\end{itemize}
+\item elements that are specific to an allele:
+\begin{itemize}
+  \item \texttt{C1\_455|C2\_455|C3\_839|C4\_848|C5\_5|C6\_0|C7\_39|C8\_31} summarizes the counts found by KisSplice during the step where reads are used to perform quantification of each variant detected. There are 8 counts because we input 8 files. Each count correspond to the reads coming from each file that could be mapped on the variant, in the order they have been passed to KisSplice. For instance, 455 reads from the first file (corresponding to one file of the pair of files from the first TSC individual) have been mapped on the first allele. This information is particularly important in kissDE since it represents the counts used for the test.
+  \item The quality scores come after the counts for each read set following a \texttt{Q}.
+\end{itemize}
+\item NB: the rank is a deprecated measure.
+\end{itemize}
+The first step is to convert this fasta file into a format that will be used in kissDE's main function for testing. This can be done as follows:
+<<snp_counts>>=
+myCounts <- kissplice2counts(fileIn, pairedEnd=T)
+names(myCounts)
+head(myCounts$countsEvents)
+@
+We are in the casee of paired-end files, where a pair of file correspond to an individual. This information must be passed to the function so that counts from both files can be summed, with option \texttt{pairedEnd=T}.
+In the result, we can see that the event's ID are used to label each event, and that an event is represented in two ines (one for each allele). The second column stores the size of the event, and all the next columns summarize the counts for each replicate. For instance, event \texttt{bcc\_44787|Cycle\_421687} already described previously has a length of 131, has 910 reads corresponding to its first TSC replicate (which correspond to the sum of the counts in \texttt{C1\_455|C2\_455}: 455 + 455 = 910, that have been realized thanks to \texttt{pairedEnd} option).
+
+To be able to perform the differential analysis, we msut provide a vector that describes what is our experimental plan. In this example, we have two replicates of TSC and two replicates of EUR. So we construct a vector:
+<<snp_condition>>=
+myCondition <- c(rep("TSC",2), rep("EUR",2))
+@
+With this vector we can call the main function of the package that computes the statistical test. kissDE outputs a list of events that passed the p-value threshold:
+<<snp_test>>=
+myResult <- diffExpressedVariants(myCounts, myCondition)
+head(myResult$finalTable)
+@
+\begin{itemize}
+  \item \texttt{ID}: again we can spot an event using its ID. This time an event is represented by one row in the table.
+  \item \texttt{ Length\_diff}: not relevant for SNPs. 
+  \item \texttt{Variant1\_EUR\_repl1\_Norm} and following columns: summarize the counts for each replicate of each variant after normalization with DESeq2. The first half represent the first allele of each event, the second half the second allele (the first allele is refered to as \texttt{Variant1} while the second is \texttt{Variant2}).
+  \item \texttt{Adjusted\_pvalue}: corresponds to p-values computed and adjusted.
+  \item \texttt{Deltaf/DeltaPSI}: summarizes the magnitude of the effect.
+  \item \texttt{lowcounts}: flags low counts events as described in section[]. \texttt{FALSE} if the events has no low counts.
+\end{itemize}
+Events are sorted by p-values and then by magnitude of effect (based on their absolute values), so that the top candidates for further investigation/validation appear at the beginning of the list.
+
+The event at the top of the list shows a low p-value (1.928149e-05) and a very contrasted $\Delta f$ (-0.9258) close to the maximum value (1 in absolute). Here we do not present biological conclusion because of the size of the sample that have been selected, which does not represent the real counts distribution.  
 \subsection{kissDE on alternative splicing data}
-vecteur condition
-lancement test
-export données
-results
+
 
 \section{Session info}
 Aurélie
@@ -263,6 +311,19 @@ Aurélie
 % \item You must build a table with the counts of the pairwise variants you want to test. This can be done with \texttt{kissplice2counts}.
 % \item Once you have provided a table of counts on your own or created by \texttt{kissplice2counts}, you must provide a vector that describes the experimental conditions
 %\end{enumerate}
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
 
 \subsection{Providing a table of counts}
 
@@ -341,14 +402,6 @@ To start the analyse you just have to run \texttt{diffExpressedVariants}, for a 
 
 
 
-
-
-
-
-
-
-\end{document}
-
 \section{Tests}
 Our statistical analysis adopts the framework of count regression with Negative Binomial distribution as in standard RNA-Seq analysis. We consider 2-way design with interaction with \textit{alleles} and \textit{experimental conditions} as main effects. Following the Generalized Linear Model framework, the expected intensity of the signal is denoted by $\lambda_{ij}$ and is decomposed such that
 $$
@@ -370,7 +423,7 @@ This correction factor is not the same if the counts that were input to kissDE c
   $\Rightarrow$ no information is provided about junction counts. In this case:
  \begin{enumerate}
  \item a correction factor is calculated, taking into account the apparent length of the each path (which is where the reads can actually map):\\
-   $correctFactor\:=\: \frac{length\_upper\_path + readLength - 2 \times overlap + 1}{length\_lower\_path + readLength - 2\times overlap + 1}$ with :
+  % $correctFactor\:=\: \frac{length\_upper\_path + readLength - 2 \times overlap + 1}{length\_lower\_path + readLength - 2\times overlap + 1}$ with :
  \begin{itemize}
   \item \texttt{upper\_path} which is always the inclusion isoform (the longer one)/\texttt{lower\_path} which is the exclusion isoform,
   \item \texttt{overlap}: which is set to \texttt{k+1} (the \texttt{k} value used in KisSplice) and \texttt{readLength} (default: 75) are two option in \texttt{diffExpressedVariants} to estimate the area where read can map on each path
