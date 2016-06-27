@@ -37,7 +37,10 @@
 
 \section{Abstract}
 
-\kde~is a R-package for the analysis of RNA-seq data in the context of alternative splicing. It is the the continuation of \kp~but may also be used independently with data from other software to search. \kde~detects genomic variants like exon specific events, indels, SNP/mutations, that are specific to a biological condition. Many experiments include several biological conditions to decypher their influence on the present transcripts. After one have found a collection of variants by analyzing its reads, it is natural to focus on the biological relevance of what is in the list, which can be thousands of variants. \kde~helps to sort interesting variants by testing if a variant is specific to a condition.
+In the context of RNA-seq, NGS gives access to important sequencing depth and enables to study different transcripts isoforms coming  from the same gene. In eukaryotes, many genes are not only spliced (
+exons are kept to build a mRNA) but also undergo alternative splicing, where combinations of exons in a gene yield different transcripts that correspond to alternative isoforms. Through this process a single gene can produce a collection of RNA molecules. Many experiments include several biological conditions to decypher their influence on the present transcripts. After one have found a collection of variants by analyzing its reads, it is natural to focus on the biological relevance of what is in the list, which can be thousands of variants. 
+
+\kde~helps to sort interesting variants by testing if a variant is specific to a condition. \kde~is a R-package for the analysis of RNA-seq data in the context of alternative splicing. It is the the continuation of \kp~, a software a designed to retrieve alternative transcripts in RNA-seq data.  Even if it has been customed for \kp~, it may also be used independently with data from other software that reports alternative variants from sequencing data. \kde~detects genomic variants like exon specific events, indels, SNP/mutations, that are specific to a biological condition. 
 When a gene gives rise to more than two RNA molecules, we assume the set of all transcripts can be split in two groups.
 In the case of alternative splicing, the two groups are: the ones that include the exon of interest, and the ones that exclude the exon of interest.
 In the case of genomic polymorphism, the two groups are: the ones that contain the first allele, and the ones that contain the second allele.\\
@@ -74,34 +77,33 @@ schema du workflow
 %\subsection{Options} maybe in the end ?
 \subsection{Normalization}
 Counts are normalized with the default normalization methods provided in the \textbf{DESeq2} package. In particular, if some replicate has been sequenced with a higher depth, this is properly taken care of.
-\subsection{Statistical tests}
 
-\subsubsection{Estimation of dispersion}
+\subsection{Estimation of dispersion}
+
+First, we choose a model to describe the counts distribution. When working with biological replicates, the Poisson distribution's variance parameter is in general not flexible enough to describe the data, because replicates add several sources of variance. This overdispersion is often modeled using a Negative Binomial distribution, which we chose for this package. However, due to numerical instabilities associated with the estimation of Negative Binomial parameters, we use a model selection approach to determine which model is the best handle the overdispersion parameter $\phi$. We first estimate a model without overdispersion using the \textsc{glmnet} package (model $\mathcal{M}(\phi=0)$). We then consider two different estimation methods for the parameter $\phi$, namely a global estimation approach using the package \textsc{aod} (model $\mathcal{M}(\phi=\phi_{\text{global}})$), and a variant-specific parameter using the \textsc{DSS} package (model $\mathcal{M}(\phi=\phi^i_{\text{DSS}})$. A BIC is used to choose the best model out of the three.
+\subsection{Pre-test filtering}
 % a table to explain thta some events are not tested but taken for this estimation
  If global counts for both variants are too low (option \texttt{filterLowCountsVariants}), the event is not tested.
 Here we present two examples to explain how \texttt{filterLowCountsVariants} option works. Let's assume that there are two conditions and two replicates (rep1 and rep2) per condition. \texttt{filterLowCountsVariants} has its default value: 10.\\
 
-\begin{tabular}{r|c|c|c}
-  \hline
-   & Condition 1 & Condition 2& Sum by variant \\
-  \hline
-  Variant 1 &	rep1:1, rep2:2 & rep1:3, rep2:2& 1+2+3+2=8 $<$ 10  \\
- Variant 2 &	rep1:8, rep2:0 & rep1:1, rep2:0& 8+0+1+0=9 $<$ 10 \\
-  \hline
+
+
+\begin{table}[h]
+\centering
+\begin{tabular}{c|c|c|c|c|c}
+    &\multicolumn{2}{c|}{Condition 1} &  \multicolumn{2}{c|}{Condition 2}&  Sum by variant\\
+    & replicate 1  & replicate 2 & replicate 1 & replicate 2 & \\ \hline
+ Variant 1 &	11 &         15  & 3           &   2         & 11+15+3+2=31 $>$ 10 \\
+ Variant 2 &	8  &           0 &        1    &            0& 8+0+1+0=9 $<$ 10 \\
 \end{tabular}
+\caption{}
+\label{tab:filter1}
+\end{table}
+
 \paragraph{}In this first example the two variants have global counts less than 10, this event will be used to compute the overdispersion, but will not be used to compute the models. It will neither appear in the final table. On the contrary in the second example below, the event will be taken into account for tests.\\
 
-\begin{tabular}{r|c|c|c}
-  \hline
-   & Condition 1 & Condition 2& Sum by variant \\
-  \hline
-  Variant 1 &	rep1:11, rep2:15 & rep1:3, rep2:2&  11+15+3+2=31 $>$ 10 \\
- Variant 2 &	rep1:8, rep2:0 & rep1:1, rep2:0& 8+0+1+0=9 $<$ 10 \\
-  \hline
-\end{tabular}
-\subsubsection{Models}
-
-First, we choose a model to describe the counts distribution. When working with biological replicates, the Poisson distribution's variance parameter is in general not flexible enough to describe the data, because replicates add several sources of variance. This overdispersion is often modeled using a Negative Binomial distribution, which we chose for this package. However, due to numerical instabilities associated with the estimation of Negative Binomial parameters, we use a model selection approach to determine which model is the best handle the overdispersion parameter $\phi$. We first estimate a model without overdispersion using the \textsc{glmnet} package (model $\mathcal{M}(\phi=0)$). We then consider two different estimation methods for the parameter $\phi$, namely a global estimation approach using the package \textsc{aod} (model $\mathcal{M}(\phi=\phi_{\text{global}})$), and a variant-specific parameter using the \textsc{DSS} package (model $\mathcal{M}(\phi=\phi^i_{\text{DSS}})$. A BIC is used to choose the best model out of the three. 
+\subsection{Model}
+ 
 
 Then we design two models to take into account interactions with \textit{variants}(SNPs or alternative isoforms) and \textit{experimental conditions} as main effects. We  use the Generalized Linear Model framework. The expected intensity $\lambda_{ijk}$ can be written as following:
 
@@ -114,24 +116,29 @@ where $\mu$ is the local mean expression of the transcript that contains the var
 To avoid singular hessian matrices while fitting models, pseudo-counts (\textit{i.e.}, systematic random allocation of ones) were considered for variants showing many zero counts.
 
 
-\subsubsection{Likelihood ratio test}
+\subsection{Likelihood ratio test}
 To select the between $\mathcal{M_0}$ and $\mathcal{M_1}$, we perform a Likelihood Ratio Test (LRT). In the null hypothesis $H_0:\{\left(\alpha \beta \right)_{ij}=0\}$, there is no interaction between variant and condition. For events which $H_0$ is rejected, the interaction term is significant to explain the count's distribution, which leads to conclude to a differential usage of a variant across conditions. The LRT is performed with one degree of freedom, which  corresponds to the supplementary interaction parameter. P-values are then adjusted with a 5\% false discovery rate (FDR) following a Benjamini-Hochberg procedure to account for multiple testing, 
 
-\subsection{Filtering}
+\subsection{Flagging low counts}
 %a table to explain
 If in at least $n-1$ conditions (be $n$ the number of conditions $\geq 2$) an event has low counts (option \texttt{filagLowCountsConditions}) it is flagged (\texttt{TRUE} in the last column of the output).\\
 In the example table, we can see that the counts are quite contrasted, variant 1 seemed more expressed in condition 1 and variant 2 in condition 2. Moreover, this event has enough counts for each variant not to be filtered out by \texttt{filterLowCountsVariants} option:\\
 
-\begin{tabular}{r|c|c|c}
-  \hline
-   & Condition 1 & Condition 2& Sum by variant \\
-  \hline
-  Variant 1 &	rep1:1, rep2:0 & rep1:6, rep2:7&  1+0+6+7=14 $>$ 10 \\
- Variant 2 &	rep1:5, rep2:3 & rep1:1, rep2:2&  5+3+1+2=11 $>$ 10 \\
-  \hline
- Sum by condition &	\textbf{9} $<$ 10 	&16 $>$ 10 & \\ 	
-  \hline
+
+
+\begin{table}[h]
+\centering
+\begin{tabular}{c|c|c|c|c|c}
+    &\multicolumn{2}{c|}{Condition 1} &  \multicolumn{2}{c|}{Condition 2}&  Sum by variant\\
+    & replicate 1  & replicate 2 & replicate 1 & replicate 2 & \\ \hline
+ Variant 1 &	1 &         0  & 6       &   7         &  1+0+6+7=14 $>$ 10 \\
+ Variant 2 &	5 &           3 &        1    &           2&  5+3+1+2=11 $>$ 10 \\
+ \hline
+  Sum by condition &\multicolumn{2}{c|}{\textbf{9} $<$ 10 }	&\multicolumn{2}{c|}{16 $>$ 10} & \\
 \end{tabular}
+\caption{}
+\label{tab:flag1}
+\end{table}
 
 \paragraph{}However, in $n-1$ (here 1) condition, the global count for one condition is less than 10 (9 for condition 1), so \texttt{flagLowCountsConditions} option will classify this in event in \texttt{'Low\_Counts'} column with a \texttt{TRUE} value. 
 \subsection{Magnitude of the effect}
@@ -157,7 +164,7 @@ they are the mean of individual PSI for one condition. If more than the half of 
 unless one of the mean PSI of a condition could not be estimated. Delta PSI is calculated subtracting one condition PSI from another. This does not always follow the order of the conditions you entered in the first place. To know the order, you must report to the output file, delta PSI are calculated subtracting the first condition appearing in the header from the one after.
 \end{itemize}
 
-
+%TODO: size correction
 
 \section{Examples}
 
@@ -338,6 +345,10 @@ To start the analyse you just have to run \texttt{diffExpressedVariants}, for a 
 
 
 
+
+
+\end{document}
+
 \section{Tests}
 Our statistical analysis adopts the framework of count regression with Negative Binomial distribution as in standard RNA-Seq analysis. We consider 2-way design with interaction with \textit{alleles} and \textit{experimental conditions} as main effects. Following the Generalized Linear Model framework, the expected intensity of the signal is denoted by $\lambda_{ij}$ and is decomposed such that
 $$
@@ -378,6 +389,3 @@ This correction factor is not the same if the counts that were input to kissDE c
   \end{enumerate}
  \end{itemize}
  
-
-
-\end{document}
