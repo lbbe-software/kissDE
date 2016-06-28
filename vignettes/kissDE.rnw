@@ -245,7 +245,7 @@ A pair of files represent each replicate (whom have been paired-end sequenced), 
 We first load the output of KisSplice. It is a fasta file that stores SNPs found in the data set.
 
 <<snp_data>>=
-fileIn <- "inst/extdata/output_kissplice_SNP.fa"
+fileIn <- system.file("extdata", "output_kissplice_SNP.fa", package = "kissDE")
 exampleTable <- read.table(fileIn)
 head(exampleTable, 4)
 @
