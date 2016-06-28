@@ -531,7 +531,7 @@
     for (i in singhes_n) {
       pALLGlobalPhi.glm.nb.pen[i, ] <- try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
                                                                  dispersion(dispData)[i],
-                                                                 , phi, nbAll), silent = TRUE)
+                                                                 phi, nbAll), silent = TRUE)
     }
     pALLGlobalPhi.glm.nb <- as.data.frame(matrixpALLGlobalPhi)
     
