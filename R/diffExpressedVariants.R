@@ -122,14 +122,15 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
         } else {
           resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, exonicReads)
           eventName <- resultLine$eventName
-          variantLength <- resultLine$variantLength
+          variantLengthUp <- resultLine$variantLengthUp
+          variantLengthLow <- resultLine$variantLengthLow
           variantCountsUp <- resultLine$variantCountsUp
           variantCountsLow <- resultLine$variantCountsLow
-          events.mat[indexNames, 1] <- as.numeric(variantLength)
+          events.mat[indexNames, 1] <- as.numeric(variantLengthUp)
           events.mat[indexNames, 2:NCOL(events.mat)] <- variantCountsUp
           events.names[indexNames] <- eventName
           psiInfo[indexNames, ] <- resultLine$psiInfoUp
-          events.mat[indexNames + 1, 1] <- 0
+          events.mat[indexNames + 1, 1] <- as.numeric(variantLengthLow)
           events.mat[indexNames + 1, 2:NCOL(events.mat)] <- variantCountsLow
           events.names[indexNames + 1] <- eventName
           psiInfo[indexNames + 1, ] <- resultLine$psiInfoLow
