@@ -286,7 +286,7 @@
 
 
 
-.fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, phiGlobal, nbAll){
+.fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, phiDSScond, phiGlobal, nbAll){
   nbglmA0 <- negbin(counts~cond + path, data = eventdata, random = ~1, fixpar = list(4, 0))
   nbglmI0 <- negbin(counts~cond * path, data = eventdata, random = ~1, fixpar = list(5, 0))  
   # S: simple, A: additive, I : interaction models
@@ -316,20 +316,33 @@
   nbSingHes <- c(nbglmA@singular.hessian, nbglmI@singular.hessian)
   nbCode <- c(nbglmA@code, nbglmI@code)
   
+  # binomial negative model, with phi DSS, conditionally to the expression mean  	 
+  nbglmAcond <- negbin(counts~cond + path, data = eventdata, random = ~1, fixpar = list(4, phiDSScond))	 
+  nbglmIcond <- negbin(counts~cond * path, data = eventdata, random = ~1, fixpar = list(5, phiDSScond))	 
+  
+  nbAnovcond <- anova(nbglmAcond, nbglmIcond)	 
+  nbAICcond <- c(AIC(nbglmAcond, k = log(nbAll))@istats$AIC, AIC(nbglmIcond, k = log(nbAll))@istats$AIC)	 
+  nbSingHescond <- c(nbglmAcond@singular.hessian, nbglmIcond@singular.hessian)	 
+  nbCodecond <- c(nbglmAcond@code, nbglmIcond@code)
+  
   rslts <- c(nbAnov0@anova.table$'P(> Chi2)'[2],       # [1]
              nbAnovgb@anova.table$'P(> Chi2)'[2],      # [2]
              nbAnov@anova.table$'P(> Chi2)'[2],        # [3]
-             nbAIC0,       #  [4:5]
-             nbAICgb,      #  [6:7]
-             nbAIC,        #  [8:9]
+             nbAnovcond@anova.table$'P(> Chi2)'[2],    # [4]	 
+             nbAIC0,       # [5:6]	 
+             nbAICgb,      # [7:8]
+             nbAIC,        # [9:10]	 
+             nbAICcond,    # [11:12]
              
-             nbCode0,      # [10:11]
-             nbCodegb,     # [12:13]
-             nbCode,       # [14:15]
+             nbCode0,      # [13:14]
+             nbCodegb,     # [15:16]
+             nbCode,       # [17:18]
+             nbCodecond,   # [19:20]
              
-             nbSingHes0,   # [16:17]
-             nbSingHesgb,  # [18:19]
-             nbSingHes)    # [20:21]
+             nbSingHes0,   # [21:22]
+             nbSingHesgb,  # [23:24]
+             nbSingHes,    # [25:26]
+             nbSingHescond)# [27:28]
   return(rslts)  
 }
 
@@ -443,9 +456,9 @@
   ###################################################
   ### code chunk number 6: pALLGlobalPhi.glm.nb
   ###################################################
-  pALLGlobalPhiGlmNb <- data.frame(t(rep(NA, 21)))
+  pALLGlobalPhiGlmNb <- data.frame(t(rep(NA, 28)))
   for (i in 1:length(allEventtables)) {
-    pALLGlobalPhiGlmNb[i, ] <- try(.fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i], phi, nbAll), silent = TRUE)
+    pALLGlobalPhiGlmNb[i, ] <- try(.fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i], dispersion(dispData)[i], phi, nbAll), silent = TRUE)
   }
   ###################################################
   ### code chunk number 7: excl_errors
@@ -457,18 +470,22 @@
   colnames(pALLGlobalPhiGlmNb) <- c("(0)I vs A",
                                     "(gb)I vs A",
                                     "I vs A",
+                                    "(c)I vs A",
                                     
                                     "(0)bicA","(0)bicI",
                                     "(gb)bicA","(gb)bicI",
                                     "bicA","bicI",
+                                    "(c)bicA","(c)bicI",
                                     
                                     "(0)codeA","(0)codeI",
                                     "(gb)codeA","(gb)codeI", 
                                     "codeA","codeI",
+                                    "(c)codeA","(c)codeI",
                                     
                                     "(0)shA","(0)shI",
                                     "(gb)shA","(gb)shI", 
-                                    "shA","shI")
+                                    "shA","shI",
+                                    "(c)shA","(c)shI")
   if (length(sing.events) != 0) {
     rownames(pALLGlobalPhiGlmNb) <- dataPart3[-sing.events, 1]
   } else {
@@ -490,15 +507,15 @@
     ###################################################
     ### code chunk number 1: best model
     ###################################################
-    bestmodel.table.n <- apply(matrixpALLGlobalPhi[, c(5, 7, 9)], 1, which.min)  #######"%%%%%"
+    bestmodel.table.n <- apply(matrixpALLGlobalPhi[, c(6, 8, 10, 12)], 1, which.min)  #######"%%%%%"
     bestmodel.table <- bestmodel.table.n
     bestmodel.table[bestmodel.table == 1] <- "Poisson"
     bestmodel.table[bestmodel.table == 2] <- "NB, global phi"
     bestmodel.table[bestmodel.table == 3] <- "NB, DSS phi"
-    #bestmodel.table[bestmodel.table == 4] <- "NB, cond DSS phi"
+    bestmodel.table[bestmodel.table == 4] <- "NB, cond DSS phi"
     bestmodel.singhes <- c()
     for (i in 1:length(bestmodel.table.n)) {
-      bestmodel.singhes[i] <- c(matrixpALLGlobalPhi[i, c(17, 19, 21)])[bestmodel.table.n[i]]  ##########%%%%%%%%%%
+      bestmodel.singhes[i] <- c(matrixpALLGlobalPhi[i, c(22, 24, 26, 28)])[bestmodel.table.n[i]]  ##########%%%%%%%%%%
     }
     bestmodel.singhes <- unlist(bestmodel.singhes, use.names = FALSE)
     bestmodel <- table(bestmodel.table)
@@ -509,7 +526,7 @@
     pALLGlobalPhi.glm.nb.glmnet <- as.data.frame(matrixpALLGlobalPhi)
     pALLGlobalPhi.glm.nb.glmnet$glmnet.pval <- 1
     pALLGlobalPhi.glm.nb.glmnet$glmnet.code <- 0
-    singhes0 <- which(apply(pALLGlobalPhi.glm.nb[, c(5, 7, 9)], 1, which.min) == 1)  # Variants for which the Poisson model is better
+    singhes0 <- which(apply(pALLGlobalPhi.glm.nb[, c(6, 8, 10, 12)], 1, which.min) == 1)  # Variants for which the Poisson model is better
     singhes0_n <- names(singhes0)
     for (i in singhes0_n) {
       Xinter   <- model.matrix(~cond * path, data = allEventtables[[which(rownames(dataPart3) == i)]])
@@ -526,35 +543,42 @@
     #############################################################################################################
     ###  code chunk number 4 : Pseudo-counts  and glmnet                                                   ###
     #############################################################################################################
-    singhes <- which(apply(matrixpALLGlobalPhi[, c(5, 7, 9)], 1, which.min) > 1 & rowSums(matrixpALLGlobalPhi[, c(17, 19, 21)]) != 0)
+    singhes <- which(apply(matrixpALLGlobalPhi[, c(6, 8, 10, 12)], 1, which.min) > 1 & rowSums(matrixpALLGlobalPhi[, c(22, 24, 26, 28)]) != 0)
     
     singhes_n <- names(singhes)
     pALLGlobalPhi.glm.nb.pen <- as.data.frame(matrixpALLGlobalPhi)
     for (i in singhes_n) {
       pALLGlobalPhi.glm.nb.pen[i, ] <- try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
                                                                  dispersion(dispData)[i],
-                                                                 phi, nbAll), silent = TRUE)
+                                                                 dispersion(dispData)[i], phi, nbAll), silent = TRUE)
     }
     pALLGlobalPhi.glm.nb <- as.data.frame(matrixpALLGlobalPhi)
     
     pALLGlobalPhi.glm.nb$final.pval.a.ia <- 1
     i <- 1  # Poisson model
-    li.singhes <- which(apply(pALLGlobalPhi.glm.nb[, c(5, 7, 9)], 1, which.min) == i)
+    li.singhes <- which(apply(pALLGlobalPhi.glm.nb[, c(6, 8, 10, 12)], 1, which.min) == i)
     pALLGlobalPhi.glm.nb$final.pval.a.ia[li.singhes] <- pALLGlobalPhi.glm.nb.glmnet$glmnet.pval[li.singhes]
     
     i <- 2  # negative binomial model, with global phi
-    li <- which(apply(pALLGlobalPhi.glm.nb[, c(5, 7, 9)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(17, 19, 21)]) == 0)
+    li <- which(apply(pALLGlobalPhi.glm.nb[, c(6, 8, 10, 12)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(22, 24, 26, 28)]) == 0)
     pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li, 2]
-    li <- which(apply(pALLGlobalPhi.glm.nb[, c(5, 7, 9)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(17, 19, 21)]) != 0)
+    li <- which(apply(pALLGlobalPhi.glm.nb[, c(6, 8, 10, 12)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(22, 24, 26, 28)]) != 0)
     pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li, 2]
     
     i <- 3  # negative binomial model, phi estimated with DSS
-    li <- which(apply(pALLGlobalPhi.glm.nb[, c(5, 7, 9)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(17, 19, 21)]) == 0)
+    li <- which(apply(pALLGlobalPhi.glm.nb[, c(6, 8, 10, 12)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(22, 24, 26, 28)]) == 0)
     pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li, 3]
-    li <- which(apply(pALLGlobalPhi.glm.nb[, c(5, 7, 9)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(17, 19, 21)]) != 0)
+    li <- which(apply(pALLGlobalPhi.glm.nb[, c(6, 8, 10, 12)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(22, 24, 26, 28)]) != 0)
     pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li, 3]
     
-    sing.events.final <- which(grepl("Error", pALLGlobalPhi.glm.nb[, 22])) 
+    i <- 4  # negative binomial model, phi estimated with DSS, conditionally to the expression mean
+    
+    li <- which(apply(pALLGlobalPhi.glm.nb[, c(6, 8, 10, 12)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(22, 24, 26, 28)]) == 0)	 
+    pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb[li, 4]	 
+    li <- which(apply(pALLGlobalPhi.glm.nb[, c(6, 8, 10, 12)], 1, which.min) == i & rowSums(pALLGlobalPhi.glm.nb[, c(22, 24, 26, 28)]) != 0)	 
+    pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- pALLGlobalPhi.glm.nb.pen[li, 4]	 
+    
+    sing.events.final <- which(grepl("Error", pALLGlobalPhi.glm.nb[, 29]))
     if (length(sing.events.final) != 0) {
       pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[-sing.events.final, ]
     }
