@@ -1,4 +1,4 @@
-events.names X1 X2 X3 X4 X5
+eventsName eventsLength cond1rep1 cond1rep2 cond2rep1 cond2rep2
 bcc_83285|Cycle_2 261 105 41 15 26
 bcc_83285|Cycle_2 81 2 5 100 150
 bcc_161433|Cycle_2 207 20 17 60 58
