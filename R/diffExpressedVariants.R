@@ -83,7 +83,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     
     i <- 1
     line <- lines[i]
-    write(line, file = FILE)
+    #write(line, file = FILE)
     i <- 2
     line <- lines[i]
     resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, exonicReads)
