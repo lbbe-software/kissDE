@@ -75,11 +75,11 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     
     keepEvents <- wantedEvents(keep,remove)
     
-    fileSplit <- strsplit(fileName, split = "\\.")
-    if(length(fileSplit[[1]]) > 1)
-      FILE <- paste(fileSplit[[1]][1], "_kDE", ".", fileSplit[[1]][2], sep = "")
-    else
-      FILE <- paste(fileSplit[[1]][1], "_kDE", sep = "")
+    #fileSplit <- strsplit(fileName, split = "\\.")
+    #if(length(fileSplit[[1]]) > 1)
+    #  FILE <- paste(fileSplit[[1]][1], "_kDE", ".", fileSplit[[1]][2], sep = "")
+    #else
+    #  FILE <- paste(fileSplit[[1]][1], "_kDE", sep = "")
     
     i <- 1
     line <- lines[i]
@@ -94,7 +94,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
       if (!strsplit(line, split = "\t")[[1]][EVENTNAME] %in% lBcc && strsplit(line, split = "\t")[[1]][EVENT] %in% keepEvents) {
         lBcc[iBcc] <- strsplit(line, split = "\t")[[1]][EVENTNAME]
         iBcc <- iBcc + 1
-        write(line, file = FILE, append = TRUE)
+        #write(line, file = FILE, append = TRUE)
       }
       i <- i + 1
       line <- lines[i]
