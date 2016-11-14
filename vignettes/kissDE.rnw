@@ -230,7 +230,18 @@ The function \texttt{qualityControl} produce 2 plots :
 <<qualityControl_howto>>=
 qualityControl(myCounts,myConditions)
 @
-% insert the graphs in the pdf
+\begin{figure}[ht]
+\centering
+\includegraphics[page=1]{Rplots.pdf}
+\caption{Dendrogram of samples.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[page=2]{Rplots.pdf}
+\caption{Heatmap of the sample-to-sample distances.}
+\end{figure}
+
 With theses plots, the user can see the similarities and the differences between the analyzed samples. If a sample is contaminated or has an abnormality that will influence the differential analysis, it will certainly not be clustered as expected. The user can then go back to the quality control of the raw data to solve the problem or decide to remove the sample from the analysis.\\
 
 The created figures can be saved by setting the \texttt{storeFigs} option to \texttt{TRUE} or to the path where the figures are to be stored.
@@ -294,7 +305,8 @@ head(myResult$finalTable)
 \end{itemize}
 Events are sorted by p-values and then by magnitude of effect (based on their absolute values), so that the top candidates for further investigation/validation appear at the beginning of the list.
 
-The event at the top of the list shows a low p-value (1.928149e-05) and a very contrasted $\Delta f$ (-0.9258) close to the maximum value (1 in absolute). Here we do not present biological conclusion because of the size of the sample that have been selected, which does not represent the real counts distribution.  
+The event at the top of the list shows a low p-value (1.928149e-05) and a very contrasted $\Delta f$ (-0.9258) close to the maximum value (1 in absolute). Here we do not present biological conclusion because of the size of the sample that have been selected, which does not represent the real counts distribution. 
+
 \subsection{kissDE on alternative splicing data}
 
 
