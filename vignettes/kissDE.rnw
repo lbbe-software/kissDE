@@ -19,9 +19,7 @@
 \newcommand{\kde}{\textsc{kissDE}}
 \newcommand{\kp}{\textsc{KisSplice}}
 
-\hypersetup{
-    	   pdfborder={0 0 0},
-}
+\hypersetup{pdfborder={0 0 0}}
 
 %\VignetteIndexEntry{kissDE Reference Manual}
 \title{kissDE Reference Manual}
@@ -59,15 +57,15 @@ If you use output files from KisSplice or Kissplice2RefGenome, you can directly 
 %You can provide your own table of counts, or simply use \kp's output. Raw table of counts format is described at \textbf{section 4.1: Input data}.
 \subsection{Install and load \kde}
 In a R session, you must first install Bioconductor.
-<<installBC,eval=FALSE>>=
+<<installBC,eval=FALSE, fig=FALSE>>=
 source("http://bioconductor.org/biocLite.R")
 @
 Then you can install the \kde~package from Bioconductor.
-<<install,eval=FALSE>>=
+<<install,eval=FALSE, fig=FALSE>>=
 biocLite("kissDE")
 @
 Finally, load it.
-<<library>>=
+<<library, fig=FALSE>>=
 library(kissDE)
 @
 
@@ -174,7 +172,7 @@ unless one of the mean PSI of a condition could not be estimated. Delta PSI is c
 
 \subsubsection{You work with your own data (without KisSplice): table of counts format}
 The proper input table is in the following format:
-<<tablecounts_howto>>=
+<<tablecounts_howto, fig=FALSE>>=
 fpath1 <- system.file("extdata", "table_counts_alt_splicing.txt", package="kissDE")
 tableCounts <- read.table(fpath1, head = TRUE)
 head(tableCounts)
@@ -189,14 +187,14 @@ head(tableCounts)
 \end{itemize}
 \end{itemize}
 The second item to provide is the condition vector that describes the order in which the counts are given. Following our example, the condition vector will be:
-<<conditionVector_howto>>=
+<<conditionVector_howto, fig=FALSE>>=
 myConditions <- c(rep("condition_1",2),rep("condition_2",2))
 @
 because (\texttt{V3, V4, V5, V6}) have been put in an order that represents first two replicates of $condition_1$, then two replicates of $condition_2$.
 
 \subsubsection{KisSplice}
 The user must refer to \kp~manual for any question about \kp~format and output. \kde~can be used on any type output by \kp~(0: SNP, 1: alternative splicing events, 2: indels,...). It is possible to obtain a table of counts to perform the tests of \kde~directly from \kp's output, using the function \texttt{kissplice2counts}.
-<<kissplice2counts_howto>>=
+<<kissplice2counts_howto, fig=FALSE>>=
 fpath2 <- system.file("extdata", "output_kissplice_alt_splicing.fa", package="kissDE")
 myCounts <- kissplice2counts(fpath2, counts = 2, pairedEnd = TRUE)
 names(myCounts)
@@ -227,18 +225,18 @@ The function \texttt{qualityControl} produce 2 plots :
 \item{dendrogram}
 \item{heatmap of the sample-to-sample distances}
 \end{itemize}
-<<qualityControl_howto>>=
+<<qualityControl_howto, include=FALSE, fig=TRUE>>=
 qualityControl(myCounts,myConditions)
 @
 \begin{figure}[ht]
 \centering
-\includegraphics[page=1]{Rplots.pdf}
+\includegraphics[page=1]{kissDE-qualityControl_howto.pdf}
 \caption{Dendrogram of samples.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[page=2]{Rplots.pdf}
+\includegraphics[page=2]{kissDE-qualityControl_howto.pdf}
 \caption{Heatmap of the sample-to-sample distances.}
 \end{figure}
 
@@ -255,7 +253,7 @@ RNA-seq data do not only provide an insight in alternative splicing, it can also
 A pair of files represent each replicate (whom have been paired-end sequenced), so eight files have been used for KisSplice input, 4 files representing the two TSC, followed by 4 files representing the two EUR. Paired-end files from a same individual have been input following each other.\\
 We first load the output of KisSplice. It is a fasta file that stores SNPs found in the data set.
 
-<<snp_data>>=
+<<snp_data, fig=FALSE>>=
 fileIn <- system.file("extdata", "output_kissplice_SNP.fa", package = "kissDE")
 exampleTable <- read.table(fileIn)
 head(exampleTable, 4)
@@ -278,7 +276,7 @@ events are reported in 4 lines, the two first represent one allele of the SNP, t
 \item NB: the rank is a deprecated measure.
 \end{itemize}
 The first step is to convert this fasta file into a format that will be used in kissDE's main function for testing. This can be done as follows:
-<<snp_counts>>=
+<<snp_counts, fig=FALSE>>=
 myCounts <- kissplice2counts(fileIn, pairedEnd=T)
 names(myCounts)
 head(myCounts$countsEvents)
@@ -287,11 +285,11 @@ We are in the casee of paired-end files, where a pair of file correspond to an i
 In the result, we can see that the event's ID are used to label each event, and that an event is represented in two ines (one for each allele). The second column stores the size of the event, and all the next columns summarize the counts for each replicate. For instance, event \texttt{bcc\_44787|Cycle\_421687} already described previously has a length of 131, has 910 reads corresponding to its first TSC replicate (which correspond to the sum of the counts in \texttt{C1\_455|C2\_455}: 455 + 455 = 910, that have been realized thanks to \texttt{pairedEnd} option).
 
 To be able to perform the differential analysis, we msut provide a vector that describes what is our experimental plan. In this example, we have two replicates of TSC and two replicates of EUR. So we construct a vector:
-<<snp_condition>>=
+<<snp_condition, fig=FALSE>>=
 myCondition <- c(rep("TSC",2), rep("EUR",2))
 @
 With this vector we can call the main function of the package that computes the statistical test. kissDE outputs a list of events that passed the p-value threshold:
-<<snp_test>>=
+<<snp_test, fig=FALSE>>=
 myResult <- diffExpressedVariants(myCounts, myCondition)
 head(myResult$finalTable)
 @
@@ -314,7 +312,7 @@ The data used in this vignette to show an example of analysis of alternative spl
 
 The first step is to load the output of KisSplice2refgenome. It is a tab delimited file that store the annotated alternative splicing events found in the dataset.
 
-<<AS_data>>=
+<<AS_data, fig=FALSE>>=
 fileInAS <- system.file("extdata", "output_k2rg_alt_splicing.txt", package = "kissDE")
 exampleK2RG <- read.table(fileInAS)
 head(exampleK2RG, 3)
@@ -326,7 +324,7 @@ One line correspond to one alternative splicing event.
 The \texttt{kissplice2count} function allow to transform this texte format into a format compatible with kissDE's main function for testing. The \texttt{r2rg} option must be set to \texttt{TRUE} to indicate that the file comes from KisSplice2refgenome and not from \kp. Like explained earlier, thes samples are paired-end. This information must be given to the \texttt{kissplice2count} function.
 % talk about the counts and the exonicReads options
 
-<<AS_counts, tidy=TRUE, highlight=FALSE>>=
+<<AS_counts, tidy=TRUE, highlight=FALSE, fig=FALSE>>=
 myCountsAS <- kissplice2counts(fileInAS, pairedEnd = TRUE, k2rg = TRUE, 
                                counts = 2, exonicReads = FALSE)
 names(myCountsAS)
@@ -335,7 +333,7 @@ head(myCountsAS$countsEvents)
 
 The KisSplice2refgenome output contains the information of the type of splicing events. So it is possible to choose the event we want to analyse. The two options \texttt{keep} and \texttt{remove} allow the user to indicate the type of splicing events to analyse or to remove from the analysis. The events names should come from this list : deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified. By default, all types of events are analysed.\\
 For example, if we only want to analyse the skipped exon events, the command to load the data is the following:
-<<AS_ES_data, tidy=TRUE, highlight=FALSE>>=
+<<AS_ES_data, tidy=TRUE, highlight=FALSE, fig=FALSE>>=
 myCountsES <- kissplice2counts(fileInAS, pairedEnd = TRUE, k2rg = TRUE, 
                                counts = 2, exonicReads = FALSE,
                                keep = c("ES"),remove = c("MULTI"))
@@ -345,12 +343,12 @@ head(myCountsES$countsEvents)
 
 
 To be able to perform the differential analysis, we must provide a vector that describes our experimental plan. In this example, we have two replicates of the SK-N-SH cell line without treatment (SKNSH) and two replicates of the same cell line treated with retinoic acid (SKSNH-RA). So we construct a vector:
-<<AS_condition>>=
+<<AS_condition, fig=FALSE>>=
 myConditionAS <- c(rep("SKNSH",2), rep("SKNSH-RA",2))
 @
 
 With this vector we can call the main function of the package that computes the statistical test. kissDE outputs a list of events that passed the p-value threshold:
-<<AS_test>>=
+<<AS_test, fig=FALSE>>=
 myResultAS <- diffExpressedVariants(myCountsAS, myConditionAS, pvalue = 1)
 head(myResultAS$finalTable)
 @
