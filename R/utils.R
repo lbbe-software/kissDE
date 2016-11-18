@@ -447,7 +447,8 @@
   
   if (length(-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants)) > 0){
     dataPart3 <- dataPart2[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), ]
-    exprs(dispData) <- exprs(dispData)[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), ]
+    exprsDataWithoutLowCounts <- exprs(dispData)[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), ]
+    dispData <- newSeqCountSet(exprsDataWithoutLowCounts,as.data.frame(designs))
   } else {
     dataPart3 <- dataPart2
   }
