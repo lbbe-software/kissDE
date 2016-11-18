@@ -423,7 +423,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
                     correctedPVal = chunk2$correctedPVal, 
                     uncorrectedPVal = chunk2$noCorrectPVal, 
                     resultFitNBglmModel = chunk1$pALLGlobalPhi.glm.nb,
-                    psiTable = sizeOfEffect$psiTable))
+                    `f/psiTable` = sizeOfEffect$psiTable))
       }, error = function(err) {
         print(paste(err, "Returning only resultFitNBglmModel and pvalues tab"))
         return(list(correctedPVal = chunk2$correctedPVal,
