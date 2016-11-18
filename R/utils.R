@@ -448,11 +448,9 @@
   if (length(-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants)) > 0){
     dataPart3 <- dataPart2[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), ]
     exprsDataWithoutLowCounts <- exprs(dispData)[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), ]
+    dispersionDataWithoutLowCounts <- dispersion(dispData)[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants)]
     dispData <- newSeqCountSet(exprsDataWithoutLowCounts,as.data.frame(designs))
-    set.seed(40)  ## fix the seed to avoid the stochastic outputs of the DSS:estDispersion function
-    dispData <- estDispersion(dispData)
-    names(exprs(dispData)) <- rownames(dataPart3)
-    #exprs(dispData) <- exprs(dispData)[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), ]
+    dispData@dispersion <- dispersionDataWithoutLowCounts
   } else {
     dataPart3 <- dataPart2
   }
