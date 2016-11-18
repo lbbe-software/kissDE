@@ -449,7 +449,9 @@
     dataPart3 <- dataPart2[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), ]
     exprsDataWithoutLowCounts <- exprs(dispData)[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants), ]
     dispersionDataWithoutLowCounts <- dispersion(dispData)[-which(totUP < filterLowCountsVariants & totLOW < filterLowCountsVariants)]
+    normFactorWithoutLowCounts <- dispData@normalizationFactor
     dispData <- newSeqCountSet(exprsDataWithoutLowCounts,as.data.frame(designs))
+    dispData@normalizationFactor <- normFactorWithoutLowCounts
     dispData@dispersion <- dispersionDataWithoutLowCounts
   } else {
     dataPart3 <- dataPart2
