@@ -611,7 +611,7 @@
 
 
 
-.sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, lengths, discoSNP = FALSE) {
+.sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, lengths, discoSNP = FALSE, exonicReads) {
   ###################################################
   ### code chunk 1 : compute delta PSI/f
   ###################################################
@@ -630,8 +630,14 @@
   } 
   namesPsiPairCond <- c()
   if (!is.null(ASSBinfo)) {
-    newindex <- unlist(sapply(rownames(signifVariants), function(x) res <- which(ASSBinfo[, 1] == x)), use.names = FALSE)  # to put the lines of the 2 data frames in the same order
-    ASSBinfo <- ASSBinfo[newindex, ]
+    if (exonicReads){
+      rown <- row.names(signifVariants)
+      lengths2 <- lengths[rown, ]
+    }
+    else{
+      newindex <- unlist(sapply(rownames(signifVariants), function(x) res <- which(ASSBinfo[, 1] == x)), use.names = FALSE)  # to put the lines of the 2 data frames in the same order
+      ASSBinfo <- ASSBinfo[newindex, ]
+    }
   } else {
     rown <- row.names(signifVariants)
     lengths2 <- lengths[rown, ]
@@ -666,8 +672,14 @@
         subsetLow <- signifVariants[namesLow]
         if (discoSNP == FALSE) {
           if (!is.null(ASSBinfo)) {  # counts correction
-            nameASSBinfo <- c(paste(condi[nbRepli], "_repl", i, sep = ""))
-            subsetUp[which(subsetUp > 0), ] <- subsetUp[which(subsetUp > 0), ] / (2 - ASSBinfo[which(subsetUp > 0), nameASSBinfo] / subsetUp[which(subsetUp > 0), ])
+            if (exonicReads){
+              correctFactor <- lengths2$upper / lengths2$lower   # apparent size of upper path other apparent size of lower path
+              subsetUp <- subsetUp / correctFactor
+            }
+            else{
+              nameASSBinfo <- c(paste(condi[nbRepli], "_repl", i, sep = ""))
+              subsetUp[which(subsetUp > 0), ] <- subsetUp[which(subsetUp > 0), ] / (2 - ASSBinfo[which(subsetUp > 0), nameASSBinfo] / subsetUp[which(subsetUp > 0), ])
+            }
           } else {  #counts correction if there is no info about the junction counts
             correctFactor <- lengths2$upper / lengths2$lower   # apparent size of upper path other apparent size of lower path
             subsetUp <- subsetUp / correctFactor

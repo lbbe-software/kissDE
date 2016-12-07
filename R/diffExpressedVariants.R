@@ -153,7 +153,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     dupBcc.df <- data.frame()
   }
   
-  output <- list(countsEvents = events.df, psiInfo = psiInfo, discoInfo = discoSNP, dupBcc = dupBcc.df)
+  output <- list(countsEvents = events.df, psiInfo = psiInfo, discoInfo = discoSNP, exonicReadsInfo = exonicReads, dupBcc = dupBcc.df)
   class(output) <- c("list", "countsData")
   return(output)
 }
@@ -418,7 +418,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
         } 
         
         sizeOfEffect <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, 
-                                          flagLowCountsConditions, chunk1$lengths, discoSNP)
+                                          flagLowCountsConditions, chunk1$lengths, discoSNP, countsData$exonicReadsInfo)
         return(list(finalTable = sizeOfEffect$signifVariants.sorted, 
                     correctedPVal = chunk2$correctedPVal, 
                     uncorrectedPVal = chunk2$noCorrectPVal, 
