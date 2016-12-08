@@ -1,8 +1,8 @@
 kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE, keep = c("All"), remove = NULL) {
   toConvert <- file(fileName, open = "r")
   lines <- readLines(toConvert)
-  cDupBcc <- c()
   if (k2rg == FALSE) {
+    fileNameK2RG = NULL
     line <- lines[1]
     isQuality <- grepl("Q", line[1])
     resultLine1 <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, isQuality, discoSNP)  # get all the informations for the 1st line
@@ -50,6 +50,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     events.df <- data.frame(events.names, events.mat)
     
   } else {
+    fileNameK2RG = fileName
     GENEID <- 1
     GENENAME <- 2
     POS <- 3
@@ -75,64 +76,54 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     
     keepEvents <- wantedEvents(keep,remove)
     
-    #fileSplit <- strsplit(fileName, split = "\\.")
-    #if(length(fileSplit[[1]]) > 1)
-    #  FILE <- paste(fileSplit[[1]][1], "_kDE", ".", fileSplit[[1]][2], sep = "")
-    #else
-    #  FILE <- paste(fileSplit[[1]][1], "_kDE", sep = "")
-    
     i <- 1
+    nextI <- 1
     line <- lines[i]
-    #write(line, file = FILE)
-    i <- 2
-    line <- lines[i]
+    if(substr(line[1],0,1)=="#"){
+      i <- 2
+      nextI <- 2
+      line <- lines[i]
+    }
     resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, exonicReads)
     variantCountsUp <- resultLine$variantCountsUp
-    iBcc <- 1
-    lBcc <- list()
+    iEvents <- 0  # nombre de bcc unique + dupliqué = nombre d'événements 
+    lEvents <- list()
     while (i <= length(lines)) {
-      if (!strsplit(line, split = "\t")[[1]][EVENTNAME] %in% lBcc && strsplit(line, split = "\t")[[1]][EVENT] %in% keepEvents) {
-        lBcc[iBcc] <- strsplit(line, split = "\t")[[1]][EVENTNAME]
-        iBcc <- iBcc + 1
-        #write(line, file = FILE, append = TRUE)
+      bcc=strsplit(line, split = "\t")[[1]][EVENTNAME]
+      if (strsplit(line, split = "\t")[[1]][EVENT] %in% keepEvents){
+        lEvents[iEvents+1] <- bcc
+        iEvents <- iEvents + 1
       }
       i <- i + 1
       line <- lines[i]
     }
-    events.mat <- matrix(NA, iBcc * 2 - 2, length(variantCountsUp) + 1)
-    events.names <- rep(NA, iBcc * 2 - 2)
-    psiInfo <- matrix(NA, iBcc * 2 - 2, length(resultLine$psiInfoUp))
+    lBcc <- unique(lEvents)
+    iBcc <- length(lBcc)  # nombre de bcc unique
+    events.mat <- matrix(NA, iBcc * 2, length(variantCountsUp) + 1)
+    events.names <- rep(NA, iBcc * 2)
+    psiInfo <- matrix(NA, iBcc * 2, length(resultLine$psiInfoUp))
     indexNames <- 1
-    matBccApp <- matrix(0,nrow = length(lBcc)) # nombre d'apparition pour chaque BCC
+    
+    matBccApp <- matrix(0,nrow = iBcc) # nombre d'apparition pour chaque BCC
     rownames(matBccApp) <- lBcc
     iDupBcc <- 1
-    i <- 2
+    i <- nextI
     while (i <= length(lines)) {
       line <- lines[i]
-      if(strsplit(line, split = "\t")[[1]][EVENT] %in% keepEvents){
-        bcc <- strsplit(line, split = "\t")[[1]][EVENTNAME]
+      lLine <- strsplit(line, split = "\t")[[1]]
+      if(lLine[EVENT] %in% keepEvents){
+        bcc <- lLine[EVENTNAME]
         matBccApp[bcc, 1] <- matBccApp[bcc, 1] + 1
-        
-        if (matBccApp[bcc, 1] > 1) {
-          if (!bcc %in% cDupBcc) {
-            cDupBcc[iDupBcc] <- bcc
-            iDupBcc <- iDupBcc + 1
-          }
-          
-        } else {
+        if (matBccApp[bcc, 1] == 1) {
           resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, exonicReads)
-          eventName <- resultLine$eventName
-          variantLengthUp <- resultLine$variantLengthUp+resultLine$variantLengthLow
-          variantLengthLow <- resultLine$variantLengthLow
-          variantCountsUp <- resultLine$variantCountsUp
-          variantCountsLow <- resultLine$variantCountsLow
-          events.mat[indexNames, 1] <- as.numeric(variantLengthUp)
-          events.mat[indexNames, 2:NCOL(events.mat)] <- variantCountsUp
-          events.names[indexNames] <- eventName
+          resultLine$variantLengthUp <- as.numeric(resultLine$variantLengthUp) + as.numeric(resultLine$variantLengthLow)
+          events.mat[indexNames, 1] <- as.numeric(resultLine$variantLengthUp)
+          events.mat[indexNames, 2:NCOL(events.mat)] <- resultLine$variantCountsUp
+          events.names[indexNames] <- resultLine$eventName
           psiInfo[indexNames, ] <- resultLine$psiInfoUp
-          events.mat[indexNames + 1, 1] <- as.numeric(variantLengthLow)
-          events.mat[indexNames + 1, 2:NCOL(events.mat)] <- variantCountsLow
-          events.names[indexNames + 1] <- eventName
+          events.mat[indexNames + 1, 1] <- as.numeric(resultLine$variantLengthLow)
+          events.mat[indexNames + 1, 2:NCOL(events.mat)] <- resultLine$variantCountsLow
+          events.names[indexNames + 1] <- resultLine$eventName
           psiInfo[indexNames + 1, ] <- resultLine$psiInfoLow
           class(events.mat) <- "numeric"
           indexNames <- indexNames + 2
@@ -147,13 +138,8 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
   
   close(toConvert)
   psiInfo <- data.frame(events.names, as.data.frame(psiInfo))
-  if (length(cDupBcc) > 0) {
-    dupBcc.df <- data.frame(matBccApp[cDupBcc, 1])
-  } else {
-    dupBcc.df <- data.frame()
-  }
   
-  output <- list(countsEvents = events.df, psiInfo = psiInfo, discoInfo = discoSNP, exonicReadsInfo = exonicReads, dupBcc = dupBcc.df)
+  output <- list(countsEvents = events.df, psiInfo = psiInfo, discoInfo = discoSNP, exonicReadsInfo = exonicReads, k2rgFile = fileNameK2RG)
   class(output) <- c("list", "countsData")
   return(output)
 }
@@ -332,8 +318,7 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
 
 
 
-diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE) {
-  
+diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE, output = "./kissDE_result") {
   options(warn = -1)  # suppress the warning for the users
   if (storeFigs == FALSE) {
     pathToFigs <- NA
@@ -419,6 +404,9 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
         
         sizeOfEffect <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, 
                                           flagLowCountsConditions, chunk1$lengths, discoSNP, countsData$exonicReadsInfo)
+        if(!is.null(countsData$k2rgFile)) {
+          writeMergeOutput(sizeOfEffect$signifVariants.sorted,sizeOfEffect$psiTable,output,countsData$k2rgFile)
+        }
         return(list(finalTable = sizeOfEffect$signifVariants.sorted, 
                     correctedPVal = chunk2$correctedPVal, 
                     uncorrectedPVal = chunk2$noCorrectPVal, 
@@ -614,4 +602,52 @@ plotPSI <- function(diffVariants, conditions, thresholdPvalue = 0.05, thresholdD
     }
     void <- dev.off()
   }
+}
+
+writeMergeOutput <- function(finalTable,pisTable,output,k2rgFile) {
+  EVENTNAME <- 16
+  COUNTSSTART <- 3
+  COUNTSENDBEFOREEND <- 3
+  PSISTART <- 2
+  
+  COUNTSEND <- ncol(finalTable)-COUNTSENDBEFOREEND
+  PSIEND <- ncol(psiTable)
+  
+  lBcc <- rownames(finalTable)
+  fK2RG <- file(k2rgFile, open = "r")
+  lines <- readLines(fK2RG)
+  fOut <- file(output, open = "w")
+  i <- 1
+  line <- lines[i]
+  if(substr(line[1],0,1)=="#"){
+    nCol <- length(strsplit(line, split = "\t")[[1]])
+    countsLabel <- paste(colnames(finalTable)[COUNTSSTART:COUNTSEND],collapse=",")
+    countsName <- paste("CountsNorm(",countsLabel,")",sep="")
+    psiLabel <- paste(colnames(psiTable)[PSISTART:PSIEND],collapse=",")
+    psiName <- paste("psiNorm(",psiLabel,")",sep="")
+    countsHead <- paste(nCol+1,countsName,sep=":")
+    psiHead <- paste(nCol+2,psiName,sep=":")
+    pvHead <- paste(nCol+3,"adjusted_pvalue",sep=":")
+    dPSIHead <- paste(nCol+4,"dPSI",sep=":")
+    warnHead <- paste(nCol+5,"warnings",sep=":")
+    toWrite <- paste(line,countsHead,psiHead,pvHead,dPSIHead,warnHead,sep="\t")
+    writeLines(toWrite,fOut)
+    i <- 2
+  }
+  while(i <= length(lines)) {
+    line <- lines[i]
+    bcc <- strsplit(line, split = "\t")[[1]][EVENTNAME]
+    bcc <- strsplit(bcc, split = "Type_")[[1]][1]
+    bcc <- substr(bcc,0,nchar(bcc)-1)
+    if(bcc %in% lBcc) {
+      countsValue <- paste(as.character(finalTable[rownames(finalTable)==bcc,][COUNTSSTART:COUNTSEND]),collapse=",")
+      psiValue <- psiTable[psiTable$ID==bcc,][PSISTART:PSIEND]
+      psiValue <- paste(as.character(psiValue),collapse=",")
+      toWrite <- paste(line,countsValue,psiValue,finalTable[rownames(finalTable)==bcc,]$Adjusted_pvalue,finalTable[rownames(finalTable)==bcc,]$`Deltaf/DeltaPSI`,finalTable[rownames(finalTable)==bcc,]$lowcounts,sep="\t")
+      writeLines(toWrite,fOut)
+    }
+    i <- i + 1
+  }
+  close(fK2RG)
+  close(fOut)
 }

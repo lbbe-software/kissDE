@@ -191,7 +191,7 @@
   countsLow <- strsplit(splitElements[21], ",")
   resultCountsSetUp <- .countsSetk2rg(countsUp, counts, pairedEnd, order, exonicReads)
   resultCountsSetLow <- .countsSetk2rg(countsLow, counts, pairedEnd, order, exonicReads)
-  variantLengthUp <- sum(as.integer(strsplit(splitElements[11],",")[[1]]))
+  variantLengthUp <- as.integer(splitElements[6])
   variantLengthLow <- sum(as.integer(strsplit(splitElements[17],",")[[1]]))
   
   return (list(eventName = eventName, variantLengthUp = variantLengthUp, variantLengthLow = variantLengthLow, variantCountsUp = resultCountsSetUp$vCounts, 
