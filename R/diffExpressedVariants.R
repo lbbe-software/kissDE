@@ -405,6 +405,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
         sizeOfEffect <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, 
                                           flagLowCountsConditions, chunk1$lengths, discoSNP, countsData$exonicReadsInfo)
         if(!is.null(countsData$k2rgFile)) {
+          print("Writing output...")
           writeMergeOutput(sizeOfEffect$signifVariants.sorted,sizeOfEffect$psiTable,output,countsData$k2rgFile)
         }
         return(list(finalTable = sizeOfEffect$signifVariants.sorted, 
@@ -641,7 +642,7 @@ writeMergeOutput <- function(finalTable,pisTable,output,k2rgFile) {
     bcc <- substr(bcc,0,nchar(bcc)-1)
     if(bcc %in% lBcc) {
       countsValue <- paste(as.character(finalTable[rownames(finalTable)==bcc,][COUNTSSTART:COUNTSEND]),collapse=",")
-      psiValue <- psiTable[psiTable$ID==bcc,][PSISTART:PSIEND]
+      psiValue <- as.numeric(psiTable[psiTable$ID==bcc,][PSISTART:PSIEND])
       psiValue <- paste(as.character(psiValue),collapse=",")
       toWrite <- paste(line,countsValue,psiValue,finalTable[rownames(finalTable)==bcc,]$Adjusted_pvalue,finalTable[rownames(finalTable)==bcc,]$`Deltaf/DeltaPSI`,finalTable[rownames(finalTable)==bcc,]$lowcounts,sep="\t")
       writeLines(toWrite,fOut)
