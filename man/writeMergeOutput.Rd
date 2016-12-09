@@ -25,6 +25,7 @@
 }
 
 \examples{
+  kissplice2refgenome_file <- system.file("extdata", "output_k2rg_alt_splicing.txt", package = "kissDE")
   counts=kissplice2counts(fileName = kissplice2refgenome_file, k2rg = TRUE)
   res=diffExpressedVariants(countsData = counts, conditions = myConditions)
   writeMergOutput(finalTable = res$finalTable, psiTable = res$`f/psiTable`, output = "path/to/my/output/file", k2rgFile = kissplice2refgenome_file)
