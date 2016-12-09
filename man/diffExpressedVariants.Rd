@@ -29,6 +29,8 @@
 	\item{flagLowCountsConditions}{a numerical value indicating the value below which we flag events as 'lowCounts' in the final data frame. This column aims to help seeing which event (variant 1 counts + variant 2 counts) has low counts (< \code{flagLowCountsBoundary = 10}) for at least n-1 conditions (over n).}
 	
 	\item{discoSNP}{a logical indicating if you are using discoSNP++'s output file instead of \code{KisSplice}'s file}
+	
+	\item{output}{a character indicating the name of the file to output the results.}
 	}
 	
 \value{

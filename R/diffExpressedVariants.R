@@ -86,7 +86,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     }
     resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, exonicReads)
     variantCountsUp <- resultLine$variantCountsUp
-    iEvents <- 0  # nombre de bcc unique + dupliqué = nombre d'événements 
+    iEvents <- 0  # nombre de bcc unique + duplique = nombre d'evenements 
     lEvents <- list()
     while (i <= length(lines)) {
       bcc=strsplit(line, split = "\t")[[1]][EVENTNAME]
@@ -605,7 +605,7 @@ plotPSI <- function(diffVariants, conditions, thresholdPvalue = 0.05, thresholdD
   }
 }
 
-writeMergeOutput <- function(finalTable,pisTable,output,k2rgFile) {
+writeMergeOutput <- function(finalTable,psiTable,output,k2rgFile) {
   EVENTNAME <- 16
   COUNTSSTART <- 3
   COUNTSENDBEFOREEND <- 3
