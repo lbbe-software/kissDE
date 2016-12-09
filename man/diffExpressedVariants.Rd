@@ -7,7 +7,7 @@
 
 \usage{
   diffExpressedVariants(countsData, conditions, storeFigs = FALSE, pvalue = 0.05, 
-  filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE)
+  filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE, output = "./kissDE_result")
   }
 
 \arguments{
