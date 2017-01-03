@@ -50,7 +50,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     events.df <- data.frame(events.names, events.mat)
     
   } else {
-    fileNameK2RG = fileName
+    fileNameK2RG <- fileName
     GENEID <- 1
     GENENAME <- 2
     POS <- 3
@@ -79,7 +79,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     i <- 1
     nextI <- 1
     line <- lines[i]
-    if(substr(line[1],0,1)=="#"){
+    if(substr(line[1], 0, 1)=="#"){
       i <- 2
       nextI <- 2
       line <- lines[i]
@@ -89,9 +89,9 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     iEvents <- 0  # nombre de bcc unique + duplique = nombre d'evenements 
     lEvents <- list()
     while (i <= length(lines)) {
-      bcc=strsplit(line, split = "\t")[[1]][EVENTNAME]
+      bcc <- strsplit(line, split = "\t")[[1]][EVENTNAME]
       if (strsplit(line, split = "\t")[[1]][EVENT] %in% keepEvents){
-        lEvents[iEvents+1] <- bcc
+        lEvents[iEvents + 1] <- bcc
         iEvents <- iEvents + 1
       }
       i <- i + 1
