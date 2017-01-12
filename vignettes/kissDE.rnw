@@ -295,7 +295,7 @@ head(myResult$finalTable)
 @
 \begin{itemize}
   \item \texttt{ID}: again we can spot an event using its ID. This time an event is represented by one row in the table.
-  \item \texttt{ Length\_diff}: not relevant for SNPs. 
+  \item \texttt{Length\_diff}: not relevant for SNPs. 
   \item \texttt{Variant1\_EUR\_repl1\_Norm} and following columns: summarize the counts for each replicate of each variant after normalization with DESeq2. The first half represent the first allele of each event, the second half the second allele (the first allele is refered to as \texttt{Variant1} while the second is \texttt{Variant2}).
   \item \texttt{Adjusted\_pvalue}: corresponds to p-values computed and adjusted.
   \item \texttt{Deltaf/DeltaPSI}: summarizes the magnitude of the effect.
@@ -304,6 +304,8 @@ head(myResult$finalTable)
 Events are sorted by p-values and then by magnitude of effect (based on their absolute values), so that the top candidates for further investigation/validation appear at the beginning of the list.
 
 The event at the top of the list shows a low p-value (1.928149e-05) and a very contrasted $\Delta f$ (-0.9258) close to the maximum value (1 in absolute). Here we do not present biological conclusion because of the size of the sample that have been selected, which does not represent the real counts distribution. 
+
+
 
 \subsection{kissDE on alternative splicing data}
 
@@ -321,8 +323,8 @@ head(exampleK2RG, 3)
 One line correspond to one alternative splicing event.
 % explain the format ?
 
-The \texttt{kissplice2count} function allow to transform this texte format into a format compatible with kissDE's main function for testing. The \texttt{r2rg} option must be set to \texttt{TRUE} to indicate that the file comes from KisSplice2refgenome and not from \kp. Like explained earlier, thes samples are paired-end. This information must be given to the \texttt{kissplice2count} function.
-% talk about the counts and the exonicReads options
+The \texttt{kissplice2count} function allow to transform this texte format into a format compatible with kissDE's main function for testing. The \texttt{k2rg} option must be set to \texttt{TRUE} to indicate that the file comes from KisSplice2refgenome and not from \kp. Like explained earlier, these samples are paired-end. This information must be given to the \texttt{kissplice2count} function.\\
+The \texttt{counts} option must be set to the same value as in \kp and KisSplice2refgenome to indicate which counts are given in input. If \texttt{counts} is set to 0 (default value), total counts are used. If this option is set to 1, only junction counts are used. And if this option is set to 2, the detailed counts (AS, SB, AB, ASSB and S) are given. In this last case, the user can choose to use exonic reads (S counts) or not by set the \texttt{exonicReads} options to \texttt{TRUE}.
 
 <<AS_counts, tidy=TRUE, highlight=FALSE, fig=FALSE>>=
 myCountsAS <- kissplice2counts(fileInAS, pairedEnd = TRUE, k2rg = TRUE, 
@@ -341,19 +343,35 @@ names(myCountsES)
 head(myCountsES$countsEvents)
 @
 
-
-To be able to perform the differential analysis, we must provide a vector that describes our experimental plan. In this example, we have two replicates of the SK-N-SH cell line without treatment (SKNSH) and two replicates of the same cell line treated with retinoic acid (SKSNH-RA). So we construct a vector:
+To be able to perform the differential analysis, we must provide a vector that describes our experimental plan. In this example, we have two replicates of the SK-N-SH cell line without treatment (SKNSH) and two replicates of the same cell line treated with retinoic acid (SKSNH-RA). So we construct the following vector:
 <<AS_condition, fig=FALSE>>=
 myConditionAS <- c(rep("SKNSH",2), rep("SKNSH-RA",2))
 @
 
 With this vector we can call the main function of the package that computes the statistical test. kissDE outputs a list of events that passed the p-value threshold:
 <<AS_test, fig=FALSE>>=
-myResultAS <- diffExpressedVariants(myCountsAS, myConditionAS, pvalue = 1)
+myResultAS <- diffExpressedVariants(myCountsAS, myConditionAS)
 head(myResultAS$finalTable)
 @
 
-% Explain results (differents cases) : significants or not, NA, low counts, ...
+\begin{itemize}
+  \item \texttt{ID}: again we can spot an event using its ID. This time an event is represented by one row in the table.
+  \item \texttt{Length\_diff}: represent the difference of length between the upper and lower paths.
+  \item \texttt{Variant1\_SKNSH\_repl1\_Norm} and following columns: summarize the counts for each replicate of each variant after normalization with DESeq2. The first half represent the first variant of each event, the second half the second variant.
+  \item \texttt{Adjusted\_pvalue}: corresponds to p-values computed and adjusted.
+  \item \texttt{Deltaf/DeltaPSI}: summarizes the magnitude of the effect.
+  \item \texttt{lowcounts}: flags low counts events as described in section[]. \texttt{FALSE} if the events has no low counts.
+\end{itemize}
+Events are sorted by p-values and then by magnitude of effect (based on their absolute values), so that the top candidates for further investigation/validation appear at the beginning of the list.
+
+The event at the top of the list shows a very low p-value (0) and a very contrasted $\Delta PSI$ (-0.8042) close to the maximum value (1 in absolute). Here we do not present biological conclusion because of the size of the sample that have been selected, which does not represent the real counts distribution. 
+
+It is possible to output all the analysed events by setting the p-value threshold to 1:
+<<AS_test_complete, fig=FALSE>>=
+myResultAS_complete <- diffExpressedVariants(myCountsAS, myConditionAS, pvalue = 1)
+tail(myResultAS_complete$finalTable)
+@
+The format of the result is the same as previously but the last events of this list are not significant (p-value > 0.05). Moreover, for some events, the $\Delta PSI$ is not computed because the counts are too low (\texttt{lowcounts} flag is set to \texttt{TRUE}).
 
 
 \section{Session info}
