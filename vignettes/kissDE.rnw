@@ -15,6 +15,13 @@
 \usepackage{amsthm}
 \usepackage{fancyvrb}
 \usepackage{listings}
+\usepackage{color}   %May be necessary if you want to color links
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true, %set true if you want colored links
+    linktoc=all,     %set to all if you want both sections and subsections linked
+    linkcolor=blue,  %choose some color if you want links to stand out
+}
 
 \newcommand{\kde}{\textsc{kissDE}}
 \newcommand{\kp}{\textsc{KisSplice}}
@@ -33,7 +40,7 @@
 
 
 
-\section{Abstract}
+\begin{abstract}
 
 In the context of RNA-seq, NGS gives access to important sequencing depth and enables to study different transcripts isoforms coming  from the same gene. In eukaryotes, many genes are not only spliced (
 exons are kept to build a mRNA) but also undergo alternative splicing, where combinations of exons in a gene yield different transcripts that correspond to alternative isoforms. Through this process a single gene can produce a collection of RNA molecules. Many experiments include several biological conditions to decypher their influence on the present transcripts. After one have found a collection of variants by analyzing its reads, it is natural to focus on the biological relevance of what is in the list, which can be thousands of variants. 
@@ -43,6 +50,11 @@ When a gene gives rise to more than two RNA molecules, we assume the set of all 
 In the case of alternative splicing, the two groups are: the ones that include the exon of interest, and the ones that exclude the exon of interest.
 In the case of genomic polymorphism, the two groups are: the ones that contain the first allele, and the ones that contain the second allele.\\
 The statistical framework is similar to DESeq. The main difference is that for gene expression, one value per gene is provided, although in the case of \kde, dealing with polymorphism or alternative splicing means providing two values: one per variant. To perform the condition-specific analysis, \kde~implements the statistical framework in a user-friendly manner. Read counts are pre-processed, several models are tested to fit the data and keep the best to perform the LRT and output the p-value jointly to several metrics and flags. 
+
+\end{abstract}
+
+
+\tableofcontents
 
 \section{Prerequisites}
 %\subsection{Data}
