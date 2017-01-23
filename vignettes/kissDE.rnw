@@ -59,14 +59,12 @@ The statistical framework is similar to DESeq. The main difference is that for g
 \section{Prerequisites}
 %\subsection{Data}
 \subsection{Use case}
-3 kinds : from kissplice / from k2rg /user
-just explain the format (4 lines... and the type of question/biological objects)
-%The input count data to KissDE may come from kissplice, DiscoSNP, kissplice2RefGenome or any other sofware if the counts are transformed into the data structure required for the package.
-If you use output files from KisSplice or Kissplice2RefGenome, you can directly import your counts using \texttt{kissplice2counts} function.
-%\kde~is meant to work on pairs of alternative variants that have been quantified across different conditions. Such variants can be found with different bioformatics workflows, variant callers,... Among them, \kde~was at first designed to work with \kp, which performs local assembly on RNA-seq data in order to find and quantify alternative variants. When one have found a list of variants with \kp, we provide a function within this packages that makes easy to convert \kp's fasta files into a format than can be used for testing with \kde. Although \kde~is a tool from \kp's suite, it can be used independantly from \kp~with counts for each variants obtained with any other method.\\
-%The user must keep in mind that \kde~was designed to work with at least one replicate for each condition, which means that the minimal input is variants quantified for 4 different individuals, each couple representing a condition. There can be more replicates and more conditions, it is also not mandatory to have an equal number of replicates in each condition.\\
-%For running \kde, you need to give as input a table of raw counts and a vector describing your number of conditions and replicates.
-%You can provide your own table of counts, or simply use \kp's output. Raw table of counts format is described at \textbf{section 4.1: Input data}.
+%just explain the format (4 lines... and the type of question/biological objects)
+\kde~is meant to work on pairs of alternative variants that have been quantified across different conditions. It can deals with single nucleotide variant (SNV) or alternative splicing.\\
+The input count data to \kde~may come from kissplice, kissplice2RefGenome or any other sofware if the counts are transformed into the data structure required for the package.
+If you use output files from KisSplice or Kissplice2RefGenome, you can directly import your counts using \texttt{kissplice2counts} function.\\
+The user must keep in mind that \kde~was designed to work with at least one replicate for each condition, which means that the minimal input is variants quantified for 4 different individuals, each couple representing a condition. There can be more replicates and more conditions, it is also not mandatory to have an equal number of replicates in each condition.\\
+
 \subsection{Install and load \kde}
 In a R session, you must first install Bioconductor.
 <<installBC,eval=FALSE, fig=FALSE>>=
@@ -119,7 +117,7 @@ Here we present two examples to explain how \texttt{filterLowCountsVariants} opt
 
 \subsection{Model}
  
-Then we design two models to take into account interactions with \textit{variants}(SNPs or alternative isoforms) and \textit{experimental conditions} as main effects. We  use the Generalized Linear Model framework. The expected intensity $\lambda_{ijk}$ can be written as following:
+Then we design two models to take into account interactions with \textit{variants} (SNPs or alternative isoforms) and \textit{experimental conditions} as main effects. We  use the Generalized Linear Model framework. The expected intensity $\lambda_{ijk}$ can be written as following:
 
 $$\mathcal{M_0}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j} $$
 $$\mathcal{M_1}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j}+ \left(\alpha \beta \right)_{ij}$$ 
