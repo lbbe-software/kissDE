@@ -261,12 +261,12 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   ### code chunk number 2: dendrogram
   ###################################################
   if (storeFigs == FALSE) {
-    plot(hclust(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))])), "ward.D"))
+    plot(hclust(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))])), "ward.D"), sub = "", xlab = "")
     par(ask = TRUE)
   } else {
     filename <- paste(storeFigs, "/dendrogram.png", sep = "")
     png(filename)
-    plot(hclust(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))])), "ward.D"))
+    plot(hclust(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))])), "ward.D"), sub = "", xlab = "")
     void <- dev.off()
   }
   
@@ -274,46 +274,46 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   ### code chunk number 3: replicates
   ###################################################
   if (storeFigs == FALSE) {
-    heatmap(as.matrix(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))]))), margins = c(10, 10))
+    heatmap(as.matrix(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))]))), margins = c(10, 10), cexRow = 1, cexCol = 1)
   } else {
     filename <- paste(storeFigs, "/heatmap.png", sep = "")
     png(filename)
-    heatmap(as.matrix(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))]))), margins = c(10, 10))
+    heatmap(as.matrix(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))]))), margins = c(10, 10), cexRow = 1, cexCol = 1)
     void <- dev.off()
   }
   
-  ###################################################
-  ### code chunk number 4: intra-group and inter-group-variance
-  ###################################################
-  # Mean and variance over all conditions and replicates (normalized counts!)
-  countsData$mn <- rowMeans(countsData[, (dimns + 1):(dimns + length(conds))])
-  countsData$var <- apply(countsData[, (dimns + 1):(dimns + length(conds))], 1, var)
-  # correction term
-  nbAll <- sum(nr)  # number of all observations in all groups
-  countsData$ct <- rowSums(countsData[, (dimns + 1):(dimns + length(conds))])^2 / nbAll
-  # sum of squares between groups
-  countsData$ss <- rowSums(countsData[, (dimns + 1):(dimns + length(conds) / n)])^2 / nr[1] + rowSums(countsData[, ((dimns + 1) + length(conds) / n):(dimns + length(conds))])^2 / nr[2]
-  # substract the correction term from the SS and divide by the degrees of 
-  df <- 1 # freedom(groups); here: df=2-1=1
-  countsData$varInter <- (countsData$ss - countsData$ct) / df
-  # intra-variability 
-  countsData$varC1 <- apply(countsData[, (dimns + 1):(dimns + nr[1])], 1, var)
-  countsData$varC2 <- apply(countsData[, ((dimns + 1) + nr[1]):(dimns + nr[2] + nr[1])], 1, var)
-  countsData$varIntra <- rowMeans(data.frame(countsData$varC1, countsData$varC2))
-  
-  ###################################################
-  ### code chunk number 5: intra-vs-inter
-  ###################################################
-  if (storeFigs == FALSE) {
-    plot(x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
-    abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
-  } else {
-    filename <- paste(storeFigs, "/InterIntraVariability.png", sep = "")
-    png(filename)
-    plot(x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
-    abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
-    void <- dev.off()
-  }
+  # ###################################################
+  # ### code chunk number 4: intra-group and inter-group-variance
+  # ###################################################
+  # # Mean and variance over all conditions and replicates (normalized counts!)
+  # countsData$mn <- rowMeans(countsData[, (dimns + 1):(dimns + length(conds))])
+  # countsData$var <- apply(countsData[, (dimns + 1):(dimns + length(conds))], 1, var)
+  # # correction term
+  # nbAll <- sum(nr)  # number of all observations in all groups
+  # countsData$ct <- rowSums(countsData[, (dimns + 1):(dimns + length(conds))])^2 / nbAll
+  # # sum of squares between groups
+  # countsData$ss <- rowSums(countsData[, (dimns + 1):(dimns + length(conds) / n)])^2 / nr[1] + rowSums(countsData[, ((dimns + 1) + length(conds) / n):(dimns + length(conds))])^2 / nr[2]
+  # # substract the correction term from the SS and divide by the degrees of 
+  # df <- 1 # freedom(groups); here: df=2-1=1
+  # countsData$varInter <- (countsData$ss - countsData$ct) / df
+  # # intra-variability 
+  # countsData$varC1 <- apply(countsData[, (dimns + 1):(dimns + nr[1])], 1, var)
+  # countsData$varC2 <- apply(countsData[, ((dimns + 1) + nr[1]):(dimns + nr[2] + nr[1])], 1, var)
+  # countsData$varIntra <- rowMeans(data.frame(countsData$varC1, countsData$varC2))
+  # 
+  # ###################################################
+  # ### code chunk number 5: intra-vs-inter
+  # ###################################################
+  # if (storeFigs == FALSE) {
+  #   plot(x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
+  #   abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
+  # } else {
+  #   filename <- paste(storeFigs, "/InterIntraVariability.png", sep = "")
+  #   png(filename)
+  #   plot(x = countsData$varIntra, y = countsData$varInter, xlab = "Intra-variability", ylab = "Inter-variability", las = 1, log = "xy")
+  #   abline(a = 0, b = 1, col = 2, lty = 2, lwd = 2)
+  #   void <- dev.off()
+  # }
 }
 
 
