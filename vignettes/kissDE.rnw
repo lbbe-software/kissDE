@@ -117,7 +117,7 @@ Here we present two examples to explain how \texttt{filterLowCountsVariants} opt
 
 \subsection{Model}
  
-Then we design two models to take into account interactions with \textit{variants} (SNPs or alternative isoforms) and \textit{experimental conditions} as main effects. We  use the Generalized Linear Model framework. The expected intensity $\lambda_{ijk}$ can be written as following:
+Then we design two models to take into account interactions with \textit{variants} (SNVs or alternative isoforms) and \textit{experimental conditions} as main effects. We  use the Generalized Linear Model framework. The expected intensity $\lambda_{ijk}$ can be written as following:
 
 $$\mathcal{M_0}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j} $$
 $$\mathcal{M_1}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j}+ \left(\alpha \beta \right)_{ij}$$ 
@@ -192,7 +192,7 @@ tableCounts <- read.table(fpath1, head = TRUE)
 head(tableCounts)
 @
 \begin{itemize}
- \item \textbf{Lines:} one variation is represented by two lines, one for each variant. For instance for SNPs, one allele is described in the first line, and the other in the second line. For alternative splicing events, the inclusion form and the exclusion forms has one line each.
+ \item \textbf{Lines:} one variation is represented by two lines, one for each variant. For instance for SNVs, one allele is described in the first line, and the other in the second line. For alternative splicing events, the inclusion form and the exclusion forms has one line each.
 \item \textbf{Columns:}
 \begin{itemize}
 \item Each line has a first column (\texttt{V1}) with the name of the variation.
@@ -207,7 +207,7 @@ myConditions <- c(rep("condition_1",2),rep("condition_2",2))
 because (\texttt{V3, V4, V5, V6}) have been put in an order that represents first two replicates of $condition_1$, then two replicates of $condition_2$.
 
 \subsubsection{\kp}
-The user must refer to \kp~manual for any question about \kp~format and output. \kde~can be used on any type output by \kp~(0: SNP, 1: alternative splicing events, 2: indels,...). It is possible to obtain a table of counts to perform the tests of \kde~directly from \kp's output, using the function \texttt{kissplice2counts}.
+The user must refer to \kp~manual for any question about \kp~format and output. \kde~can be used on any type output by \kp~(0: SNV, 1: alternative splicing events, 2: indels,...). It is possible to obtain a table of counts to perform the tests of \kde~directly from \kp's output, using the function \texttt{kissplice2counts}.
 <<kissplice2counts_howto, fig=FALSE>>=
 fpath2 <- system.file("extdata", "output_kissplice_alt_splicing.fa", package="kissDE")
 myCounts <- kissplice2counts(fpath2, counts = 2, pairedEnd = TRUE)
@@ -215,7 +215,7 @@ names(myCounts)
 head(myCounts$countsEvents)
 @
 \begin{itemize}
-\item \textbf{Lines:} one variation is represented by two lines, one for each variant. For instance for SNPs, one allele is described in the first line, and the other in the second line.
+\item \textbf{Lines:} one variation is represented by two lines, one for each variant. For instance for SNVs, one allele is described in the first line, and the other in the second line.
  For alternative splicing events (like in this example), the inclusion form and the exclusion forms has one line each.
 \item \textbf{Columns:}
 \begin{itemize}
@@ -261,25 +261,25 @@ With theses plots, the user can see the similarities and the differences between
 The created figures can be saved by setting the \texttt{storeFigs} option to \texttt{TRUE} or to the path where the figures are to be stored.
 
 
-\subsection{kissDE on SNP data}
-RNA-seq data do not only provide an insight in alternative splicing, it can also be used to study SNPs in expressed regions of the genome. Such SNPs can be detected and reported by KisSplice. Here we use an extract of sequences from the Geuvadis project. We selected two Toscans (TSC) individuals and two Central Europeans (EUR).
+\subsection{kissDE on SNV data}
+RNA-seq data do not only provide an insight in alternative splicing, it can also be used to study SNVs in expressed regions of the genome. Such SNVs can be detected and reported by KisSplice. Here we use an extract of sequences from the Geuvadis project. We selected two Toscans (TSC) individuals and two Central Europeans (EUR).
 A pair of files represent each replicate (whom have been paired-end sequenced), so eight files have been used for KisSplice input, 4 files representing the two TSC, followed by 4 files representing the two EUR. Paired-end files from a same individual have been input following each other.\\
-We first load the output of KisSplice. It is a fasta file that stores SNPs found in the data set.
+We first load the output of KisSplice. It is a fasta file that stores SNVs found in the data set.
 
-<<snp_data, fig=FALSE>>=
-fileIn <- system.file("extdata", "output_kissplice_SNP.fa", package = "kissDE")
+<<snv_data, fig=FALSE>>=
+fileIn <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
 exampleTable <- read.table(fileIn)
 head(exampleTable, 4)
 @
 
  By having a look a the 4 first lines, we can see that the fasta file is structurated as follows:
-events are reported in 4 lines, the two first represent one allele of the SNP, the two last the other allele. Thus the sequences only differ from each other by their SNP content. The headers contain useful information:
+events are reported in 4 lines, the two first represent one allele of the SNV, the two last the other allele. Thus the sequences only differ from each other by their SNV content. The headers contain useful information:
 \begin{itemize}
 \item elements shared by the headers of the two alleles:
 \begin{itemize}
   \item \texttt{bcc\_44787|Cycle\_421687} is the event's ID
-  \item \texttt{Type\_0b} means that the sequences contains multiple SNPs, on the contrary \texttt{Type\_0a} is used for refering to single SNPs that could not be phased
-  \item \texttt{upper\_path\_length\_131} and \texttt{lower\_path\_length\_131} give the length of the nucleotide sequences. They are the same for both alleles of a SNP (131 in this example). Upper path and lower path are a denomination for the representation of each allele in KisSplice's graph.
+  \item \texttt{Type\_0b} means that the sequences contains multiple SNVs, on the contrary \texttt{Type\_0a} is used for refering to single SNVs that could not be phased
+  \item \texttt{upper\_path\_length\_131} and \texttt{lower\_path\_length\_131} give the length of the nucleotide sequences. They are the same for both alleles of a SNV (131 in this example). Upper path and lower path are a denomination for the representation of each allele in KisSplice's graph.
 \end{itemize}
 \item elements that are specific to an allele:
 \begin{itemize}
@@ -289,7 +289,7 @@ events are reported in 4 lines, the two first represent one allele of the SNP, t
 \item NB: the rank is a deprecated measure.
 \end{itemize}
 The first step is to convert this fasta file into a format that will be used in kissDE's main function for testing. This can be done as follows:
-<<snp_counts, fig=FALSE>>=
+<<snv_counts, fig=FALSE>>=
 myCounts <- kissplice2counts(fileIn, pairedEnd=T)
 names(myCounts)
 head(myCounts$countsEvents)
@@ -298,17 +298,17 @@ We are in the casee of paired-end files, where a pair of file correspond to an i
 In the result, we can see that the event's ID are used to label each event, and that an event is represented in two ines (one for each allele). The second column stores the size of the event, and all the next columns summarize the counts for each replicate. For instance, event \texttt{bcc\_44787|Cycle\_421687} already described previously has a length of 131, has 910 reads corresponding to its first TSC replicate (which correspond to the sum of the counts in \texttt{C1\_455|C2\_455}: 455 + 455 = 910, that have been realized thanks to \texttt{pairedEnd} option).
 
 To be able to perform the differential analysis, we msut provide a vector that describes what is our experimental plan. In this example, we have two replicates of TSC and two replicates of EUR. So we construct a vector:
-<<snp_condition, fig=FALSE>>=
+<<snv_condition, fig=FALSE>>=
 myCondition <- c(rep("TSC",2), rep("EUR",2))
 @
 With this vector we can call the main function of the package that computes the statistical test. kissDE outputs a list of events that passed the p-value threshold:
-<<snp_test, fig=FALSE>>=
+<<snv_test, fig=FALSE>>=
 myResult <- diffExpressedVariants(myCounts, myCondition)
 head(myResult$finalTable)
 @
 \begin{itemize}
   \item \texttt{ID}: again we can spot an event using its ID. This time an event is represented by one row in the table.
-  \item \texttt{Length\_diff}: not relevant for SNPs. 
+  \item \texttt{Length\_diff}: not relevant for SNVs. 
   \item \texttt{Variant1\_EUR\_repl1\_Norm} and following columns: summarize the counts for each replicate of each variant after normalization with DESeq2. The first half represent the first allele of each event, the second half the second allele (the first allele is refered to as \texttt{Variant1} while the second is \texttt{Variant2}).
   \item \texttt{Adjusted\_pvalue}: corresponds to p-values computed and adjusted.
   \item \texttt{Deltaf/DeltaPSI}: summarizes the magnitude of the effect.
