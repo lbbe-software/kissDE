@@ -401,43 +401,6 @@
   phi <- 1 / coef(nls.modelNB) # to be used as fixed parameter later on
   
   ###################################################
-  ### code chunk number 4: plot models
-  ###################################################
-  
-  # compute model fit
-  # log plot, so exclude 0 from the x values
-  x <- c(seq(0.1, 1, 0.1), seq(2, 5000, 1))
-  yQP <- x * coef(lm.D)
-  yNB <- x + 1 / coef(nls.modelNB) * x^2
-  
-  if (storeFigs == FALSE) {
-    plot(event.mean.variance.df$Mean, event.mean.variance.df$Variance, 
-         xlab = "Mean Event count", 
-         ylab = "Variance Event count",
-         log = "xy", las = 1)
-    abline(a = 0, b = 1, col = 2, lwd = 2)
-    lines(x, yQP, col = 3, lwd = 2)
-    lines(x, yNB, col = 6, lwd = 2)
-    legend("topleft", c("Poisson", "Quasi-Poisson", "Negative Binomial"), text.col = c(2, 3, 6), box.lty = 0)
-  } else {
-    find <- paste("find", pathFigs)
-    d <- system(find, TRUE, ignore.stderr = TRUE)
-    if (length(d) == 0) { 
-      command <- paste("mkdir", pathFigs)
-      system(command, ignore.stderr = TRUE)
-    }
-    filename <- paste(pathFigs, "/models.png", sep = "")
-    png(filename)
-    plot(event.mean.variance.df$Mean, event.mean.variance.df$Variance, 
-         xlab = "Mean Event count", ylab = "Variance Event count", log = "xy", las = 1)
-    abline(a = 0, b = 1, col = 2, lwd = 2)
-    lines(x, yQP, col = 3, lwd = 2)
-    lines(x, yNB, col = 6, lwd = 2)
-    legend("topleft", c("Poisson", "Quasi-Poisson", "Negative Binomial"), text.col = c(2, 3, 6), box.lty = 0)
-    void <- dev.off()
-  }
-  
-  ###################################################
   ### code chunk number 5: exclude low counts
   ###################################################
   totLOW <- as.vector(apply(dataPart2[, (3 + sum(nr)):(3 + 2 * sum(nr) - 1)], 1, sum))  # global counts for each variant (low/up) by event
