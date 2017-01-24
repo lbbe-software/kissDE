@@ -136,6 +136,8 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     events.df <- data.frame(events.names, events.mat)
   }
   
+  colnames(events.df) <- c("events.names", "events.length", paste("counts", 1:(length(colnames(events.df)) - 2), sep="")) # change col names
+  
   close(toConvert)
   psiInfo <- data.frame(events.names, as.data.frame(psiInfo))
   
