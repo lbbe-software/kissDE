@@ -6,7 +6,7 @@
 \description{Function that retrieves condition-specific variants in RNA-seq data.}
 
 \usage{
-  diffExpressedVariants(countsData, conditions, storeFigs = FALSE, pvalue = 0.05, 
+  diffExpressedVariants(countsData, conditions, storeFigs = FALSE, pvalue = 1, 
   filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE, 
   output = "./kissDE_result")
   }

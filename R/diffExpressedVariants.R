@@ -343,7 +343,7 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
 
 
 
-diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pvalue = 0.05, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE, output = "./kissDE_result") {
+diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pvalue = 1, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE, output = "./kissDE_result") {
   options(warn = -1)  # suppress the warning for the users
   if (storeFigs == FALSE) {
     pathToFigs <- NA
