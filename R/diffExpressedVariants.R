@@ -260,15 +260,36 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   nr <- listData$nr
   
   ###################################################
+  ### select events with highest variance (on PSI)
+  ###################################################
+  countsData2 <- reshape(countsData[, c(1,(dimns):(dimns + length(conds)))], timevar = "Path", idvar = "ID", direction = "wide")
+  for (i in 1:n){
+    for (j in 1:nr[i]){
+      countsData2$PSI <- countsData2[,(1+j+sum(nr[0:(i-1)]))]/
+        (countsData2[,(1+j+sum(nr[0:(i-1)]))] + countsData2[,(1+sum(nr)+j+sum(nr[0:(i-1)]))])
+      # replace PSI by NA if count less or equal to 10 reads for the 2 isoforms
+      indexNA <- intersect(which(countsData2[,(1+j+sum(nr[0:(i-1)]))] < 10), which(countsData2[,(1+sum(nr)+j+sum(nr[0:(i-1)]))] < 10))
+      countsData2$PSI[indexNA] <- NA
+      colnames(countsData2)[9+j+(i-1)*2] <- paste(paste0("PSI_cond",i),paste0("repl",j),sep="_")
+    }
+  }
+  countsData2$vars <- apply(as.matrix(countsData2[, 10:(9 + length(conds))]), 1, var, na.rm = TRUE)
+  ntop <- min(500, dim(countsData2)[1])
+  selectntop <- order(countsData2$vars, decreasing=TRUE)[seq_len(ntop)]
+  countsData2Selected <- countsData2[selectntop,]
+  # remove all NAs
+  countsData2Selected <- countsData2Selected[complete.cases(countsData2Selected[, 10:(9 + length(conds))]),]
+  
+  ###################################################
   ### code chunk number 2: dendrogram
   ###################################################
   if (storeFigs == FALSE) {
-    plot(hclust(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))])), "ward.D"), sub = "", xlab = "")
+    plot(hclust(as.dist(1 - cor(countsData2Selected[, 10:(9 + length(conds))])), "ward.D"), sub = "", xlab = "")
     par(ask = TRUE)
   } else {
     filename <- paste(storeFigs, "/dendrogram.png", sep = "")
     png(filename)
-    plot(hclust(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))])), "ward.D"), sub = "", xlab = "")
+    plot(hclust(as.dist(1 - cor(countsData2Selected[, 10:(9 + length(conds))])), "ward.D"), sub = "", xlab = "")
     void <- dev.off()
   }
   
@@ -276,11 +297,13 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   ### code chunk number 3: replicates
   ###################################################
   if (storeFigs == FALSE) {
-    heatmap(as.matrix(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))]))), margins = c(10, 10), cexRow = 1, cexCol = 1)
+    heatmap.2(as.matrix(as.dist(1 - cor(countsData2Selected[, 10:(9 + length(conds))]))), margins = c(10, 10), 
+              cexRow = 1, cexCol = 1, density.info = "none", trace = "none")
   } else {
     filename <- paste(storeFigs, "/heatmap.png", sep = "")
     png(filename)
-    heatmap(as.matrix(as.dist(1 - cor(countsData[, (dimns + 1):(dimns + length(conds))]))), margins = c(10, 10), cexRow = 1, cexCol = 1)
+    heatmap.2(as.matrix(as.dist(1 - cor(countsData2Selected[, 10:(9 + length(conds))]))), margins = c(10, 10), 
+              cexRow = 1, cexCol = 1, density.info = "none", trace = "none")
     void <- dev.off()
   }
   
