@@ -348,7 +348,7 @@
 
 
 
-.modelFit <-function(countsData, n, nr, ASSBinfo, storeFigs, pathFigs, filterLowCountsVariants){
+.modelFit <-function(countsData, n, nr, ASSBinfo, filterLowCountsVariants){
   ##################################################
   ## code chunk number 1: event-list
   ##################################################

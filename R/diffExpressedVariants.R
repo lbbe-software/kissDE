@@ -343,17 +343,8 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
 
 
 
-diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pvalue = 1, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE, output = "./kissDE_result") {
+diffExpressedVariants <- function(countsData, conditions, pvalue = 1, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE, output = "./kissDE_result") {
   options(warn = -1)  # suppress the warning for the users
-  if (storeFigs == FALSE) {
-    pathToFigs <- NA
-  } else {
-    if (isTRUE(storeFigs)) {
-      pathToFigs <- "kissDEFigures"
-    } else {
-      pathToFigs <- storeFigs
-    }
-  }
   
   print("Pre-processing the data...")
   chunk0 <- tryCatch({.readAndPrepareData(countsData, conditions)
@@ -382,7 +373,7 @@ diffExpressedVariants <- function(countsData, conditions, storeFigs = FALSE, pva
       ASSBinfo <- ASSBinfo[li, ]
     }
     print("Trying to fit models on data...")
-    chunk1 <- tryCatch({.modelFit(chunk0$countsData, chunk0$n, chunk0$nr, ASSBinfo, storeFigs, pathToFigs, filterLowCountsVariants)
+    chunk1 <- tryCatch({.modelFit(chunk0$countsData, chunk0$n, chunk0$nr, ASSBinfo, filterLowCountsVariants)
       #### chunk 1 var ####
       # chunk1$pALLGlobalPhi.glm.nb 
       # chunk1$sing.events
