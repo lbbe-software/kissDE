@@ -281,29 +281,39 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   countsData2Selected <- countsData2Selected[complete.cases(countsData2Selected[, 10:(9 + length(conds))]),]
   
   ###################################################
-  ### code chunk number 2: dendrogram
-  ###################################################
-  if (storeFigs == FALSE) {
-    plot(hclust(as.dist(1 - cor(countsData2Selected[, 10:(9 + length(conds))])), "ward.D"), sub = "", xlab = "")
-    par(ask = TRUE)
-  } else {
-    filename <- paste(storeFigs, "/dendrogram.png", sep = "")
-    png(filename)
-    plot(hclust(as.dist(1 - cor(countsData2Selected[, 10:(9 + length(conds))])), "ward.D"), sub = "", xlab = "")
-    void <- dev.off()
-  }
-  
-  ###################################################
-  ### code chunk number 3: replicates
+  ### code chunk number 3: heatmap
   ###################################################
   if (storeFigs == FALSE) {
     heatmap.2(as.matrix(as.dist(1 - cor(countsData2Selected[, 10:(9 + length(conds))]))), margins = c(10, 10), 
               cexRow = 1, cexCol = 1, density.info = "none", trace = "none")
+    par(ask = TRUE)
   } else {
     filename <- paste(storeFigs, "/heatmap.png", sep = "")
     png(filename)
     heatmap.2(as.matrix(as.dist(1 - cor(countsData2Selected[, 10:(9 + length(conds))]))), margins = c(10, 10), 
               cexRow = 1, cexCol = 1, density.info = "none", trace = "none")
+    void <- dev.off()
+  }
+  
+  ###################################################
+  ### PCA plot
+  ###################################################
+  pca <- prcomp(t(countsData2Selected[, 10:(9 + length(conds))]))
+  fac <- factor(conds)
+  colorpalette <- c("#192823", "#DD1E2F", "#EBB035", "#06A2CB", "#218559", "#D0C6B1")
+  colors <- colorpalette[1:n]
+  pc1var <- round(summary(pca)$importance[2,1]*100, digits=1)
+  pc2var <- round(summary(pca)$importance[2,2]*100, digits=1)
+  pc1lab <- paste0("PC1 (",as.character(pc1var),"%)")
+  pc2lab <- paste0("PC2 (",as.character(pc2var),"%)")
+  if (storeFigs == FALSE) {
+    plot(PC2~PC1, data=as.data.frame(pca$x), bg=colors[fac], pch=21, xlab=pc1lab, ylab=pc2lab, main="PCA plot")
+    legend("right", legend=levels(fac), col=colors, pch=20)
+  } else {
+    filename <- paste(storeFigs, "/pca.png", sep = "")
+    png(filename)
+    plot(PC2~PC1, data=as.data.frame(pca$x), bg=colors[fac], pch=21, xlab=pc1lab, ylab=pc2lab, main="PCA plot")
+    legend("right", legend=levels(fac), col=colors, pch=20)
     void <- dev.off()
   }
   
