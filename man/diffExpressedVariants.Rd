@@ -28,7 +28,7 @@
 	}
 	
 \value{
-  \code{diffExpressedVariants} returns a list of 4 objects:
+  \code{diffExpressedVariants} returns a list of 5 objects:
     \item{finalTable}{a data frame containing the columns
       \itemize{
         \item \code{ID}: the variation ID
@@ -42,8 +42,7 @@
 	\item{uncorrectedPVal}{a numeric vector containing pvalues before correction for multiple testing}
 	\item{resultFitNBglmModel}{a data frame containing the results of the fitting of models to the data}
 	\item{psiTable}{a data frame containing the Percent Spliced In (PSI) of each replicates}
-	
-	\code{diffExpressedVariants} also returns a graphic representing the variance by the mean of event counts and the Poisson, Quasi-Poisson and Negative Binomial models.
+
 }
 
 \details{
