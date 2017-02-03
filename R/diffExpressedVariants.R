@@ -270,7 +270,7 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
       # replace PSI by NA if count less or equal to 10 reads for the 2 isoforms
       indexNA <- intersect(which(countsData2[,(1+j+sum(nr[0:(i-1)]))] < 10), which(countsData2[,(1+sum(nr)+j+sum(nr[0:(i-1)]))] < 10))
       countsData2$PSI[indexNA] <- NA
-      colnames(countsData2)[9+j+(i-1)*2] <- paste(paste0("PSI_cond",i),paste0("repl",j),sep="_")
+      colnames(countsData2)[9+j+(i-1)*2] <- paste(paste0("Cond",i),paste0("repl",j),sep="_")
     }
   }
   countsData2$vars <- apply(as.matrix(countsData2[, 10:(9 + length(conds))]), 1, var, na.rm = TRUE)
@@ -307,13 +307,19 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
   pc1lab <- paste0("PC1 (",as.character(pc1var),"%)")
   pc2lab <- paste0("PC2 (",as.character(pc2var),"%)")
   if (storeFigs == FALSE) {
+    par(oma = c(2, 1, 1, 1))
     plot(PC2~PC1, data=as.data.frame(pca$x), bg=colors[fac], pch=21, xlab=pc1lab, ylab=pc2lab, main="PCA plot")
-    legend("right", legend=levels(fac), col=colors, pch=20)
+    par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
+    plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
+    legend("bottom", legend=levels(fac), xpd = TRUE, horiz = TRUE, inset = c(0, 0), bty = "n", pch = 20, col = colors)
   } else {
     filename <- paste(storeFigs, "/pca.png", sep = "")
     png(filename)
+    par(oma = c(2, 1, 1, 1))
     plot(PC2~PC1, data=as.data.frame(pca$x), bg=colors[fac], pch=21, xlab=pc1lab, ylab=pc2lab, main="PCA plot")
-    legend("right", legend=levels(fac), col=colors, pch=20)
+    par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
+    plot(0, 0, type = "n", bty = "n", xaxt = "n", yaxt = "n")
+    legend("bottom", legend=levels(fac), xpd = TRUE, horiz = TRUE, inset = c(0, 0), bty = "n", pch = 20, col = colors)
     void <- dev.off()
   }
   
