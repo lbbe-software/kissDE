@@ -80,8 +80,8 @@
 
 
 \examples{
-  fpath <- system.file("extdata", "output_kissplice_SNP.fa", package = "kissDE")
-  mySNPcounts <- kissplice2counts(fpath, pairedEnd = TRUE)
-  head(mySNPcounts)
-  names(mySNPcounts)
+  fpath <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
+  mySNVcounts <- kissplice2counts(fpath, pairedEnd = TRUE)
+  head(mySNVcounts)
+  names(mySNVcounts)
 }

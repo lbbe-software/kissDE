@@ -29,8 +29,8 @@ The figures are stored or displayed in the R session.
 
 
 \examples{
-fpath <- system.file("extdata", "output_kissplice_SNP.fa", package = "kissDE")
-mySNPcounts <- kissplice2counts(fpath, pairedEnd = TRUE)
-mySNPconditions <- c("EUR", "EUR", "TSC", "TSC")
-qualityControl(mySNPcounts, mySNPconditions)
+fpath <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
+mySNVcounts <- kissplice2counts(fpath, pairedEnd = TRUE)
+mySNVconditions <- c("EUR", "EUR", "TSC", "TSC")
+qualityControl(mySNVcounts, mySNVconditions)
 }

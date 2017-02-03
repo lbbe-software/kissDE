@@ -2,12 +2,12 @@ library("kissDE")
 
 
 ## tests 'kissplice2counts'
-fpath <- system.file("extdata", "output_kissplice_SNP.fa", package = "kissDE")
-mySNPcounts <- kissplice2counts(fpath, pairedEnd = TRUE)
+fpath <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
+mySNVcounts <- kissplice2counts(fpath, pairedEnd = TRUE)
 
 stopifnot(
-  all(names(mySNPcounts) == c("countsEvents", "psiInfo", "discoInfo", "exonicReadsInfo", "k2rgFile")),
-  all(mySNPcounts$countsEvents[, 1] == mySNPcounts$psiInfo[, 1])
+  all(names(mySNVcounts) == c("countsEvents", "psiInfo", "discoInfo", "exonicReadsInfo", "k2rgFile")),
+  all(mySNVcounts$countsEvents[, 1] == mySNVcounts$psiInfo[, 1])
 )
 
 ## tests 'diffExpressedVariants'

@@ -53,10 +53,10 @@
 }
 
 \examples{
-fpath1 <- system.file("extdata", "output_kissplice_SNP.fa", package = "kissDE")
-mySNPcounts <- kissplice2counts(fpath1, pairedEnd = TRUE)
-mySNPconditions <- c("EUR", "EUR", "TSC", "TSC")
-# diffSNP <- diffExpressedVariants(mySNPcounts, mySNPconditions)
+fpath1 <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
+mySNVcounts <- kissplice2counts(fpath1, pairedEnd = TRUE)
+mySNVconditions <- c("EUR", "EUR", "TSC", "TSC")
+# diffSNV <- diffExpressedVariants(mySNVcounts, mySNVconditions)
 
 fpath2 <- system.file("extdata", "table_counts_alt_splicing.txt", package = "kissDE")
 mySplicingconditions <- c("C1", "C1", "C2", "C2")
