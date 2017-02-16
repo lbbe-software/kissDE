@@ -722,3 +722,149 @@
   return(list(signifVariants.sorted = signifVariants.sorted,
               psiTable = psi))
 }
+
+
+.writeTableOutput <- function(finalTable, pvalMax = 1, dPSImin = 0, output) {
+  fOut <- file(output, open = "w")
+  colNames <- colnames(finalTable)
+  rowNames <- rownames(finalTable)
+  nbRow <- length(rowNames)
+  idDPSI <- length(colNames) - 1
+  idPV <- length(colNames) - 2
+  lHead <- c()
+  j <- 1
+  for (colName in colNames) {
+    lHead <- append(lHead, paste(j, colName, sep="."))
+    j <- j + 1
+  }
+  head <- paste(lHead, collapse = "\t")
+  head <- paste("#", head, sep = "")
+  writeLines(head,fOut)
+  
+  #fT <- finalTable
+  #rownames(fT) <- NULL
+  #colnames(fT) <- NULL
+  i <- 1
+  while (i <= nbRow) {
+    apv <- finalTable[i, idPV]
+    if (is.na(apv)) {
+      apv <- 1
+    }
+    dpsi <- abs(finalTable[i, idDPSI])
+    if (is.na(dpsi)) {
+      dpsi <- 0
+    }
+    if (dpsi >= dPSImin && apv <= pvalMax) {
+      writeLines(paste(rowNames[i], paste(as.character(finalTable[i, ])[-1], collapse = "\t"), sep = "\t"), fOut)
+    }
+    i <- i + 1
+  }
+  close(fOut)
+} 
+
+.writeMergeOutput <- function(resDiffExpr, k2rgFile, pvalMax = 1, dPSImin = 0, output) {
+  K2RG_GENEID <- "Gene_Id"
+  K2RG_GENENAME <- "Gene_name"
+  K2RG_POS <- "Chromosome_and_genomic_position"
+  K2RG_STRAND <- "Strand"
+  K2RG_TYPE <- "Event_type"
+  K2RG_VARLENGTH <- "Variabble_part_length"
+  K2RG_FS <- "Frameshift_?"
+  K2RG_CDS <- "CDS_?"
+  K2RG_BIO <- "Gene_biotype"
+  K2RG_KNOWNSS <- "number_of_known_splice_sites/number_of_SNPs"
+  K2RG_BLOCUP <- "genomic_blocs_size_(upper_path)"
+  K2RG_POSUP <- "genomic_position_of_each_splice_site_(upper_path)/of_each_SNP"
+  K2RG_PARA <- "paralogs_?"
+  K2RG_COMPLEX <- "Complex_event_?"
+  K2RG_SNP <- "snp_in_variable_region"
+  K2RG_EVENT <- "Event_name"
+  K2RG_BLOCLOW <- "genomic_blocs_size_(lower_path)"
+  K2RG_POSLOW <- "genomic_position_of_each_splice_site_(lower_path)"
+  K2RG_PSI <- "Psi_for_each_replicate"
+  K2RG_COVUP <- "Read_coverage(upper_path)"
+  K2RG_COVLOW <- "Read_coverage(lower_path)"
+  K2RG_CANON <- "Canonical_sites?"
+  LK2RG <- c(K2RG_GENEID, K2RG_GENENAME, K2RG_POS, K2RG_STRAND, K2RG_TYPE, K2RG_VARLENGTH, K2RG_FS, K2RG_CDS, K2RG_BIO, K2RG_KNOWNSS, K2RG_BLOCUP, K2RG_POSUP, K2RG_PARA, K2RG_COMPLEX, K2RG_SNP, K2RG_EVENT, K2RG_BLOCLOW, K2RG_POSLOW, K2RG_PSI, K2RG_COVUP, K2RG_COVLOW, K2RG_CANON)
+  
+  K2RGKDE_APV="adjusted_pvalue"
+  K2RGKDE_DPSI="dPSI"
+  K2RGKDE_WARN="warnings"
+  
+  finalTable <- resDiffExpr$finalTable
+  psiTable <- resDiffExpr$`f/psiTable`
+  EVENTNAME <- 16
+  COUNTSSTART <- 3
+  COUNTSENDBEFOREEND <- 3
+  PSISTART <- 2
+  
+  COUNTSEND <- ncol(finalTable)-COUNTSENDBEFOREEND
+  PSIEND <- ncol(psiTable)
+  
+  lBcc <- rownames(finalTable)
+  fK2RG <- file(k2rgFile, open = "r")
+  lines <- readLines(fK2RG)
+  fOut <- file(output, open = "w")
+  
+  countsLabel <- paste(colnames(finalTable)[COUNTSSTART:COUNTSEND],collapse=",")
+  countsName <- paste("CountsNorm(",countsLabel,")",sep="")
+  psiLabel <- paste(colnames(psiTable)[PSISTART:PSIEND],collapse=",")
+  psiName <- paste("psiNorm(",psiLabel,")",sep="")
+  
+  i <- 1
+  line <- lines[i]
+  if(substr(line[1],0,1)=="#"){
+    nCol <- length(strsplit(line, split = "\t")[[1]])
+    countsHead <- paste(nCol+1,countsName,sep=".")
+    psiHead <- paste(nCol+2,psiName,sep=".")
+    pvHead <- paste(nCol+3,K2RGKDE_APV,sep=".")
+    dPSIHead <- paste(nCol+4,K2RGKDE_DPSI,sep=".")
+    warnHead <- paste(nCol+5,K2RGKDE_WARN,sep=".")
+    toWrite <- paste(line,countsHead,psiHead,pvHead,dPSIHead,warnHead,sep="\t")
+    writeLines(toWrite,fOut)
+    i <- 2
+  }
+  else {
+    # Creation d'un header a partir du format k2rg avec 22 colonnes
+    lHead <- c()
+    j <- 1
+    for (k2rg_field in LK2RG) {
+      lHead <- append(lHead, paste(j, k2rg_field, sep="."))
+      j <- j + 1
+    }
+    lHead <- append(lHead, paste(j, countsName, sep="."))
+    lHead <- append(lHead, paste(j + 1, psiName, sep="."))
+    lHead <- append(lHead, paste(j + 2, K2RGKDE_APV, sep="."))
+    lHead <- append(lHead, paste(j + 3, K2RGKDE_DPSI, sep="."))
+    lHead <- append(lHead, paste(j + 4, K2RGKDE_WARN, sep="."))
+    toWrite <- paste(lHead, collapse = "\t")
+    toWrite <- paste("#", toWrite, sep ="")
+    writeLines(toWrite,fOut)
+  }
+  while(i <= length(lines)) {
+    line <- lines[i]
+    bcc <- strsplit(line, split = "\t")[[1]][EVENTNAME]
+    bcc <- strsplit(bcc, split = "Type_")[[1]][1]
+    bcc <- substr(bcc,0,nchar(bcc)-1)
+    if(bcc %in% lBcc) {
+      countsValue <- paste(as.character(finalTable[rownames(finalTable)==bcc,][COUNTSSTART:COUNTSEND]),collapse=",")
+      psiValue <- as.numeric(psiTable[psiTable$ID==bcc,][PSISTART:PSIEND])
+      psiValue <- paste(as.character(psiValue),collapse=",")
+      apv <- finalTable[rownames(finalTable)==bcc,]$Adjusted_pvalue
+      if (is.na(apv)) {
+        apv <- 1
+      }
+      dpsi <- abs(finalTable[rownames(finalTable)==bcc,]$`Deltaf/DeltaPSI`)
+      if (is.na(dpsi)) {
+        dpsi <- 0
+      }
+      if (dpsi >= dPSImin && apv <= pvalMax) {
+        toWrite <- paste(line,countsValue,psiValue,finalTable[rownames(finalTable)==bcc,]$Adjusted_pvalue,finalTable[rownames(finalTable)==bcc,]$`Deltaf/DeltaPSI`,finalTable[rownames(finalTable)==bcc,]$lowcounts,sep="\t")
+        writeLines(toWrite,fOut)
+      }
+    }
+    i <- i + 1
+  }
+  close(fK2RG)
+  close(fOut)
+}

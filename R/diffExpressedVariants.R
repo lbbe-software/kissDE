@@ -2,7 +2,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
   toConvert <- file(fileName, open = "r")
   lines <- readLines(toConvert)
   if (k2rg == FALSE) {
-    fileNameK2RG = NULL
+    fileNameK2RG <- NULL
     line <- lines[1]
     isQuality <- grepl("Q", line[1])
     resultLine1 <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, isQuality, discoSNP)  # get all the informations for the 1st line
@@ -359,7 +359,7 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
 
 
 
-diffExpressedVariants <- function(countsData, conditions, pvalue = 1, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE, output = "./kissDE_result") {
+diffExpressedVariants <- function(countsData, conditions, pvalue = 1, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE) {
   options(warn = -1)  # suppress the warning for the users
   
   print("Pre-processing the data...")
@@ -436,15 +436,12 @@ diffExpressedVariants <- function(countsData, conditions, pvalue = 1, filterLowC
         
         sizeOfEffect <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, 
                                           flagLowCountsConditions, chunk1$lengths, discoSNP, countsData$exonicReadsInfo)
-        if(!is.null(countsData$k2rgFile)) {
-          print("Writing output...")
-          writeMergeOutput(sizeOfEffect$signifVariants.sorted,sizeOfEffect$psiTable,output,countsData$k2rgFile)
-        }
         return(list(finalTable = sizeOfEffect$signifVariants.sorted, 
                     correctedPVal = chunk2$correctedPVal, 
                     uncorrectedPVal = chunk2$noCorrectPVal, 
                     resultFitNBglmModel = chunk1$pALLGlobalPhi.glm.nb,
-                    `f/psiTable` = sizeOfEffect$psiTable))
+                    `f/psiTable` = sizeOfEffect$psiTable,
+                    k2rgFile = countsData$k2rgFile))
       }, error = function(err) {
         print(paste(err, "Returning only resultFitNBglmModel and pvalues tab"))
         return(list(correctedPVal = chunk2$correctedPVal,
@@ -637,50 +634,21 @@ plotPSI <- function(diffVariants, conditions, thresholdPvalue = 0.05, thresholdD
   }
 }
 
-writeMergeOutput <- function(finalTable,psiTable,output,k2rgFile) {
-  EVENTNAME <- 16
-  COUNTSSTART <- 3
-  COUNTSENDBEFOREEND <- 3
-  PSISTART <- 2
-  
-  COUNTSEND <- ncol(finalTable)-COUNTSENDBEFOREEND
-  PSIEND <- ncol(psiTable)
-  
-  lBcc <- rownames(finalTable)
-  fK2RG <- file(k2rgFile, open = "r")
-  lines <- readLines(fK2RG)
-  fOut <- file(output, open = "w")
-  i <- 1
-  line <- lines[i]
-  if(substr(line[1],0,1)=="#"){
-    nCol <- length(strsplit(line, split = "\t")[[1]])
-    countsLabel <- paste(colnames(finalTable)[COUNTSSTART:COUNTSEND],collapse=",")
-    countsName <- paste("CountsNorm(",countsLabel,")",sep="")
-    psiLabel <- paste(colnames(psiTable)[PSISTART:PSIEND],collapse=",")
-    psiName <- paste("psiNorm(",psiLabel,")",sep="")
-    countsHead <- paste(nCol+1,countsName,sep=":")
-    psiHead <- paste(nCol+2,psiName,sep=":")
-    pvHead <- paste(nCol+3,"adjusted_pvalue",sep=":")
-    dPSIHead <- paste(nCol+4,"dPSI",sep=":")
-    warnHead <- paste(nCol+5,"warnings",sep=":")
-    toWrite <- paste(line,countsHead,psiHead,pvHead,dPSIHead,warnHead,sep="\t")
-    writeLines(toWrite,fOut)
-    i <- 2
+# writeMergeOutput(sizeOfEffect$signifVariants.sorted,sizeOfEffect$psiTable,output,countsData$k2rgFile)
+writeOutputKissDE <- function(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, output) {
+  if (adjPvalMax > 1 || adjPvalMax < 0) {
+    print("ERROR: Invalid pvalMax (0 <= pvalMax <= 1).")
+    return
   }
-  while(i <= length(lines)) {
-    line <- lines[i]
-    bcc <- strsplit(line, split = "\t")[[1]][EVENTNAME]
-    bcc <- strsplit(bcc, split = "Type_")[[1]][1]
-    bcc <- substr(bcc,0,nchar(bcc)-1)
-    if(bcc %in% lBcc) {
-      countsValue <- paste(as.character(finalTable[rownames(finalTable)==bcc,][COUNTSSTART:COUNTSEND]),collapse=",")
-      psiValue <- as.numeric(psiTable[psiTable$ID==bcc,][PSISTART:PSIEND])
-      psiValue <- paste(as.character(psiValue),collapse=",")
-      toWrite <- paste(line,countsValue,psiValue,finalTable[rownames(finalTable)==bcc,]$Adjusted_pvalue,finalTable[rownames(finalTable)==bcc,]$`Deltaf/DeltaPSI`,finalTable[rownames(finalTable)==bcc,]$lowcounts,sep="\t")
-      writeLines(toWrite,fOut)
-    }
-    i <- i + 1
+  if (dPSImin > 1 || dPSImin < 0) {
+    print("ERROR: Invalid dPSImin (0 <= dPSImin <= 1). A dPSImin = 0.1 will catch all dPSI from -1 to -0.1 and all dPSI from 0.1 to 1.")
+    return
   }
-  close(fK2RG)
-  close(fOut)
+  k2rgFile <- resDiffExprVariant$k2rgFile
+  if (is.null(k2rgFile)) {
+    .writeTableOutput(resDiffExprVariant$finalTable, adjPvalMax, dPSImin, output)
+  }
+  else {
+    .writeMergeOutput(resDiffExprVariant, k2rgFile, adjPvalMax, dPSImin, output)
+  }
 }
