@@ -3,7 +3,7 @@
 
 \title{Pre-treatment of \code{KisSplice} outputs}
 
-\description{Function that converts \code{KisSplice} \code{.fa} outputs to data frame that can be used by others functions of the \code{KissDE} package.
+\description{Function that converts \code{KisSplice} \code{.fa} outputs and \code{KisSplice2RefGenome} outputs to data frame that can be used by others functions of the \code{KissDE} package.
 }
 
 \usage{
@@ -47,7 +47,7 @@
   \item{exonicReads}{a logical indicating if exonic reads will be taken into account in the counts. 
     It is valid to use the \code{kissplice2counts} function only if the \code{counts} option is at 2 as the information about junction and exonic reads is needed.}
   
-  \item{k2rg}{a logical indicating if you are using kissplice2refgenome's output file instead of \code{KisSplice}'s file}
+  \item{k2rg}{a logical indicating if you are using \code{KisSplice2RefGenome}'s output file instead of \code{KisSplice}'s file}
   
   \item{keep}{a character vector indicating the names of the events to keep for the statistical test. The test will be more sensitive for those events, the other ones will not be tested.
     Event(s) name(s) must be : deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified, unclassifiedSNP, -. If you only want to work with intron retention events and altAD events, the vector should be \code{keep = c("IR","altAD")}.
@@ -63,11 +63,11 @@
 }
 
 
-\value{\code{kissplice2counts} returns a list of 5 objects:
-  \item{countsEvents}{a data frame containing several columns: a first column (\code{events.names}) containing the name of the event based on \code{KisSplice} notation, a second one (\code{X1}) containing the length of the event, and several others (\code{X2} to \code{Xn}) containing the counts corresponding to the replicates of the conditions.}
+\value{\code{kissplice2counts} returns a list of 4 objects:
+  \item{countsEvents}{a data frame containing several columns: a first column (\code{events.names}) containing the name of the event based on \code{KisSplice} notation, a second one (\code{events.length}) containing the length of the event, and several others (\code{counts1} to \code{countsN}) containing the counts corresponding to the replicates of the conditions.}
   \item{psiInfo}{a data frame containing only one column (\code{events.names}) containing the name of the event based on \code{KisSplice} notation, as in the first column of the \code{countsEvents} output.}
   \item{exonicReadsInfo}{a logical indicating if you are using exonicReads.}
-  \item{k2rgFile}{a character containing the kissplice2refgenome file's name. If you are working without a kissplice2refgenome file, this contains NULL.}
+  \item{k2rgFile}{a string containing the \code{KisSplice2RefGenome} file's name. If you are working with a file coming from KisSplice and not \code{KisSplice2RefGenome}, this object is equal to NULL.}
 }
 
 

@@ -37,7 +37,7 @@
 	\item{uncorrectedPVal}{a numeric vector containing pvalues before correction for multiple testing}
 	\item{resultFitNBglmModel}{a data frame containing the results of the fitting of models to the data}
 	\item{psiTable}{a data frame containing the Percent Spliced In (PSI) of each replicates}
-	\item{k2rgFile}{a character containing either the Kissplice2RefGenome's file path and name or NULL}
+	\item{k2rgFile}{a string containing either the \code{KisSplice2RefGenome} file path and name or NULL if no \code{KisSplice2RefGenome} file was used as input}
 
 }
 
