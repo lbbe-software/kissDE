@@ -3,8 +3,10 @@
 
 \title{Write an output file for \code{KissDE}'s \code{diffExpressedVariants} result.}
 
-\description{If you were working with a fasta file as input for \code{kissplice2counts}, this function will output a tab-delimited table containing one alternative splicing event/SNV per line. The fields are : the ID of the path, the variable part length, the counts of each variant for each conditions, the adjusted p-value, the dPSI and a boolean indicating if the event/SNV was correctly cover by reads.\\
-If you were working with a \code{KisSplice2RefGenome} file, this function will add five columns to the \code{KisSplice2RefGenome}'s file, containing the following \code{KissDE} results : normalized counts, normalized psi, adjusted p-value, delta-PSI, warnings.\\
+\description{If you were working with a fasta file as input for \code{kissplice2counts}, this function will output a tab-delimited table containing one alternative splicing event/SNV per line. The fields are : the ID of the path, the variable part length, the counts of each variant for each conditions, the adjusted p-value, the dPSI and a boolean indicating if the event/SNV was correctly cover by reads.
+
+If you were working with a \code{KisSplice2RefGenome} file, this function will add five columns to the \code{KisSplice2RefGenome}'s file, containing the following \code{KissDE} results : normalized counts, normalized psi, adjusted p-value, delta-PSI, warnings.
+
 If you want to write the table containing the PSI/f values, you should set \code{writePSI} to \code{TRUE}. 
 }
 
