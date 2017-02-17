@@ -627,7 +627,7 @@ plotPSI <- function(diffVariants, conditions, thresholdPvalue = 0.05, thresholdD
 }
 
 # writeMergeOutput(sizeOfEffect$signifVariants.sorted,sizeOfEffect$psiTable,output,countsData$k2rgFile)
-writeOutputKissDE <- function(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, output) {
+writeOutputKissDE <- function(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, output, writePSI = FALSE) {
   if (adjPvalMax > 1 || adjPvalMax < 0) {
     print("ERROR: Invalid pvalMax (0 <= pvalMax <= 1).")
     return
@@ -637,10 +637,14 @@ writeOutputKissDE <- function(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, o
     return
   }
   k2rgFile <- resDiffExprVariant$k2rgFile
-  if (is.null(k2rgFile)) {
-    .writeTableOutput(resDiffExprVariant$finalTable, adjPvalMax, dPSImin, output)
-  }
-  else {
-    .writeMergeOutput(resDiffExprVariant, k2rgFile, adjPvalMax, dPSImin, output)
+  if (writePSI){
+    .writePSITable(resDiffExprVariant, adjPvalMax, dPSImin, output)
+  } else{
+    if (is.null(k2rgFile)) {
+      .writeTableOutput(resDiffExprVariant$finalTable, adjPvalMax, dPSImin, output)
+    }
+    else {
+      .writeMergeOutput(resDiffExprVariant, k2rgFile, adjPvalMax, dPSImin, output)
+    }
   }
 }

@@ -7,7 +7,7 @@
 }
 
 \usage{
-  writeOutputKissDE(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, output)
+  writeOutputKissDE(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, output, writePSI = FALSE)
 }
 
 \arguments{
@@ -18,6 +18,8 @@
   \item{dPSImin}{a double, indicating the minimum absolute value of a dPSI allowed to output an event/SNV.}
   
   \item{output}{a character indicating the name of the file to save \code{writeOutputKissDE} output.}
+  
+  \item{writePSI}{a boolean indicating if the user wants the PSI/f table to be printed instead of the final table.}
 }
 
 \value{
