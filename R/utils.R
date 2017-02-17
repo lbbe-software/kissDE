@@ -1,4 +1,4 @@
-.lineParse <- function(line, indexStart, isQuality, discoSNP = FALSE) {
+.lineParse <- function(line, indexStart, isQuality) {
   options(warn = -1)
   beginningLineToWrite <- ""
   splitElements <- strsplit(line, "|", fixed = TRUE)[[1]]  # splits the line
@@ -90,8 +90,8 @@
 
 
 
-.countsSet <- function(line, indexStart, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, isQuality, discoSNP = FALSE) {
-  resultParsing <- .lineParse(line, indexStart, isQuality, discoSNP)
+.countsSet <- function(line, indexStart, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, isQuality) {
+  resultParsing <- .lineParse(line, indexStart, isQuality)
   beginningLineInfo <- resultParsing$beginning
   countsperCond <- resultParsing$countsperCond
   nbVec <- rep.int(0, length(countsperCond))
@@ -160,23 +160,18 @@
 
 
 
-.getInfoLine <- function(line, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, isQuality, discoSNP = FALSE) {
+.getInfoLine <- function(line, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, isQuality) {
   if (grepl("branching_nodes", line)) {
     indexStart <- 6 
   } else {
     indexStart <- 5
   }
-  resultCountsSet <- .countsSet(line, indexStart, counts, pairedEnd, order, exonicReads, isQuality, discoSNP)
+  resultCountsSet <- .countsSet(line, indexStart, counts, pairedEnd, order, exonicReads, isQuality)
   lineFirstPart <- resultCountsSet$firstPart
   lineFirstPartSplit <- strsplit(lineFirstPart, "|", fixed = TRUE)[[1]]
-  if (discoSNP == TRUE) {
-    eventName <- strsplit(lineFirstPartSplit[2], "_", fixed = TRUE)[[1]][4]
-    variantLength <- "0"
-  } else {
-    eventName <- paste(lineFirstPartSplit[2], lineFirstPartSplit[3], sep = "|")
-    eventName <- substr(eventName, start = 2, stop = nchar(eventName))
-    variantLength <- strsplit(lineFirstPartSplit[5], "_")[[1]][4]
-  }
+  eventName <- paste(lineFirstPartSplit[2], lineFirstPartSplit[3], sep = "|")
+  eventName <- substr(eventName, start = 2, stop = nchar(eventName))
+  variantLength <- strsplit(lineFirstPartSplit[5], "_")[[1]][4]
   return(list(eventName = eventName, variantLength = variantLength, variantCounts = resultCountsSet$vCounts, psiInfo = resultCountsSet$psiCounts))
 }
 
@@ -578,7 +573,7 @@
 
 
 
-.sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, lengths, discoSNP = FALSE, exonicReads) {
+.sizeOfEffectCalc <- function(signifVariants, ASSBinfo, n, nr, sortedconditions, flagLowCountsConditions, lengths, exonicReads) {
   ###################################################
   ### code chunk 1 : compute delta PSI/f
   ###################################################
@@ -637,20 +632,18 @@
         namesLow <- c(paste("LP_", condi[nbRepli], "_repl", i, "_Norm", sep = ""))
         subsetUp <- signifVariants[namesUp]  # the subsets are the counts we are going to use to compute all psis
         subsetLow <- signifVariants[namesLow]
-        if (discoSNP == FALSE) {
-          if (!is.null(ASSBinfo)) {  # counts correction
-            if (exonicReads){
-              correctFactor <- lengths2$upper / lengths2$lower   # apparent size of upper path other apparent size of lower path
-              subsetUp <- subsetUp / correctFactor
-            }
-            else{
-              nameASSBinfo <- c(paste(condi[nbRepli], "_repl", i, sep = ""))
-              subsetUp[which(subsetUp > 0), ] <- subsetUp[which(subsetUp > 0), ] / (2 - ASSBinfo[which(subsetUp > 0), nameASSBinfo] / subsetUp[which(subsetUp > 0), ])
-            }
-          } else {  #counts correction if there is no info about the junction counts
+        if (!is.null(ASSBinfo)) {  # counts correction
+          if (exonicReads){
             correctFactor <- lengths2$upper / lengths2$lower   # apparent size of upper path other apparent size of lower path
             subsetUp <- subsetUp / correctFactor
           }
+          else{
+            nameASSBinfo <- c(paste(condi[nbRepli], "_repl", i, sep = ""))
+            subsetUp[which(subsetUp > 0), ] <- subsetUp[which(subsetUp > 0), ] / (2 - ASSBinfo[which(subsetUp > 0), nameASSBinfo] / subsetUp[which(subsetUp > 0), ])
+          }
+        } else {  #counts correction if there is no info about the junction counts
+          correctFactor <- lengths2$upper / lengths2$lower   # apparent size of upper path other apparent size of lower path
+          subsetUp <- subsetUp / correctFactor
         }
         sumLowCond[, nbRepli] <- sumLowCond[, nbRepli] + as.matrix(subsetUp) + as.matrix(subsetLow)  # sumLowCond sums up the counts 
         psiPairCond[, indexMatrixPsiPairCond] <- as.matrix(subsetUp / (subsetUp + subsetLow))  # psi is #incl/(#incl+#exclu) after all corrections for each replicate

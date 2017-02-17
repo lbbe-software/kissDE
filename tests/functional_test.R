@@ -6,7 +6,7 @@ fpath <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
 mySNVcounts <- kissplice2counts(fpath, pairedEnd = TRUE)
 
 stopifnot(
-  all(names(mySNVcounts) == c("countsEvents", "psiInfo", "discoInfo", "exonicReadsInfo", "k2rgFile")),
+  all(names(mySNVcounts) == c("countsEvents", "psiInfo", "exonicReadsInfo", "k2rgFile")),
   all(mySNVcounts$countsEvents[, 1] == mySNVcounts$psiInfo[, 1])
 )
 

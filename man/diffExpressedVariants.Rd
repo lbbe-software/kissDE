@@ -7,7 +7,7 @@
 
 \usage{
   diffExpressedVariants(countsData, conditions, pvalue = 1, 
-  filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE)
+  filterLowCountsVariants = 10, flagLowCountsConditions = 10)
   }
 
 \arguments{
@@ -20,8 +20,6 @@
 	\item{filterLowCountsVariants}{a numerical value indicating the value below which events are filtered out. After having computing the overdispersion, we screen out events which both variants have global counts < \code{filterLowCountsVariants} (sum of each replicate x condition) in order to gain strength for the models.}
 	
 	\item{flagLowCountsConditions}{a numerical value indicating the value below which we flag events as 'lowCounts' in the final data frame. This column aims to help seeing which event (variant 1 counts + variant 2 counts) has low counts (< \code{flagLowCountsBoundary = 10}) for at least n-1 conditions (over n).}
-	
-	\item{discoSNP}{a logical indicating if you are using discoSNP++'s output file instead of \code{KisSplice}'s file}
 	}
 	
 \value{

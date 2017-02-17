@@ -1,11 +1,11 @@
-kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE, keep = c("All"), remove = NULL) {
+kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL) {
   toConvert <- file(fileName, open = "r")
   lines <- readLines(toConvert)
   if (k2rg == FALSE) {
     fileNameK2RG <- NULL
     line <- lines[1]
     isQuality <- grepl("Q", line[1])
-    resultLine1 <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, isQuality, discoSNP)  # get all the informations for the 1st line
+    resultLine1 <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, isQuality)  # get all the informations for the 1st line
     eventName <- resultLine1$eventName
     variantLength <- resultLine1$variantLength
     variantCounts <- resultLine1$variantCounts
@@ -141,7 +141,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
   close(toConvert)
   psiInfo <- data.frame(events.names, as.data.frame(psiInfo))
   
-  output <- list(countsEvents = events.df, psiInfo = psiInfo, discoInfo = discoSNP, exonicReadsInfo = exonicReads, k2rgFile = fileNameK2RG)
+  output <- list(countsEvents = events.df, psiInfo = psiInfo, exonicReadsInfo = exonicReads, k2rgFile = fileNameK2RG)
   class(output) <- c("list", "countsData")
   return(output)
 }
@@ -359,7 +359,7 @@ qualityControl <- function(countsData, conditions, storeFigs = FALSE) {
 
 
 
-diffExpressedVariants <- function(countsData, conditions, pvalue = 1, filterLowCountsVariants = 10, flagLowCountsConditions = 10, discoSNP = FALSE) {
+diffExpressedVariants <- function(countsData, conditions, pvalue = 1, filterLowCountsVariants = 10, flagLowCountsConditions = 10) {
   options(warn = -1)  # suppress the warning for the users
   
   print("Pre-processing the data...")
@@ -426,16 +426,8 @@ diffExpressedVariants <- function(countsData, conditions, pvalue = 1, filterLowC
     if (length(chunk2) > 2) {  # no error during chunk2
       print("Computing size of the effect and last cutoffs...")
       chunk3 <- tryCatch({
-        if (discoSNP != FALSE) {
-          if (is.na(countsData$discoInfo)) {
-            discoSNP <- FALSE
-          } else {
-            discoSNP <- countsData$discoInfo
-          }
-        } 
-        
         sizeOfEffect <- .sizeOfEffectCalc(chunk2$signifVariants, chunk1$ASSBinfo, chunk0$n, chunk0$nr, chunk0$sortedconditions, 
-                                          flagLowCountsConditions, chunk1$lengths, discoSNP, countsData$exonicReadsInfo)
+                                          flagLowCountsConditions, chunk1$lengths, countsData$exonicReadsInfo)
         return(list(finalTable = sizeOfEffect$signifVariants.sorted, 
                     correctedPVal = chunk2$correctedPVal, 
                     uncorrectedPVal = chunk2$noCorrectPVal, 

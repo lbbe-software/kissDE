@@ -8,7 +8,7 @@
 
 \usage{
   kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL, 
-  exonicReads = TRUE, discoSNP = FALSE, k2rg = FALSE, keep = c("All"), remove = NULL)
+  exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL)
 }
 
 \arguments{
@@ -47,8 +47,6 @@
   \item{exonicReads}{a logical indicating if exonic reads will be taken into account in the counts. 
     It is valid to use the \code{kissplice2counts} function only if the \code{counts} option is at 2 as the information about junction and exonic reads is needed.}
   
-  \item{discoSNP}{a logical indicating if you are using discoSNP++'s output file instead of \code{KisSplice}'s file}
-  
   \item{k2rg}{a logical indicating if you are using kissplice2refgenome's output file instead of \code{KisSplice}'s file}
   
   \item{keep}{a character vector indicating the names of the events to keep for the statistical test. The test will be more sensitive for those events, the other ones will not be tested.
@@ -68,7 +66,6 @@
 \value{\code{kissplice2counts} returns a list of 5 objects:
   \item{countsEvents}{a data frame containing several columns: a first column (\code{events.names}) containing the name of the event based on \code{KisSplice} notation, a second one (\code{X1}) containing the length of the event, and several others (\code{X2} to \code{Xn}) containing the counts corresponding to the replicates of the conditions.}
   \item{psiInfo}{a data frame containing only one column (\code{events.names}) containing the name of the event based on \code{KisSplice} notation, as in the first column of the \code{countsEvents} output.}
-  \item{discoInfo}{a logical indicating if you are using discoSNP++'s output file instead of \code{KisSplice}'s file}
   \item{exonicReadsInfo}{a logical indicating if you are using exonicReads.}
   \item{k2rgFile}{a character containing the kissplice2refgenome file's name. If you are working without a kissplice2refgenome file, this contains NULL.}
 }
