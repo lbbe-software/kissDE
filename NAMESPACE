@@ -8,5 +8,5 @@ importFrom("graphics", "abline", "legend", "lines", "par", "plot", "points")
 importFrom("stats", "aggregate", "as.dist", "coef", "complete.cases", "cor", "hclust", "heatmap", "lm", "model.matrix", "nls", "p.adjust", "pchisq", "prcomp", "var", "reshape")
 importFrom("gplots", "heatmap.2")
 
-export(diffExpressedVariants, kissplice2counts, qualityControl, wantedEvents, plotPSI)
+export(diffExpressedVariants, kissplice2counts, qualityControl, wantedEvents)
 S3method("print", "countsData")
