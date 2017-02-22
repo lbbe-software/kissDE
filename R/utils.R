@@ -142,14 +142,14 @@
   } else {  # counts == 0 
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
-        order <- rep(1:(length(countsperCond) / 2), rep(2, length(countsperCond) / 2))  # for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) (assuming data is ordered)
+        order <- rep(1:(dim(countsperCond)[2] / 2), rep(2, dim(countsperCond)[2] / 2))  # for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) (assuming data is ordered)
       } else {
         if (!is.vector(order)) {
           print("Error, order vector seems to be in a wrong format.")
         }
       }
     } else {
-      order <- c(1:length(countsperCond))
+      order <- c(1:dim(countsperCond)[2])
     }
     d <- data.frame(order, countsVec)
     names(d) <- c("ORDER", "COUNTS")
