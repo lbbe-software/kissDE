@@ -16,7 +16,7 @@
 \usepackage{amsthm}
 \usepackage{fancyvrb}
 \usepackage{listings}
-\usepackage[square,numbers]{natbib}
+\usepackage[round]{natbib}
 \usepackage{calc}
 \usepackage{color}   %May be necessary if you want to color links
 \usepackage{hyperref}
@@ -66,7 +66,7 @@ options(continue=" ")
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Use case}
 \kde~is meant to work on pairs of variants that have been quantified across different conditions. It can deal with single nucleotide variant (SNV), indels or alternative splicing.\\
-The input count data to \kde~may come from \kp\cite{Sacomoto2012}, \krg~or any other sofware if the counts are transformed into the data structure required for the package.
+The input count data to \kde~may come from \kp~\citep{KisSplice}, \krg~or any other sofware if the counts are transformed into the data structure required for the package.
 If you use output files from \kp~or \krg, you can directly import your counts using \texttt{kissplice2counts} function.\\
 The user must keep in mind that \kde~was designed to work with at least one replicate for each condition, which means that the minimal input contains the variants quantified for 4 different samples, each couple representing a condition. There can be more replicates and more conditions. It is not mandatory to have an equal number of replicates in each condition.\\
 
@@ -114,7 +114,7 @@ The data conversion with the \texttt{kissplice2counts} function and the statisti
   \multirow{2}{*}{SNV data} & \texttt{counts}=0, & \multirow{2}{*}{64824} & \multirow{2}{*}{391.958 sec} & \multirow{2}{*}{7829.016 sec} \\
     & \texttt{pairedEnd}=TRUE & & & \\
 \end{tabular}
-\caption{Running time (in seconds) of the two principal function of \kde (\texttt{kissplice2counts} and \texttt{diffExpressedVariants}) for two datasets (AS dataset from the ENCODE project\cite{Djebali2012} described in section \ref{subsec:AS} and SNP dataset from the GEUVADIS project\cite{Lappalainen2013} described in section \ref{subsec:SNV}).}
+\caption{Running time (in seconds) of the two principal function of \kde (\texttt{kissplice2counts} and \texttt{diffExpressedVariants}) for two datasets (AS dataset from the ENCODE project \citep{Djebali2012} described in section \ref{subsec:AS} and SNP dataset from the GEUVADIS project \citep{Lappalainen2013} described in section \ref{subsec:SNV}).}
 \label{tab:time}
 \end{table}
 
@@ -460,7 +460,7 @@ They are sumarized in the Figure \ref{fig:kdetheory}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Normalization}
 \label{subsec:norm}
-In a first step, counts are normalized with the default normalization methods provided by the \textbf{DESeq2}\cite{Love2014} package.
+In a first step, counts are normalized with the default normalization methods provided by the \textbf{DESeq2} \citep{DESeq2} package.
 The goal of this normalization step is to remove technical factors that could influence the differential analysis.
 By using \textbf{DESeq2} normalization, we correct for library size, because the sequencing depth can vary between samples.
 
@@ -471,8 +471,8 @@ A model to describe the counts distribution is first chosen.
 When working with biological replicates, the Poisson distribution's variance parameter is in general not flexible enough to describe the data, because replicates add several sources of variance.
 This overdispersion is often modeled using a Negative Binomial distribution, which is chosen in \kde.
 However, due to numerical instabilities associated with the estimation of Negative Binomial parameters, we use a model selection approach to determine which model is the best to handle the overdispersion parameter $\phi$. 
-We first estimate a model without overdispersion using the \textbf{glmnet} \textbf{R} package\cite{} (model $\mathcal{M}(\phi=0)$). 
-We then consider two different estimation methods for the parameter $\phi$, namely a global estimation approach using the \textbf{aod} \textbf{R} package\cite{} (model $\mathcal{M}(\phi=\phi_{\text{global}})$), and a variant-specific parameter using the \textbf{DSS} \textbf{R} package\cite{} (model $\mathcal{M}(\phi=\phi^i_{\text{DSS}})$. 
+We first estimate a model without overdispersion using the \textbf{glmnet} \textbf{R} package \citep{glmnet} (model $\mathcal{M}(\phi=0)$). 
+We then consider two different estimation methods for the parameter $\phi$, namely a global estimation approach using the \textbf{aod} \textbf{R} package \citep{aod} (model $\mathcal{M}(\phi=\phi_{\text{global}})$), and a variant-specific parameter using the \textbf{DSS} \textbf{R} package \citep{DSS1, DSS2, DSS3, DSS4} (model $\mathcal{M}(\phi=\phi^i_{\text{DSS}})$. 
 A BIC is used to choose the best model out of the three.
 
 %TODO : rewrite this part...
@@ -582,8 +582,8 @@ The deltaPSI/deltaf is computed as follows:
 \label{subsec:SNV}
 RNA-Seq data can be used to study SNVs (SNPs, mutations, RNA editing) in expressed regions of the genome. 
 Such SNVs can be detected and reported by \kp. 
-In this first following example, an analysis of SNPs is done with \kde~on RNA-Seq data from the human GEUVADIS project\cite{Lappalainen2013}. 
-The sample data presented here is a subset of the case study presented in Lopez-Maestre et al.\cite{Lopez-Maestre2016}.
+In this first following example, an analysis of SNPs is done with \kde~on RNA-Seq data from the human GEUVADIS project \citep{Lappalainen2013}. 
+The sample data presented here is a subset of the case study presented in \cite{Lopez-Maestre2016}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -692,7 +692,7 @@ The sample data presented here is a subset of the case study used in Benoit-Pilv
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Dataset}
-The data used in this example of AS comes from the ENCODE project\cite{Djebali2012}. 
+The data used in this example of AS comes from the ENCODE project \citep{Djebali2012}. 
 The chosen samples are from a neuroblastoma cell line, SK-N-SH, with or without a retinoic acid treatment. 
 Each condition is composed of two biological replicates. 
 The data are paired-end.\\
