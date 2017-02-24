@@ -25,20 +25,20 @@
 }
 
 .countsSetk2rg <- function(splittedCounts, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE) {
-  countsperCond <- sapply(splittedCounts[[1]], function(splittedCounts) regmatches(splittedCounts[[1]], gregexpr(pattern = "[0-9]+", splittedCounts[[1]])))
-  nbVec <- rep(0, length(countsperCond))
-  countsVec <- rep(0, length(countsperCond))
-  psiVec <- rep(0, length(countsperCond))
-  for (i in 1:length(countsperCond)) {
-    nbVec[i] <- as.numeric(countsperCond[[i]][1])
-    countsVec[i] <- as.numeric(countsperCond[[i]][2])
+  countsperCond <- vapply(splittedCounts[[1]], .getJunctionCounts, c("jct_id" = "0", "count" = "0"))
+  nbVec <- rep.int(0, dim(countsperCond)[2])
+  countsVec <- rep.int(0, dim(countsperCond)[2])
+  psiVec <- rep.int(0, dim(countsperCond)[2])
+  for (i in 1:dim(countsperCond)[2]) {
+    nbVec[i] <- as.numeric(countsperCond[1,i])
+    countsVec[i] <- as.numeric(countsperCond[2,i])
     if (counts > 1) {  # specific issues linked with --counts option
-      if (grepl("ASSB", names(countsperCond)[i]) == TRUE) {  # so that counts on ASSB junction are not counted twice.
+      if (grepl("ASSB", colnames(countsperCond)[i]) == TRUE) {  # so that counts on ASSB junction are not counted twice.
         psiVec[i] <- countsVec[i]
         countsVec[i] <- -countsVec[i]
       }
       if ((counts == 2) & (exonicReads == FALSE)) {
-        if (grepl("^S[0-9]+", names(countsperCond)[i]) == TRUE) {  # when exonic reads are not wanted we must discard reads counted in S_X
+        if (grepl("^S[0-9]+", colnames(countsperCond)[i]) == TRUE) {  # when exonic reads are not wanted we must discard reads counted in S_X
           countsVec[i] <- 0
         }
       }
@@ -72,7 +72,7 @@
   } else {  # counts == 0 
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
-        order <- rep(1:(length(countsperCond) / 2), rep(2, length(countsperCond) / 2))  # for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) (assuming data is ordered)
+        order <- rep(1:(dim(countsperCond)[2] / 2), rep(2, dim(countsperCond)[2] / 2))  # for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) (assuming data is ordered)
       } else {
         if (!is.vector(order)) {
           print("Error, order vector seems to be in a wrong format.")
