@@ -47,7 +47,7 @@ It can be used to study splice variants, which differ by the inclusion/exclusion
 It can also be used to study genomic variants (whenever they are transcribed), which differ by a SNV or an indel.\\
 The statistical framework is similar to DESeq. Counts are modelled using the negative binomial distribution. We use the framework of the generalised linear model, and we test for association of a variant with a condition using a likelihood ratio test.\\
 This vignette explains how to use this package.\\
-The workflow for SNPs/SNVs is fully described in Lopez-Maestre el al., the workflow for splicing is fully described in Benoit-Pilven et al. 
+The workflow for SNPs/SNVs is fully described in Lopez-Maestre et al., the workflow for splicing is fully described in Benoit-Pilven et al.
 \end{abstract}
 
 \newpage
@@ -127,6 +127,7 @@ The data conversion with the \texttt{kissplice2counts} function and the statisti
 
 \section{\kde's workflow}
 \label{sec:workflow}
+In this section, the different steps and functions of a differential analysis with \kde~are described.
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.7\textwidth]{Workflow_KissDE.png}
@@ -166,7 +167,7 @@ It must be a data frame with:
   \item \textbf{in columns:}
     \begin{itemize}
       \item The first column (\texttt{eventsName}) contains the name of the variation.
-      \item The second column (\texttt{eventsLength}) contains the variant size. If this size is unknown, the value can be set to 0. Note that the size is used only in the context of alternative splicing. Then it indicates whether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a switch in the ORF).
+      \item The second column (\texttt{eventsLength}) contains the variant size. If this size is unknown, the value can be set to 0. Note that the size is used only in the context of alternative splicing. Then it indicates whether the size difference due to the switch from one isoform to the other is a multiple of 3 or not and thus if it can induce a frameshift in the open reading frame (ORF).
       \item  All others columns (\texttt{cond1rep1, cond1rep2, cond2rep1, cond2rep2}) contain read counts of a variant in each sample. In the above example, \texttt{cond1rep1} is the number of reads supporting this variant in the first replicate of $condition\_1$, \texttt{cond1rep2} is the counts of reads sequenced for replicate 2 in $condition\_1$, \texttt{cond2rep1} and \texttt{cond2rep2} are counts for replicates 1 and 2 of $condition\_2$.
     \end{itemize}
 \end{itemize}
@@ -209,7 +210,7 @@ Headers contain information used in \kde. In the example, there are:
 
 
 \kde~can be used on any type output by \kp~(0: SNV, 1: alternative splicing events, 3: indels,...). 
-The user should refer to \kp~manual (ref url ??) for further questions about \kp~format and output.\\
+The user should refer to \kp~manual (\url{http://kissplice.prabi.fr/documentation/user_guide.pdf}) for further questions about \kp~format and output.\\
 
 To be used in \kde, \kp's output must be converted in a table of counts thanks to the \texttt{kissplice2counts} function.
 In the example below, a \kp's output recorded in a file called \texttt{output\_kissplice\_alt\_splicing.fa} (\texttt{fpath2} contains the absolute path of the file on your hard disk) is loaded.
@@ -243,7 +244,7 @@ head(myCounts$countsEvents)
 \item \textbf{in columns:}
 \begin{itemize}
 \item The first column (\texttt{events.names}) contains the name of the variation, using \kp~notation.
-\item The second column (\texttt{events.length}) contains the size of the variant, extracted from the \kp~header. It indicates wether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a switch in the ORF).
+\item The second column (\texttt{events.length}) contains the size of the variant, extracted from the \kp~header. It indicates wether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a frameshift in the ORF).
 \item  All others columns (\texttt{counts1, counts2, counts3, counts4}) contain counts for each replicate in each condition for the variant.
 \end{itemize}
 ~
@@ -254,7 +255,7 @@ head(myCounts$countsEvents)
 \subsubsection{Input table from \krg~output}
 \label{subsubsec:input_krg}
 The \texttt{kissplice2counts} function can also deal with \krg~output data, thanks to the \texttt{k2rg} parameter. 
-\krg~allows the annotation of the alternative splicing events. It assign each event to the gene it map to and to a type of alternative splicing event: Skipped Exon (SE), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (ref - url ??).
+\krg~allows the annotation of the alternative splicing events. It assign each event to the gene it map to and to a type of alternative splicing event: Skipped Exon (SE), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (\url{ftp://pbil.univ-lyon1.fr/pub/logiciel/kissplice/tools/kissplice2refgenome_userguide.pdf}).
 
 In the example below, a \krg's output recorded in a file called \texttt{output\_k2rg\_alt\_splicing.txt} (\texttt{fpath3} contains the absolute path of the file on your hard disk) is loaded.
 The \texttt{kissplice2counts} function here uses the same \texttt{counts} and \texttt{pairedEnd} parameters as explained in the section \ref{subsubsec:input_ks}.
@@ -347,7 +348,7 @@ myResults <- diffExpressedVariants(countsData = myCounts, conditions = myConditi
 
 The \texttt{diffExpressedVariants} function has three other parameters to change the filters or the flags applied on data:
 \begin{itemize}
-  \item \texttt{pvalue}: By default, the p-value threshold to output the significant events is set to 1. So all variants are output in the final table. This parameter must be a numeric value between 0 and 1. Be aware that by setting \texttt{pvalue} to 0.05, only events that have been identified as significant between the conditions with a FDR > 5\% will be present in the final table. If you wish to change this threshold, you will need to recompute everything.
+  \item \texttt{pvalue}: By default, the p-value threshold to output the significant events is set to 1. So all variants are output in the final table. This parameter must be a numeric value between 0 and 1. Be aware that by setting \texttt{pvalue} to 0.05, only events that have been identified as significant between the conditions with a false discovery rate (FDR) > 5\% will be present in the final table. If you wish to change this threshold, you will need to recompute everything.
   \item \texttt{filterLowCountsVariants}: This parameter allows to change the threshold to filter low expressed events before testing (as explained in section \ref{subsec:filter}). By default, it is equal to 10.
   \item \texttt{flagLowCountsConditions}: This parameter allows to change the threshold to flag low expressed events (as explained in section \ref{subsec:flag}). By default, it is equal to 10.
 \end{itemize}
@@ -394,7 +395,7 @@ This table contains in columns the following information:
   \item \texttt{Length\_diff} contains the variable part length in a splicing event. It is the length difference between the upper and lower path. This column is not relevant for SNVs. 
   \item \texttt{Variant1\_condition\_1\_repl1\_Norm} and following columns contain the counts for each replicate of each variant after normalization (raw counts are normalized as in the \texttt{DESeq2} \textbf{BioConductor} \textbf{R} package, see details in section \ref{subsec:norm}). The first half of these columns concerns the first variant of each event, the second half the second variant.
   \item \texttt{Adjusted\_pvalue} contains p-values adjusted by a Benjamini-Hochberg procedure.
-  \item \texttt{Deltaf/DeltaPSI} summarizes the magnitude of the effect.
+  \item \texttt{Deltaf/DeltaPSI} summarizes the magnitude of the effect (see details in section \ref{subsec:psi}).
   \item \texttt{lowcounts} contains booleans which flag low counts events as described in section \ref{subsec:flag}. A \texttt{FALSE} value means that the event has no low counts.
 \end{itemize}
 In the \texttt{finalTable} output, events are sorted by p-values and then by magnitude of effect (based on their absolute values), so that the top candidates for further investigation/validation appear at the beginning of the output.\\
@@ -427,7 +428,7 @@ writeOutputKissDE(myResults_K2RG, output = "merge_K2RG_results_table.tab", adjPv
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{f/PSI table}
 \label{subsubsec:psitable}
-The \texttt{f/psiTable} output of the function \texttt{diffExpressedVariants} contains the f/PSI value (see details and computation in section \ref{subsec:psi}) for each event in each sample.
+The \texttt{f/psiTable} output of the function \texttt{diffExpressedVariants} contains the f value for SNV analysis and PSI value for alternative splicing analysis (see details and computation in section \ref{subsec:psi}) for each event in each sample.
 The first three rows of the \texttt{f/psiTable} output of the \texttt{myResults} object (created in the section \ref{subsec:diffanalysis}) look like this:
 <<fPSItable_description, fig=FALSE, echo=FALSE, keep.source=FALSE>>=
 head(myResults$`f/psiTable`, n = 3)
@@ -473,7 +474,7 @@ This overdispersion is often modeled using a Negative Binomial distribution, whi
 However, due to numerical instabilities associated with the estimation of Negative Binomial parameters, we use a model selection approach to determine which model is the best to handle the overdispersion parameter $\phi$. 
 We first estimate a model without overdispersion using the \textbf{glmnet} \textbf{R} package \citep{glmnet} (model $\mathcal{M}(\phi=0)$). 
 We then consider two different estimation methods for the parameter $\phi$, namely a global estimation approach using the \textbf{aod} \textbf{R} package \citep{aod} (model $\mathcal{M}(\phi=\phi_{\text{global}})$), and a variant-specific parameter using the \textbf{DSS} \textbf{R} package \citep{DSS1, DSS2, DSS3, DSS4} (model $\mathcal{M}(\phi=\phi^i_{\text{DSS}})$. 
-A BIC is used to choose the best model out of the three.
+The bayesian information criterion (BIC) is used to choose the best model out of the three.
 
 %TODO : rewrite this part...
 
