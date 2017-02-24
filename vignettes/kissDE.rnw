@@ -72,11 +72,11 @@ The user must keep in mind that \kde~was designed to work with at least one repl
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Install and load \kde}
-In a \textbf{R} session, you must first install Bioconductor.
+In a \textbf{R} session, you must first install \textbf{BioConductor}.
 <<installBC,eval=FALSE, fig=FALSE>>=
 source("http://bioconductor.org/biocLite.R")
 @
-Then you can install the \kde~package from Bioconductor.
+Then you can install the \kde~package from \textbf{BioConductor}.
 <<install,eval=FALSE, fig=FALSE>>=
 biocLite("kissDE")
 @
@@ -114,7 +114,7 @@ The data conversion with the \texttt{kissplice2counts} function and the statisti
   \multirow{2}{*}{SNV data} & \texttt{counts}=0, & \multirow{2}{*}{64824} & \multirow{2}{*}{391.958 sec} & \multirow{2}{*}{7829.016 sec} \\
     & \texttt{pairedEnd}=TRUE & & & \\
 \end{tabular}
-\caption{Running time (in seconds) of the two principal function of \kde (\texttt{kissplice2counts} and \texttt{diffExpressedVariants}) for two datasets (AS dataset from ENCODE described in section \ref{subsec:AS} and SNP dataset from GEUVADIS described in section \ref{subsec:SNV}).}
+\caption{Running time (in seconds) of the two principal function of \kde (\texttt{kissplice2counts} and \texttt{diffExpressedVariants}) for two datasets (AS dataset from the ENCODE project\cite{Djebali2012} described in section \ref{subsec:AS} and SNP dataset from the GEUVADIS project\cite{Lappalainen2013} described in section \ref{subsec:SNV}).}
 \label{tab:time}
 \end{table}
 
@@ -392,7 +392,7 @@ This table contains in columns the following information:
 \begin{itemize}
   \item \texttt{ID} is the event identifier. An event is represented by one row in the table.
   \item \texttt{Length\_diff} contains the variable part length in a splicing event. It is the length difference between the upper and lower path. This column is not relevant for SNVs. 
-  \item \texttt{Variant1\_condition\_1\_repl1\_Norm} and following columns contain the counts for each replicate of each variant after normalization (raw counts are normalized as in the \texttt{DESeq2} Bioconductor \textbf{R} package, see details in section \ref{subsec:norm}). The first half of these columns concerns the first variant of each event, the second half the second variant.
+  \item \texttt{Variant1\_condition\_1\_repl1\_Norm} and following columns contain the counts for each replicate of each variant after normalization (raw counts are normalized as in the \texttt{DESeq2} \textbf{BioConductor} \textbf{R} package, see details in section \ref{subsec:norm}). The first half of these columns concerns the first variant of each event, the second half the second variant.
   \item \texttt{Adjusted\_pvalue} contains p-values adjusted by a Benjamini-Hochberg procedure.
   \item \texttt{Deltaf/DeltaPSI} summarizes the magnitude of the effect.
   \item \texttt{lowcounts} contains booleans which flag low counts events as described in section \ref{subsec:flag}. A \texttt{FALSE} value means that the event has no low counts.
@@ -502,7 +502,7 @@ Here we present two examples to explain how \texttt{filterLowCountsVariants} opt
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Model}
-Then we design two models to take into account interactions with \textit{variants} (SNVs or alternative isoforms) and \textit{experimental conditions} as main effects. We  use the Generalized Linear Model framework. The expected intensity $\lambda_{ijk}$ can be written as following:
+Then we design two models to take into account interactions with variants (SNVs or alternative isoforms) and experimental conditions as main effects. We  use the Generalized Linear Model framework. The expected intensity $\lambda_{ijk}$ can be written as following:
 
 $$\mathcal{M_0}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j} $$
 $$\mathcal{M_1}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j}+ \left(\alpha \beta \right)_{ij}$$ 
@@ -550,7 +550,7 @@ Moreover, this event has enough counts for each variant not to be filtered out w
 \label{subsec:psi}
 %just the main computation, particular correction wrt the length will come with examples
 When a gene is found to be differentially spliced between two conditions, or an allele is found to be differentially present in two populations, one concern which remains is to quantify the magnitude of this effect.
-Indeed, especially in RNA-Seq, where some genes are very highly expressed (and hence have very high read counts), it is often the case that we detect significant (p<0.05) but weak effects. 
+Indeed, especially in RNA-Seq, where some genes are very highly expressed (and hence have very high read counts), it is often the case that we detect significant (p-value < 0.05) but weak effects. 
 
 When dealing with genomic variants, we quantify the magnitude of the effect using the difference of allele frequencies (Delta f) between the two conditions.
 When dealing with splicing variants, we quantify the magnitude of the effect using the difference of Percent Spliced In (PSI) between the two conditions.
@@ -692,15 +692,15 @@ The sample data presented here is a subset of the case study used in Benoit-Pilv
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Dataset}
-The data used in this example of AS comes from ENCODE\cite{Djebali2012}. 
+The data used in this example of AS comes from the ENCODE project\cite{Djebali2012}. 
 The chosen samples are from a neuroblastoma cell line, SK-N-SH, with or without a retinoic acid treatment. 
 Each condition is composed of two biological replicates. 
 The data are paired-end.\\
 
 \kp~has been used to analyse these two conditions. 
-Then, the type 1 results from \kp~were mapped to the reference genome with STAR and analyzed with \krg. 
+Then, the \textit{type 1} results from \kp~were mapped to the reference genome with the \textbf{STAR} software and analyzed with \krg. 
 \krg~enables to annotate the AS events discovered by \kp. 
-It assigns each event to the gene it maps to and to a type of alternative splicing event: Exon Skipping (ES), Intron Retention (IR), Alternatid Donor (AltD), Alternative Acceptor (AltA). 
+It assigns each event to the gene it maps to and to a type of alternative splicing event: Exon Skipping (ES), Intron Retention (IR), Alternatid Donor (AltD), Alternative Acceptor (AltA), \dots. 
 For any question on these tools, please refer to the manual.\\
 
 The output file of \krg~is a tab-delimited file that stores the annotated alternative splicing events found in the dataset. 
