@@ -8,6 +8,7 @@ importFrom("graphics", "abline", "legend", "lines", "par", "plot", "points")
 importFrom("grDevices", "adjustcolor", "dev.off", "palette", "png")
 importFrom("stats", "aggregate", "as.dist", "coef", "complete.cases", "cor", "hclust", "heatmap", "lm", "model.matrix", "nls", "p.adjust", "pchisq", "prcomp", "var", "reshape")
 importFrom("utils", "write.table")
+importFrom("R.utils", "countLines")
 
 export(diffExpressedVariants, kissplice2counts, qualityControl, wantedEvents, writeOutputKissDE)
 S3method("print", "countsData")

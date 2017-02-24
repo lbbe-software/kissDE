@@ -1,52 +1,36 @@
 kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL) {
   toConvert <- file(fileName, open = "r")
-  lines <- readLines(toConvert)
+  nbLines <- countLines(fileName)
   if (k2rg == FALSE) {
     fileNameK2RG <- NULL
-    line <- lines[1]
-    isQuality <- grepl("Q", line[1])
-    resultLine1 <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, isQuality)  # get all the informations for the 1st line
-    eventName <- resultLine1$eventName
-    variantLength <- resultLine1$variantLength
-    variantCounts <- resultLine1$variantCounts
-    events.mat <- matrix(NA, length(lines) / 2, length(variantCounts) + 1)
-    events.names <- rep(NA, length(lines) / 2)
-    events.mat[1, 1] <- as.numeric(variantLength)
-    events.mat[1, 2:NCOL(events.mat)] <- variantCounts
-    events.names[1] <- eventName
-    index <- 3
-    indexNames <- 2
-    firstLineChar <- substr(lines[index], start = 0, stop = 1)
-    psiInfo <- matrix(NA, length(lines) / 2, length(resultLine1$psiInfo))
-    psiInfo[1, ] <- resultLine1$psiInfo
-    #### 6/09 ####
-    # nbcol <- length(variantCounts) + 2
-    # events.df <- as.data.frame(matrix(nrow = length(lines) / 2, ncol = nbcol))
-    ####
-    if (firstLineChar == ">") {  # same for all other lines, ignore lines with sequences
-      while (index <= length(lines)) {
-        line <- lines[index]
-        resultLine <- .getInfoLine(line, counts, pairedEnd, order, exonicReads)
-        eventName <- resultLine$eventName
-        variantLength <- resultLine$variantLength
-        variantCounts <- resultLine$variantCounts
-        events.mat[indexNames, 1] <- as.numeric(variantLength)
-        events.mat[indexNames, 2:NCOL(events.mat)] <- variantCounts
-        events.names[indexNames] <- eventName
-        psiInfo[indexNames, ] <- resultLine$psiInfo
-        index <- index + 2
-        indexNames <- indexNames + 1
-        class(events.mat) <- "numeric"
-        #### 6/09 ####
-        # events.df[, 1] <- events.names
-        # events.df[, 2:nbcol] <- events.mat
-        
-        # events.df <- as.data.frame(events.mat)
-        # events.df <- data.frame(events.names, events.df)
-        ####
+    index <- 1
+    while (TRUE) {
+      line = readLines(toConvert, n = 1)
+      if (length(line) == 0) {
+        break
       }
+      if (substr(line, start = 0, stop = 1) != ">"){
+        next
+      }
+      if (index == 1){
+        isQuality <- grepl("Q", line[1])
+      }
+      resultLine <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, isQuality)  # get all the informations for the line
+      eventName <- resultLine$eventName
+      variantLength <- resultLine$variantLength
+      variantCounts <- resultLine$variantCounts
+      if (index == 1){
+        events.mat <- matrix(NA, nbLines[1] / 2, length(variantCounts) + 1)
+        events.names <- rep(NA, nbLines[1] / 2)
+        psiInfo <- matrix(NA, nbLines[1] / 2, length(resultLine$psiInfo))
+      }
+      events.mat[index, 1] <- as.numeric(variantLength)
+      events.mat[index, 2:NCOL(events.mat)] <- variantCounts
+      events.names[index] <- eventName
+      psiInfo[index, ] <- resultLine$psiInfo
+      index <- index + 1
+      class(events.mat) <- "numeric"
     }
-    # events.df <- as.data.frame(events.mat)
     events.df <- data.frame(events.names, events.mat)
     
   } else {
@@ -76,46 +60,54 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
     
     keepEvents <- wantedEvents(keep,remove)
     
-    i <- 1
-    nextI <- 1
-    line <- lines[i]
-    if(substr(line[1], 0, 1)=="#"){
-      i <- 2
-      nextI <- 2
-      line <- lines[i]
-    }
-    resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, exonicReads)
-    variantCountsUp <- resultLine$variantCountsUp
+    index <- 1
     iEvents <- 0  # nombre de bcc unique + duplique = nombre d'evenements 
     lEvents <- list()
-    while (i <= length(lines)) {
+    while (TRUE) {
+      line = readLines(toConvert, n = 1)
+      if (length(line) == 0) {
+        break
+      }
+      if(substr(line[1], 0, 1)=="#"){
+        index <- index + 1
+        next
+      }
       bcc <- strsplit(line, split = "\t")[[1]][EVENTNAME]
       if (strsplit(line, split = "\t")[[1]][EVENT] %in% keepEvents){
         lEvents[iEvents + 1] <- bcc
         iEvents <- iEvents + 1
       }
-      i <- i + 1
-      line <- lines[i]
+      index <- index + 1
     }
     lBcc <- unique(lEvents)
     iBcc <- length(lBcc)  # nombre de bcc unique
-    events.mat <- matrix(NA, iBcc * 2, length(variantCountsUp) + 1)
-    events.names <- rep(NA, iBcc * 2)
-    psiInfo <- matrix(NA, iBcc * 2, length(resultLine$psiInfoUp))
-    indexNames <- 1
-    
-    matBccApp <- matrix(0,nrow = iBcc) # nombre d'apparition pour chaque BCC
+    matBccApp <- matrix(0, nrow = iBcc) # nombre d'apparition pour chaque BCC
     rownames(matBccApp) <- lBcc
     iDupBcc <- 1
-    i <- nextI
-    while (i <= length(lines)) {
-      line <- lines[i]
+    index <- 1
+    indexNames <- 1
+    seek(toConvert, 0) # reinitialize the cursor at the beginning of the file
+    while (TRUE) {
+      line = readLines(toConvert, n = 1)
+      if (length(line) == 0) {
+        break
+      }
+      if(substr(line[1], 0, 1)=="#"){
+        index <- index + 1
+        indexNames <- 1
+        next
+      }
       lLine <- strsplit(line, split = "\t")[[1]]
       if(lLine[EVENT] %in% keepEvents){
         bcc <- lLine[EVENTNAME]
         matBccApp[bcc, 1] <- matBccApp[bcc, 1] + 1
         if (matBccApp[bcc, 1] == 1) {
           resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, exonicReads)
+          if (indexNames == 1){
+            events.mat <- matrix(NA, iBcc * 2, length(resultLine$variantCountsUp) + 1)
+            events.names <- rep(NA, iBcc * 2)
+            psiInfo <- matrix(NA, iBcc * 2, length(resultLine$variantCountsUp))
+          }
           resultLine$variantLengthUp <- as.numeric(resultLine$variantLengthUp) + as.numeric(resultLine$variantLengthLow)
           events.mat[indexNames, 1] <- as.numeric(resultLine$variantLengthUp)
           events.mat[indexNames, 2:NCOL(events.mat)] <- resultLine$variantCountsUp
@@ -129,9 +121,7 @@ kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NU
           indexNames <- indexNames + 2
         }
       }
-      i <- i + 1
-      # events.df <- as.data.frame(events.mat)
-      # events.df <- data.frame(events.names, events.df)
+      index <- index + 1
     }
     events.df <- data.frame(events.names, events.mat)
   }
