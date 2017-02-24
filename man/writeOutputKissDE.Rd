@@ -35,7 +35,8 @@ If you want to write the table containing the PSI/f values, you should set \code
   kissplice2refgenome_file <- system.file("extdata", "output_k2rg_alt_splicing.txt", 
     package = "kissDE")
   mySplicingconditions <- c("C1", "C1", "C2", "C2")
-  counts <- kissplice2counts(fileName = kissplice2refgenome_file, pairedEnd = TRUE, k2rg = TRUE)
+  counts <- kissplice2counts(fileName = kissplice2refgenome_file, counts = 2, pairedEnd = TRUE, 
+    k2rg = TRUE)
   res <- diffExpressedVariants(countsData = counts, conditions = mySplicingconditions)
   # writeOutputKissDE(res, output = "path/to/my/output/file")
   # writeOutputKissDE(res, output = "path/to/my/output/file", adjPvalMax = 0.05, dPSImin = 0.1)
