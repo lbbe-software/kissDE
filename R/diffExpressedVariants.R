@@ -1,4 +1,15 @@
 kissplice2counts <- function(fileName, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL) {
+  # check options compatibility
+  if (counts == 1 & exonicReads == TRUE) { # when counts = 1 set automatically exonicReads = TRUE
+    exonicReads == FALSE
+    warning("Changing 'exonicReads' value to FALSE for consistency with counts = 1.")
+  }
+  if (k2rg == FALSE & (keep != c("All") | !is.null(remove))) { # keep and remove should only be used when k2rg = TRUE
+    keep = c("All")
+    remove = NULL
+    warning("Changing 'keep' and 'remove' options to default value for consistency with k2rg = FALSE.")
+  }
+  
   toConvert <- file(fileName, open = "r")
   nbLines <- countLines(fileName)
   if (k2rg == FALSE) {
