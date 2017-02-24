@@ -32,7 +32,7 @@
   for (i in 1:dim(countsperCond)[2]) {
     nbVec[i] <- as.numeric(countsperCond[1,i])
     countsVec[i] <- as.numeric(countsperCond[2,i])
-    if (counts > 1) {  # specific issues linked with --counts option
+    if (counts >= 1) {  # specific issues linked with --counts option
       if (grepl("ASSB", colnames(countsperCond)[i]) == TRUE) {  # so that counts on ASSB junction are not counted twice.
         psiVec[i] <- countsVec[i]
         countsVec[i] <- -countsVec[i]
@@ -44,7 +44,7 @@
       }
     }
   }
-  if (counts > 1) {
+  if (counts >= 1) {
     d <- data.frame(nbVec, countsVec)
     names(d) <- c("NB", "COUNTS")
     sums <- aggregate(d$COUNTS, by = list(d$NB), sum)  # sums the counts for each junction that belongs to the same event
@@ -102,7 +102,7 @@
   for (i in 1:dim(countsperCond)[2]) {
     nbVec[i] <- as.numeric(countsperCond[1,i])
     countsVec[i] <- as.numeric(countsperCond[2,i])
-    if (counts > 1) {  # specific issues linked with --counts option
+    if (counts >= 1) {  # specific issues linked with --counts option
       if (grepl("ASSB", colnames(countsperCond)[i]) == TRUE) {  # so that counts on ASSB junction are not counted twice.
         psiVec[i] <- countsVec[i]
         countsVec[i] <- -countsVec[i]
@@ -114,7 +114,7 @@
       }
     }
   }
-  if (counts > 1) {
+  if (counts >= 1) {
     d <- data.frame(nbVec, countsVec)
     names(d) <- c("NB", "COUNTS")
     sums <- aggregate(d$COUNTS, by = list(d$NB), sum)  # sums the counts for each junction that belongs to the same event
