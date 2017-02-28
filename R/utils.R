@@ -1,31 +1,31 @@
 .lineParse <- function(line, indexStart, isQuality) {
-  options(warn = -1)
+  options(warn=-1)
   beginningLineToWrite <- ""
-  splitElements <- strsplit(line, "|", fixed = TRUE)[[1]]  # splits the line
+  splitElements <- strsplit(line, "|", fixed=TRUE)[[1]]  # splits the line
   if (indexStart == 6) {
     for (k in 1:4) { # indexStart - 2 = 4
-      beginningLineToWrite <- paste(beginningLineToWrite, splitElements[k], sep = "|")  # writes the firsts elements of the line : bcc, cycle... but NOT branching_nodes
+      beginningLineToWrite <- paste(beginningLineToWrite, splitElements[k], sep="|")  # writes the firsts elements of the line : bcc, cycle... but NOT branching_nodes
     }
   } else {
     for (k in 1:(indexStart - 1)) {
-      beginningLineToWrite <- paste(beginningLineToWrite, splitElements[k], sep = "|")  # writes the firsts elements of the line : bcc, cycle... 
+      beginningLineToWrite <- paste(beginningLineToWrite, splitElements[k], sep="|")  # writes the firsts elements of the line : bcc, cycle... 
     }
   }
-  allcondi <- gregexpr(pattern = "C[[:digit:]]+_[[:digit:]]+", text = line, perl = TRUE)
+  allcondi <- gregexpr(pattern="C[[:digit:]]+_[[:digit:]]+", text=line, perl=TRUE)
   if (allcondi[[1]][1] == -1) {  # no C in the header => ASSB counts
-    allcondi <- gregexpr(pattern = "[ASB]{1,4}[[:digit:]]+_[[:digit:]]+", text = line, perl = TRUE)
+    allcondi <- gregexpr(pattern="[ASB]{1,4}[[:digit:]]+_[[:digit:]]+", text=line, perl=TRUE)
   }
-  splittedCounts <- regmatches(x = line, m = allcondi)
-  countsperCond <- vapply(splittedCounts[[1]], .getJunctionCounts, c("jct_id" = "0", "count" = "0"))  # gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
-  return(list(beginning = beginningLineToWrite, countsperCond = countsperCond))
+  splittedCounts <- regmatches(x=line, m=allcondi)
+  countsperCond <- vapply(splittedCounts[[1]], .getJunctionCounts, c("jct_id"="0", "count"="0"))  # gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
+  return(list(beginning=beginningLineToWrite, countsperCond=countsperCond))
 }
 
 .getJunctionCounts <- function(X){
-  return(unlist(regmatches(x = X[[1]], m = gregexpr(pattern = "[0-9]+", text = X[[1]]))))
+  return(unlist(regmatches(x=X[[1]], m=gregexpr(pattern="[0-9]+", text=X[[1]]))))
 }
 
-.countsSetk2rg <- function(splittedCounts, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE) {
-  countsperCond <- vapply(splittedCounts[[1]], .getJunctionCounts, c("jct_id" = "0", "count" = "0"))
+.countsSetk2rg <- function(splittedCounts, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE) {
+  countsperCond <- vapply(splittedCounts[[1]], .getJunctionCounts, c("jct_id"="0", "count"="0"))
   nbVec <- rep.int(0, dim(countsperCond)[2])
   countsVec <- rep.int(0, dim(countsperCond)[2])
   psiVec <- rep.int(0, dim(countsperCond)[2])
@@ -47,10 +47,10 @@
   if (counts >= 1) {
     d <- data.frame(nbVec, countsVec)
     names(d) <- c("NB", "COUNTS")
-    sums <- aggregate(d$COUNTS, by = list(d$NB), sum)  # sums the counts for each junction that belongs to the same event
+    sums <- aggregate(d$COUNTS, by=list(d$NB), sum)  # sums the counts for each junction that belongs to the same event
     dpsi <- data.frame(nbVec, psiVec)  # dpsi will store counts of ASSB counts 
     names(dpsi) <- c("NB", "ASSB")
-    assbPsi <- aggregate(dpsi$ASSB, by = list(dpsi$NB), sum)
+    assbPsi <- aggregate(dpsi$ASSB, by=list(dpsi$NB), sum)
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
         order <- rep(1:((NROW(sums)) / 2), rep(2, ((NROW(sums)) / 2)))
@@ -61,11 +61,11 @@
       }
       d2 <- data.frame(order, sums)
       names(d2)[3] <- "sums"
-      sums2 <- aggregate(d2$sums, by = list(d2$order), sum)  # in case data is paired-end, there is one more sum to do, for each part of the pair
+      sums2 <- aggregate(d2$sums, by=list(d2$order), sum)  # in case data is paired-end, there is one more sum to do, for each part of the pair
       sums <- sums2
       dpsi2 <- data.frame(order, assbPsi)
       names(dpsi2) [3] <- "sums"
-      assbPsi2 <- aggregate(dpsi2$sums, by = list(dpsi2$order), sum)
+      assbPsi2 <- aggregate(dpsi2$sums, by=list(dpsi2$order), sum)
       assbPsi <- assbPsi2
     } 
     listASSB <- t(assbPsi)[2, ]
@@ -83,16 +83,16 @@
     }
     d <- data.frame(order, countsVec)
     names(d) <- c("ORDER", "COUNTS")
-    sums <- aggregate(d$COUNTS, by = list(d$ORDER), sum)
+    sums <- aggregate(d$COUNTS, by=list(d$ORDER), sum)
     listASSB <- NULL
   }
   listCounts <- t(sums)[2, ]
-  return(list(vCounts = listCounts, psiCounts = listASSB))
+  return(list(vCounts=listCounts, psiCounts=listASSB))
 }
 
 
 
-.countsSet <- function(line, indexStart, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, isQuality) {
+.countsSet <- function(line, indexStart, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, isQuality) {
   resultParsing <- .lineParse(line, indexStart, isQuality)
   beginningLineInfo <- resultParsing$beginning
   countsperCond <- resultParsing$countsperCond
@@ -117,10 +117,10 @@
   if (counts >= 1) {
     d <- data.frame(nbVec, countsVec)
     names(d) <- c("NB", "COUNTS")
-    sums <- aggregate(d$COUNTS, by = list(d$NB), sum)  # sums the counts for each junction that belongs to the same event
+    sums <- aggregate(d$COUNTS, by=list(d$NB), sum)  # sums the counts for each junction that belongs to the same event
     dpsi <- data.frame(nbVec, psiVec)  # dpsi will store counts of ASSB counts 
     names(dpsi) <- c("NB", "ASSB")
-    assbPsi <- aggregate(dpsi$ASSB, by = list(dpsi$NB), sum)
+    assbPsi <- aggregate(dpsi$ASSB, by=list(dpsi$NB), sum)
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
         order <- rep(1:((NROW(sums)) / 2), rep(2, ((NROW(sums)) / 2)))
@@ -131,11 +131,11 @@
       }
       d2 <- data.frame(order, sums)
       names(d2)[3] <- "sums"
-      sums2 <- aggregate(d2$sums, by = list(d2$order), sum)  # in case data is paired-end, there is one more sum to do, for each part of the pair
+      sums2 <- aggregate(d2$sums, by=list(d2$order), sum)  # in case data is paired-end, there is one more sum to do, for each part of the pair
       sums <- sums2
       dpsi2 <- data.frame(order, assbPsi)
       names(dpsi2)[3] <- "sums"
-      assbPsi2 <- aggregate(dpsi2$sums, by = list(dpsi2$order), sum)
+      assbPsi2 <- aggregate(dpsi2$sums, by=list(dpsi2$order), sum)
       assbPsi <- assbPsi2
     } 
     listASSB <- t(assbPsi)[2, ]
@@ -153,16 +153,16 @@
     }
     d <- data.frame(order, countsVec)
     names(d) <- c("ORDER", "COUNTS")
-    sums <- aggregate(d$COUNTS, by = list(d$ORDER), sum)
+    sums <- aggregate(d$COUNTS, by=list(d$ORDER), sum)
     listASSB <- NULL
   }
   listCounts <- t(sums)[2, ]
-  return(list(firstPart = beginningLineInfo, vCounts = listCounts, psiCounts = listASSB))
+  return(list(firstPart=beginningLineInfo, vCounts=listCounts, psiCounts=listASSB))
 }
 
 
 
-.getInfoLine <- function(line, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE, isQuality) {
+.getInfoLine <- function(line, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE, isQuality) {
   if (grepl("branching_nodes", line)) {
     indexStart <- 6 
   } else {
@@ -170,20 +170,20 @@
   }
   resultCountsSet <- .countsSet(line, indexStart, counts, pairedEnd, order, exonicReads, isQuality)
   lineFirstPart <- resultCountsSet$firstPart
-  lineFirstPartSplit <- strsplit(lineFirstPart, "|", fixed = TRUE)[[1]]
-  eventName <- paste(lineFirstPartSplit[2], lineFirstPartSplit[3], sep = "|")
-  eventName <- substr(eventName, start = 2, stop = nchar(eventName))
+  lineFirstPartSplit <- strsplit(lineFirstPart, "|", fixed=TRUE)[[1]]
+  eventName <- paste(lineFirstPartSplit[2], lineFirstPartSplit[3], sep="|")
+  eventName <- substr(eventName, start=2, stop=nchar(eventName))
   variantLength <- strsplit(lineFirstPartSplit[5], "_")[[1]][4]
-  return(list(eventName = eventName, variantLength = variantLength, variantCounts = resultCountsSet$vCounts, psiInfo = resultCountsSet$psiCounts))
+  return(list(eventName=eventName, variantLength=variantLength, variantCounts=resultCountsSet$vCounts, psiInfo=resultCountsSet$psiCounts))
 }
 
 
 
-.getInfoLineK2rg <- function(line, counts = 0, pairedEnd = FALSE, order = NULL, exonicReads = TRUE) {
-  splitElements <- strsplit(line, "\t", fixed = TRUE)[[1]]
+.getInfoLineK2rg <- function(line, counts=0, pairedEnd=FALSE, order=NULL, exonicReads=TRUE) {
+  splitElements <- strsplit(line, "\t", fixed=TRUE)[[1]]
   firstPart <- splitElements[16]
-  firstPartSplit <- strsplit(firstPart, "|", fixed = TRUE)[[1]]
-  eventName <- paste(firstPartSplit[1], firstPartSplit[2], sep = "|")
+  firstPartSplit <- strsplit(firstPart, "|", fixed=TRUE)[[1]]
+  eventName <- paste(firstPartSplit[1], firstPartSplit[2], sep="|")
   countsUp <- strsplit(splitElements[20], ",")
   countsLow <- strsplit(splitElements[21], ",")
   resultCountsSetUp <- .countsSetk2rg(countsUp, counts, pairedEnd, order, exonicReads)
@@ -191,8 +191,8 @@
   variantLengthUp <- as.integer(splitElements[6])
   variantLengthLow <- sum(as.integer(strsplit(splitElements[17],",")[[1]]))
   
-  return (list(eventName = eventName, variantLengthUp = variantLengthUp, variantLengthLow = variantLengthLow, variantCountsUp = resultCountsSetUp$vCounts, 
-               variantCountsLow = resultCountsSetLow$vCounts, psiInfoUp = resultCountsSetUp$psiCounts, psiInfoLow = resultCountsSetLow$psiCounts))
+  return (list(eventName=eventName, variantLengthUp=variantLengthUp, variantLengthLow=variantLengthLow, variantCountsUp=resultCountsSetUp$vCounts, 
+               variantCountsLow=resultCountsSetLow$vCounts, psiInfoUp=resultCountsSetUp$psiCounts, psiInfoLow=resultCountsSetLow$psiCounts))
 }
 
 
@@ -222,12 +222,12 @@
   sortedindex <- order(conditions) + 2
   namesData <- c("ID", "Length", rep(NA, length(conditions)))
   for (k in 1:nr[1]) {
-    namesData[2 + k] <- paste(sortedconditions[k], "_repl", k, sep = "", collapse = "")
+    namesData[2 + k] <- paste(sortedconditions[k], "_repl", k, sep="", collapse="")
   }
   
   for (i in 2:n) {
     for (j in 1:nr[n]) {
-      namesData[2 + cumsum(nr)[i - 1] + j] <- paste(sortedconditions[cumsum(nr)[i - 1] + j], "_repl", j, sep = "", collapse = "")
+      namesData[2 + cumsum(nr)[i - 1] + j] <- paste(sortedconditions[cumsum(nr)[i - 1] + j], "_repl", j, sep="", collapse="")
     }
   }  # proper names for conditionsXreplicates
   countsEvents[, -(1:2)] <- countsEvents[, sortedindex]
@@ -242,7 +242,7 @@
   } else {
     ASSBinfo <- NULL
   }
-  countsEvents$Path <- gl(2, 1, NROW(countsEvents), labels = c("UP", "LP"))
+  countsEvents$Path <- gl(2, 1, NROW(countsEvents), labels=c("UP", "LP"))
   
   ###################################################
   ### code chunk number 2: Normalization
@@ -250,79 +250,79 @@
   # Normalization with DESeq2
   conds <- c()
   for (i in 1:n) {
-    conds <- c(conds, rep(paste("Cond", i, sep = "", collapse = ""), nr[i]))
+    conds <- c(conds, rep(paste("Cond", i, sep="", collapse=""), nr[i]))
   } 
   
-  suppressMessages(dds <- DESeqDataSetFromMatrix(countData = countsEvents[, !(names(countsEvents) %in% c("ID", "Length", "Path"))], 
-                                colData = data.frame(condition = conds),
-                                design = ~ condition)) # create a DESeqDataSet object
+  suppressMessages(dds <- DESeqDataSetFromMatrix(countData=countsEvents[, !(names(countsEvents) %in% c("ID", "Length", "Path"))], 
+                                colData=data.frame(condition=conds),
+                                design=~ condition)) # create a DESeqDataSet object
   ddsSF <- estimateSizeFactors(dds)
   shouldWeNormalize <- sum(is.na(sizeFactors(ddsSF))) < 1
   dimns <- NCOL(countsEvents)
   
   # add columns containing normalized data
-  countsEvents[, (dimns + 1):(dimns + length(conds))] <- round(counts(ddsSF, normalized = shouldWeNormalize))
-  colnames(countsEvents)[(dimns + 1):(dimns + length(conds))] <- paste(namesData[3:(3 + sum(nr) - 1)], "_Norm", sep = "")
+  countsEvents[, (dimns + 1):(dimns + length(conds))] <- round(counts(ddsSF, normalized=shouldWeNormalize))
+  colnames(countsEvents)[(dimns + 1):(dimns + length(conds))] <- paste(namesData[3:(3 + sum(nr) - 1)], "_Norm", sep="")
   
-  return(list(countsData = countsEvents, conditions = conds, dim = dimns, n = n, nr = nr, sortedconditions = sortedconditions, ASSBinfo = ASSBinfo))
+  return(list(countsData=countsEvents, conditions=conds, dim=dimns, n=n, nr=nr, sortedconditions=sortedconditions, ASSBinfo=ASSBinfo))
 }
 
 
 
 .eventtable <- function(df, startPosColumn4Counts, endPosCol4Counts) {
-  eventTab <- data.frame(ID = rep(as.factor(df["ID"]), endPosCol4Counts - startPosColumn4Counts + 1),
-                         cond = as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "_"), FUN = function(d){paste(d[2:(length(d) - 2)], collapse = "_")}), use.names = FALSE)), # to manage the conditions names which contains "_"
-                         counts = as.numeric(df[startPosColumn4Counts:endPosCol4Counts]),
-                         path = as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "|"), FUN = function(d){d[1]}), use.names = FALSE)),
-                         row.names = NULL)
+  eventTab <- data.frame(ID=rep(as.factor(df["ID"]), endPosCol4Counts - startPosColumn4Counts + 1),
+                         cond=as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "_"), FUN=function(d){paste(d[2:(length(d) - 2)], collapse="_")}), use.names=FALSE)), # to manage the conditions names which contains "_"
+                         counts=as.numeric(df[startPosColumn4Counts:endPosCol4Counts]),
+                         path=as.factor(unlist(lapply(strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "|"), FUN=function(d){d[1]}), use.names=FALSE)),
+                         row.names=NULL)
   return(eventTab)
 }
 
 
 
 .addOneCount <- function(df){
-  df$counts <- unlist(lapply(df[, "counts"], function(x){x + 1}), use.names = FALSE)
+  df$counts <- unlist(lapply(df[, "counts"], function(x){x + 1}), use.names=FALSE)
   return(df)
 }
 
 
 
 .fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, phiDSScond, phiGlobal, nbAll){
-  nbglmA0 <- negbin(counts~cond + path, data = eventdata, random = ~1, fixpar = list(4, 0))
-  nbglmI0 <- negbin(counts~cond * path, data = eventdata, random = ~1, fixpar = list(5, 0))  
+  nbglmA0 <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4, 0))
+  nbglmI0 <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5, 0))  
   # S: simple, A: additive, I : interaction models
   # Poisson model  
   nbAnov0 <- anova(nbglmA0, nbglmI0)
-  nbAIC0 <- c(AIC(nbglmA0, k = log(nbAll))@istats$AIC, AIC(nbglmI0, k = log(nbAll))@istats$AIC)
+  nbAIC0 <- c(AIC(nbglmA0, k=log(nbAll))@istats$AIC, AIC(nbglmI0, k=log(nbAll))@istats$AIC)
   # singular.hessian:  true when fitting provided a singular hessian, indicating an overparamaterized model.
   nbSingHes0 <- c(nbglmA0@singular.hessian, nbglmI0@singular.hessian)
   # code: "code" An integer (returned by "optim") indicating why the optimization process terminated.
   nbCode0 <- c(nbglmA0@code, nbglmI0@code)  
   
   # binomial negative model, with global phi
-  nbglmAgb <- negbin(counts~cond + path, data = eventdata, random = ~1, fixpar = list(4, phiGlobal))
-  nbglmIgb <- negbin(counts~cond * path, data = eventdata, random = ~1, fixpar = list(5, phiGlobal)) 
+  nbglmAgb <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4, phiGlobal))
+  nbglmIgb <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5, phiGlobal)) 
   nbAnovgb <- anova(nbglmAgb, nbglmIgb)
-  nbAICgb <- c(AIC(nbglmAgb, k = log(nbAll))@istats$AIC, AIC(nbglmIgb, k = log(nbAll))@istats$AIC)
-  # the BIC in fact, since we use k = log(nobs)
+  nbAICgb <- c(AIC(nbglmAgb, k=log(nbAll))@istats$AIC, AIC(nbglmIgb, k=log(nbAll))@istats$AIC)
+  # the BIC in fact, since we use k=log(nobs)
   nbSingHesgb <- c(nbglmAgb@singular.hessian, nbglmIgb@singular.hessian)
   nbCodegb <- c(nbglmAgb@code, nbglmIgb@code)
   
   # binomial negative model, with phi DSS
-  nbglmA <- negbin(counts~cond + path, data = eventdata, random = ~1, fixpar = list(4, phiDSS))
-  nbglmI <- negbin(counts~cond * path, data = eventdata, random = ~1, fixpar = list(5, phiDSS))
+  nbglmA <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4, phiDSS))
+  nbglmI <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5, phiDSS))
   
   nbAnov <- anova(nbglmA, nbglmI)
-  nbAIC <- c(AIC(nbglmA, k = log(nbAll))@istats$AIC, AIC(nbglmI, k = log(nbAll))@istats$AIC)
+  nbAIC <- c(AIC(nbglmA, k=log(nbAll))@istats$AIC, AIC(nbglmI, k=log(nbAll))@istats$AIC)
   nbSingHes <- c(nbglmA@singular.hessian, nbglmI@singular.hessian)
   nbCode <- c(nbglmA@code, nbglmI@code)
   
   # binomial negative model, with phi DSS, conditionally to the expression mean  	 
-  nbglmAcond <- negbin(counts~cond + path, data = eventdata, random = ~1, fixpar = list(4, phiDSScond))	 
-  nbglmIcond <- negbin(counts~cond * path, data = eventdata, random = ~1, fixpar = list(5, phiDSScond))	 
+  nbglmAcond <- negbin(counts~cond + path, data=eventdata, random=~1, fixpar=list(4, phiDSScond))	 
+  nbglmIcond <- negbin(counts~cond * path, data=eventdata, random=~1, fixpar=list(5, phiDSScond))	 
   
   nbAnovcond <- anova(nbglmAcond, nbglmIcond)	 
-  nbAICcond <- c(AIC(nbglmAcond, k = log(nbAll))@istats$AIC, AIC(nbglmIcond, k = log(nbAll))@istats$AIC)	 
+  nbAICcond <- c(AIC(nbglmAcond, k=log(nbAll))@istats$AIC, AIC(nbglmIcond, k=log(nbAll))@istats$AIC)	 
   nbSingHescond <- c(nbglmAcond@singular.hessian, nbglmIcond@singular.hessian)	 
   nbCodecond <- c(nbglmAcond@code, nbglmIcond@code)
   
@@ -356,10 +356,10 @@
   # reduce data frame to the interesting columns
   nbAll <- sum(nr)
   dataPart <- countsData[, c(1:2, which(grepl("_Norm", names(countsData))))]
-  dataPart$Path <- gl(2, 1, NROW(countsData), labels = c("UP","LP"))
+  dataPart$Path <- gl(2, 1, NROW(countsData), labels=c("UP","LP"))
   dataPart2 <- cbind(dataPart[seq(1, NROW(dataPart), 2), ], dataPart[seq(2, NROW(dataPart), 2), grepl("Norm", names(dataPart))])
-  names(dataPart2)[3:(3 + nbAll - 1)] <- paste("UP", names(dataPart2)[3:(3 + nbAll - 1)], sep = "_")
-  names(dataPart2)[(3 + nbAll + 1):(3 + 2 * nbAll + 1 - 1)] <- paste("LP", names(dataPart2)[(3 + nbAll + 1):(3 + 2 * nbAll + 1 - 1)], sep = "_")
+  names(dataPart2)[3:(3 + nbAll - 1)] <- paste("UP", names(dataPart2)[3:(3 + nbAll - 1)], sep="_")
+  names(dataPart2)[(3 + nbAll + 1):(3 + 2 * nbAll + 1 - 1)] <- paste("LP", names(dataPart2)[(3 + nbAll + 1):(3 + 2 * nbAll + 1 - 1)], sep="_")
   lengths <- data.frame(dataPart[seq(1, NROW(dataPart), 2), 2], dataPart[seq(2, NROW(dataPart), 2), 2])
   colnames(lengths) <- c("upper", "lower")
   dataPart2[2] <- lengths$upper - lengths$lower  # computes the difference of length between the lower and upper paths 
@@ -374,7 +374,7 @@
   }
   rownames(lengths) <- rownames(dataPart2) 
   # create list for the complete data set
-  allEventtables <- apply(dataPart2, 1, .eventtable, startPosColumn4Counts = which(grepl("UP", names(dataPart2)))[1], endPosCol4Counts = ncol(dataPart2))
+  allEventtables <- apply(dataPart2, 1, .eventtable, startPosColumn4Counts=which(grepl("UP", names(dataPart2)))[1], endPosCol4Counts=ncol(dataPart2))
   
   ###################################################
   ### code chunk number 2: DSS dispersion estimation
@@ -398,7 +398,7 @@
   lm.D <- lm(event.mean.variance.df$Variance ~ event.mean.variance.df$Mean - 1)
   # estimate the overdispersion parameter theta of the NB distritution
   modelNB <- Variance ~ Mean + 1 / theta * Mean^2
-  nls.modelNB <- nls(modelNB, data = event.mean.variance.df, start = list(theta = 100))
+  nls.modelNB <- nls(modelNB, data=event.mean.variance.df, start=list(theta=100))
   phi <- 1 / coef(nls.modelNB) # to be used as fixed parameter later on
   
   ###################################################
@@ -420,14 +420,14 @@
   } else {
     dataPart3 <- dataPart2
   }
-  allEventtables <- apply(dataPart3, 1, .eventtable, startPosColumn4Counts = which(grepl("UP", names(dataPart3)))[1], endPosCol4Counts = ncol(dataPart3))
+  allEventtables <- apply(dataPart3, 1, .eventtable, startPosColumn4Counts=which(grepl("UP", names(dataPart3)))[1], endPosCol4Counts=ncol(dataPart3))
   
   ###################################################
   ### code chunk number 6: pALLGlobalPhi.glm.nb
   ###################################################
   pALLGlobalPhiGlmNb <- data.frame(t(rep(NA, 28)))
   for (i in 1:length(allEventtables)) {
-    pALLGlobalPhiGlmNb[i, ] <- try(.fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i], dispersion(dispData)[i], phi, nbAll), silent = TRUE)
+    pALLGlobalPhiGlmNb[i, ] <- try(.fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i], dispersion(dispData)[i], phi, nbAll), silent=TRUE)
   }
   ###################################################
   ### code chunk number 7: excl_errors
@@ -460,8 +460,8 @@
   } else {
     rownames(pALLGlobalPhiGlmNb) <- dataPart3[, 1]
   }
-  return(list(pALLGlobalPhi.glm.nb = pALLGlobalPhiGlmNb, sing.events = sing.events, dataPart3 = dataPart3, ASSBinfo = ASSBinfo, 
-              allEventtables = allEventtables, lengths = lengths, phi = phi, dispData = dispData))
+  return(list(pALLGlobalPhi.glm.nb=pALLGlobalPhiGlmNb, sing.events=sing.events, dataPart3=dataPart3, ASSBinfo=ASSBinfo, 
+              allEventtables=allEventtables, lengths=lengths, phi=phi, dispData=dispData))
 }
 
 
@@ -486,7 +486,7 @@
     for (i in 1:length(bestmodel.table.n)) {
       bestmodel.singhes[i] <- c(matrixpALLGlobalPhi[i, c(22, 24, 26, 28)])[bestmodel.table.n[i]]  ##########%%%%%%%%%%
     }
-    bestmodel.singhes <- unlist(bestmodel.singhes, use.names = FALSE)
+    bestmodel.singhes <- unlist(bestmodel.singhes, use.names=FALSE)
     bestmodel <- table(bestmodel.table)
     
     ###################################################
@@ -498,11 +498,11 @@
     singhes0 <- which(apply(pALLGlobalPhi.glm.nb[, c(6, 8, 10, 12)], 1, which.min) == 1)  # Variants for which the Poisson model is better
     singhes0_n <- names(singhes0)
     for (i in singhes0_n) {
-      Xinter   <- model.matrix(~cond * path, data = allEventtables[[which(rownames(dataPart3) == i)]])
-      outinter <- glmnet(Xinter, allEventtables[[which(rownames(dataPart3) == i)]]$counts, family = "poisson", lambda = 1e-4, alpha = 0)
-      Xprinc   <- model.matrix(~path + cond, data = allEventtables[[which(rownames(dataPart3) == i)]])
-      outprinc <- glmnet(Xprinc, allEventtables[[which(rownames(dataPart3) == i)]]$counts, family = "poisson", lambda = 1e-4, alpha = 0)
-      Pv       <- 1 - pchisq(deviance(outprinc) - deviance(outinter), df = 1)
+      Xinter   <- model.matrix(~cond * path, data=allEventtables[[which(rownames(dataPart3) == i)]])
+      outinter <- glmnet(Xinter, allEventtables[[which(rownames(dataPart3) == i)]]$counts, family="poisson", lambda=1e-4, alpha=0)
+      Xprinc   <- model.matrix(~path + cond, data=allEventtables[[which(rownames(dataPart3) == i)]])
+      outprinc <- glmnet(Xprinc, allEventtables[[which(rownames(dataPart3) == i)]]$counts, family="poisson", lambda=1e-4, alpha=0)
+      Pv       <- 1 - pchisq(deviance(outprinc) - deviance(outinter), df=1)
       pALLGlobalPhi.glm.nb.glmnet[i, "glmnet.pval"] <- Pv
       pALLGlobalPhi.glm.nb.glmnet[i, "glmnet.code"] <- outinter$jerr
     }
@@ -519,7 +519,7 @@
     for (i in singhes_n) {
       pALLGlobalPhi.glm.nb.pen[i, ] <- try(.fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]),
                                                                  dispersion(dispData)[i],
-                                                                 dispersion(dispData)[i], phi, nbAll), silent = TRUE)
+                                                                 dispersion(dispData)[i], phi, nbAll), silent=TRUE)
     }
     pALLGlobalPhi.glm.nb <- as.data.frame(matrixpALLGlobalPhi)
     
@@ -553,7 +553,7 @@
     }
     noCorrectPVal <- pALLGlobalPhi.glm.nb$final.pval.a.ia
     names(noCorrectPVal) <- rownames(pALLGlobalPhi.glm.nb)
-    pALLGlobalPhi.glm.nb$final.padj.a.ia <- p.adjust(pALLGlobalPhi.glm.nb$final.pval.a.ia, method = "fdr")
+    pALLGlobalPhi.glm.nb$final.padj.a.ia <- p.adjust(pALLGlobalPhi.glm.nb$final.pval.a.ia, method="fdr")
     correctedPVal <- pALLGlobalPhi.glm.nb$final.padj.a.ia
     names(correctedPVal) <- rownames(pALLGlobalPhi.glm.nb)
     if (length(sing.events) != 0) {
@@ -567,7 +567,7 @@
     } else {
       signifVariants <- cbind(dataPart3, pALLGlobalPhi.glm.nb$final.padj.a.ia)[pALLGlobalPhi.glm.nb$final.padj.a.ia <= pvalue, ]
     }
-    return(list(noCorrectPVal = noCorrectPVal, correctedPVal = correctedPVal, signifVariants = signifVariants))
+    return(list(noCorrectPVal=noCorrectPVal, correctedPVal=correctedPVal, signifVariants=signifVariants))
   } else {
     return(NA)
   }
@@ -582,7 +582,7 @@
   if (!is.null(ASSBinfo)) {
     ASSBinfo <- subset(ASSBinfo, ASSBinfo$events.names %in% as.vector(signifVariants[, 1]))  # select only the lines corresponding to the remaining lines of signifVariants
   }
-  sumLowCond <- matrix(data = rep(0, n * NROW(signifVariants)), nrow = NROW(signifVariants), ncol = n)  # to check later for low counts to flag
+  sumLowCond <- matrix(data=rep(0, n * NROW(signifVariants)), nrow=NROW(signifVariants), ncol=n)  # to check later for low counts to flag
   pairsCond <- list()
   namesCond <- unique(sortedconditions)
   for (i in 1:n) {
@@ -599,17 +599,17 @@
       lengths2 <- lengths[rown, ]
     }
     else{
-      newindex <- unlist(sapply(rownames(signifVariants), function(x) res <- which(ASSBinfo[, 1] == x)), use.names = FALSE)  # to put the lines of the 2 data frames in the same order
+      newindex <- unlist(sapply(rownames(signifVariants), function(x) res <- which(ASSBinfo[, 1] == x)), use.names=FALSE)  # to put the lines of the 2 data frames in the same order
       ASSBinfo <- ASSBinfo[newindex, ]
     }
   } else {
     rown <- row.names(signifVariants)
     lengths2 <- lengths[rown, ]
   }
-  deltapsi <- matrix(nrow = NROW(signifVariants), ncol = length(pairsCond))
+  deltapsi <- matrix(nrow=NROW(signifVariants), ncol=length(pairsCond))
   rownames(deltapsi) <- rownames(signifVariants)
   namesDeltaPsi <- c()
-  psi <- data.frame(ID = rownames(signifVariants)) # initialize empty data frame to save the PSI values
+  psi <- data.frame(ID=rownames(signifVariants)) # initialize empty data frame to save the PSI values
   for (pair in pairsCond) {  # delta psi calculated for pairs of conditions, psi are calcuted for each replicateXcondition
     # for one pair
     index <- pair[[1]]
@@ -620,7 +620,7 @@
       condi <- namesCond[index]
       replicates <- nr[index]
     }
-    psiPairCond <- matrix(nrow = NROW(signifVariants), ncol = sum(replicates))
+    psiPairCond <- matrix(nrow=NROW(signifVariants), ncol=sum(replicates))
     colsPsiPairCond <- c()
     indexMatrixPsiPairCond <- 1
     indexdeltapsi <- 1
@@ -629,9 +629,9 @@
     for (nbRepli in 1:length(replicates)) {  # for a given condition in the pair
       for (i in 1:replicates[nbRepli]) {  # for each replicate (i) of the condition
         nbLoop <- nbLoop + 1
-        colsPsiPairCond <- c(colsPsiPairCond, paste(condi[nbRepli], "_repl", i, sep = ""))
-        namesUp <- c(paste("UP_", condi[nbRepli], "_repl", i, "_Norm", sep = ""))
-        namesLow <- c(paste("LP_", condi[nbRepli], "_repl", i, "_Norm", sep = ""))
+        colsPsiPairCond <- c(colsPsiPairCond, paste(condi[nbRepli], "_repl", i, sep=""))
+        namesUp <- c(paste("UP_", condi[nbRepli], "_repl", i, "_Norm", sep=""))
+        namesLow <- c(paste("LP_", condi[nbRepli], "_repl", i, "_Norm", sep=""))
         subsetUp <- signifVariants[namesUp]  # the subsets are the counts we are going to use to compute all psis
         subsetLow <- signifVariants[namesLow]
         if (!is.null(ASSBinfo)) {  # counts correction
@@ -640,7 +640,7 @@
             subsetUp <- subsetUp / correctFactor
           }
           else{
-            nameASSBinfo <- c(paste(condi[nbRepli], "_repl", i, sep = ""))
+            nameASSBinfo <- c(paste(condi[nbRepli], "_repl", i, sep=""))
             subsetUp[which(subsetUp > 0), ] <- subsetUp[which(subsetUp > 0), ] / (2 - ASSBinfo[which(subsetUp > 0), nameASSBinfo] / subsetUp[which(subsetUp > 0), ])
           }
         } else {  #counts correction if there is no info about the junction counts
@@ -652,7 +652,7 @@
         indexNan <- intersect(which(subsetUp[, 1] < 10), which(subsetLow[, 1] < 10))  # if counts are too low we will put NaN
         psiPairCond[indexNan, nbLoop] <- NaN
         indexMatrixPsiPairCond <- indexMatrixPsiPairCond + 1
-        namesPsiPairCond <- c(namesPsiPairCond, paste(as.character(condi[nbRepli]), "_repl", i, sep = ""))
+        namesPsiPairCond <- c(namesPsiPairCond, paste(as.character(condi[nbRepli]), "_repl", i, sep=""))
       }
     } 
     colnames(psiPairCond) <- namesPsiPairCond
@@ -662,10 +662,10 @@
     # if there are 2 NaN and 3 values for a bcc, nanSums is at 2
     listNaN <- names(NaNSums[which(NaNSums > NCOL(psiPairCond) / 2)]) # when there are more NaN than nb of column/2, we do not calculate the psi
     psiPairCond[listNaN, ] <- NaN
-    deltaPsiCond <- rowMeans(psiPairCond[, (replicates[1] + 1):sum(replicates)], na.rm = TRUE) - rowMeans(psiPairCond[, 1:replicates[1]], na.rm = TRUE)  # delta psi is the mean of the psis of the 2nd condition (in terms of sorted condition) - the mean of the psis of the 1st condition 
+    deltaPsiCond <- rowMeans(psiPairCond[, (replicates[1] + 1):sum(replicates)], na.rm=TRUE) - rowMeans(psiPairCond[, 1:replicates[1]], na.rm=TRUE)  # delta psi is the mean of the psis of the 2nd condition (in terms of sorted condition) - the mean of the psis of the 1st condition 
     deltapsi[, indexdeltapsi] <- deltaPsiCond 
     indexdeltapsi <- indexdeltapsi + 1
-    psi <- merge(psi, psiPairCond, by.x = "ID", by.y = "row.names")  # add the PSI in the data frame
+    psi <- merge(psi, psiPairCond, by.x="ID", by.y="row.names")  # add the PSI in the data frame
   }
   
   # when there are more than 2 conditions, we want to simplify the output :
@@ -679,7 +679,7 @@
         condB <- as.character(pairsCond[[mindex]][[1]][2])
         dP <- round(deltapsi[l, mindex], 4)
         dPvector1[l] <- dP
-        dPvector2[l] <-paste(as.character(dP), "(Cond", condB, ",", condA, ")", sep = "")  # we also return
+        dPvector2[l] <-paste(as.character(dP), "(Cond", condB, ",", condA, ")", sep="")  # we also return
       }
     }
   } else {
@@ -714,13 +714,13 @@
   signifVariants.sorted <- cbind(signifVariants.sorted, lowcounts)
   colnames(signifVariants.sorted[NCOL(signifVariants.sorted)]) <- "Low_counts"
   # return the final table and the table of PSI
-  return(list(signifVariants.sorted = signifVariants.sorted,
-              psiTable = psi))
+  return(list(signifVariants.sorted=signifVariants.sorted,
+              psiTable=psi))
 }
 
 
-.writeTableOutput <- function(finalTable, pvalMax = 1, dPSImin = 0, output) {
-  fOut <- file(output, open = "w")
+.writeTableOutput <- function(finalTable, pvalMax=1, dPSImin=0, output) {
+  fOut <- file(output, open="w")
   colNames <- colnames(finalTable)
   rowNames <- rownames(finalTable)
   nbRow <- length(rowNames)
@@ -732,8 +732,8 @@
     lHead <- append(lHead, paste(j, colName, sep="."))
     j <- j + 1
   }
-  head <- paste(lHead, collapse = "\t")
-  head <- paste("#", head, sep = "")
+  head <- paste(lHead, collapse="\t")
+  head <- paste("#", head, sep="")
   writeLines(head,fOut)
   
   #fT <- finalTable
@@ -750,14 +750,14 @@
       dpsi <- 0
     }
     if (dpsi >= dPSImin && apv <= pvalMax) {
-      writeLines(paste(rowNames[i], paste(as.character(finalTable[i, ])[-1], collapse = "\t"), sep = "\t"), fOut)
+      writeLines(paste(rowNames[i], paste(as.character(finalTable[i, ])[-1], collapse="\t"), sep="\t"), fOut)
     }
     i <- i + 1
   }
   close(fOut)
 } 
 
-.writeMergeOutput <- function(resDiffExpr, k2rgFile, pvalMax = 1, dPSImin = 0, output) {
+.writeMergeOutput <- function(resDiffExpr, k2rgFile, pvalMax=1, dPSImin=0, output) {
   K2RG_GENEID <- "Gene_Id"
   K2RG_GENENAME <- "Gene_name"
   K2RG_POS <- "Chromosome_and_genomic_position"
@@ -797,9 +797,9 @@
   PSIEND <- ncol(psiTable)
   
   lBcc <- rownames(finalTable)
-  fK2RG <- file(k2rgFile, open = "r")
+  fK2RG <- file(k2rgFile, open="r")
   lines <- readLines(fK2RG)
-  fOut <- file(output, open = "w")
+  fOut <- file(output, open="w")
   
   countsLabel <- paste(colnames(finalTable)[COUNTSSTART:COUNTSEND],collapse=",")
   countsName <- paste("CountsNorm(",countsLabel,")",sep="")
@@ -809,7 +809,7 @@
   i <- 1
   line <- lines[i]
   if(substr(line[1],0,1)=="#"){
-    nCol <- length(strsplit(line, split = "\t")[[1]])
+    nCol <- length(strsplit(line, split="\t")[[1]])
     countsHead <- paste(nCol+1,countsName,sep=".")
     psiHead <- paste(nCol+2,psiName,sep=".")
     pvHead <- paste(nCol+3,K2RGKDE_APV,sep=".")
@@ -832,14 +832,14 @@
     lHead <- append(lHead, paste(j + 2, K2RGKDE_APV, sep="."))
     lHead <- append(lHead, paste(j + 3, K2RGKDE_DPSI, sep="."))
     lHead <- append(lHead, paste(j + 4, K2RGKDE_WARN, sep="."))
-    toWrite <- paste(lHead, collapse = "\t")
-    toWrite <- paste("#", toWrite, sep ="")
+    toWrite <- paste(lHead, collapse="\t")
+    toWrite <- paste("#", toWrite, sep="")
     writeLines(toWrite,fOut)
   }
   while(i <= length(lines)) {
     line <- lines[i]
-    bcc <- strsplit(line, split = "\t")[[1]][EVENTNAME]
-    bcc <- strsplit(bcc, split = "Type_")[[1]][1]
+    bcc <- strsplit(line, split="\t")[[1]][EVENTNAME]
+    bcc <- strsplit(bcc, split="Type_")[[1]][1]
     bcc <- substr(bcc,0,nchar(bcc)-1)
     if(bcc %in% lBcc) {
       countsValue <- paste(as.character(finalTable[rownames(finalTable)==bcc,][COUNTSSTART:COUNTSEND]),collapse=",")
@@ -864,10 +864,10 @@
   close(fOut)
 }
 
-.writePSITable <- function(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, output){
+.writePSITable <- function(resDiffExprVariant, adjPvalMax=1, dPSImin=0, output){
   selected_id <- resDiffExprVariant$finalTable$ID[which(resDiffExprVariant$finalTable$Adjusted_pvalue < adjPvalMax & 
                                                         abs(resDiffExprVariant$finalTable$`Deltaf/DeltaPSI`) > dPSImin)]
   selected_PSI <- resDiffExprVariant$`f/psiTable`[selected_id]
-  write.table(resDiffExprVariant$`f/psiTable`, file = output, 
-              quote = FALSE, sep = "\t", row.names = FALSE)
+  write.table(resDiffExprVariant$`f/psiTable`, file=output, 
+              quote=FALSE, sep="\t", row.names=FALSE)
 }
