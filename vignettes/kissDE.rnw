@@ -101,23 +101,6 @@ results <- diffExpressedVariants(counts, conditions)
 writeOutputKissDE(results, adjPvalMax = 0.05, dPSImin = 0.1, output = "kissDE_output.tab")
 @
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Time / Requirements}
-The data conversion with the \texttt{kissplice2counts} function and the statistical analysis done with the \texttt{diffExpressedVariants} function can take some time to run. Here is an example of the running time of this 2 functions on the two complete datasets presented in the case studies (section \ref{sec:casestudies}). The time presented were evaluated on a desktop computer with the following caracteristics: Intel Core i7, CPU 2,60 GHz, 16G RAM. %TODO: ask Leandro what is necessary in this section ? 
-\begin{table}[h]
-\centering
-\begin{tabular}{c|c|c|c|c}
-   \multirow{2}{*}{Dataset} & \multirow{2}{*}{Options} & Number of & \multicolumn{2}{|c}{Running time}  \\
-    & & events & \texttt{kissplice2counts} & \texttt{diffExpressedVariants} \\ \hline
-  \multirow{2}{*}{AS data} & \texttt{counts}=2,  & \multirow{2}{*}{68497} & \multirow{2}{*}{1263.74 sec} & \multirow{2}{*}{8275.891 sec} \\ 
-    & \texttt{pairedEnd}=TRUE & & & \\ \hline
-  \multirow{2}{*}{SNV data} & \texttt{counts}=0, & \multirow{2}{*}{64824} & \multirow{2}{*}{391.958 sec} & \multirow{2}{*}{7829.016 sec} \\
-    & \texttt{pairedEnd}=TRUE & & & \\
-\end{tabular}
-\caption{Running time (in seconds) of the two principal function of \kde (\texttt{kissplice2counts} and \texttt{diffExpressedVariants}) for two datasets (AS dataset from the ENCODE project \citep{Djebali2012} described in section \ref{subsec:AS} and SNP dataset from the GEUVADIS project \citep{Lappalainen2013} described in section \ref{subsec:SNV}).}
-\label{tab:time}
-\end{table}
-
 
 
 
@@ -131,7 +114,7 @@ In this section, the different steps and functions of a differential analysis wi
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.7\textwidth]{Workflow_KissDE.png}
-  \caption{\textbf{Schema of the workflow.}}
+  \caption{\textbf{Schema of \kde's workflow. Numbers in light blue point to the section of this vignette explaining the step.}}
 \end{figure}
 
 
@@ -367,7 +350,7 @@ To control that the condition of application of the Benjamini Hochberg multiple 
 hist(myResults$uncorrectedPVal, main="Histogram of p-values", xlab = "p-values", breaks = 50)
 @
 
-The histogram obtained with the two complete datasets presented in the case studies (section \ref{sec:casestudies}) shows as expected an uniform distribution with a peak near 0 (Figure \ref{fig:distribpvalue}).
+Because the dataset used here is small, the distribution obtained is not representative. Representative histogram can be obtained with the two complete datasets presented in the case studies (section \ref{sec:casestudies}). As expected, the histograms show an uniform distribution with a peak near 0 Figure \ref{fig:distribpvalue}).
 
 \begin{figure}[!ht]
   \centering
@@ -453,7 +436,7 @@ They are sumarized in the Figure \ref{fig:kdetheory}.
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.5\textwidth]{Workflow_diffExpressedVariants.png}
-  \caption{\textbf{The different steps of the \texttt{diffExpressedVariants} function.}}
+  \caption{\textbf{The different steps of the \texttt{diffExpressedVariants} function. Numbers in light red point to the section of this vignette explaining the step.}}
   \label{fig:kdetheory}
 \end{figure}
 
@@ -484,21 +467,21 @@ The bayesian information criterion (BIC) is used to choose the best model out of
 \label{subsec:filter}
 If global counts for both variants are too low (option \texttt{filterLowCountsVariants}), the event is not tested.
 The rationale behind this filter is to speed up the analysis and gain statistical power.
-Here we present two examples to explain how \texttt{filterLowCountsVariants} option works. Let's assume that there are two conditions and two replicates per condition. \texttt{filterLowCountsVariants} keeps its default value, 10.\\
+Here we present an example to explain how \texttt{filterLowCountsVariants} option works. Let's assume that there are two conditions and two replicates per condition. \texttt{filterLowCountsVariants} keeps its default value, 10.\\
 
 \begin{table}[h]
 \centering
 \begin{tabular}{c|c|c|c|c|c}
     &\multicolumn{2}{c|}{Condition 1} &  \multicolumn{2}{c|}{Condition 2}&  Sum by variant\\
     & replicate 1  & replicate 2 & replicate 1 & replicate 2 & \\ \hline
- Variant 1 &	11 &         15  & 3           &   2         & 11+15+3+2=31 $>$ 10 \\
- Variant 2 &	8  &           0 &        1    &            0& 8+0+1+0=9 $<$ 10 \\
+  Variant 1  &	2  &           1 &        3    &           2 & 2+1+3+2=8 $<$ 10 \\
+  Variant 2  &	8  &           0 &        1    &           0 & 8+0+1+0=9 $<$ 10 \\
 \end{tabular}
 \caption{}
 \label{tab:filter1}
 \end{table}
 
-\paragraph{}In the first example (Table \ref{tab:filter1}), the two variants have global counts less than 10, this event will be used to compute the overdispersion, but will not be used to compute the models. It will neither appear in the result table.\\
+\paragraph{}In this example (Table \ref{tab:filter1}), the two variants have global counts less than 10, this event will be used to compute the overdispersion, but will not be used to compute the models. It will neither appear in the result table.\\
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -534,8 +517,8 @@ Moreover, this event has enough counts for each variant not to be filtered out w
 \begin{tabular}{c|c|c|c|c|c}
     &\multicolumn{2}{c|}{Condition 1} &  \multicolumn{2}{c|}{Condition 2}&  Sum by variant\\
     & replicate 1  & replicate 2 & replicate 1 & replicate 2 & \\ \hline
- Variant 1 &	1 &         0  & 6       &   7         &  1+0+6+7=14 $>$ 10 \\
- Variant 2 &	5 &           3 &        1    &           2&  5+3+1+2=11 $>$ 10 \\
+  Variant 1   &	1  &           0 &           6 &           7 &  1+0+6+7=14 $>$ 10 \\
+  Variant 2   &	5  &           3 &           1 &           2 &  5+3+1+2=11 $>$ 10 \\
  \hline
   Sum by condition &\multicolumn{2}{c|}{\textbf{9} $<$ 10 }	&\multicolumn{2}{c|}{16 $>$ 10} & \\
 \end{tabular}
@@ -699,10 +682,10 @@ Each condition is composed of two biological replicates.
 The data are paired-end.\\
 
 \kp~has been used to analyse these two conditions. 
-Then, the \textit{type 1} results from \kp~were mapped to the reference genome with the \textbf{STAR} software and analyzed with \krg. 
+Then, the \textit{type 1} results from \kp~were mapped to the reference genome with the \textbf{STAR}\citep{Dobin2013} software and analyzed with \krg. 
 \krg~enables to annotate the AS events discovered by \kp. 
 It assigns each event to the gene it maps to and to a type of alternative splicing event: Exon Skipping (ES), Intron Retention (IR), Alternatid Donor (AltD), Alternative Acceptor (AltA), \dots. 
-For any question on these tools, please refer to the manual.\\
+For any question on these tools (\kp~ and \krg), please refer to the manual that can be found on this web page: \url{http://kissplice.prabi.fr/}.\\
 
 The output file of \krg~is a tab-delimited file that stores the annotated alternative splicing events found in the dataset. 
 Following, is an extract of this file (the first 3 rows and first 11 columns), where each row is one alternative splicing event:
@@ -713,8 +696,6 @@ exampleK2RG <- read.table(fileInAS)
 names(exampleK2RG) <- NULL 
 print(head(exampleK2RG[,c(1:11)], 3), row.names = FALSE)
 @
-
-%TODO : explain the format ?
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -783,6 +764,24 @@ Here are the commands to carry out this task:
 writeOutputKissDE(myResults_AS, output = "results_table.tab")
 writeOutputKissDE(myResults_AS, output = "psi_table.tab", writePSI = TRUE)
 @
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Time / Requirements}
+The data conversion with the \texttt{kissplice2counts} function and the statistical analysis done with the \texttt{diffExpressedVariants} function can take some time to run. Here is an example of the running time of this 2 functions on the two complete datasets presented in the case studies (section \ref{sec:casestudies}). The time presented were evaluated on a desktop computer with the following caracteristics: Intel Core i7, CPU 2,60 GHz, 16G RAM.
+\begin{table}[h]
+\centering
+\begin{tabular}{c|c|c|c|c}
+   \multirow{2}{*}{Dataset} & \multirow{2}{*}{Options} & Number of & \multicolumn{2}{|c}{Running time}  \\
+    & & events & \texttt{kissplice2counts} & \texttt{diffExpressedVariants} \\ \hline
+  \multirow{2}{*}{AS data} & \texttt{counts}=2,  & \multirow{2}{*}{68497} & \multirow{2}{*}{14m} & \multirow{2}{*}{2h 18m} \\ 
+    & \texttt{pairedEnd}=TRUE & & & \\ \hline
+  \multirow{2}{*}{SNV data} & \texttt{counts}=0, & \multirow{2}{*}{64824} & \multirow{2}{*}{6m} & \multirow{2}{*}{2h 10m} \\
+    & \texttt{pairedEnd}=TRUE & & & \\
+\end{tabular}
+\caption{Running time of the two principal function of \kde (\texttt{kissplice2counts} and \texttt{diffExpressedVariants}) for two datasets (AS dataset from the ENCODE project \citep{Djebali2012} described in section \ref{subsec:AS} and SNP dataset from the GEUVADIS project \citep{Lappalainen2013} described in section \ref{subsec:SNV}).}
+\label{tab:time}
+\end{table}
 
 
 
