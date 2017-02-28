@@ -779,7 +779,7 @@ When the SK-N-SH cell line is treated with retinoic acid, there is a switch of m
 \subsubsection{Export results}
 In order to facilitate the downstream analysis of the results, two tables are exported: the result table (\texttt{myResults\_AS{\$}finalTable} object, see section \ref{subsubsec:finaltable}) is saved in a \texttt{results\_table.tab} file and the PSI table (\texttt{myResults\_AS{\$}$^{\backprime}$f/psiTable$^{\backprime}$}, see section \ref{subsubsec:psitable}) is saved in a \texttt{psi\_table.tab} file. 
 Here are the commands to carry out this task:
-<<AS_test, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
+<<AS_export, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults_AS, output = "results_table.tab")
 writeOutputKissDE(myResults_AS, output = "psi_table.tab", writePSI = TRUE)
 @
