@@ -55,7 +55,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 	ntop <- min(500, dim(countsData2)[1])
 	selectntop <- order(countsData2$vars, decreasing=TRUE)[seq_len(ntop)]
 	countsData2Selected <- countsData2[selectntop,]
-	# remove all NAs
+	## remove all NAs
 	countsData2Selected <- countsData2Selected[complete.cases(
 		countsData2Selected[, 10:(9 + length(conds))]), ]
 	
@@ -86,8 +86,8 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 	colors <- colorpalette[1:n]
 	pc1var <- round(summary(pca)$importance[2,1]*100, digits=1)
 	pc2var <- round(summary(pca)$importance[2,2]*100, digits=1)
-	pc1lab <- paste0("PC1 (",as.character(pc1var),"%)")
-	pc2lab <- paste0("PC2 (",as.character(pc2var),"%)")
+	pc1lab <- paste0("PC1 (", as.character(pc1var), "%)")
+	pc2lab <- paste0("PC2 (", as.character(pc2var), "%)")
 	if (storeFigs == FALSE) {
 		par(oma=c(2, 1, 1, 1))
 		plot(PC2~PC1, data=as.data.frame(pca$x), bg=colors[fac], pch=21, 
