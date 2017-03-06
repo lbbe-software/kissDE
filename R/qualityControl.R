@@ -81,7 +81,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 	### PCA plot
 	###################################################
 	pca <- prcomp(t(
-	  countsData2Selected[, (sum(nr)*2+1):(sum(nr)*2+1+length(conds))]))
+	  countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))
 	fac <- factor(conds)
 	colorpalette <- c("#192823", "#DD1E2F", "#EBB035", "#06A2CB", 
 										"#218559", "#D0C6B1")
