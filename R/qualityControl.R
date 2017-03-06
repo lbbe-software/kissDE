@@ -51,28 +51,28 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 		}
 	}
 	countsData2$vars <- apply(
-	  as.matrix(countsData2[, (sum(nr)*2+1):(sum(nr)*2+1+length(conds))]),
+	  as.matrix(countsData2[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]),
 	  1, var, na.rm=TRUE)
 	ntop <- min(500, dim(countsData2)[1])
 	selectntop <- order(countsData2$vars, decreasing=TRUE)[seq_len(ntop)]
 	countsData2Selected <- countsData2[selectntop,]
 	## remove all NAs
 	countsData2Selected <- countsData2Selected[complete.cases(
-		countsData2Selected[, (sum(nr)*2+1):(sum(nr)*2+1+length(conds))]), ]
+		countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]), ]
 	
 	###################################################
 	### code chunk number 3: heatmap
 	###################################################
 	if (storeFigs == FALSE) {
 		heatmap.2(as.matrix(as.dist(1 - 
-			cor(countsData2Selected[, (sum(nr)*2+1):(sum(nr)*2+1+length(conds))]))), 
+			cor(countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))), 
 			margins=c(10, 10), cexRow=1, cexCol=1, density.info="none", trace="none")
 		par(ask=TRUE)
 	} else {
 		filename <- paste(storeFigs, "/heatmap.png", sep="")
 		png(filename)
 		heatmap.2(as.matrix(as.dist(1 - 
-			cor(countsData2Selected[, (sum(nr)*2+1):(sum(nr)*2+1+length(conds))]))),
+			cor(countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))),
 			margins=c(10, 10), cexRow=1, cexCol=1, density.info="none", trace="none")
 		void <- dev.off()
 	}
