@@ -90,7 +90,7 @@ library(kissDE)
 Here we present the basic \textbf{R} commands for the analysis of alternative splicing events with \kde. 
 These commands require an example output file of \kp~called \texttt{output\_kissplice.fa}. 
 To deal with other types of input file, please refer to section \ref{subsec:input}.
-The used funtions \texttt{kissplice2counts}, \texttt{qualityControl}, \texttt{diffExpressedVariants} and \texttt{writeOutputKissDE} of \kde~are detailled in the section \ref{sec:workflow}.
+The used funtions \texttt{kissplice2counts}, \texttt{qualityControl}, \texttt{diffExpressedVariants} and \texttt{writeOutputKissDE} of \kde~are detailed in the section \ref{sec:workflow}.
 Here we assume that there are two conditions (\texttt{condition\_1} and \texttt{condition\_2}) with two biological replicates and the RNA-Seq libraries are single-end.
 
 <<quick_start, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
@@ -110,7 +110,7 @@ writeOutputKissDE(results, adjPvalMax = 0.05, dPSImin = 0.1, output = "kissDE_ou
 
 \section{\kde's workflow}
 \label{sec:workflow}
-In this section, the different steps and functions of a differential analysis with \kde~are described.
+In this section, the successive steps and functions of a differential analysis with \kde~are described.
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.7\textwidth]{Workflow_KissDE.png}
@@ -128,7 +128,7 @@ Three options are possible, either to provide a table of counts or to work with 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{You work with your own data (without \kp): table of counts format}
 \label{subsubsec:input_count}
-Let's assume we work with two conditions (\texttt{condition\_1} and \texttt{condition\_2}) and two replicates per conditions.
+Let's assume we work with two conditions (\texttt{condition\_1} and \texttt{condition\_2}) and two replicates per condition.
 An input example table contained in a flat file called \texttt{table\_counts\_alt\_splicing.txt} (\texttt{fpath1} contains the absolute path of the file on your hard disk) is loaded and stored in a \texttt{tableCounts} object.
 <<tablecounts_howto, fig=FALSE, keep.source=FALSE>>=
 fpath1 <- system.file("extdata", "table_counts_alt_splicing.txt", package="kissDE")
@@ -142,12 +142,12 @@ head(tableCounts)
 
 It must be a data frame with:
 \begin{itemize}
-  \item \textbf{in rows:} 
+  \item \textbf{In rows:} 
     \begin{itemize}
       \item One variation is represented by two lines, one for each variant. For instance, for SNVs, one allele is described in the first line, and the other in the second line. For alternative splicing events, the inclusion isoform and the exclusion isoform have one line each.
       \item A head row must contains the columns name in the flat file.
     \end{itemize}
-  \item \textbf{in columns:}
+  \item \textbf{In columns:}
     \begin{itemize}
       \item The first column (\texttt{eventsName}) contains the name of the variation.
       \item The second column (\texttt{eventsLength}) contains the variant size. If this size is unknown, the value can be set to 0. Note that the size is used only in the context of alternative splicing. Then it indicates whether the size difference due to the switch from one isoform to the other is a multiple of 3 or not and thus if it can induce a frameshift in the open reading frame (ORF).
@@ -192,7 +192,7 @@ Headers contain information used in \kde. In the example, there are:
 \end{figure}
 
 
-\kde~can be used on any type output by \kp~(0: SNV, 1: alternative splicing events, 3: indels,...). 
+\kde~can be used on any type output from \kp~(0: SNV, 1: alternative splicing events, 3: indels,...). 
 The user should refer to \kp~manual (\url{http://kissplice.prabi.fr/documentation/user_guide.pdf}) for further questions about \kp~format and output.\\
 
 To be used in \kde, \kp's output must be converted in a table of counts thanks to the \texttt{kissplice2counts} function.
@@ -205,7 +205,7 @@ myCounts <- kissplice2counts(fpath2, counts = 2, pairedEnd = TRUE)
 
 The counts returned by \texttt{kissplice2counts} are extracted from the \kp~header and depending on the parameters used to run \kp. 
 This used parameters must be set in the \texttt{kissplice2counts} parameters.\\
-First, the \texttt{counts} parameter of \texttt{kissplice2counts} must be the same as the \texttt{counts} parameter used to obatin data with \kp. 
+First, the \texttt{counts} parameter of \texttt{kissplice2counts} must be the same as the \texttt{counts} parameter used to obtain data with \kp. 
 The possible values are 0, 1 or 2. 0 is the default value for both \texttt{kissplice2counts} and \kp.\\
 Then, the user should also specify the \texttt{pairedEnd} parameter in \texttt{kissplice2counts}. 
 If RNA-Seq libraries are single-end, \texttt{pairedEnd} should be set to \texttt{FALSE} (the default value). 
@@ -227,7 +227,7 @@ head(myCounts$countsEvents)
 \item \textbf{in columns:}
 \begin{itemize}
 \item The first column (\texttt{events.names}) contains the name of the variation, using \kp~notation.
-\item The second column (\texttt{events.length}) contains the size of the variant, extracted from the \kp~header. It indicates wether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a frameshift in the ORF).
+\item The second column (\texttt{events.length}) contains the size of the variant, extracted from the \kp~header. It indicates whether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a frameshift in the ORF).
 \item  All others columns (\texttt{counts1, counts2, counts3, counts4}) contain counts for each replicate in each condition for the variant.
 \end{itemize}
 ~
@@ -238,7 +238,7 @@ head(myCounts$countsEvents)
 \subsubsection{Input table from \krg~output}
 \label{subsubsec:input_krg}
 The \texttt{kissplice2counts} function can also deal with \krg~output data, thanks to the \texttt{k2rg} parameter. 
-\krg~allows the annotation of the alternative splicing events. It assign each event to the gene it map to and to a type of alternative splicing event: Skipped Exon (SE), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (\url{ftp://pbil.univ-lyon1.fr/pub/logiciel/kissplice/tools/kissplice2refgenome_userguide.pdf}).
+\krg~allows the annotation of the alternative splicing events. It assigns each event to the gene it maps to and to a type of alternative splicing event: Skipped Exon (SE), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (\url{ftp://pbil.univ-lyon1.fr/pub/logiciel/kissplice/tools/kissplice2refgenome_userguide.pdf}).
 
 In the example below, a \krg's output recorded in a file called \texttt{output\_k2rg\_alt\_splicing.txt} (\texttt{fpath3} contains the absolute path of the file on your hard disk) is loaded.
 The \texttt{kissplice2counts} function here uses the same \texttt{counts} and \texttt{pairedEnd} parameters as explained in the section \ref{subsubsec:input_ks}.
@@ -253,7 +253,7 @@ head(myCounts_k2rg$countsEvents)
 @
 
 
-The \krg~output contains informations about the type of splicing events. 
+The \krg~output contains information about the type of splicing events. 
 So it is possible to choose the subtype of events we want to analyse. 
 The \texttt{keep} and \texttt{remove} parameters of the \texttt{kissplice2counts} function allow to indicate the type of splicing events to analyse or to remove from the analysis. 
 These two parameters take a character vector indicating the types of events to keep or remove. 
@@ -293,7 +293,7 @@ qualityControl(myCounts, myConditions)
 
 It produces 2 graphs:
 \begin{itemize}
-\item{an heatmap of the sample-to-sample distances (see left of Figure \ref{fig:qualityControl})}
+\item{a heatmap of the sample-to-sample distances (see left of Figure \ref{fig:qualityControl})}
 \item{the factor map formed by the first two axes of a principal component analysis (PCA) (see right of Figure \ref{fig:qualityControl})}
 \end{itemize}
 
@@ -315,7 +315,7 @@ Indeed, in the heatmap plot, the samples that cluster together are from the same
 In the PCA plot, the first principal component (PC1) resume 90.2\% of the total variance of the dataset. 
 This first axis clearly separate the replicates of the 2 conditions.
 
-The created graphs can be saved by setting the \texttt{storeFigs} parameter of the \texttt{qualityControl} function to \texttt{TRUE} (then graphs are stored in a \texttt{kissDEFigures} folder created in the \textbf{R} working directory) or to the path where user want to store his/her graphs.
+The created graphs can be saved by setting the \texttt{storeFigs} parameter of the \texttt{qualityControl} function to \texttt{TRUE} (then graphs are stored in a \texttt{kissDEFigures} folder created in the \textbf{R} working directory) or to the path where the user wants to store his/her graphs.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -401,7 +401,7 @@ writeOutputKissDE(myResults, output = "results_table_filtered.tab", adjPvalMax =
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Merge between final table and \krg~output}
 \label{subsubsec:merge}
-If the table counts was built from a \krg~output with the \texttt{kissplice2counts} function, running the \texttt{writeOutputKissDE} will write a file merging results of differential analysis with \krg~data. 
+If the counts table was built from a \krg~output with the \texttt{kissplice2counts} function, running the \texttt{writeOutputKissDE} will write a file merging results of differential analysis with \krg~data. 
 Like previously explained (section \ref{subsubsec:finaltable}), users can choose to save only events passing thresholds, in a file called \texttt{merge\_K2RG\_results\_table.tab}:
 <<krg_output_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults_K2RG, output = "merge_K2RG_results_table.tab", adjPvalMax = 0.05, dPSImin = 0.10)
@@ -418,7 +418,7 @@ head(myResults$`f/psiTable`, n = 3)
 @
 
 This output can be useful to carry out downstream analysis or to produce specific plots (like heatmap on f/PSI events). 
-To use these informations with external tools, this table can be saved in a tab-delimited file (here called \texttt{result\_PSI.tab}), setting the \texttt{writePSI} parameter to \texttt{TRUE}:
+To use this information with external tools, this table can be saved in a tab-delimited file (here called \texttt{result\_PSI.tab}), setting the \texttt{writePSI} parameter to \texttt{TRUE}:
 <<fPSItable_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults, output = "result_PSI.tab", writePSI = TRUE)
 @
@@ -486,7 +486,7 @@ Here we present an example to explain how \texttt{filterLowCountsVariants} optio
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Model}
-Then we design two models to take into account interactions with variants (SNVs or alternative isoforms) and experimental conditions as main effects. We  use the Generalized Linear Model framework. The expected intensity $\lambda_{ijk}$ can be written as following:
+Then we design two models to take into account interactions with variants (SNVs or alternative isoforms) and experimental conditions as main effects. We  use the generalised linear model framework. The expected intensity $\lambda_{ijk}$ can be written as following:
 
 $$\mathcal{M_0}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j} $$
 $$\mathcal{M_1}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j}+ \left(\alpha \beta \right)_{ij}$$ 
@@ -546,7 +546,7 @@ $$Deltaf \:=\: f_{cond1} - f_{cond2}$$
 
 The deltaPSI/deltaf is computed as follows:
 \begin{itemize}
-  \item First, individual (per replicate) PSI/f are calculated.If counts for both upper and lower path are too low ($<10$) after normalization, the individual PSI/f is not computed.
+  \item First, individual (per replicate) PSI/f are calculated. If counts for both upper and lower paths are too low ($<10$) after normalization, the individual PSI/f is not computed.
   \item Then mean PSI/f are computed for each condition. If more than half of individual PSI/f were not calculated at the previous step, the mean PSI/f is not computed.
   \item Finally, we output deltaPSI/deltaf. Unless one of the mean PSI/f of a condition could not be estimated. DeltaPSI/deltaf is calculated subtracting one condition PSI/f from another. This does not always follow the order of the conditions you entered in the first place. To know the order, you must report to the output file, deltaPSI/deltaf are calculated subtracting the first condition appearing in the header from the one after. DeltaPSI/deltaf absolute value vary between 0 and 1, with values close to 0 indicating low effect and values close to 1 strong effect.
 \end{itemize}
@@ -583,7 +583,7 @@ In total, 8 files have been used as \kp~input: 4 files about the two TSC samples
 Paired-end files from a same sample have been input following each other.\\
 
 The output file of \kp~is a fasta file that stores SNVs found in the dataset.
-Its structure is decribed in the section \ref{subsubsec:input_ks}.
+Its structure is described in the section \ref{subsubsec:input_ks}.
 Following, the four first lines of this fasta output file:
 
 <<snv_kissplice_data, fig=FALSE, echo=FALSE, keep.source=FALSE>>=
@@ -636,7 +636,7 @@ qualityControl(myCounts_SNV, myConditions_SNV)
   \label{qcSNV}
 \end{figure}
 
-On both plots returned by the \texttt{qualityControl} function (Figure \ref{qcSNV}), the replicates of the same condition seem to be more similar between them than to the samples of the other condition. 
+On both plots returned by the \texttt{qualityControl} function (Figure \ref{qcSNV}), the replicates of the same condition seem to be more similar between themselves than to the samples of the other condition. 
 On the heatmap (left of Figure \ref{qcSNV}), the samples of the same condition cluster together. 
 On the PCA plot (right of Figure \ref{qcSNV}), the first principal component (which resumes 88\% of the total variance) clearly discriminate the samples of the two conditions.
 
@@ -672,7 +672,7 @@ writeOutputKissDE(myResults_SNV, output = "final_table_significants.tab", adjPva
 \label{subsec:AS}
 This second example corresponds to the case of differential analysis of alternative splicing (AS) events. 
 The sample data presented here is a subset of the case study used in Benoit-Pilven et al. (ref ?).
-
+%TODO ref
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Dataset}
@@ -737,9 +737,9 @@ qualityControl(myCounts_AS, myConditions_AS)
   \label{qcAS}
 \end{figure}
 
-On both plots returned by the \texttt{qualityControl} function (Figure \ref{qcAS}), the replicates of the same condition seem to be more similar between them than to the samples of the other condition. 
+On both plots returned by the \texttt{qualityControl} function (Figure \ref{qcAS}), the replicates of the same condition seem to be more similar between themselves than to the samples of the other condition. 
 On the heatmap (left of Figure \ref{qcAS}), the samples of the same condition cluster together. 
-On the PCA plot (right of Figure \ref{qcAS}), the first principal component (which resumes 88\% of the total variance) clearly discriminate the samples of the two conditions.
+On the PCA plot (right of Figure \ref{qcAS}), the first principal component (which resumes 88\% of the total variance) clearly discriminates the samples of the two conditions.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -779,7 +779,7 @@ The data conversion with the \texttt{kissplice2counts} function and the statisti
   \multirow{2}{*}{SNV data} & \texttt{counts}=0, & \multirow{2}{*}{64824} & \multirow{2}{*}{6m} & \multirow{2}{*}{2h 10m} \\
     & \texttt{pairedEnd}=TRUE & & & \\
 \end{tabular}
-\caption{Running time of the two principal function of \kde (\texttt{kissplice2counts} and \texttt{diffExpressedVariants}) for two datasets (AS dataset from the ENCODE project \citep{Djebali2012} described in section \ref{subsec:AS} and SNP dataset from the GEUVADIS project \citep{Lappalainen2013} described in section \ref{subsec:SNV}).}
+\caption{Running time of the two principal functions of \kde (\texttt{kissplice2counts} and \texttt{diffExpressedVariants}) for two datasets (AS dataset from the ENCODE project \citep{Djebali2012} described in section \ref{subsec:AS} and SNP dataset from the GEUVADIS project \citep{Lappalainen2013} described in section \ref{subsec:SNV}).}
 \label{tab:time}
 \end{table}
 
