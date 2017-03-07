@@ -179,7 +179,7 @@ wantedEvents <- function(keep=c("All"), remove=NULL){
 	if (!is.null(remove)) {
 		for (i in 1:length(remove)) {
 			if (!remove[i] %in% append(EVENTS, "MULTI")) {
-				print(paste("In remove : couldn't find", remove[i]))
+				print(paste("In remove: couldn't find", remove[i]))
 				stop("One of the element(s) of the remove vector is not part of: 
 						 deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified, 
 						 -, MULTI, unclassifiedSNP")
@@ -205,7 +205,7 @@ wantedEvents <- function(keep=c("All"), remove=NULL){
 	}
 	for (i in 1:length(keep)) {
 		if (!keep[i] %in% EVENTS) {
-			print(paste("In keep : couldn't find", keep[i]))
+			print(paste("In keep: couldn't find", keep[i]))
 			stop("One of the element(s) of the keep vector is not part of: 
 					 deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified, 
 					 -, unclassifiedSNP")
@@ -230,7 +230,7 @@ wantedEvents <- function(keep=c("All"), remove=NULL){
 	}
 	for (i in 1:length(remove)){
 		if (!remove[i] %in% ES_EVENTS) {
-			print(paste("In remove : couldn't find",remove[i]))
+			print(paste("In remove: couldn't find",remove[i]))
 			stop("One of the element(s) of the remove vector is not part of: 
 					 altA, altD, altAD, alt, MULTI")
 		}
