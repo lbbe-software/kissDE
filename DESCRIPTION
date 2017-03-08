@@ -11,10 +11,11 @@ Authors@R: c(
 	person("Janice", "Kielbassa", email = "janice.kielbassa@lyon.unicancer.fr", role = "aut"),
 	person("Vincent", "Lacroix", email = "vincent.lacroix@univ-lyon1.fr", role = "aut"),
 	person("Frank", "Picard", role = "ctb"), 
+	person("Laurent", "Jacob", role = "ctb"), 
 	person("Vincent", "Miele", role = "ctb"), 
 	person("Aurélie", "Siberchicot", email = "aurelie.siberchicot@univ-lyon1.fr", role = "cre"))
 Imports: aod, Biobase, DESeq2, DSS, glmnet, gplots, graphics, grDevices, R.utils, stats, utils
 License: GPL (>= 2)
 Contact: Vincent Lacroix <vincent.lacroix@univ-lyon1.fr>
 Encoding: UTF-8
-biocViews: AlternativeSplicing, ExperimentalDesign
+biocViews: AlternativeSplicing, ExperimentalDesign, Software
