@@ -34,7 +34,7 @@
 
 
 \title{kissDE Reference Manual}
-\author{Clara Benoit-Pilven, Camille Marchet, Janice Kielbassa, Audric Cologne, Aurélie Siberchicot, Vincent Lacroix, Aurélie Siberchicot}
+\author{Clara Benoit-Pilven, Camille Marchet, Janice Kielbassa, Audric Cologne, Aurélie Siberchicot, Vincent Lacroix}
 
 \begin{document}
 \SweaveOpts{concordance=TRUE}
