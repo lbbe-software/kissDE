@@ -37,8 +37,8 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 	###################################################
 	countsData2 <- reshape(countsData[, c(1,(dimns):(dimns + length(conds)))], 
 												 timevar="Path", idvar="ID", direction="wide")
-	for (i in 1:n){
-		for (j in 1:nr[i]){
+	for (i in seq_len(n)) {
+		for (j in seq_len(nr[i])) {
 			countsData2$PSI <- countsData2[, (1+j+sum(nr[0:(i-1)]))] /
 				(countsData2[, (1+j+sum(nr[0:(i-1)]))] + 
 				 	countsData2[, (1+sum(nr)+j+sum(nr[0:(i-1)]))])
@@ -85,7 +85,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 	fac <- factor(conds)
 	colorpalette <- c("#192823", "#DD1E2F", "#EBB035", "#06A2CB", 
 										"#218559", "#D0C6B1")
-	colors <- colorpalette[1:n]
+	colors <- colorpalette[seq_len(n)]
 	pc1var <- round(summary(pca)$importance[2,1]*100, digits=1)
 	pc2var <- round(summary(pca)$importance[2,2]*100, digits=1)
 	pc1lab <- paste0("PC1 (", as.character(pc1var), "%)")

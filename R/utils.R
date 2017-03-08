@@ -3,14 +3,14 @@
   beginningLineToWrite <- ""
   splitElements <- strsplit(line, "|", fixed=TRUE)[[1]]  ## splits the line
   if (indexStart == 6) {
-    for (k in 1:4) { ## indexStart - 2 = 4
+    for (k in seq_len(4)) { ## indexStart - 2 = 4
     	## writes the firsts elements of the line: bcc, cycle... 
     	## but NOT branching_nodes
       beginningLineToWrite <- paste(beginningLineToWrite, 
         splitElements[k], sep="|")
     }
   } else {
-    for (k in 1:(indexStart - 1)) {
+    for (k in seq_len(indexStart - 1)) {
     	## writes the firsts elements of the line: bcc, cycle... 
       beginningLineToWrite <- paste(beginningLineToWrite, 
       															splitElements[k], sep="|")
@@ -47,7 +47,7 @@
   nbVec <- rep.int(0, dim(countsperCond)[2])
   countsVec <- rep.int(0, dim(countsperCond)[2])
   psiVec <- rep.int(0, dim(countsperCond)[2])
-  for (i in 1:dim(countsperCond)[2]) {
+  for (i in seq_len(dim(countsperCond)[2])) {
     nbVec[i] <- as.numeric(countsperCond[1,i])
     countsVec[i] <- as.numeric(countsperCond[2,i])
     if (counts >= 1) {  ## specific issues linked with --counts option
@@ -76,7 +76,7 @@
     assbPsi <- aggregate(dpsi$ASSB, by=list(dpsi$NB), sum)
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
-        order <- rep(1:((NROW(sums)) / 2), rep(2, ((NROW(sums)) / 2)))
+        order <- rep(seq_len((NROW(sums)) / 2), rep(2, ((NROW(sums)) / 2)))
       } else {
         if (!is.vector(order)) {
           print("Error, order vector seems to be in a wrong format.")
@@ -99,7 +99,7 @@
       if (is.null(order)) {
       	## for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) 
       	## (assuming data is ordered)
-        order <- rep(1:(dim(countsperCond)[2] / 2), 
+        order <- rep(seq_len(dim(countsperCond)[2] / 2), 
         						 rep(2, dim(countsperCond)[2] / 2))
       } else {
         if (!is.vector(order)) {
@@ -107,7 +107,7 @@
         }
       }
     } else {
-      order <- c(1:length(countsperCond))
+      order <- c(seq_along(countsperCond))
     }
     d <- data.frame(order, countsVec)
     names(d) <- c("ORDER", "COUNTS")
@@ -130,9 +130,9 @@
   nbVec <- rep.int(0, dim(countsperCond)[2])
   countsVec <- rep.int(0, dim(countsperCond)[2])
   psiVec <- rep.int(0, dim(countsperCond)[2])
-  for (i in 1:dim(countsperCond)[2]) {
-    nbVec[i] <- as.numeric(countsperCond[1,i])
-    countsVec[i] <- as.numeric(countsperCond[2,i])
+  for (i in seq_len(dim(countsperCond)[2])) {
+    nbVec[i] <- as.numeric(countsperCond[1, i])
+    countsVec[i] <- as.numeric(countsperCond[2, i])
     if (counts >= 1) {  ## specific issues linked with --counts option
       if (grepl("ASSB", colnames(countsperCond)[i]) == TRUE) {
       	## so that counts on ASSB junction are not counted twice.
@@ -159,7 +159,7 @@
     assbPsi <- aggregate(dpsi$ASSB, by=list(dpsi$NB), sum)
     if (pairedEnd == TRUE) {
       if (is.null(order)) {
-        order <- rep(1:((NROW(sums)) / 2), rep(2, ((NROW(sums)) / 2)))
+        order <- rep(seq_len((NROW(sums)) / 2), rep(2, ((NROW(sums)) / 2)))
       } else {
         if (!is.vector(order)) {
           print("Error, order vector seems to be in a wrong format.")
@@ -182,7 +182,7 @@
       if (is.null(order)) {
       	## for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) 
       	## (assuming data is ordered)
-        order <- rep(1:(dim(countsperCond)[2] / 2), 
+        order <- rep(seq_len(dim(countsperCond)[2] / 2), 
         						 rep(2, dim(countsperCond)[2] / 2))
       } else {
         if (!is.vector(order)) {
@@ -190,7 +190,7 @@
         }
       }
     } else {
-      order <- c(1:dim(countsperCond)[2])
+      order <- c(seq_len(dim(countsperCond)[2]))
     }
     d <- data.frame(order, countsVec)
     names(d) <- c("ORDER", "COUNTS")
@@ -280,19 +280,19 @@
   }
   sortedindex <- order(conditions) + 2
   namesData <- c("ID", "Length", rep(NA, length(conditions)))
-  for (k in 1:nr[1]) {
+  for (k in seq_len(nr[1])) {
     namesData[2 + k] <- paste(sortedconditions[k], "_repl", 
     													k, sep="", collapse="")
   }
   
   for (i in 2:n) {
-    for (j in 1:nr[n]) {
+    for (j in seq_len(nr[n])) {
       namesData[2 + cumsum(nr)[i - 1] + j] <- 
       	paste(sortedconditions[cumsum(nr)[i - 1] + j], "_repl", j, 
       				sep="", collapse="")
     }
   }  ## proper names for conditionsXreplicates
-  countsEvents[, -(1:2)] <- countsEvents[, sortedindex]
+  countsEvents[, -(seq_len(2))] <- countsEvents[, sortedindex]
   colnames(countsEvents) <- namesData
   
   if (!is.null(psiInfo)){
@@ -311,7 +311,7 @@
   ###################################################
   # Normalization with DESeq2
   conds <- c()
-  for (i in 1:n) {
+  for (i in seq_len(n)) {
     conds <- c(conds, rep(paste("Cond", i, sep="", collapse=""), nr[i]))
   } 
   
@@ -455,7 +455,7 @@
   ##################################################
   # reduce data frame to the interesting columns
   nbAll <- sum(nr)
-  dataPart <- countsData[, c(1:2, which(grepl("_Norm", names(countsData))))]
+  dataPart <- countsData[, c(seq_len(2), which(grepl("_Norm", names(countsData))))]
   dataPart$Path <- gl(2, 1, NROW(countsData), labels=c("UP","LP"))
   dataPart2 <- cbind(dataPart[seq(1, NROW(dataPart), 2), ], 
   									 dataPart[seq(2, NROW(dataPart), 2), 
@@ -492,8 +492,8 @@
   ###################################################
   ## the counts matrix
   dataNormCountsEvent <- as.matrix(dataPart2[, 3:ncol(dataPart2)])
-  colnames(dataNormCountsEvent) <- 1:ncol(dataNormCountsEvent)
-  designs <- rep(c(1:(n * 2)), c(nr, nr))  ## the design matrix
+  colnames(dataNormCountsEvent) <- seq_len(ncol(dataNormCountsEvent))
+  designs <- rep(c(seq_len(n * 2)), c(nr, nr))  ## the design matrix
   dispData <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
   ## fix the seed to avoid the stochastic outputs of the 
   ## DSS:estDispersion function
@@ -560,7 +560,7 @@
   ### code chunk number 6: pALLGlobalPhi.glm.nb
   ###################################################
   pALLGlobalPhiGlmNb <- data.frame(t(rep(NA, 28)))
-  for (i in 1:length(allEventtables)) {
+  for (i in seq_along(allEventtables)) {
     pALLGlobalPhiGlmNb[i, ] <- 
     	try(.fitNBglmModelsDSSPhi(allEventtables[[i]], 
     														dispersion(dispData)[i], 
@@ -636,7 +636,7 @@
     bestmodel.table[bestmodel.table == 3] <- "NB, DSS phi"
     bestmodel.table[bestmodel.table == 4] <- "NB, cond DSS phi"
     bestmodel.singhes <- c()
-    for (i in 1:length(bestmodel.table.n)) {
+    for (i in seq_along(bestmodel.table.n)) {
       bestmodel.singhes[i] <- 
       	c(matrixpALLGlobalPhi[i, c(22, 24, 26, 28)])[bestmodel.table.n[i]]
     }
@@ -796,7 +796,7 @@
   										 nrow=NROW(signifVariants), ncol=n)
   pairsCond <- list()
   namesCond <- unique(sortedconditions)
-  for (i in 1:n) {
+  for (i in seq_len(n)) {
     j <- i + 1
     while (j <= n) {
     	## creation of permutation of size 2 in c
@@ -850,9 +850,9 @@
     nbLoop <- 0
     
     ## for a given condition in the pair
-    for (nbRepli in 1:length(replicates)) {
+    for (nbRepli in seq_along(replicates)) {
     	## for each replicate (i) of the condition
-      for (i in 1:replicates[nbRepli]) {
+      for (i in seq_len(replicates[nbRepli])) {
         nbLoop <- nbLoop + 1
         
         colsPsiPairCond <- 
@@ -925,7 +925,7 @@
     deltaPsiCond <- 
     	rowMeans(psiPairCond[, (replicates[1] + 1):sum(replicates)], 
     					 na.rm=TRUE) - 
-    	rowMeans(psiPairCond[, 1:replicates[1]], na.rm=TRUE)
+    	rowMeans(psiPairCond[, seq_len(replicates[1])], na.rm=TRUE)
     
     deltapsi[, indexdeltapsi] <- deltaPsiCond 
     indexdeltapsi <- indexdeltapsi + 1
@@ -940,7 +940,7 @@
   if (length(pairsCond) > 1) {
   	## if there are more than 2 conditions, we take the maximum of the 
   	## deltaPSI of all pairs
-    for (l in 1:NROW(deltapsi)) {
+    for (l in seq_len(NROW(deltapsi))) {
       mindex <- which.max(abs(deltapsi[l, ]))
       if (length(mindex) != 0) {
         condA <- as.character(pairsCond[[mindex]][[1]][1])

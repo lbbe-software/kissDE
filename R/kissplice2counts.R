@@ -152,7 +152,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
 	
 	## update col names
 	colnames(events.df) <- c("events.names", "events.length", paste("counts", 
-													 			1:(length(colnames(events.df)) - 2), sep=""))
+														seq_len(length(colnames(events.df)) - 2), sep=""))
 	
 	close(toConvert)
 	psiInfo <- data.frame(events.names, as.data.frame(psiInfo))
@@ -170,14 +170,14 @@ wantedEvents <- function(keep=c("All"), remove=NULL){
 	wEvents <- c()
 	if (keep == c("All") && is.null(remove)) {
 		wEvents <- EVENTS
-		for (i in 1:length(ES_EVENTS)) {
+		for (i in seq_along(ES_EVENTS)) {
 			wEvents <- append(wEvents, paste("ES_", ES_EVENTS[i], sep=""))
 		}
 		return(wEvents)
 	}
 	
 	if (!is.null(remove)) {
-		for (i in 1:length(remove)) {
+		for (i in seq_along(remove)) {
 			if (!remove[i] %in% append(EVENTS, "MULTI")) {
 				print(paste("In remove: couldn't find", remove[i]))
 				stop("One of the element(s) of the remove vector is not part of: 
@@ -188,7 +188,7 @@ wantedEvents <- function(keep=c("All"), remove=NULL){
 	}
 	ES <- FALSE
 	if (keep[1] == "All") {
-		for (i in 1:length(EVENTS)) {
+		for (i in seq_along(EVENTS)) {
 			if (!EVENTS[i] %in% remove) {
 				wEvents <- append(wEvents, EVENTS[i])
 			}
@@ -197,13 +197,13 @@ wantedEvents <- function(keep=c("All"), remove=NULL){
 			ES <- TRUE
 		}
 		if (ES == FALSE) {
-			for (i in 1:length(ES_EVENTS)) {
+			for (i in seq_along(ES_EVENTS)) {
 				wEvents <- append(wEvents, paste("ES_", ES_EVENTS[i], sep=""))
 			}
 		}
 		return(wEvents)
 	}
-	for (i in 1:length(keep)) {
+	for (i in seq_along(keep)) {
 		if (!keep[i] %in% EVENTS) {
 			print(paste("In keep: couldn't find", keep[i]))
 			stop("One of the element(s) of the keep vector is not part of: 
@@ -223,19 +223,19 @@ wantedEvents <- function(keep=c("All"), remove=NULL){
 		return(wEvents)
 	}
 	if (is.null(remove)) {
-		for (i in 1:length(ES_EVENTS)) {
+		for (i in seq_along(ES_EVENTS)) {
 			wEvents <- append(wEvents, paste("ES_", ES_EVENTS[i], sep=""))
 		}
 		return(wEvents)
 	}
-	for (i in 1:length(remove)){
+	for (i in seq_along(remove)){
 		if (!remove[i] %in% ES_EVENTS) {
 			print(paste("In remove: couldn't find",remove[i]))
 			stop("One of the element(s) of the remove vector is not part of: 
 					 altA, altD, altAD, alt, MULTI")
 		}
 	}
-	for (i in 1:length(ES_EVENTS)) {
+	for (i in seq_along(ES_EVENTS)) {
 		if (!ES_EVENTS[i] %in% remove) {
 			wEvents <- append(wEvents, paste("ES_", ES_EVENTS[i], sep=""))
 		}

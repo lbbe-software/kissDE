@@ -26,7 +26,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 		ASSBinfo <- chunk0$ASSBinfo  
 		if (!is.null(ASSBinfo)) {
 			li <- c()
-			for (i in (1:NROW(ASSBinfo))) {
+			for (i in seq_len(NROW(ASSBinfo))) {
 				if (i%%2 != 0) {
 					li <- c(li, i)
 				}
