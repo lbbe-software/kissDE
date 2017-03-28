@@ -107,7 +107,7 @@
         }
       }
     } else {
-      order <- c(seq_along(countsperCond))
+      order <- c(seq_along(countsperCond[2,]))
     }
     d <- data.frame(order, countsVec)
     names(d) <- c("ORDER", "COUNTS")
