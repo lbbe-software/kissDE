@@ -17,10 +17,12 @@ writeOutputKissDE <- function(resDiffExprVariant, adjPvalMax=1, dPSImin=0,
 		.writePSITable(resDiffExprVariant, adjPvalMax, dPSImin, output)
 	} else{
 		if (is.null(k2rgFile)) {
-			.writeTableOutput(resDiffExprVariant$finalTable, adjPvalMax, dPSImin, output)
+			.writeTableOutput(resDiffExprVariant$finalTable, adjPvalMax, dPSImin, 
+												output)
 		}
 		else {
-			.writeMergeOutput(resDiffExprVariant, k2rgFile, adjPvalMax, dPSImin, output)
+			.writeMergeOutput(resDiffExprVariant, k2rgFile, adjPvalMax, dPSImin, 
+												output)
 		}
 	}
 }

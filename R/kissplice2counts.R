@@ -1,5 +1,6 @@
-kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL, 
-    exonicReads=TRUE, k2rg=FALSE, keep=c("All"), remove=NULL) {
+kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
+														 exonicReads=TRUE, k2rg=FALSE, keep=c("All"), 
+														 remove=NULL) {
 	## check options compatibility
 	if (counts == 1 & exonicReads == TRUE) { 
 		## when counts=1 set automatically exonicReads=TRUE
@@ -135,7 +136,8 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
 						resultLine$variantCountsUp
 					events.names[indexNames] <- resultLine$eventName
 					psiInfo[indexNames, ] <- resultLine$psiInfoUp
-					events.mat[indexNames + 1, 1] <- as.numeric(resultLine$variantLengthLow)
+					events.mat[indexNames + 1, 1] <- 
+						as.numeric(resultLine$variantLengthLow)
 					events.mat[indexNames + 1, 2:NCOL(events.mat)] <- 
 						resultLine$variantCountsLow
 					events.names[indexNames + 1] <- resultLine$eventName
@@ -150,8 +152,9 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
 	}
 	
 	## update col names
-	colnames(events.df) <- c("events.names", "events.length", paste("counts", 
-														seq_len(length(colnames(events.df)) - 2), sep=""))
+	colnames(events.df) <- c("events.names", "events.length", 
+													 paste("counts", 
+													 		seq_len(length(colnames(events.df)) - 2), sep=""))
 	
 	close(toConvert)
 	psiInfo <- data.frame(events.names, as.data.frame(psiInfo))

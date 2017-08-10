@@ -1,5 +1,6 @@
 diffExpressedVariants <- function(countsData, conditions, pvalue=1, 
-    filterLowCountsVariants=10, flagLowCountsConditions=10) {
+																	filterLowCountsVariants=10, 
+																	flagLowCountsConditions=10) {
 	
 	options(warn=-1)  # suppress the warning for the users
 	
@@ -101,6 +102,6 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 		}
 	} else {
 		return(NA)
-	}
+  }
 }
 

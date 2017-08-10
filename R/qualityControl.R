@@ -44,15 +44,15 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 				 	countsData2[, (1+sum(nr)+j+sum(nr[0:(i-1)]))])
 			## replace PSI by NA if count less or equal to 10 reads for the 2 isoforms
 			indexNA <- intersect(which(countsData2[, (1+j+sum(nr[0:(i-1)]))] < 10), 
-										which(countsData2[, (1+sum(nr)+j+sum(nr[0:(i-1)]))] < 10))
+											which(countsData2[, (1+sum(nr)+j+sum(nr[0:(i-1)]))] < 10))
 			countsData2$PSI[indexNA] <- NA
 			colnames(countsData2)[(sum(nr)*2+1)+j+sum(nr[0:(i-1)])] <- 
-			              paste(paste0("Cond", i),paste0("repl", j), sep="_")
+				paste(paste0("Cond", i),paste0("repl", j), sep="_")
 		}
 	}
 	countsData2$vars <- apply(
-	  as.matrix(countsData2[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]),
-	  1, var, na.rm=TRUE)
+		as.matrix(countsData2[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]),
+		1, var, na.rm=TRUE)
 	ntop <- min(500, dim(countsData2)[1])
 	selectntop <- order(countsData2$vars, decreasing=TRUE)[seq_len(ntop)]
 	countsData2Selected <- countsData2[selectntop,]
@@ -64,15 +64,16 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 	### code chunk number 3: heatmap
 	###################################################
 	if (storeFigs == FALSE) {
-		heatmap.2(as.matrix(as.dist(1 - 
-			cor(countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))), 
+		heatmap.2(
+			as.matrix(as.dist(1 - cor(
+				countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))), 
 			margins=c(10, 10), cexRow=1, cexCol=1, density.info="none", trace="none")
 		par(ask=TRUE)
 	} else {
 		filename <- paste(storeFigs, "/heatmap.png", sep="")
 		png(filename)
-		heatmap.2(as.matrix(as.dist(1 - 
-			cor(countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))),
+		heatmap.2(as.matrix(as.dist(1 - cor(
+			countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))), 
 			margins=c(10, 10), cexRow=1, cexCol=1, density.info="none", trace="none")
 		void <- dev.off()
 	}
@@ -81,7 +82,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 	### PCA plot
 	###################################################
 	pca <- prcomp(t(
-	  countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))
+		countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))
 	fac <- factor(conds)
 	colorpalette <- c("#192823", "#DD1E2F", "#EBB035", "#06A2CB", 
 										"#218559", "#D0C6B1")

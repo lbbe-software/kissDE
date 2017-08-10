@@ -24,18 +24,6 @@ Model) framework.
   
   kissplice2counts(fileName, counts=0, pairedEnd=FALSE, order=NULL,
   	exonicReads=TRUE, discoSNP=FALSE, k2rg=FALSE)
-  
-  \tabular{ll}{
-    Package: \tab \code{kissDE}\cr
-    Type: \tab Package\cr
-    Version: \tab 0.99.0\cr
-    Date: \tab 2017-03-01\cr
-    License: \tab GPL (>=2)\cr
-  }
-}
-
-\author{
-Lilia Brinza, Vincent Lacroix, Frank Picard, Vincent Miele and Camille Marchet
 }
 
 \keyword{package}

@@ -1,21 +1,21 @@
 Package: kissDE
-Version: 0.99.0
-Date: 2017-02-22
+Version: 1.5.0
+Date: 2017-08-10
 Title: Retrieves Condition-Specific Variants in RNA-Seq Data
 Description: Retrieves condition-specific variants in RNA-seq data (SNPs, alternative-splicings, indels). It has been developped as a post-treatment of KisSplice but can also be used with your own data.
 Authors@R: c(
 	person("Clara", "Benoit-Pilven", email = "clara.benoitp@gmail.com", role = "aut"),
-	person("Audric", "Cologne", email = "audric.cologne@gmail.com", role = "aut"),
 	person("Camille", "Marchet", email = "camille.marchet@inria.fr", role = "aut"),
-	person("Lilia", "Brinza", role = "aut"),
 	person("Janice", "Kielbassa", email = "janice.kielbassa@lyon.unicancer.fr", role = "aut"),
+	person("Lilia", "Brinza", role = "aut"),
+	person("Audric", "Cologne", email = "audric.cologne@gmail.com", role = "aut"),
+	person("Aurélie", "Siberchicot", email = "aurelie.siberchicot@univ-lyon1.fr", role = c("aut", "cre")),
 	person("Vincent", "Lacroix", email = "vincent.lacroix@univ-lyon1.fr", role = "aut"),
 	person("Frank", "Picard", role = "ctb"), 
 	person("Laurent", "Jacob", role = "ctb"), 
-	person("Vincent", "Miele", role = "ctb"), 
-	person("Aurélie", "Siberchicot", email = "aurelie.siberchicot@univ-lyon1.fr", role = "cre"))
+	person("Vincent", "Miele", role = "ctb"))
 Imports: aod, Biobase, DESeq2, DSS, glmnet, gplots, graphics, grDevices, R.utils, stats, utils
 License: GPL (>= 2)
 Contact: Vincent Lacroix <vincent.lacroix@univ-lyon1.fr>
 Encoding: UTF-8
-biocViews: AlternativeSplicing, ExperimentalDesign, Software
+biocViews: AlternativeSplicing, DifferentialSplicing, GenomicVariation, RNASeq, Transcriptomics
