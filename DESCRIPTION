@@ -18,4 +18,4 @@ Imports: aod, Biobase, DESeq2, DSS, glmnet, gplots, graphics, grDevices, R.utils
 License: GPL (>= 2)
 Contact: Vincent Lacroix <vincent.lacroix@univ-lyon1.fr>
 Encoding: UTF-8
-biocViews: AlternativeSplicing, DifferentialSplicing, GenomicVariation, RNASeq, Transcriptomics
+biocViews: AlternativeSplicing, DifferentialSplicing, ExperimentalDesign, GenomicVariation, RNASeq, Transcriptomics
