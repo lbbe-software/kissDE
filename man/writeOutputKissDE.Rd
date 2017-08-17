@@ -4,6 +4,7 @@
 \title{Write an output file for \code{KissDE}'s \code{diffExpressedVariants}
 result.}
 
+
 \description{If you were working with a fasta file as input for 
 \code{kissplice2counts}, this function will output a tab-delimited table
 containing one alternative splicing event/SNV per line. The fields are: the ID
@@ -20,42 +21,46 @@ If you want to write the table containing the PSI/f values, you should set
 \code{writePSI} to \code{TRUE}. 
 }
 
+
 \usage{
-  writeOutputKissDE(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, output, 
+writeOutputKissDE(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, output, 
     writePSI = FALSE)
 }
 
+
 \arguments{
-  \item{resDiffExprVariant}{a list, returned by \code{diffExpressedVariants}.}
-  
-  \item{adjPvalMax}{a double indicating the maximum adjusted p-value allowed to
-  output an event/SNV.}
-  
-  \item{dPSImin}{a double indicating the minimum absolute value of a dPSI
-  allowed to output an event/SNV.}
-  
-  \item{output}{a character indicating the name of the file to save 
-  \code{writeOutputKissDE} output.}
-  
-  \item{writePSI}{a boolean indicating if the user wants the PSI/f table to be
-  printed instead of the final table.}
+\item{resDiffExprVariant}{a list, returned by \code{diffExpressedVariants}.}
+
+\item{adjPvalMax}{a double indicating the maximum adjusted p-value allowed to
+output an event/SNV.}
+
+\item{dPSImin}{a double indicating the minimum absolute value of a dPSI
+allowed to output an event/SNV.}
+
+\item{output}{a character indicating the name of the file to save 
+\code{writeOutputKissDE} output.}
+
+\item{writePSI}{a boolean indicating if the user wants the PSI/f table to be
+printed instead of the final table.}
 }
 
+
 \value{
-  None.
+None.
 }
+
 
 \examples{
 kissplice2refgenome_file <- system.file("extdata", 
-	"output_k2rg_alt_splicing.txt", package="kissDE")
+    "output_k2rg_alt_splicing.txt", package="kissDE")
 mySplicingconditions <- c("C1", "C1", "C2", "C2")
-counts <- kissplice2counts(fileName=kissplice2refgenome_file, counts = 2,
-	pairedEnd=TRUE, k2rg=TRUE)
+counts <- kissplice2counts(fileName=kissplice2refgenome_file, counts=2,
+    pairedEnd=TRUE, k2rg=TRUE)
 # res <- diffExpressedVariants(countsData=counts, 
 #	    conditions=mySplicingconditions)
-# writeOutputKissDE(res, output = "path/to/my/output/file")
-# writeOutputKissDE(res, output = "path/to/my/output/file", 
-#			adjPvalMax = 0.05, dPSImin = 0.1)
-# writeOutputKissDE(res, output = "path/to/my/output/file", adjPvalMax = 0.05,
-#     dPSImin = 0.1, writePSI = TRUE)
+# writeOutputKissDE(res, output="path/to/my/output/file")
+# writeOutputKissDE(res, output="path/to/my/output/file", 
+#			adjPvalMax=0.05, dPSImin=0.1)
+# writeOutputKissDE(res, output="path/to/my/output/file", adjPvalMax=0.05,
+#     dPSImin=0.1, writePSI=TRUE)
 }

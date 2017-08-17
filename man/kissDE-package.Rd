@@ -16,14 +16,14 @@ Model) framework.
 }
 
 \details{Main functions:
-
-  diffExpressedVariants(countsData, conditions, storeFigs=FALSE, pvalue=0.05,
-		filterLowCountsVariants=10, flagLowCountsConditions=10, discoSNP=FALSE)
-
-  qualityControl(countsData, conditions, storeFigs=FALSE)
-  
-  kissplice2counts(fileName, counts=0, pairedEnd=FALSE, order=NULL,
-  	exonicReads=TRUE, discoSNP=FALSE, k2rg=FALSE)
+    
+    diffExpressedVariants(countsData, conditions, storeFigs=FALSE, pvalue=0.05,
+        filterLowCountsVariants=10, flagLowCountsConditions=10, discoSNP=FALSE)
+    
+    qualityControl(countsData, conditions, storeFigs=FALSE)
+    
+    kissplice2counts(fileName, counts=0, pairedEnd=FALSE, order=NULL,
+        exonicReads=TRUE, discoSNP=FALSE, k2rg=FALSE)
 }
 
 \keyword{package}

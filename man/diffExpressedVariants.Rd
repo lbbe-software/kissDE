@@ -6,41 +6,44 @@
 \description{Function that retrieves condition-specific variants in RNA-seq 
 data.}
 
+
 \usage{
-  diffExpressedVariants(countsData, conditions, pvalue = 1, 
-  filterLowCountsVariants = 10, flagLowCountsConditions = 10)
-  }
+diffExpressedVariants(countsData, conditions, pvalue = 1, 
+filterLowCountsVariants = 10, flagLowCountsConditions = 10)
+}
+
 
 \arguments{
-	\item{countsData}{the output of the \code{kissplice2counts} function or a data
-	frame containing in its first column the names of the events, in its second
-	column the lengths of the events, and in the following columns, the counts
-	corresponding to each replicate of each experimental condition of one variant.
-	Each row corresponds with one variant.}
-	
-	\item{conditions}{a character vector containing the experimental conditions,
-	of length \code{NCR} (see Details below).}
+\item{countsData}{the output of the \code{kissplice2counts} function or a data
+frame containing in its first column the names of the events, in its second
+column the lengths of the events, and in the following columns, the counts
+corresponding to each replicate of each experimental condition of one variant.
+Each row corresponds with one variant.}
 
-	\item{pvalue}{a numerical value indicating the threshold below which the
-	pvalues are kept.}
-	
-	\item{filterLowCountsVariants}{a numerical value indicating the value below
-	which events are filtered out. After having computing the overdispersion, we
-	screen out events which both variants have global counts 
-	< \code{filterLowCountsVariants} (sum of each replicate x condition) in order
-	to gain strength for the models.}
-	
-	\item{flagLowCountsConditions}{a numerical value indicating the value below
-	which we flag events as 'lowCounts' in the final data frame. This column aims
-	to help seeing which event (variant 1 counts + variant 2 counts) has low
-	counts (< \code{flagLowCountsBoundary = 10}) for at least n-1 conditions
-	(over n).}
-	}
-	
+\item{conditions}{a character vector containing the experimental conditions,
+of length \code{NCR} (see Details below).}
+
+\item{pvalue}{a numerical value indicating the threshold below which the
+pvalues are kept.}
+
+\item{filterLowCountsVariants}{a numerical value indicating the value below
+which events are filtered out. After having computing the overdispersion, we
+screen out events which both variants have global counts 
+< \code{filterLowCountsVariants} (sum of each replicate x condition) in order
+to gain strength for the models.}
+
+\item{flagLowCountsConditions}{a numerical value indicating the value below
+which we flag events as 'lowCounts' in the final data frame. This column aims
+to help seeing which event (variant 1 counts + variant 2 counts) has low
+counts (< \code{flagLowCountsBoundary = 10}) for at least n-1 conditions
+(over n).}
+}
+
+
 \value{
-  \code{diffExpressedVariants} returns a list of 6 objects:
-    \item{finalTable}{a data frame containing the columns
-      \itemize{
+\code{diffExpressedVariants} returns a list of 6 objects:
+\item{finalTable}{a data frame containing the columns
+    \itemize{
         \item \code{ID}: the variation ID
         \item \code{Length_diff}: the size of the first variant
         \item \code{UP_Condn_Rm_Norm (resp LP_Condn_Rm_Norm)}: returns the
@@ -60,32 +63,33 @@ data.}
         and overlap coming from the input options.
         \item \code{lowcounts}: a column to highlight low counts in data. 
         If 1, at least one replicate shows less than 10 reads, 0 else.
-	}}
-	\item{correctedPval}{a numeric vector containing pvalues after correction 
-	for multiple testing}
-	\item{uncorrectedPVal}{a numeric vector containing pvalues before correction
-	for multiple testing}
-	\item{resultFitNBglmModel}{a data frame containing the results of the fitting
-	of models to the data}
-	\item{psiTable}{a data frame containing the Percent Spliced In (PSI) of each
-	replicates}
-	\item{k2rgFile}{a string containing either the \code{KisSplice2RefGenome} file
-	path and name or NULL if no \code{KisSplice2RefGenome} file was used as input}
+}}
+\item{correctedPval}{a numeric vector containing pvalues after correction 
+for multiple testing}
+\item{uncorrectedPVal}{a numeric vector containing pvalues before correction
+for multiple testing}
+\item{resultFitNBglmModel}{a data frame containing the results of the fitting
+of models to the data}
+\item{psiTable}{a data frame containing the Percent Spliced In (PSI) of each
+replicates}
+\item{k2rgFile}{a string containing either the \code{KisSplice2RefGenome} file
+path and name or NULL if no \code{KisSplice2RefGenome} file was used as input}
 }
 
+
 \details{
-  \code{NCR} is defined as the number of combinaisons Condition/Replicate. 
-  It is the length of the experimental design.
-  If we define \eqn{C_i} the \eqn{i^{th}} experimental condition and 
-  \eqn{R_{ij}} the \eqn{j^{th}} replicate of the \eqn{i^{th}} experimental
-  condition, \code{Ncr} is equal to \eqn{\sum_{i}\sum_{j} \left | C_iR_{ij}
-  \right |}.
-  For example, a balanced experimental design defined by 2 replicates in the
-  first condition and 2 replicates in the second one has a length of 4
-  (\code{NCR} = 4). 
-  An unbalanced experimental design defined by 2 replicates in the first
-  condition and 3 replicates in the second one has a length of 5 
-  (\code{NCR} = 5). 
+\code{NCR} is defined as the number of combinaisons Condition/Replicate. 
+It is the length of the experimental design.
+If we define \eqn{C_i} the \eqn{i^{th}} experimental condition and 
+\eqn{R_{ij}} the \eqn{j^{th}} replicate of the \eqn{i^{th}} experimental
+condition, \code{Ncr} is equal to \eqn{\sum_{i}\sum_{j} \left | C_iR_{ij}
+\right |}.
+For example, a balanced experimental design defined by 2 replicates in the
+first condition and 2 replicates in the second one has a length of 4
+(\code{NCR} = 4). 
+An unbalanced experimental design defined by 2 replicates in the first
+condition and 3 replicates in the second one has a length of 5 
+(\code{NCR} = 5). 
 }
 
 \examples{
