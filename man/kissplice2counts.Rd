@@ -117,6 +117,7 @@ the \code{countsEvents} one is showed when the output is printed.
 \examples{
 fpath <- system.file("extdata", "output_kissplice_SNV.fa", package="kissDE")
 mySNVcounts <- kissplice2counts(fpath, pairedEnd=TRUE)
-head(mySNVcounts)
 names(mySNVcounts)
+str(mySNVcounts)
+head(mySNVcounts$countsEvents)
 }

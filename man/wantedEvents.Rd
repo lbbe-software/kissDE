@@ -1,7 +1,7 @@
 \name{wantedEvents}
 \alias{wantedEvents}
 
-\title{Give the events to be used in the \code{KissDE} analysis with k2rg.}
+\title{Give the events to be used in the \pkg{kissDE} analysis with k2rg.}
 
 \description{Function that converts \code{keep} and \code{remove} vectors into 
 one vector containing the events to work with.

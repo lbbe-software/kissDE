@@ -1,12 +1,13 @@
 \name{writeOutputKissDE}
 \alias{writeOutputKissDE}
 
-\title{Write an output file for \code{KissDE}'s \code{diffExpressedVariants}
-result.}
+\title{Create and store the output of the \code{diffExpressedVariants} function 
+in a readable file.}
 
 
-\description{If you were working with a fasta file as input for 
-\code{kissplice2counts}, this function will output a tab-delimited table
+\description{If a fasta file was used as input in the \code{kissplice2counts} 
+function which the result was used as input in the \code{diffExpressedVariants} 
+function, \code{writeOutputKissDE} will output a tab-delimited table
 containing one alternative splicing event/SNV per line. The fields are: the ID
 of the path, the variable part length, the counts of each variant for each
 conditions, the adjusted p-value, the dPSI and a boolean indicating if the 
