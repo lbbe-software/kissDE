@@ -15,15 +15,31 @@ Likelihood ratio tests are then performed using the GLM (Genralized Linear
 Model) framework.
 }
 
+
 \details{Main functions:
-    
-    diffExpressedVariants(countsData, conditions, storeFigs=FALSE, pvalue=0.05,
-        filterLowCountsVariants=10, flagLowCountsConditions=10, discoSNP=FALSE)
-    
-    qualityControl(countsData, conditions, storeFigs=FALSE)
-    
-    kissplice2counts(fileName, counts=0, pairedEnd=FALSE, order=NULL,
-        exonicReads=TRUE, discoSNP=FALSE, k2rg=FALSE)
+
+diffExpressedVariants(countsData, conditions, storeFigs=FALSE, pvalue=0.05,
+filterLowCountsVariants=10, flagLowCountsConditions=10, discoSNP=FALSE)
+
+qualityControl(countsData, conditions, storeFigs=FALSE)
+
+kissplice2counts(fileName, counts=0, pairedEnd=FALSE, order=NULL, 
+exonicReads=TRUE, discoSNP=FALSE, k2rg=FALSE)
+}
+
+
+\note{
+Authors of the package: 
+Clara Benoit-Pilven, Camille Marchet, Janice Kielbassa, Lilia Brinza, Audric 
+Cologne and Vincent Lacroix all contributed code and ideas.
+
+Contributors of the package: 
+Franck Picard and Laurent Jacob provided statistical expertise for the models 
+underlying kissDE.
+Vincent Miele provided expertise for the development of the R package. 
+
+Maintainer of the package: 
+Aurélie Siberchicot
 }
 
 \keyword{package}
