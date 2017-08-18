@@ -1,40 +1,52 @@
 %\VignetteIndexEntry{kissDE Reference Manual}
 %\VignettePackage{kissDE}
-
-\documentclass[11pt]{article}
-\usepackage[T1]{fontenc}
+%\VignetteEngine{utils::Sweave}
+\documentclass{article}
+<<style-Sweave, eval=TRUE, echo=FALSE, results=tex>>=
+BiocStyle::latex2()
+@
+\usepackage{booktabs} % book-quality tables
+% \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{geometry}
-\usepackage[english]{babel}
+% \usepackage{geometry}
+% \usepackage[english]{babel}
 \usepackage{multicol}
 \usepackage{multirow}
-\usepackage{hyperref}
+% \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{amsthm}
-\usepackage[dvips]{graphicx}
-\usepackage{color}
-\usepackage{alltt}
-\usepackage{dsfont}
-\usepackage{fancyvrb}
-\usepackage{listings}
-\usepackage[round]{natbib}
-\usepackage{calc}
-\hypersetup{
-    colorlinks=true, %set true if you want colored links
-    linktoc=all,     %set to all if you want both sections and subsections linked
-    linkcolor=blue,  %choose some color if you want links to stand out
-}
+% \usepackage{amsthm}
+% \usepackage[dvips]{graphicx}
+% \usepackage{color}
+% \usepackage{alltt}
+% \usepackage{dsfont}
+% \usepackage{fancyvrb}
+% \usepackage{listings}
+% % \usepackage[round]{natbib}
+% \usepackage{calc}
 
-\newcommand{\kde}{\textbf{kissDE}}
-\newcommand{\kp}{\textbf{KisSplice}}
-\newcommand{\krg}{\textbf{KisSplice2refgenome}}
+<<options, results=hide, echo=FALSE>>=
+options(digits=3, width=80, prompt=" ", continue=" ")
+@
 
-\hypersetup{pdfborder={0 0 0}}
+\newcommand{\kde}{\Biocpkg{kissDE}}
+\newcommand{\kp}{\software{KisSplice}}
+\newcommand{\krg}{\software{KisSplice2refgenome}}
+
+% \hypersetup{pdfborder={0 0 0}}
 
 
-\title{kissDE Reference Manual}
-\author{Clara Benoit-Pilven, Camille Marchet, Janice Kielbassa, Audric Cologne, Aurélie Siberchicot, Vincent Lacroix}
+\bioctitle{kissDE Reference Manual}
+
+\author[1]{Clara Benoit-Pilven}
+\author[2]{Camille Marchet}
+\author[3]{Janice Kielbassa}
+\author[1]{Audric Cologne}
+\author[1]{Aurélie Siberchicot}
+\author[1]{Vincent Lacroix\thanks{\email{vincent.lacroix@univ-lyon1.fr}}}
+\affil[1]{Université de Lyon, Université Lyon 1, CNRS UMR5558, Laboratoire de Biométrie et Biologie Evolutive, Villeurbanne, France}
+\affil[2]{Université de Rennes, Equipe GenScale, IRISA, Rennes, France}
+\affil[3]{Synergie Lyon Cancer, Université Lyon 1, Centre Léon Berard, Lyon, France}
 
 \begin{document}
 \SweaveOpts{concordance=TRUE}
@@ -45,17 +57,15 @@
 \kde~is a package dedicated to the analysis of count data obtained from quantification of pairs of variants in RNAseq data.\\
 It can be used to study splice variants, where the two variant of the pair differ by the inclusion/exclusion of an exonic region.
 It can also be used to study genomic variants (whenever they are transcribed), which differ by a single nucleotide variation (SNV) or an indel.\\
-The statistical framework is similar to \texttt{DESeq}. Counts are modelled using the negative binomial distribution. We use the framework of the generalised linear model, and we test for association of a variant with a condition using a likelihood ratio test.\\
+The statistical framework is similar to \Biocpkg{DESeq}. Counts are modelled using the negative binomial distribution. We use the framework of the generalised linear model, and we test for association of a variant with a condition using a likelihood ratio test.\\
 This vignette explains how to use this package.\\
-The workflow for SNPs/SNVs is fully described in Lopez-Maestre et al. \citep{Lopez-Maestre2016}, the workflow for splicing is fully described in Benoit-Pilven et al.
+The workflow for SNPs/SNVs is fully described in Lopez-Maestre et al. \cite{Lopez-Maestre2016}, the workflow for splicing is fully described in Benoit-Pilven et al.
 \end{abstract}
 
-\newpage
-\tableofcontents
+\packageVersion{\Sexpr{BiocStyle::pkg_ver("kissDE")}}
 
-<<echo=false>>=
-options(continue=" ")
-@
+\tableofcontents
+\newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -66,17 +76,17 @@ options(continue=" ")
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Use case}
 \kde~is meant to work on pairs of variants that have been quantified across different conditions. It can deal with single nucleotide variations (SNPs, mutations, RNA editing), indels or alternative splicing.\\
-The input count data to \kde~may come from \kp \citep{KisSplice}, \krg~or any other software which produces count data properly formatted.
-If you use the output files from \kp~or \krg, you can directly import your counts using \texttt{kissplice2counts} function.\\
+The input count data to \kde~may come from \kp~\cite{KisSplice}, \krg~or any other software which produces count data properly formatted.
+If you use the output files from \kp~or \krg, you can directly import your counts using \Rfunction{kissplice2counts} function.\\
 The user must keep in mind that \kde~was designed to work with at least two replicates for each condition, which means that the minimal input contains the variants quantified for 4 different samples, each couple representing a condition and its 2 replicates. There can be more replicates and more conditions. It is not mandatory to have an equal number of replicates in each condition.\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Install and load \kde}
-In a \textbf{R} session, you must first install \textbf{BioConductor}.
+In a \R{} session, you must first install \Bioconductor{}.
 <<installBC,eval=FALSE, fig=FALSE>>=
 source("http://bioconductor.org/biocLite.R")
 @
-Then you can install the \kde~package from \textbf{BioConductor}.
+Then you can install the \kde~package from \Bioconductor{}.
 <<install,eval=FALSE, fig=FALSE>>=
 biocLite("kissDE")
 @
@@ -87,11 +97,11 @@ library(kissDE)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Quick start}
-Here we present the basic \textbf{R} commands for an analysis with \kde. 
-These commands require an example output file of \kp~called \texttt{output\_kissplice.fa}. 
+Here we present the basic \R{} commands for an analysis with \kde. 
+These commands require an example output file of \kp~called \file{output_kissplice.fa}. 
 To deal with other types of input file, please refer to section \ref{subsec:input}.
-The used funtions \texttt{kissplice2counts}, \texttt{qualityControl}, \texttt{diffExpressedVariants} and \texttt{writeOutputKissDE} of \kde~are detailed in section \ref{sec:workflow}.
-Here we assume that there are two conditions (\texttt{condition\_1} and \texttt{condition\_2}) with two biological replicates and the RNA-Seq libraries are single-end.
+The used funtions \Rfunction{kissplice2counts}, \Rfunction{qualityControl}, \Rfunction{diffExpressedVariants} and \Rfunction{writeOutputKissDE} of \kde~are detailed in section \ref{sec:workflow}.
+Here we assume that there are two conditions ($condition\_1$ and $condition\_2$) with two biological replicates and the RNA-Seq libraries are single-end.
 
 <<quick_start, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 counts <- kissplice2counts("output_kissplice.fa")
@@ -111,10 +121,11 @@ writeOutputKissDE(results, adjPvalMax = 0.05, dPSImin = 0.1, output = "kissDE_ou
 \section{\kde's workflow}
 \label{sec:workflow}
 In this section, the successive steps and functions of a differential analysis with \kde~are described.
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.7\textwidth]{Workflow_KissDE.png}
-  \caption{\textbf{Schema of \kde's workflow. Numbers in light blue point to the section of this vignette explaining the step.}}
+
+\begin{figure}
+  \includegraphics{Workflow_KissDE.png}
+  \caption{\label{fig:workflow}Schema of \kde's workflow. Numbers in light blue 
+  point to the section of this vignette explaining the step.}
 \end{figure}
 
 
@@ -134,14 +145,14 @@ myConditions <- c(rep("condition_1", 2), rep("condition_2", 2))
 because the counts have been input in an order that represents first the two replicates of $condition\_1$, then the two replicates of $condition\_2$.\\
 If the count table was loaded from \kp~or~\krg output, the condition vector must contain the samples in the same order they were given to \kp (see sections \ref{subsubsec:input_ks} and \ref{subsubsec:input_krg}).\\
 
-\noindent \fbox{\parbox{\linewidth-2\fboxrule-2\fboxsep}{\underline{WARNING:} To run \kde, all conditions must have replicates. So each condition must at least be present twice in the condition vector. If this is not the case, you will get an error message.}}
+\warning{To run \kde, all conditions must have replicates. So each condition must at least be present twice in the condition vector. If this is not the case, you will get an error message.}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{You work with your own data (without \kp): table of counts format}
 \label{subsubsec:input_count}
-Let's assume we work with two conditions (\texttt{condition\_1} and \texttt{condition\_2}) and two replicates per condition.
-An input example table contained in a flat file called \texttt{table\_counts\_alt\_splicing.txt} (\texttt{fpath1} contains the absolute path of the file on your hard disk) is loaded and stored in a \texttt{tableCounts} object.
+Let's assume we work with two conditions ($condition\_1$ and $condition\_2$) and two replicates per condition.
+An input example table contained in a flat file called \file{table_counts_alt_splicing.txt} (\Robject{fpath1} contains the absolute path of the file on your hard disk) is loaded and stored in a \Robject{tableCounts} object.
 <<tablecounts_howto, fig=FALSE, keep.source=FALSE>>=
 fpath1 <- system.file("extdata", "table_counts_alt_splicing.txt", package="kissDE")
 tableCounts <- read.table(fpath1, head = TRUE)
@@ -154,16 +165,16 @@ head(tableCounts)
 
 It must be a data frame with:
 \begin{itemize}
-  \item \textbf{In rows:} 
+  \item \textbf{in rows:} 
     \begin{itemize}
       \item One variation is represented by two lines, one for each variant. For instance, for SNVs, one allele is described in the first line, and the other in the second line. For alternative splicing events, the inclusion isoform and the exclusion isoform have one line each.
       \item A head row must contain the columns name in the flat file.
     \end{itemize}
-  \item \textbf{In columns:}
+  \item \textbf{in columns:}
     \begin{itemize}
-      \item The first column (\texttt{eventsName}) contains the name of the variation.
-      \item The second column (\texttt{eventsLength}) contains the variant size in nucleotide (bp). If this size is unknown, the value can be set to 0. Note that the size is used only in the context of alternative splicing. Then it indicates whether the size difference due to the switch from one isoform to the other is a multiple of 3 or not and thus if it can induce a frameshift in the open reading frame (ORF).
-      \item  All other columns (\texttt{cond1rep1, cond1rep2, cond2rep1, cond2rep2}) contain read counts of a variant in each sample. In the example above, \texttt{cond1rep1} is the number of reads supporting this variant in the first replicate of $condition\_1$, \texttt{cond1rep2} is the number of reads sequenced for replicate 2 in $condition\_1$, \texttt{cond2rep1} and \texttt{cond2rep2} are counts for replicates 1 and 2 of $condition\_2$.
+      \item The first column (\Rcode{eventsName}) contains the name of the variation.
+      \item The second column (\Rcode{eventsLength}) contains the variant size in nucleotide (bp). If this size is unknown, the value can be set to 0. Note that the size is used only in the context of alternative splicing. Then it indicates whether the size difference due to the switch from one isoform to the other is a multiple of 3 or not and thus if it can induce a frameshift in the open reading frame (ORF).
+      \item  All other columns (\Rcode{cond1rep1}, \Rcode{cond1rep2}, \Rcode{cond2rep1}, \Rcode{cond2rep2}) contain read counts of a variant in each sample. In the example above, \Rcode{cond1rep1} is the number of reads supporting this variant in the first replicate of $condition\_1$, \Rcode{cond1rep2} is the number of reads sequenced for replicate 2 in $condition\_1$, \Rcode{cond2rep1} and \Rcode{cond2rep2} are counts for replicates 1 and 2 of $condition\_2$.
     \end{itemize}
 \end{itemize}
 
@@ -179,67 +190,65 @@ writeLines(readLines(headfasta))
 @
 
 Events are reported in blocks of 4 lines, the two first are about one variant of the splicing event (or one allele of the SNV), the following two lines about the other variant (or the other allele). 
-For each variant, there is a header beginning with the \texttt{>} symbol and a sequence. 
+For each variant, there is a header beginning with the \Rcode{>} symbol and a sequence. 
 
 Headers contain information used in \kde. In the example, there are:
 \begin{itemize}
 \item elements shared by the headers of the two variants:
 \begin{itemize}
-  \item \texttt{bcc\_68965|Cycle\_4} is the event's ID
-  \item \texttt{Type\_1} means that the sequences correspondto a splicing event. \texttt{Type\_0} would correspond to SNVs.
+  \item \Rcode{bcc\_68965|Cycle\_4} is the event's ID.
+  \item \Rcode{Type\_1} means that the sequences correspondto a splicing event. \Rcode{Type\_0} would correspond to SNVs.
 \end{itemize}
 \item elements that are specific to a variant:
 \begin{itemize}
-  \item \texttt{upper\_path\_length\_112} and \texttt{lower\_path\_length\_82} gives the length of the nucleotide sequences. Upper path and lower path are a denomination for the representation of each variant in \kp's graph. For alternative splicing events, the upper path represents the inclusion isoform and the lower path the exclusion isoform.
-  \item \texttt{AS1\_1|SB1\_1|S1\_0|ASSB1\_0|...} and \texttt{AB1\_21|AB2\_12|AB3\_12|AB4\_2|AB5\_5|...} summarizes the counts found by \kp~during the step where reads are used to perform quantification of each variant detected. Here \kp~was run with the option \texttt{counts} set to 2. For the upper path, we have 4 counts for each sample (the different reads categories are shown on Figure \ref{fig:readstype}), and for the lower path, we have 1 count per sample. There are 8 sets of counts because we gave 8 files in input to \kp. Each count corresponds to the reads coming from each file that could be mapped on the variant, in the order they have been passed to \kp.
+  \item \Rcode{upper\_path\_length\_112} and \Rcode{lower\_path\_length\_82} gives the length of the nucleotide sequences. Upper path and lower path are a denomination for the representation of each variant in \kp's graph. For alternative splicing events, the upper path represents the inclusion isoform and the lower path the exclusion isoform.
+  \item \Rcode{AS1\_1|SB1\_1|S1\_0|ASSB1\_0|...} and \Rcode{AB1\_21|AB2\_12|AB3\_12|AB4\_2|AB5\_5|...} summarizes the counts found by \kp~during the step where reads are used to perform quantification of each variant detected. Here \kp~was run with the option \Rcode{counts} set to 2. For the upper path, we have 4 counts for each sample (the different reads categories are shown on Figure \ref{fig:readstype}), and for the lower path, we have 1 count per sample. There are 8 sets of counts because we gave 8 files in input to \kp. Each count corresponds to the reads coming from each file that could be mapped on the variant, in the order they have been passed to \kp.
 \end{itemize}
 \item a rank information which is a deprecated measure.
 \end{itemize}
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.7\textwidth]{reads_type.png}
-  \caption{\textbf{Different categories of reads:} In this figure, we show an example of an alternative skipped exon. AS corresponds to reads spanning the junction between the excluded sequence and its left flanking exon, SB to reads spanning the junction between the excluded sequence and its right flanking exon, ASSB to reads spanning the two inclusion junctions, S to reads entirely included in the alternative sequence and AB to reads spanning the junction between the two flanking exons. S reads correspond to exonic reads and all other categories of reads represented here correspond to junction reads.}
-  \label{fig:readstype}
+\begin{figure}
+  \includegraphics{reads_type.png}
+  \caption{\label{fig:readstype}Different categories of reads. In this figure, we show an example of an alternative skipped exon. AS corresponds to reads spanning the junction between the excluded sequence and its left flanking exon, SB to reads spanning the junction between the excluded sequence and its right flanking exon, ASSB to reads spanning the two inclusion junctions, S to reads entirely included in the alternative sequence and AB to reads spanning the junction between the two flanking exons. S reads correspond to exonic reads and all other categories of reads represented here correspond to junction reads.}
 \end{figure}
 
 
 \kde~can be used on any type output from \kp~(0: SNV, 1: alternative splicing events, 3: indels,...). 
 The user should refer to \kp~manual (\url{http://kissplice.prabi.fr/documentation/user_guide.pdf}) for further questions about \kp~format and output.\\
 
-To be used in \kde, \kp's output must be converted into a table of counts. This can be done with the \texttt{kissplice2counts} function.
-In the example below, a \kp's output recorded in a file called \texttt{output\_kissplice\_alt\_splicing.fa} (\texttt{fpath2} contains the absolute path of the file on your hard disk) is loaded.
-The table of counts yielded by the \texttt{kissplice2counts} function is stored in \texttt{myCounts}.
+To be used in \kde, \kp's output must be converted into a table of counts. This can be done with the \Rfunction{kissplice2counts} function.
+In the example below, a \kp's output recorded in a file called \file{output_kissplice_alt_splicing.fa} (\Robject{fpath2} contains the absolute path of the file on your hard disk) is loaded.
+The table of counts yielded by the \Rfunction{kissplice2counts} function is stored in \Robject{myCounts}.
 <<kissplice2counts_howto, fig=FALSE, keep.source=FALSE>>=
 fpath2 <- system.file("extdata", "output_kissplice_alt_splicing.fa", package="kissDE")
 myCounts <- kissplice2counts(fpath2, counts = 2, pairedEnd = TRUE)
 @
 
-The counts returned by \texttt{kissplice2counts} are extracted from the \kp~header. By default, \texttt{kissplice2counts} expects single-end reads and one count for each variant. If this is not the case, some parameters need to be adapted.\\
-First, the \texttt{counts} parameter of \texttt{kissplice2counts} must be the same as the \texttt{counts} parameter used to obtain data with \kp. 
-The possible values are 0, 1 or 2. 0 is the default value for both \texttt{kissplice2counts} and \kp.\\
-Then, the user should also specify the \texttt{pairedEnd} parameter in \texttt{kissplice2counts}. 
-If RNA-Seq libraries are single-end, \texttt{pairedEnd} should be set to \texttt{FALSE} (the default value). 
-If RNA-Seq libraries are paired-end, \texttt{pairedEnd} should be set to \texttt{TRUE}. 
-In this case, the \texttt{kissplice2counts} function expects the counts of the paired-end reads to be next to each other. 
-If it is not the case, an additional \texttt{order} parameter should be used to indicate the actual order of the counts.\\
-An example of a paired-end dataset run with \texttt{counts} equal to 0 is shown in section \ref{subsec:SNV}.
+The counts returned by \Rfunction{kissplice2counts} are extracted from the \kp~header. By default, \Rfunction{kissplice2counts} expects single-end reads and one count for each variant. If this is not the case, some parameters need to be adapted.\\
+First, the \Rcode{counts} parameter of \Rfunction{kissplice2counts} must be the same as the \Rcode{counts} parameter used to obtain data with \kp. 
+The possible values are 0, 1 or 2. 0 is the default value for both \Rfunction{kissplice2counts} and \kp.\\
+Then, the user should also specify the \Rcode{pairedEnd} parameter in \Rfunction{kissplice2counts}. 
+If RNA-Seq libraries are single-end, \Rcode{pairedEnd} should be set to \Rcode{FALSE} (the default value). 
+If RNA-Seq libraries are paired-end, \Rcode{pairedEnd} should be set to \Rcode{TRUE}. 
+In this case, the \Rfunction{kissplice2counts} function expects the counts of the paired-end reads to be next to each other. 
+If it is not the case, an additional \Rcode{order} parameter should be used to indicate the actual order of the counts.\\
+An example of a paired-end dataset run with \Rcode{counts} equal to 0 is shown in section \ref{subsec:SNV}.
 %TODO : give an example of the order option ?
 
-\texttt{kissplice2counts} returns a list of four elements, including \texttt{countsEvents} which contains the table of counts required in \kde.
+\Rfunction{kissplice2counts} returns a list of four elements, including \Rcode{countsEvents} which contains the table of counts required in \kde.
 <<kissplice2counts_head, fig=FALSE, keep.source=FALSE>>=
 names(myCounts)
 head(myCounts$countsEvents)
 @
 
-\texttt{myCounts\$countsEvents} has the same structure of the \texttt{tableCounts} object in the section \ref{subsubsec:input_count}. It is a data frame with:
+\Robject{myCounts\$countsEvents} has the same structure of the \Robject{tableCounts} object in the section \ref{subsubsec:input_count}. It is a data frame with:
 \begin{itemize}
-\item \textbf{in rows:} one variation is represented by two lines, one for each variant. For instance for SNVs, one allele is described in the first line and the other in the second line. For alternative splicing events (as in this example), the inclusion and the exclusion isoform have one line each.
+\item \textbf{in rows:} One variation is represented by two lines, one for each variant. For instance for SNVs, one allele is described in the first line and the other in the second line. For alternative splicing events (as in this example), the inclusion and the exclusion isoform have one line each.
 \item \textbf{in columns:}
 \begin{itemize}
-\item The first column (\texttt{events.names}) contains the name of the variation, using \kp~notation.
-\item The second column (\texttt{events.length}) contains the size of the variant in bp, extracted from the \kp~header. It indicates whether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a frameshift in the ORF).
-\item  All others columns (\texttt{counts1, counts2, counts3, counts4}) contain counts for each replicate in each condition for the variant.
+\item The first column (\Rcode{events.names}) contains the name of the variation, using \kp~notation.
+\item The second column (\Rcode{events.length}) contains the size of the variant in bp, extracted from the \kp~header. It indicates whether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a frameshift in the ORF).
+\item  All others columns (\Rcode{counts1, counts2, counts3, counts4}) contain counts for each replicate in each condition for the variant.
 \end{itemize}
 ~
 \end{itemize}
@@ -248,13 +257,13 @@ head(myCounts$countsEvents)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Input table from \krg~output}
 \label{subsubsec:input_krg}
-The \texttt{kissplice2counts} function can also deal with \krg~output data, thanks to the \texttt{k2rg} parameter. 
+The \Rfunction{kissplice2counts} function can also deal with \krg~output data, thanks to the \Rcode{k2rg} parameter. 
 \krg~allows the annotation of the alternative splicing events. It assigns each event to the gene it maps to and to a type of alternative splicing event: Skipped Exon (ES), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (\url{ftp://pbil.univ-lyon1.fr/pub/logiciel/kissplice/tools/kissplice2refgenome_userguide.pdf}).
 
-In the example below, a \krg's output recorded in a file called \texttt{output\_k2rg\_alt\_splicing.txt} (\texttt{fpath3} contains the absolute path of the file on your hard disk) is loaded.
-The \texttt{kissplice2counts} function here uses the same \texttt{counts} and \texttt{pairedEnd} parameters as explained in the section \ref{subsubsec:input_ks}.
-The \texttt{k2rg} parameter is a boolean value, set to \texttt{TRUE} to deal with \krg~output data.
-The table of counts yielded by the \texttt{kissplice2counts} function in the example below is stored in \texttt{myCounts\_k2rg}.
+In the example below, a \krg's output recorded in a file called \file{output_k2rg_alt_splicing.txt} (\Robject{fpath3} contains the absolute path of the file on your hard disk) is loaded.
+The \Rfunction{kissplice2counts} function here uses the same \Rcode{counts} and \Rcode{pairedEnd} parameters as explained in the section \ref{subsubsec:input_ks}.
+The \Rcode{k2rg} parameter is a boolean value, set to \Rcode{TRUE} to deal with \krg~output data.
+The table of counts yielded by the \Rfunction{kissplice2counts} function in the example below is stored in \Robject{myCounts\_k2rg}.
 Its has exactly the same structure as detailed in section \ref{subsubsec:input_ks}.
 <<kissplice2counts_k2rg_howto, fig=FALSE, keep.source=FALSE>>=
 fpath3 <- system.file("extdata", "output_k2rg_alt_splicing.txt", package="kissDE")
@@ -266,10 +275,10 @@ head(myCounts_k2rg$countsEvents)
 
 The \krg~output contains information about the type of splicing events. 
 It is therefore possible to choose the subtype of events you want to analyse. 
-The \texttt{keep} and \texttt{remove} parameters of the \texttt{kissplice2counts} function allow to indicate the type of splicing events to analyse or to remove from the analysis. 
+The \Rcode{keep} and \Rcode{remove} parameters of the \Rfunction{kissplice2counts} function allow to indicate the type of splicing events to analyse or to remove from the analysis. 
 These two parameters take a character vector indicating the types of events to keep or remove. 
-The events names should come from this list: \texttt{deletion}, \texttt{insertion}, \texttt{IR}, \texttt{ES}, \texttt{altA}, \texttt{altD}, \texttt{altAD}, \texttt{alt}, \texttt{unclassified}. 
-In the \texttt{remove} parameter, the event name \texttt{MULTI} can also be used. By default, all types of events are analysed.
+The events names should come from this list: \Rcode{deletion}, \Rcode{insertion}, \Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. 
+In the \Rcode{remove} parameter, the event name \Rcode{MULTI} can also be used. By default, all types of events are analysed.
 
 If we want to analyse only cassette exon events (i.e., a single exon is skipped or included), the following command should be used:
 <<kissplice2counts_k2rg_ESonly_howto, fig=FALSE, keep.source=FALSE>>=
@@ -284,7 +293,7 @@ myCounts_k2rg_ES <- kissplice2counts(fpath3, counts = 2, pairedEnd = TRUE, k2rg 
 \kde~contains a function that allows the user to control the quality of the data and to check if no error occured at the data loading step. 
 This data quality assessment is essential and should be done before the differential analysis.
 
-The \texttt{qualityControl} function takes as input a count table (see sections \ref{subsubsec:input_count}, \ref{subsubsec:input_ks} and \ref{subsubsec:input_krg}) and a condition vector (see section \ref{subsubsec:condition}): 
+The \Rfunction{qualityControl} function takes as input a count table (see sections \ref{subsubsec:input_count}, \ref{subsubsec:input_ks} and \ref{subsubsec:input_krg}) and a condition vector (see section \ref{subsubsec:condition}): 
 <<qualityControl_howto, include=FALSE, fig=TRUE, keep.source=FALSE>>=
 qualityControl(myCounts, myConditions)
 @
@@ -295,12 +304,11 @@ It produces 2 graphs:
 \item{the factor map formed by the first two axes of a principal component analysis (PCA) (see right panel of Figure \ref{fig:qualityControl})}
 \end{itemize}
 
-\begin{figure}[h]
-  \centering
+\begin{figure}
   \includegraphics[page=1,width=0.45\textwidth]{kissDE-qualityControl_howto.pdf}
   \includegraphics[page=2,width=0.45\textwidth]{kissDE-qualityControl_howto.pdf}
-  \caption{\textbf{Quality control plots.} Left: Heatmap of the sample-to-sample distances. Right: Principal Component Analysis.}
-  \label{fig:qualityControl}
+  \caption{\label{fig:qualityControl}Quality control plots. Left: Heatmap of the 
+  sample-to-sample distances. Right: Principal Component Analysis.}
 \end{figure}
 
 These two graphs show the similarities and the differences between the analyzed samples. 
@@ -313,35 +321,36 @@ Indeed, in the heatmap plot, the samples that cluster together are from the same
 In the PCA plot, the first principal component (PC1) summarize 90.2\% of the total variance of the dataset. 
 This first axis clearly separates the 2 conditions.
 
-The created graphs can be saved by setting the \texttt{storeFigs} parameter of the \texttt{qualityControl} function to \texttt{TRUE} (then graphs are stored in a \texttt{kissDEFigures} folder created in the \textbf{R} working directory) or to the path where the user wants to store his/her graphs.
+The created graphs can be saved by setting the \Rcode{storeFigs} parameter of the \Rfunction{qualityControl} function to \Rcode{TRUE} (then graphs are stored in a \file{kissDEFigures} folder created in the \R{} working directory) or to the path where the user wants to store his/her graphs.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Differential analysis}
 \label{subsec:diffanalysis}
-When data are loaded, the differential analysis can be run using the \texttt{diffExpressedVariants} function. 
-This function has two mandatory parameters: a count table (\texttt{countsData} parameter, see sections \ref{subsubsec:input_count}, \ref{subsubsec:input_ks} and \ref{subsubsec:input_krg}) and a condition vector (\texttt{conditions} parameter, see section \ref{subsubsec:condition}).
+When data are loaded, the differential analysis can be run using the \Rfunction{diffExpressedVariants} function. 
+This function has two mandatory parameters: a count table (\Rcode{countsData} parameter, see sections \ref{subsubsec:input_count}, \ref{subsubsec:input_ks} and \ref{subsubsec:input_krg}) and a condition vector (\Rcode{conditions} parameter, see section \ref{subsubsec:condition}).
 
-In the example below, the differential analysis results are stored in the \texttt{myResults} object:
-<<diffExpressedVariants_howto, fig=FALSE, keep.source=FALSE>>=
-myResults <- diffExpressedVariants(countsData = myCounts, conditions = myConditions)
+In the example below, the differential analysis results are stored in the \Robject{myResults} object:
+<<diffExpressedVariants_howto, fig=FALSE, keep.source=TRUE>>=
+myResults <- diffExpressedVariants(countsData = myCounts,
+    conditions = myConditions)
 @
 
-The \texttt{diffExpressedVariants} function has three other parameters to change the filters or the flags applied on data:
+The \Rfunction{diffExpressedVariants} function has three other parameters to change the filters or the flags applied on data:
 \begin{itemize}
-  \item \texttt{pvalue}: By default, the p-value threshold to output the significant events is set to 1. So all variants are output in the final table. This parameter must be a numeric value between 0 and 1. Be aware that by setting \texttt{pvalue} to 0.05, only events that have been identified as significant between the conditions with a false discovery rate (FDR) > 5\% will be present in the final table. If you wish to change this threshold, you will need to recompute everything.
-  \item \texttt{filterLowCountsVariants}: This parameter allows to change the threshold to filter low expressed events before testing (as explained in section \ref{subsec:filter}). By default, it is set to 10.
-  \item \texttt{flagLowCountsConditions}: This parameter allows to change the threshold to flag low expressed events (as explained in section \ref{subsec:flag}). By default, it is set to 10.
+  \item \Rcode{pvalue}: By default, the p-value threshold to output the significant events is set to 1. So all variants are output in the final table. This parameter must be a numeric value between 0 and 1. Be aware that by setting \Rcode{pvalue} to 0.05, only events that have been identified as significant between the conditions with a false discovery rate (FDR) > 5\% will be present in the final table. If you wish to change this threshold, you will need to recompute everything.
+  \item \Rcode{filterLowCountsVariants}: This parameter allows to change the threshold to filter low expressed events before testing (as explained in section \ref{subsec:filter}). By default, it is set to 10.
+  \item \Rcode{flagLowCountsConditions}: This parameter allows to change the threshold to flag low expressed events (as explained in section \ref{subsec:flag}). By default, it is set to 10.
 \end{itemize}
 
-The \texttt{diffExpressedVariants} function returns a list of 6 objects:
+The \Rfunction{diffExpressedVariants} function returns a list of 6 objects:
 <<myResults_description, fig=FALSE, keep.source=FALSE>>=
 names(myResults)
 @
-The \texttt{uncorrectedPVal} and \texttt{correctedPval} outputs are numeric vectors containing p-values before and after correction for multiple testing.
-\texttt{resultFitNBglmModel} is a data frame containing the results of the fitting of models to the data.
-\texttt{k2rgFile} is a string containing either the \krg~file path and name or NULL if no \krg~file was used as input.
-For explanations about the \texttt{finalTable} and \texttt{f/psiTable} outputs, see respectively section \ref{subsubsec:finaltable} and section \ref{subsubsec:psitable}.\\
+The \Rcode{uncorrectedPVal} and \Rcode{correctedPval} outputs are numeric vectors containing p-values before and after correction for multiple testing.
+\Rcode{resultFitNBglmModel} is a data frame containing the results of the fitting of models to the data.
+\Rcode{k2rgFile} is a string containing either the \krg~file path and name or NULL if no \krg~file was used as input.
+For explanations about the \Rcode{finalTable} and \Rcode{f/psiTable} outputs, see respectively section \ref{subsubsec:finaltable} and section \ref{subsubsec:psitable}.\\
 
 To control that the condition of application of the Benjamini Hochberg multiple testing correction procedure is fulfilled, the histogram of the p-values before correction can be plotted by using the following command:
 <<hist_pvalue_before_correction, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
@@ -350,12 +359,13 @@ hist(myResults$uncorrectedPVal, main="Histogram of p-values", xlab = "p-values",
 
 Because the dataset used here is small, the distribution obtained is not representative. Representative histograms can be obtained with the two complete datasets presented in the case studies (section \ref{sec:casestudies}). As expected, the histograms show a uniform distribution with a peak near 0 (Figure \ref{fig:distribpvalue}).
 
-\begin{figure}[!ht]
-  \centering
+\begin{figure}
   \includegraphics[width=0.49\textwidth]{hist_pvalue_uncorrected_SNP.png}
   \includegraphics[width=0.49\textwidth]{hist_pvalue_uncorrected_AS.png}
-  \caption{\textbf{Distribution of p-values before correction for multiple testing.} Left: for the complete dataset presented in section \ref{subsec:SNV}. Right: for the complete dataset presented in section \ref{subsec:AS}.}
-  \label{fig:distribpvalue}
+  \caption{\label{fig:distribpvalue}Distribution of p-values before correction 
+  for multiple testing. Left: for the complete dataset presented in section 
+  \ref{subsec:SNV}. Right: for the complete dataset presented in section 
+  \ref{subsec:AS}.}
 \end{figure}
 
 
@@ -364,40 +374,40 @@ Because the dataset used here is small, the distribution obtained is not represe
 
 \subsubsection{Final table}
 \label{subsubsec:finaltable}
-The \texttt{finalTable} object is the main output of the \texttt{diffExpressedVariants} function.
-The first 3 rows of the \texttt{myResults\$finalTable} output is as following:
+The \Rcode{finalTable} object is the main output of the \Rfunction{diffExpressedVariants} function.
+The first 3 rows of the \Robject{myResults\$finalTable} output is as following:
 <<finaltable_description, fig=FALSE, echo=FALSE, keep.source=FALSE>>=
 print(head(myResults$finalTable, n = 3), row.names = FALSE)
 @
 
 This table contains in columns the following information:
 \begin{itemize}
-  \item \texttt{ID} is the event identifier. An event is represented by one row in the table.
-  \item \texttt{Length\_diff} contains the variable part length in a splicing event. It is the length difference between the upper and lower path. This column is not relevant for SNVs. 
-  \item \texttt{Variant1\_condition\_1\_repl1\_Norm} and following columns contain the counts for each replicate of each variant after normalization (raw counts are normalized as in the \texttt{DESeq2} \textbf{BioConductor} \textbf{R} package, see details in section \ref{subsec:norm}). The first half of these columns concerns the first variant of each event, the second half the second variant.
-  \item \texttt{Adjusted\_pvalue} contains p-values adjusted by a Benjamini-Hochberg procedure.
-  \item \texttt{Deltaf/DeltaPSI} summarizes the magnitude of the effect (see details in section \ref{subsec:psi}).
-  \item \texttt{lowcounts} contains booleans which flag low counts events as described in section \ref{subsec:flag}. A \texttt{FALSE} value means that the event has high counts (counts above the chosen threshold).
+  \item \Rcode{ID} is the event identifier. An event is represented by one row in the table.
+  \item \Rcode{Length\_diff} contains the variable part length in a splicing event. It is the length difference between the upper and lower path. This column is not relevant for SNVs. 
+  \item \Rcode{Variant1\_condition\_1\_repl1\_Norm} and following columns contain the counts for each replicate of each variant after normalization (raw counts are normalized as in the \Biocpkg{DESeq2} \Bioconductor{} \R{} package, see details in section \ref{subsec:norm}). The first half of these columns concerns the first variant of each event, the second half the second variant.
+  \item \Rcode{Adjusted\_pvalue} contains p-values adjusted by a Benjamini-Hochberg procedure.
+  \item \Rcode{Deltaf/DeltaPSI} summarizes the magnitude of the effect (see details in section \ref{subsec:psi}).
+  \item \Rcode{lowcounts} contains booleans which flag low counts events as described in section \ref{subsec:flag}. A \Rcode{FALSE} value means that the event has high counts (counts above the chosen threshold).
 \end{itemize}
-In the \texttt{finalTable} output, events are sorted by p-values and then by magnitude of effect (based on their absolute values), so that the top candidates for further investigation/validation appear at the beginning of the output.\\
+In the \Rcode{finalTable} output, events are sorted by p-values and then by magnitude of effect (based on their absolute values), so that the top candidates for further investigation/validation appear at the beginning of the output.\\
 
-\noindent \fbox{\parbox{\linewidth-2\fboxrule-2\fboxsep}{\underline{WARNING:} When the p-value computed by \kde~is lower than the smallest number greater than zero that can be stored (i.e., 2.2e-16), this p-value is set to 0.}}
+\warning{When the p-value computed by \kde~is lower than the smallest number greater than zero that can be stored (i.e., 2.2e-16), this p-value is set to 0.}
 
-\paragraph{}To save results, a tab-delimited file can be created using the \texttt{writeOutputKissDE} function where an \texttt{output} parameter (containing the name of the saved file) is required. 
-Here, the \texttt{myResults} output is saved in a file called \texttt{results\_table.tab}:
+\paragraph{}To save results, a tab-delimited file can be created using the \Rfunction{writeOutputKissDE} function where an \Rcode{output} parameter (containing the name of the saved file) is required. 
+Here, the \Robject{myResults} output is saved in a file called \file{results_table.tab}:
 <<finaltable_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults, output = "results_table.tab")
 @
 
-Users can choose to export only events passing some thresholds on adjusted p-value and/or Deltaf/DeltaPSI using the options \texttt{adjPvalMax} and \texttt{dPSImin} of the \texttt{writeOutputKissDE} function. 
-For example, if we want to save in a file called \texttt{results\_table\_filtered.tab} only events with the adjusted p-value < 0.05 and the Deltaf/DeltaPSI absolute value > 0.10, the following command can be used:
+Users can choose to export only events passing some thresholds on adjusted p-value and/or Deltaf/DeltaPSI using the options \Rcode{adjPvalMax} and \Rcode{dPSImin} of the \Rfunction{writeOutputKissDE} function. 
+For example, if we want to save in a file called \file{results_table_filtered.tab} only events with the adjusted p-value < 0.05 and the Deltaf/DeltaPSI absolute value > 0.10, the following command can be used:
 <<finaltable_thresholds_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults, output = "results_table_filtered.tab", adjPvalMax = 0.05, dPSImin = 0.10)
 @
 
 
-If the counts table was built from a \krg~output with the \texttt{kissplice2counts} function, running the \texttt{writeOutputKissDE} will write a file merging results of differential analysis with \krg~data. 
-Like previously explained (section \ref{subsubsec:finaltable}), users can choose to save only events passing thresholds, in a file called \texttt{merge\_K2RG\_results\_table.tab}:
+If the counts table was built from a \krg~output with the \Rfunction{kissplice2counts} function, running the \Rfunction{writeOutputKissDE} will write a file merging results of differential analysis with \krg~data. 
+Like previously explained (section \ref{subsubsec:finaltable}), users can choose to save only events passing thresholds, in a file called \file{merge_K2RG_results_table.tab}:
 <<krg_output_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults_K2RG, output = "merge_K2RG_results_table.tab", adjPvalMax = 0.05, dPSImin = 0.10)
 @
@@ -406,14 +416,14 @@ writeOutputKissDE(myResults_K2RG, output = "merge_K2RG_results_table.tab", adjPv
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{f/PSI table}
 \label{subsubsec:psitable}
-The \texttt{f/psiTable} output of the function \texttt{diffExpressedVariants} contains the f values for SNV analysis and PSI values for alternative splicing analysis (see details and computation in section \ref{subsec:psi}) for each event in each sample.
-The first three rows of the \texttt{f/psiTable} output of the \texttt{myResults} object (created in the section \ref{subsec:diffanalysis}) look like this:
+The \Rcode{f/psiTable} output of the \Rfunction{diffExpressedVariants} function contains the f values for SNV analysis and PSI values for alternative splicing analysis (see details and computation in section \ref{subsec:psi}) for each event in each sample.
+The first three rows of the \Rcode{f/psiTable} output of the \Robject{myResults} object (created in the section \ref{subsec:diffanalysis}) look like this:
 <<fPSItable_description, fig=FALSE, echo=FALSE, keep.source=FALSE>>=
 head(myResults$`f/psiTable`, n = 3)
 @
 
 This output can be useful to carry out downstream analysis or to produce specific plots (like heatmap on f/PSI events). 
-To use this information with external tools, this table can be saved in a tab-delimited file (here called \texttt{result\_PSI.tab}), setting the \texttt{writePSI} parameter to \texttt{TRUE}:
+To use this information with external tools, this table can be saved in a tab-delimited file (here called \file{result_PSI.tab}), setting the \Rcode{writePSI} parameter to \Rcode{TRUE}:
 <<fPSItable_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults, output = "result_PSI.tab", writePSI = TRUE)
 @
@@ -426,22 +436,23 @@ writeOutputKissDE(myResults, output = "result_PSI.tab", writePSI = TRUE)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\kde's theory}
 
-In this section, the different steps of the \kde~main function, \texttt{diffExpressedVariants}, are detailed.
+In this section, the different steps of the \kde~main function, \Rfunction{diffExpressedVariants}, are detailed.
 They are summarized in the Figure \ref{fig:kdetheory}.
-\begin{figure}[h]
+\begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{Workflow_diffExpressedVariants.png}
-  \caption{\textbf{The different steps of the \texttt{diffExpressedVariants} function. Numbers in light red point to the section of this vignette explaining the step.}}
-  \label{fig:kdetheory}
+  \caption{\label{fig:kdetheory}The different steps of the 
+  \Rfunction{diffExpressedVariants} function. Numbers in light red point to the 
+  section of this vignette explaining the step.}
 \end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Normalization}
 \label{subsec:norm}
-In a first step, counts are normalized with the default normalization methods provided by the \textbf{DESeq2} \citep{DESeq2} package.
+In a first step, counts are normalized with the default normalization methods provided by the \Biocpkg{DESeq2} \cite{DESeq2} package.
 The goal of this normalization step is to remove technical factors that could influence the differential analysis.
-By using \textbf{DESeq2} normalization, we correct for library size, because the sequencing depth can vary between samples.
+By using \Biocpkg{DESeq2} normalization, we correct for library size, because the sequencing depth can vary between samples.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -450,8 +461,8 @@ A model to describe the counts distribution is first chosen.
 When working with biological replicates, the Poisson distribution's variance parameter is in general not flexible enough to describe the data, because replicates add several sources of variance.
 This overdispersion is often modeled using a Negative Binomial distribution, which is chosen in \kde.
 However, due to numerical instabilities associated with the estimation of Negative Binomial parameters, we use a model selection approach to determine which model is the best to handle the overdispersion parameter $\phi$. 
-We first estimate a model without overdispersion using the \textbf{glmnet} \textbf{R} package \citep{glmnet} (model $\mathcal{M}(\phi=0)$). 
-We then consider two different estimation methods for the parameter $\phi$, namely a global estimation approach using the \textbf{aod} \textbf{R} package \citep{aod} (model $\mathcal{M}(\phi=\phi_{\text{global}})$), and a variant-specific parameter using the \textbf{DSS} \textbf{R} package \citep{DSS1, DSS2, DSS3, DSS4} (model $\mathcal{M}(\phi=\phi^i_{\text{DSS}})$. 
+We first estimate a model without overdispersion using the \CRANpkg{glmnet} \R{} package \cite{glmnet} (model $\mathcal{M}(\phi=0)$). 
+We then consider two different estimation methods for the parameter $\phi$, namely a global estimation approach using the \CRANpkg{aod} \R{} package \cite{aod} (model $\mathcal{M}(\phi=\phi_{\text{global}})$), and a variant-specific parameter using the \Biocpkg{DSS} \R{} package \cite{DSS1, DSS2, DSS3, DSS4} (model $\mathcal{M}(\phi=\phi^i_{\text{DSS}})$. 
 The bayesian information criterion (BIC) is used to choose the best model out of the three.
 
 %TODO : rewrite this part...
@@ -460,12 +471,11 @@ The bayesian information criterion (BIC) is used to choose the best model out of
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Pre-test filtering}
 \label{subsec:filter}
-If global counts for both variants are too low (option \texttt{filterLowCountsVariants}), the event is not tested.
+If global counts for both variants are too low (option \Rcode{filterLowCountsVariants}), the event is not tested.
 The rationale behind this filter is to speed up the analysis and gain statistical power.
-Here we present an example to explain how \texttt{filterLowCountsVariants} option works. Let's assume that there are two conditions and two replicates per condition. \texttt{filterLowCountsVariants} keeps its default value, 10.\\
+Here we present an example to explain how \Rcode{filterLowCountsVariants} option works. Let's assume that there are two conditions and two replicates per condition. \Rcode{filterLowCountsVariants} keeps its default value, 10.\\
 
 \begin{table}[h]
-\centering
 \begin{tabular}{c|c|c|c|c|c}
     &\multicolumn{2}{c|}{Condition 1} &  \multicolumn{2}{c|}{Condition 2}&  Sum by variant\\
     & replicate 1  & replicate 2 & replicate 1 & replicate 2 & \\ \hline
@@ -481,10 +491,13 @@ Here we present an example to explain how \texttt{filterLowCountsVariants} optio
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Model}
-Then we design two models to take into account interactions with variants (SNVs or alternative isoforms) and experimental conditions as main effects. We  use the generalised linear model framework. The expected intensity $\lambda_{ijk}$ can be written as following:
-
-$$\mathcal{M_0}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j} $$
-$$\mathcal{M_1}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j}+ \left(\alpha \beta \right)_{ij}$$ 
+Then we design two models to take into account interactions with variants (SNVs or alternative isoforms) and experimental conditions as main effects. We  use the generalised linear model framework. The expected intensity $\lambda_{ijk}$ can be written as in following:
+\begin{equation}
+    \mathcal{M_0}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j}\\
+\end{equation}
+\begin{equation}
+    \mathcal{M_1}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j}+ \left(\alpha \beta \right)_{ij}
+\end{equation}
 
 where $\mu$ is the local mean expression of the transcript that contains the variant, $\alpha_{i}$ the effect of variant $i$ on the expression, $\beta_{j}$ the contribution of condition $j$ to the total expression, and $\left(\alpha \beta \right)_{ij}$ the interaction term. 
 
@@ -503,12 +516,11 @@ p-values are then adjusted with a 5\% false discovery rate (FDR) following a Ben
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Flagging low counts}
 \label{subsec:flag}
-If in at least $n-1$ conditions (be $n$ the number of conditions $\geq 2$) an event has low counts (option \texttt{flagLowCountsConditions}), it is flagged (\texttt{TRUE} in the last column of the \texttt{finalTable} output).\\
+If in at least $n-1$ conditions (be $n$ the number of conditions $\geq 2$) an event has low counts (option \Rcode{flagLowCountsConditions}), it is flagged (\Rcode{TRUE} in the last column of the \Rcode{finalTable} output).\\
 In the example Table \ref{tab:flag1}, we can see that the counts are quite contrasted, variant 1 seemed more expressed in condition 2 and variant 2 in condition 1. 
-Moreover, this event has enough counts for each variant not to be filtered out when the \texttt{filterLowCountsVariants} parameter is set to 10:\\
+Moreover, this event has enough counts for each variant not to be filtered out when the \Rcode{filterLowCountsVariants} parameter is set to 10:\\
 
 \begin{table}[h]
-\centering
 \begin{tabular}{c|c|c|c|c|c}
     &\multicolumn{2}{c|}{Condition 1} &  \multicolumn{2}{c|}{Condition 2}&  Sum by variant\\
     & replicate 1  & replicate 2 & replicate 1 & replicate 2 & \\ \hline
@@ -521,7 +533,7 @@ Moreover, this event has enough counts for each variant not to be filtered out w
 \label{tab:flag1}
 \end{table}
 
-\paragraph{}However, in $n-1$ (here 1) condition, the global count for one condition is less than 10 (9 for condition 1), so \texttt{flagLowCountsConditions} option will classify this in event in \texttt{'Low\_Counts'} column with a \texttt{TRUE} value. This event may be interesting because it has the potential to be found as differential. However, it will be hard to validate it experimentally, because the gene is poorly expressed in condition 1.
+\paragraph{}However, in $n-1$ (here 1) condition, the global count for one condition is less than 10 (9 for condition 1), so \Rcode{flagLowCountsConditions} option will classify this in event in \Rcode{'Low\_Counts'} column with a \Rcode{TRUE} value. This event may be interesting because it has the potential to be found as differential. However, it will be hard to validate it experimentally, because the gene is poorly expressed in condition 1.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -535,9 +547,15 @@ When dealing with genomic variants, we quantify the magnitude of the effect usin
 When dealing with splicing variants, we quantify the magnitude of the effect using the difference of Percent Spliced In (PSI) between the two conditions.
 These two measures turn out to be equivalent and can be summarized using the following formula:
 
-$$PSI \:=\: f  \:=\:  \frac{\#counts\_variant_1}{\#counts\_variant_1 + \#counts\_variant_2} $$ \\
-$$\Delta PSI \:=\: PSI_{cond1} - PSI_{cond2}$$ \\
-$$\Delta f \:=\: f_{cond1} - f_{cond2}$$
+\begin{equation}
+    PSI \:=\: f  \:=\:  \frac{\#counts\_variant_1}{\#counts\_variant_1 + \#counts\_variant_2}
+\end{equation}
+\begin{equation}
+    \Delta PSI \:=\: PSI_{cond1} - PSI_{cond2}
+\end{equation}
+\begin{equation}
+    \Delta f \:=\: f_{cond1} - f_{cond2}
+\end{equation}
 
 The $\Delta$PSI/$\Delta$f is computed as follows:
 \begin{itemize}
@@ -561,7 +579,7 @@ The $\Delta$PSI/$\Delta$f is computed as follows:
 \label{subsec:SNV}
 RNA-Seq data can be used to study SNVs (SNPs, mutations, RNA editing) in expressed regions of the genome. 
 Such SNVs can be detected and reported by \kp. 
-In this first following example, an analysis of SNPs is done with \kde~on RNA-Seq data from the human GEUVADIS project \citep{Lappalainen2013}. 
+In this first following example, an analysis of SNPs is done with \kde~on RNA-Seq data from the human GEUVADIS project \cite{Lappalainen2013}. 
 The sample data presented here is a subset of the case study presented in \cite{Lopez-Maestre2016}.
 
 
@@ -573,11 +591,9 @@ For each population, we selected 10 individuals, which are pooled in two groups 
 Each group corresponds to a replicate for \kde. 
 The conditions being compared are the populations.
 
-\begin{figure}[h]
-  \centering
+\begin{figure}
   \includegraphics[width=0.7\textwidth]{experimental_design_SNP.png}
-  \caption{\textbf{Experimental design of the SNP dataset.}}
-  \label{fig:designSNP}
+  \caption{\label{fig:designSNP}Experimental design of the SNP dataset.}
 \end{figure}
 
 The data are paired-end. So each sample consists of 2 files. 
@@ -596,20 +612,20 @@ writeLines(readLines(headfasta))
 Events are reported in 4 lines, the two first represent one allele of the SNV, the two last the other allele. 
 Thus the sequences only differ from each other by their SNV content.
 
-Because \kp~was run with the default value of the \texttt{counts} parameter (i.e., 0), the counts have the following format \texttt{C1\_x|C2\_y|...|Cn\_z}. 
+Because \kp~was run with the default value of the \Rcode{counts} parameter (i.e., 0), the counts have the following format \Rcode{C1\_x|C2\_y|...|Cn\_z}. 
 In this example, there are 8 counts because we input 8 files. 
 Each count corresponds to the reads coming from each file that could be mapped on the variant, in the order they have been passed to \kp. 
 This information is particularly important in \kde~since it represents the counts used for the test.
 
-%The quality scores come after the counts for each read set following a \texttt{Q} letter.
+%The quality scores come after the counts for each read set following a \Rcode{Q} letter.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Load data}
-The first step is to convert this fasta file (here called \texttt{output\_kissplice\_SNV.fa}, available at the \texttt{fileIn} path in your hard disk) into a format that will be used in \kde's main functions, thanks to the \texttt{kissplice2counts} function. 
-Due to paired-end RNA-Seq data, the \texttt{pairedEnd} parameter was set to \texttt{TRUE}.
+The first step is to convert this fasta file (here called \file{output_kissplice_SNV.fa}, available at the \Robject{fileIn} path in your hard disk) into a format that will be used in \kde's main functions, thanks to the \Rfunction{kissplice2counts} function. 
+Due to paired-end RNA-Seq data, the \Rcode{pairedEnd} parameter was set to \Rcode{TRUE}.
 
-This conversion in a table of counts is stored in a \texttt{myCounts\_SNV} object (for a detailed description of its structure, see section \ref{subsubsec:input_ks}) and can be done as follows:
+This conversion in a table of counts is stored in a \Robject{myCounts\_SNV} object (for a detailed description of its structure, see section \ref{subsubsec:input_ks}) and can be done as follows:
 <<snv_counts, fig=FALSE , keep.source=FALSE>>=
 fileIn <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
 myCounts_SNV <- kissplice2counts(fileIn, pairedEnd = TRUE)
@@ -617,7 +633,7 @@ head(myCounts_SNV$countsEvents)
 @
 
 To perform the differential analysis, a vector that describes the experimental plan must also be provided. 
-In the example, there are two replicates of TSC and two replicates of CEU. So the \texttt{myConditions\_SNV} vector is defined:
+In the example, there are two replicates of TSC and two replicates of CEU. So the \Robject{myConditions\_SNV} vector is defined:
 <<snv_condition, fig=FALSE, keep.source=FALSE>>=
 myConditions_SNV <- c(rep("TSC",2), rep("CEU",2))
 @
@@ -625,33 +641,34 @@ myConditions_SNV <- c(rep("TSC",2), rep("CEU",2))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Quality control}
-Before running the differential analysis, we check if the data was correctly loaded, by running the \texttt{qualityControl} function.
+Before running the differential analysis, we check if the data was correctly loaded, by running the \Rfunction{qualityControl} function.
 <<qualityControl_SNV, include=FALSE, fig=TRUE, keep.source=FALSE>>=
 qualityControl(myCounts_SNV, myConditions_SNV)
 @
-\begin{figure}[h]
-  \centering
+
+\begin{figure}
   \includegraphics[page=1,width=0.45\textwidth]{kissDE-qualityControl_SNV.pdf}
   \includegraphics[page=2,width=0.45\textwidth]{kissDE-qualityControl_SNV.pdf}
-  \caption{\textbf{Quality control plots on SNV data.} Left: Heatmap of the sample-to-sample distances on SNV data. Right: Principal Component Analysis on SNV data.}
-  \label{qcSNV}
+  \caption{\label{fig:qcSNV}Quality control plots on SNV data. Left: Heatmap of 
+  the sample-to-sample distances on SNV data. Right: Principal Component 
+  Analysis on SNV data.}
 \end{figure}
 
-On both plots returned by the \texttt{qualityControl} function (Figure \ref{qcSNV}), the replicates of the same condition seem to be more similar between themselves than to the samples of the other condition. 
-On the heatmap (left of Figure \ref{qcSNV}), the samples of the same condition cluster together. 
-On the PCA plot (right of Figure \ref{qcSNV}), the first principal component (which resumes 88\% of the total variance) clearly discriminate the samples of the two conditions.
+On both plots returned by the \Rfunction{qualityControl} function (Figure \ref{fig:qcSNV}), the replicates of the same condition seem to be more similar between themselves than to the samples of the other condition. 
+On the heatmap (left of Figure \ref{fig:qcSNV}), the samples of the same condition cluster together. 
+On the PCA plot (right of Figure \ref{fig:qcSNV}), the first principal component (which resumes 88\% of the total variance) clearly discriminate the samples of the two conditions.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Differential analysis}
-The main function of the \kde, \texttt{diffExpressedVariants}, can now be run to compute the statistical test. 
-Outputs are stored in a \texttt{myResult\_SNV} object (for a detailed description of its structure, see section \ref{subsubsec:finaltable}) and the sequence of successive events is printed:
+The main function of the \kde, \Rfunction{diffExpressedVariants}, can now be run to compute the statistical test. 
+Outputs are stored in a \Robject{myResult\_SNV} object (for a detailed description of its structure, see section \ref{subsubsec:finaltable}) and the sequence of successive events is printed:
 <<snv_test, fig=FALSE, keep.source=FALSE>>=
 myResult_SNV <- diffExpressedVariants(myCounts_SNV, myConditions_SNV)
 head(myResult_SNV$finalTable, n = 3)
 @
 
-The first event in the \texttt{myResult\_SNV} output has a low p-value (\texttt{Adjusted\_pvalue} column, equal to \texttt{4.975013e-09}) and a very contrasted $\Delta f$ (\texttt{Deltaf/DeltaPSI} column, equal to \texttt{-0.9258}) close to the maximum value (1 in absolute). 
+The first event in the \Robject{myResult\_SNV} output has a low p-value (\Rcode{Adjusted\_pvalue} column, equal to \Rcode{4.975013e-09}) and a very contrasted $\Delta f$ (\Rcode{Deltaf/DeltaPSI} column, equal to \Rcode{-0.9258}) close to the maximum value (1 in absolute). 
 This SNP would typically be population specific. 
 One allele is enriched in the Toscan population, the other in the European population.
 
@@ -659,7 +676,7 @@ One allele is enriched in the Toscan population, the other in the European popul
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Export results}
 We consider as significant the events that have a p-value adjusted lower than 5\%. 
-Results passing this threshold are thus extracted from \texttt{myResults\_SNV} thanks to the \texttt{adjPvalMax} parameter and are saved in a \texttt{final\_table\_significants.tab} file, thanks to the \texttt{writeOutputKissDE} function, as follows:
+Results passing this threshold are thus extracted from \Robject{myResults\_SNV} thanks to the \Rcode{adjPvalMax} parameter and are saved in a \file{final_table_significants.tab} file, thanks to the \Rfunction{writeOutputKissDE} function, as follows:
 <<snv_export_result, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults_SNV, output = "final_table_significants.tab", adjPvalMax = 0.05)
 @
@@ -675,13 +692,13 @@ The sample data presented here is a subset of the case study used in Benoit-Pilv
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Dataset}
-The data used in this example of AS comes from the ENCODE project \citep{Djebali2012}. 
+The data used in this example of AS comes from the ENCODE project \cite{Djebali2012}. 
 The chosen samples are from a neuroblastoma cell line, SK-N-SH, with or without a retinoic acid treatment. 
 Each condition is composed of two biological replicates. 
 The data are paired-end.\\
 
 \kp~has been used to analyse these two conditions. 
-Then, the \textit{type 1} results from \kp~were mapped to the reference genome with the \textbf{STAR} \citep{Dobin2013} software and analyzed with \krg. 
+Then, the \textit{type 1} results from \kp~were mapped to the reference genome with the \software{STAR} \cite{Dobin2013} software and analyzed with \krg. 
 \krg~enables to annotate the AS events discovered by \kp. 
 It assigns each event to the gene it maps to and to a type of alternative splicing event: Exon Skipping (ES), Intron Retention (IR), Alternatid Donor (AltD), Alternative Acceptor (AltA), \dots. 
 For any question on these tools (\kp~ and \krg), please refer to the manual that can be found on this web page: \url{http://kissplice.prabi.fr/}.\\
@@ -699,14 +716,14 @@ print(head(exampleK2RG[,c(1:10)], 3), row.names = FALSE)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Load data}
-The \texttt{kissplice2counts} function allows to transform this text file (here called \texttt{output\_k2rg\_alt\_splicing.txt}, available at the \texttt{fileInAS} path in your hard disk) into a format compatible with \kde's main functions. 
-As these samples are paired-end, the \texttt{pairedEnd} parameter is set to \texttt{TRUE}.
-The \texttt{k2rg} parameter must be set to \texttt{TRUE} to indicate that the file comes from \krg~and not directly from \kp. 
-The \texttt{counts} parameter must be set to the same value (i.e., 2) used in \kp~and \krg~to indicate which counts are given in input.
-Here the exonic reads are not taken into account (\texttt{exonicReads = FALSE}).
+The \Rfunction{kissplice2counts} function allows to transform this text file (here called \file{output_k2rg_alt_splicing.txt}, available at the \Robject{fileInAS} path in your hard disk) into a format compatible with \kde's main functions. 
+As these samples are paired-end, the \Rcode{pairedEnd} parameter is set to \Rcode{TRUE}.
+The \Rcode{k2rg} parameter must be set to \Rcode{TRUE} to indicate that the file comes from \krg~and not directly from \kp. 
+The \Rcode{counts} parameter must be set to the same value (i.e., 2) used in \kp~and \krg~to indicate which counts are given in input.
+Here the exonic reads are not taken into account (\Rcode{exonicReads = FALSE}).
 Only junction reads will be used (see Figure \ref{fig:readstype}).
 
-This conversion in a table of counts is stored in a \texttt{myCounts\_AS} object (for a detailed description of its structure, see section \ref{subsubsec:input_krg}) and can be done as follows:
+This conversion in a table of counts is stored in a \Robject{myCounts\_AS} object (for a detailed description of its structure, see section \ref{subsubsec:input_krg}) and can be done as follows:
 <<AS_counts, tidy=TRUE, highlight=FALSE, fig=FALSE, keep.source=FALSE>>=
 fileInAS <- system.file("extdata", "output_k2rg_alt_splicing.txt", package = "kissDE")
 myCounts_AS <- kissplice2counts(fileInAS, pairedEnd = TRUE, k2rg = TRUE, counts = 2, exonicReads = FALSE)
@@ -715,7 +732,7 @@ head(myCounts_AS$countsEvents)
 
 To perform the differential analysis, a vector that describes the experimental plan must also be provided. 
 In the example, there are two replicates of the SK-N-SH cell line without treatment (SKNSH) and two replicates of the same cell line treated with retinoic acid (SKSNH-RA). 
-So the \texttt{myConditions\_AS} vector is defined:
+So the \Robject{myConditions\_AS} vector is defined:
 <<AS_condition, fig=FALSE, keep.source=FALSE>>=
 myConditions_AS <- c(rep("SKNSH",2), rep("SKNSH-RA",2))
 @
@@ -723,40 +740,40 @@ myConditions_AS <- c(rep("SKNSH",2), rep("SKNSH-RA",2))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Quality control}
-Before running the differential analysis, we check if the data was correctly loaded, by running the \texttt{qualityControl} function.
+Before running the differential analysis, we check if the data was correctly loaded, by running the \Rfunction{qualityControl} function.
 <<qualityControl_AS, include=FALSE, fig=TRUE, keep.source=FALSE>>=
 qualityControl(myCounts_AS, myConditions_AS)
 @
-\begin{figure}[h]
-  \centering
+\begin{figure}
   \includegraphics[page=1,width=0.45\textwidth]{kissDE-qualityControl_AS.pdf}
   \includegraphics[page=2,width=0.45\textwidth]{kissDE-qualityControl_AS.pdf}
-  \caption{\textbf{Quality control plots on alternative data.} Left: Heatmap of the sample-to-sample distances for the alternative splicing dataset. Right: Principal Component Analysis for the alternative splicing dataset.}
-  \label{qcAS}
+  \caption{\label{fig:qcAS}Quality control plots on alternative data. Left: Heatmap 
+  of the sample-to-sample distances for the alternative splicing dataset. Right:
+  Principal Component Analysis for the alternative splicing dataset.}
 \end{figure}
 
-On both plots returned by the \texttt{qualityControl} function (Figure \ref{qcAS}), the replicates of the same condition seem to be more similar between themselves than to the samples of the other condition. 
-On the heatmap (left of Figure \ref{qcAS}), the samples of the same condition cluster together. 
-On the PCA plot (right of Figure \ref{qcAS}), the first principal component (which resumes 88\% of the total variance) clearly discriminates the samples of the two conditions.
+On both plots returned by the \Rfunction{qualityControl} function (Figure \ref{fig:qcAS}), the replicates of the same condition seem to be more similar between themselves than to the samples of the other condition. 
+On the heatmap (left of Figure \ref{fig:qcAS}), the samples of the same condition cluster together. 
+On the PCA plot (right of Figure \ref{fig:qcAS}), the first principal component (which resumes 88\% of the total variance) clearly discriminates the samples of the two conditions.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Differential analysis}
-The main function of the \kde, \texttt{diffExpressedVariants}, can now be run to compute the statistical test. 
-Outputs are stored in a \texttt{myResult\_AS} object (for a detailed description of its structure, see section \ref{subsubsec:finaltable}) and the sequence of successive events is printed:
-<<AS_test, fig=FALSE, keep.source=FALSE>>=
+The main function of the \kde, \Rfunction{diffExpressedVariants}, can now be run to compute the statistical test. 
+Outputs are stored in a \Robject{myResult\_AS} object (for a detailed description of its structure, see section \ref{subsubsec:finaltable}) and the sequence of successive events is printed:
+<<AS_test, fig=FALSE, keep.source=TRUE>>=
 myResult_AS <- diffExpressedVariants(myCounts_AS, myConditions_AS)
 head(myResult_AS$finalTable, n = 3)
 @
 
-The first event in the \texttt{myResult\_AS} output has a very low p-value (\texttt{Adjusted\_pvalue} column, less than \texttt{2.2e-16}) and a very contrasted $\Delta PSI$ (\texttt{Deltaf/DeltaPSI} column, equal to \texttt{-0.8042}) close to the maximum value (1 in absolute). 
+The first event in the \Robject{myResult\_AS} output has a very low p-value (\Rcode{Adjusted\_pvalue} column, less than \Rcode{2.2e-16}) and a very contrasted $\Delta PSI$ (\Rcode{Deltaf/DeltaPSI} column, equal to \Rcode{-0.8042}) close to the maximum value (1 in absolute). 
 This gene is differentially spliced. 
 When the SK-N-SH cell line is treated with retinoic acid, there seems to be a switch of minor/major isoform. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Export results}
-In order to facilitate the downstream analysis of the results, two tables are exported: the result table (\texttt{myResults\_AS{\$}finalTable} object, see section \ref{subsubsec:finaltable}) is saved in a \texttt{results\_table.tab} file and the PSI table (\texttt{myResults\_AS{\$}$^{\backprime}$f/psiTable$^{\backprime}$}, see section \ref{subsubsec:psitable}) is saved in a \texttt{psi\_table.tab} file. 
+In order to facilitate the downstream analysis of the results, two tables are exported: the result table (\Robject{myResults\_AS{\$}finalTable} object, see section \ref{subsubsec:finaltable}) is saved in a \file{results_table.tab} file and the PSI table (\Robject{myResults\_AS{\$}$^{\backprime}$f/psiTable$^{\backprime}$}, see section \ref{subsubsec:psitable}) is saved in a \file{psi_table.tab} file. 
 Here are the commands to carry out this task:
 <<AS_export, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults_AS, output = "results_table.tab")
@@ -766,18 +783,17 @@ writeOutputKissDE(myResults_AS, output = "psi_table.tab", writePSI = TRUE)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Time / Requirements}
-The data conversion with the \texttt{kissplice2counts} function and the statistical analysis done with the \texttt{diffExpressedVariants} function can take some time to run. Here is an example of the running time of this 2 functions on the two complete datasets presented in the case studies (section \ref{sec:casestudies}). The time presented were evaluated on a desktop computer with the following caracteristics: Intel Core i7, CPU 2,60 GHz, 16G RAM.
+The data conversion with the \Rfunction{kissplice2counts} function and the statistical analysis done with the \Rfunction{diffExpressedVariants} function can take some time to run. Here is an example of the running time of this 2 functions on the two complete datasets presented in the case studies (section \ref{sec:casestudies}). The time presented were evaluated on a desktop computer with the following caracteristics: Intel Core i7, CPU 2,60 GHz, 16G RAM.
 \begin{table}[h]
-\centering
 \begin{tabular}{c|c|c|c|c}
    \multirow{2}{*}{Dataset} & \multirow{2}{*}{Options} & Number of & \multicolumn{2}{|c}{Running time}  \\
-    & & events & \texttt{kissplice2counts} & \texttt{diffExpressedVariants} \\ \hline
-  \multirow{2}{*}{AS data} & \texttt{counts}=2,  & \multirow{2}{*}{68497} & \multirow{2}{*}{14m} & \multirow{2}{*}{2h 18m} \\ 
-    & \texttt{pairedEnd}=TRUE & & & \\ \hline
-  \multirow{2}{*}{SNV data} & \texttt{counts}=0, & \multirow{2}{*}{64824} & \multirow{2}{*}{6m} & \multirow{2}{*}{2h 10m} \\
-    & \texttt{pairedEnd}=TRUE & & & \\
+    & & events & \Rfunction{kissplice2counts} & \Rfunction{diffExpressedVariants} \\ \hline
+  \multirow{2}{*}{AS data} & \Rcode{counts=2},  & \multirow{2}{*}{68497} & \multirow{2}{*}{14m} & \multirow{2}{*}{2h 18m} \\ 
+    & \Rcode{pairedEnd=TRUE} & & & \\ \hline
+  \multirow{2}{*}{SNV data} & \Rcode{counts=0}, & \multirow{2}{*}{64824} & \multirow{2}{*}{6m} & \multirow{2}{*}{2h 10m} \\
+    & \Rcode{pairedEnd=TRUE} & & & \\
 \end{tabular}
-\caption{Running time of the two principal functions of \kde (\texttt{kissplice2counts} and \texttt{diffExpressedVariants}) for two datasets (AS dataset from the ENCODE project \citep{Djebali2012} described in section \ref{subsec:AS} and SNP dataset from the GEUVADIS project \citep{Lappalainen2013} described in section \ref{subsec:SNV}).}
+\caption{Profiling. Running time of the two principal functions of \kde (\Rfunction{kissplice2counts} and \Rfunction{diffExpressedVariants}) for two datasets (AS dataset from the ENCODE project \cite{Djebali2012} described in section \ref{subsec:AS} and SNP dataset from the GEUVADIS project \cite{Lappalainen2013} described in section \ref{subsec:SNV}).}
 \label{tab:time}
 \end{table}
 
@@ -789,7 +805,7 @@ The data conversion with the \texttt{kissplice2counts} function and the statisti
 \section{Session info}
 Aurélie
 
-\bibliographystyle{abbrvnat}
+% \bibliographystyle{abbrvnat}
 
 \bibliography{bibliography}
 
