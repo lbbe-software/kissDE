@@ -129,7 +129,6 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
 						events.names <- rep(NA, iBcc * 2)
 						psiInfo <- matrix(NA, iBcc * 2, length(resultLine$psiInfoUp))
 					}
-					resultLine$variantLengthUp <- 
 						as.numeric(resultLine$variantLengthUp)
 					events.mat[indexNames, 1] <- as.numeric(resultLine$variantLengthUp)
 					events.mat[indexNames, 2:NCOL(events.mat)] <- 

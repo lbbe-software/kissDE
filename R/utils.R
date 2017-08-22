@@ -495,12 +495,16 @@
 	## the counts matrix
 	dataNormCountsEvent <- as.matrix(dataPart2[, 3:ncol(dataPart2)])
 	colnames(dataNormCountsEvent) <- seq_len(ncol(dataNormCountsEvent))
-	designs <- rep(c(seq_len(n * 2)), c(nr, nr))  ## the design matrix
-	dispData <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs))
+	designs <- data.frame(condition=rep(rep(c("C1","C2"),nr),2), 
+	                      path=c(rep("U",sum(nr)),rep("L",sum(nr))))
+	designs <- model.matrix(~condition+path, data=designs)
+	dispData <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs), 
+	                           normalizationFactor = rep(1, 2*nbAll))
 	## fix the seed to avoid the stochastic outputs of the 
 	## DSS:estDispersion function
 	set.seed(40)
 	dispData <- estDispersion(dispData)
+	hist(dispersion(dispData))
 	names(exprs(dispData)) <- rownames(dataPart2)
 	
 	###################################################
