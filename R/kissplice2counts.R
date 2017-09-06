@@ -1,6 +1,6 @@
 kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
-														 exonicReads=TRUE, k2rg=FALSE, keep=c("All"), 
-														 remove=NULL) {
+                             exonicReads=TRUE, k2rg=FALSE, keep=c("All"), 
+                             remove=NULL) {
 	## check options compatibility
 	if (counts == 1 & exonicReads == TRUE) { 
 		## when counts=1 set automatically exonicReads=TRUE
@@ -33,15 +33,15 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
 				isQuality <- grepl("Q", line[1])
 			}
 			## get all the informations for the line
-			resultLine <- .getInfoLine(line, counts, pairedEnd, order, exonicReads, 
-																 isQuality)
+			resultLine <- .getInfoLine(line, counts, pairedEnd, order, 
+			                           exonicReads, isQuality)
 			eventName <- resultLine$eventName
 			variantLength <- resultLine$variantLength
 			variantCounts <- resultLine$variantCounts
 			if (index == 1){
-				events.mat <- matrix(NA, nbLines[1] / 2, length(variantCounts) + 1)
+				events.mat <- matrix(NA, nbLines[1]/2, length(variantCounts)+1)
 				events.names <- rep(NA, nbLines[1] / 2)
-				psiInfo <- matrix(NA, nbLines[1] / 2, length(resultLine$psiInfo))
+				psiInfo <- matrix(NA, nbLines[1]/2, length(resultLine$psiInfo))
 			}
 			events.mat[index, 1] <- as.numeric(variantLength)
 			events.mat[index, 2:NCOL(events.mat)] <- variantCounts
@@ -105,7 +105,8 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
 		iDupBcc <- 1
 		index <- 1
 		indexNames <- 1
-		seek(toConvert, 0) ## reinitialize the cursor at the beginning of the file
+		## reinitialize the cursor at the beginning of the file
+		seek(toConvert, 0) 
 		while (TRUE) {
 			line <- readLines(toConvert, n=1)
 			if(length(line) == 0) {
@@ -121,16 +122,17 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
 				bcc <- lLine[EVENTNAME]
 				matBccApp[bcc, 1] <- matBccApp[bcc, 1] + 1
 				if (matBccApp[bcc, 1] == 1) {
-					resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, order, 
-																				 exonicReads)
+                    resultLine <- .getInfoLineK2rg(line, counts, pairedEnd, 
+                                                   order, exonicReads)
 					if (indexNames == 1){
 						events.mat <- matrix(NA, iBcc * 2, 
-																 length(resultLine$variantCountsUp) + 1)
+                            length(resultLine$variantCountsUp) + 1)
 						events.names <- rep(NA, iBcc * 2)
-						psiInfo <- matrix(NA, iBcc * 2, length(resultLine$psiInfoUp))
+						psiInfo <- matrix(NA, iBcc * 2, 
+						                  length(resultLine$psiInfoUp))
 					}
-						as.numeric(resultLine$variantLengthUp)
-					events.mat[indexNames, 1] <- as.numeric(resultLine$variantLengthUp)
+					events.mat[indexNames, 1] <- 
+					    as.numeric(resultLine$variantLengthUp)
 					events.mat[indexNames, 2:NCOL(events.mat)] <- 
 						resultLine$variantCountsUp
 					events.names[indexNames] <- resultLine$eventName
@@ -151,22 +153,21 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
 	}
 	
 	## update col names
-	colnames(events.df) <- c("events.names", "events.length", 
-													 paste("counts", 
-													 		seq_len(length(colnames(events.df)) - 2), sep=""))
+	colnames(events.df) <- c("events.names", "events.length", paste("counts", 
+        seq_len(length(colnames(events.df)) - 2), sep=""))
 	
 	close(toConvert)
 	psiInfo <- data.frame(events.names, as.data.frame(psiInfo))
 	
 	output <- list(countsEvents=events.df, psiInfo=psiInfo, 
-								 exonicReadsInfo=exonicReads, k2rgFile=fileNameK2RG)
+	               exonicReadsInfo=exonicReads, k2rgFile=fileNameK2RG)
 	class(output) <- c("list", "countsData")
 	return(output)
 }
 
 wantedEvents <- function(keep=c("All"), remove=NULL){
 	EVENTS <- c("deletion", "insertion", "IR", "ES", "altA", "altD", "altAD", 
-							"alt", "unclassified", "-", " ", "", "unclassifiedSNP")
+	            "alt", "unclassified", "-", " ", "", "unclassifiedSNP")
 	ES_EVENTS <- c("MULTI", "alt", "altA", "altD", "altAD")
 	wEvents <- c()
 	if (keep == c("All") && is.null(remove)) {
@@ -182,8 +183,8 @@ wantedEvents <- function(keep=c("All"), remove=NULL){
 			if (!remove[i] %in% append(EVENTS, "MULTI")) {
 				print(paste("In remove: couldn't find", remove[i]))
 				stop("One of the element(s) of the remove vector is not part of: 
-						 deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified, 
-						 -, MULTI, unclassifiedSNP")
+                    deletion, insertion, IR, ES, altA, altD, altAD, alt, 
+                    unclassified, -, MULTI, unclassifiedSNP")
 			}
 		}
 	}
@@ -208,8 +209,8 @@ wantedEvents <- function(keep=c("All"), remove=NULL){
 		if (!keep[i] %in% EVENTS) {
 			print(paste("In keep: couldn't find", keep[i]))
 			stop("One of the element(s) of the keep vector is not part of: 
-					 deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified, 
-					 -, unclassifiedSNP")
+			    deletion, insertion, IR, ES, altA, altD, altAD, alt, 
+                unclassified, -, unclassifiedSNP")
 		}
 		if (ES == FALSE && keep[i] == "ES") {
 			ES <- TRUE
@@ -217,8 +218,8 @@ wantedEvents <- function(keep=c("All"), remove=NULL){
 		wEvents <- append(wEvents, keep[i])
 	}
 	if (ES == FALSE && !is.null(remove)) {
-		stop("Keep and remove can not be set together, unless keep contain ES (in 
-				 that case, remove will act on ES events)")
+		stop("Keep and remove can not be set together, unless keep contain ES 
+            (in that case, remove will act on ES events)")
 	}
 	if (ES == FALSE) {
 		return(wEvents)
