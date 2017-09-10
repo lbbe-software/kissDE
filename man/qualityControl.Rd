@@ -28,11 +28,11 @@ many elements as there are replicates in total.}
 stored and in which directory.	By default (\code{FALSE}), the figures are not
 stored but plotted one at time when Enter is pressed. If \code{storeFigs} is
 \code{TRUE}, the figures are stored in a \code{kissDEFigures} directory which
-is created in the current directory. If \code{storeFigs} is a path (string, 
-e.g. '/path/to/figs'), a new directory called with this value is created to
-store the figures. Plots are stored in .png format. If the 
-\code{qualityControl} function is a part of an automatised worflow, we 
-recommand to set this option to \code{TRUE} or to a personal value.}
+is created in the working directory. If \code{storeFigs} is a path (string, 
+e.g. '/path/to/figs'), this directory is created to store the figures. Plots 
+are stored in .png format. If the \code{qualityControl} function is a part 
+of an automatised worflow, we recommand to set this option to \code{TRUE} or 
+to a personal value.}
 }
 
 

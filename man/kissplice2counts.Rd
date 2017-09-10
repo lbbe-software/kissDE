@@ -16,11 +16,11 @@ exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL)
 
 
 \arguments{
-\item{fileName}{a string indicating the path to the \code{.fa} file that must
-be pre-treated.}
+\item{fileName}{a string indicating the path to the \code{KisSplice} 
+\code{.fa} or the \code{KisSplice2RefGenome} file that must be pre-treated.}
 
 \item{counts}{an interger (0, 1 or 2) corresponding with the \code{KisSplice}
-\code{counts} option used. By default, as in \code{KisSplice}, it is turned
+\code{counts} option used. By default, as in \code{KisSplice}, it is set
 to 0, assuming there is no special counting option. If the data used has been
 produced using \code{counts} 1 or 2 in \code{KisSplice}, this option sums the
 counts on the junctions provided by \code{counts} to obtain counts by
@@ -71,8 +71,8 @@ retention events and altAD events, the vector should be
 \code{keep = c("IR","altAD")}.
 If you want to work on specific ES events (i.e., ES_MULTI), the vector should
 be \code{keep = c("ES")} and the \code{remove} option should be used too.
-By default, all events are kept. This option goes only with \code{k2rg}
-option.}
+By default, all events are kept. This option works only when \code{k2rg}
+option is set to \code{TRUE}.}
 
 \item{remove}{a character vector indicating the names of the events to remove
 for the statistical test. The test will be more sensitive for the other
@@ -84,8 +84,8 @@ This option can not be used if the \code{keep} option is used, unless ES is
 one of the event(s) to be kept. In this case, the \code{remove} option will
 work on specific ES events. If you want to work on ES_MULTI, then you should
 do \code{keep=c("ES")} with \code{remove = c("alt","altA","altD","altAD")}.
-By default, none events are removed.
-This option goes only with \code{k2rg} option.}
+By default, not any events are removed.
+This option works only when \code{k2rg} option is set to \code{TRUE}.}
 }
 
 

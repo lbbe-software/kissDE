@@ -9,14 +9,14 @@ in a readable file.}
 function which the result was used as input in the \code{diffExpressedVariants} 
 function, \code{writeOutputKissDE} will output a tab-delimited table
 containing one alternative splicing event/SNV per line. The fields are: the ID
-of the path, the variable part length, the counts of each variant for each
-conditions, the adjusted p-value, the dPSI and a boolean indicating if the 
-event/SNV was correctly cover by reads.
+of the variation, the variable part length, the counts of each variant for 
+each conditions, the adjusted p-value, the deltaPSI and a boolean indicating 
+if the splicing event/SNV was correctly cover by reads.
 
 If you were working with a \code{KisSplice2RefGenome} file, this function will
 add five columns to the \code{KisSplice2RefGenome}'s file, containing the
-following \code{KissDE} results: normalized counts, normalized psi, adjusted 
-p-value, delta-PSI, warnings.
+following \code{KissDE} results: normalized counts, normalized PSI, adjusted 
+p-value, deltaPSI, warnings.
 
 If you want to write the table containing the PSI/f values, you should set
 \code{writePSI} to \code{TRUE}. 
@@ -33,10 +33,10 @@ writeOutputKissDE(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, output,
 \item{resDiffExprVariant}{a list, returned by \code{diffExpressedVariants}.}
 
 \item{adjPvalMax}{a double indicating the maximum adjusted p-value allowed to
-output an event/SNV.}
+output a splicing event/SNV.}
 
-\item{dPSImin}{a double indicating the minimum absolute value of a dPSI
-allowed to output an event/SNV.}
+\item{dPSImin}{a double indicating the minimum absolute value of a deltaPSI
+allowed to output a splicing event/SNV.}
 
 \item{output}{a character indicating the name of the file to save 
 \code{writeOutputKissDE} output.}

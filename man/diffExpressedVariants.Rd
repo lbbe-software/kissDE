@@ -18,7 +18,7 @@ filterLowCountsVariants = 10, flagLowCountsConditions = 10)
 frame containing in its first column the names of the events, in its second
 column the lengths of the events, and in the following columns, the counts
 corresponding to each replicate of each experimental condition of one variant.
-Each row corresponds with one variant.}
+Each row corresponds to one variant.}
 
 \item{conditions}{a character vector containing the experimental conditions,
 of length \code{NCR} (see Details below).}
@@ -27,10 +27,10 @@ of length \code{NCR} (see Details below).}
 pvalues are kept.}
 
 \item{filterLowCountsVariants}{a numerical value indicating the value below
-which events are filtered out. After having computing the overdispersion, we
+which events are filtered out. After having computed the overdispersion, we
 screen out events which both variants have global counts 
 < \code{filterLowCountsVariants} (sum of each replicate x condition) in order
-to gain strength for the models.}
+to increase statistical power of the analysis.}
 
 \item{flagLowCountsConditions}{a numerical value indicating the value below
 which we flag events as 'lowCounts' in the final data frame. This column aims
@@ -44,7 +44,7 @@ counts (< \code{flagLowCountsBoundary = 10}) for at least n-1 conditions
 \code{diffExpressedVariants} returns a list of 6 objects:
 \item{finalTable}{a data frame containing the columns
     \itemize{
-        \item \code{ID}: the variation ID
+        \item \code{ID}: the variation identifier
         \item \code{Length_diff}: the size of the first variant
         \item \code{UP_Condn_Rm_Norm (resp LP_Condn_Rm_Norm)}: returns the
         normalized counts for the first variant (UP, resp. second variant: LP),
@@ -53,10 +53,10 @@ counts (< \code{flagLowCountsBoundary = 10}) for at least n-1 conditions
         FDR = 5\%
         \item \code{Deltaf/DeltaPSI}: difference of relative abundance of
         variants across conditions. For instance if there are 2 conditions, 
-        \code{deltaPsi} returns relative abudance in condition 2 - relative
+        \code{deltaPSI} returns relative abudance in condition 2 - relative
         abundance in condition 1. If \code{counts} is at 1 or 2, inclusion
         variants are corrected for the length of the variant so that we do not
-        overestimate the psi value. If \code{counts} is at 0, we correct the
+        overestimate the PSI value. If \code{counts} is at 0, we correct the
         longer variant by diving by this correcting factor: 
         (longer_variant_length + readLength - 2 *overlap + 1) / 
         (lower_variant_lenght + readLength - 2 * overlap + 1) with readLength
@@ -82,7 +82,7 @@ path and name or NULL if no \code{KisSplice2RefGenome} file was used as input}
 It is the length of the experimental design.
 If we define \eqn{C_i} the \eqn{i^{th}} experimental condition and 
 \eqn{R_{ij}} the \eqn{j^{th}} replicate of the \eqn{i^{th}} experimental
-condition, \code{Ncr} is equal to \eqn{\sum_{i}\sum_{j} \left | C_iR_{ij}
+condition, \code{NCR} is equal to \eqn{\sum_{i}\sum_{j} \left | C_iR_{ij}
 \right |}.
 For example, a balanced experimental design defined by 2 replicates in the
 first condition and 2 replicates in the second one has a length of 4
