@@ -1225,9 +1225,9 @@
 	
 	selected_id <- 
 		resDiffExprVariant$finalTable$ID[
-			which(resDiffExprVariant$finalTable$Adjusted_pvalue < adjPvalMax & 
-							abs(resDiffExprVariant$finalTable$`Deltaf/DeltaPSI`) > dPSImin)]
-	selected_PSI <- resDiffExprVariant$`f/psiTable`[selected_id]
+			which(resDiffExprVariant$finalTable$Adjusted_pvalue <= adjPvalMax & 
+							abs(resDiffExprVariant$finalTable$`Deltaf/DeltaPSI`) >= dPSImin)]
+	selected_PSI <- resDiffExprVariant$`f/psiTable`[selected_id,]
 	write.table(resDiffExprVariant$`f/psiTable`, file=output, 
 							quote=FALSE, sep="\t", row.names=FALSE)
 }
