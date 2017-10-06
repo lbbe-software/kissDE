@@ -7,7 +7,7 @@ importFrom("DESeq2", "counts",
 importFrom("DSS", "dispersion", "estDispersion", "newSeqCountSet")
 importFrom("glmnet", "glmnet")
 importFrom("gplots", "heatmap.2")
-importFrom("graphics", "abline", "legend", "lines", "par", "plot", "points")
+importFrom("graphics", "abline", "hist", "legend", "lines", "par", "plot", "points")
 importFrom("grDevices", "adjustcolor", "dev.off", "palette", "png")
 importFrom("stats", "aggregate", 
            "as.dist", 
