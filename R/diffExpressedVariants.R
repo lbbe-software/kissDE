@@ -4,7 +4,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 	
 	options(warn=-1)  # suppress the warning for the users
 	
-	print("Pre-processing the data...")
+	message("Pre-processing the data...")
 	chunk0 <- tryCatch({.readAndPrepareData(countsData, conditions)
 		#### chunk 0 var ####
 		## chunk0$countsData
@@ -15,8 +15,8 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 		## chunk0$sortedconditions
 		## chunk0$ASSBinfo
 	}, error=function(err) {
-		print(err)
-		return(NA)
+	    return(NA)
+	    stop(err)
 	})
 	
 	if (!is.na(chunk0)) {  # no error in chunk 0
@@ -34,7 +34,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 			}
 			ASSBinfo <- ASSBinfo[li, ]
 		}
-		print("Trying to fit models on data...")
+		message("Trying to fit models on data...")
 		chunk1 <- tryCatch({.modelFit(chunk0$countsData, chunk0$n, chunk0$nr, 
 																	ASSBinfo, filterLowCountsVariants)
 			#### chunk 1 var ####
@@ -47,15 +47,15 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 			## chunk1$phi
 			## chunk1$dispData
 		}, error=function(err) {
-			print(paste(err, "An error occured, unable to fit models on data." ))
-			return(NA)
+		    return(NA)
+		    stop(paste(err, "An error occured, unable to fit models on data." ))
 		}) 
 	} else {  # error in chunk 0
 		chunk1 <- NA
 	}
 	
 	if (!is.na(chunk1)) {  # no error in chunk 1 nor in chunk 0
-		print("Searching for best model and computing pvalues...")
+		message("Searching for best model and computing pvalues...")
 		chunk2 <- tryCatch({.bestModelandSingular(chunk1$pALLGlobalPhi.glm.nb, 
 																							chunk1$sing.events, 
 																							chunk1$dataPart3, 
@@ -67,7 +67,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 			## chunk2$correctedPVal
 			## chunk2$signifVariants
 		}, error=function(err) {
-			print(paste(err, "Returning only resultFitNBglmModel and sing.events")) 
+			message(paste(err, "Returning only resultFitNBglmModel and sing.events")) 
 			return(list(resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb, 
 									sing.events=chunk1$sing.events))
 		})
@@ -77,7 +77,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 	
 	if (!is.na(chunk2)) {  # no error during chunk1
 		if (length(chunk2) > 2) {  # no error during chunk2
-			print("Computing size of the effect and last cutoffs...")
+			message("Computing size of the effect and last cutoffs...")
 			chunk3 <- tryCatch({
 				sizeOfEffect <- .sizeOfEffectCalc(chunk2$signifVariants, 
 																					chunk1$ASSBinfo, chunk0$n, 
@@ -92,7 +92,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 										`f/psiTable`=sizeOfEffect$psiTable,
 										k2rgFile=countsData$k2rgFile))
 			}, error=function(err) {
-				print(paste(err, "Returning only resultFitNBglmModel and pvalues tab"))
+				message(paste(err, "Returning only resultFitNBglmModel and pvalues tab"))
 				return(list(correctedPVal=chunk2$correctedPVal,
 										uncorrectedPVal=chunk2$noCorrectPVal,
 										resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb))

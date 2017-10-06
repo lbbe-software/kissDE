@@ -79,7 +79,7 @@
 				order <- rep(seq_len((NROW(sums)) / 2), rep(2, ((NROW(sums)) / 2)))
 			} else {
 				if (!is.vector(order)) {
-					print("Error, order vector seems to be in a wrong format.")
+					stop("Order vector seems to be in a wrong format.")
 				}
 			}
 			d2 <- data.frame(order, sums)
@@ -103,7 +103,7 @@
 										 rep(2, dim(countsperCond)[2] / 2))
 			} else {
 				if (!is.vector(order)) {
-					print("Error, order vector seems to be in a wrong format.")
+					stop("Order vector seems to be in a wrong format.")
 				}
 			}
 		} else {
@@ -162,7 +162,7 @@
 				order <- rep(seq_len((NROW(sums)) / 2), rep(2, ((NROW(sums)) / 2)))
 			} else {
 				if (!is.vector(order)) {
-					print("Error, order vector seems to be in a wrong format.")
+					stop("Order vector seems to be in a wrong format.")
 				}
 			}
 			d2 <- data.frame(order, sums)
@@ -186,7 +186,7 @@
 										 rep(2, dim(countsperCond)[2] / 2))
 			} else {
 				if (!is.vector(order)) {
-					print("Error, order vector seems to be in a wrong format.")
+					stop("Order vector seems to be in a wrong format.")
 				}
 			}
 		} else {
