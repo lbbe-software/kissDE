@@ -4,7 +4,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
 	## check options compatibility
 	if (counts == 1 & exonicReads == TRUE) { 
 		## when counts=1 set automatically exonicReads=TRUE
-		exonicReads == FALSE
+		exonicReads <- FALSE
 		warning("Changing 'exonicReads' value to FALSE for consistency with 
 						counts=1.")
 	}
