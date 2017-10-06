@@ -184,7 +184,7 @@ It must be a data frame with:
 \label{subsubsec:input_ks}
 \kde~can also deal with \kp~output, which is in fasta format.
 Below is an example of the four first lines of a \kde~output:
-<<kissplice_format, echo=FALSE, echo=FALSE, keep.source=FALSE>>=
+<<kissplice_format, echo=TRUE, keep.source=FALSE>>=
 headfasta <- system.file("extdata", "head_output_kissplice_alt_splicing_fasta.txt", package="kissDE")
 writeLines(readLines(headfasta))
 @
@@ -376,7 +376,7 @@ Because the dataset used here is small, the distribution obtained is not represe
 \label{subsubsec:finaltable}
 The \Rcode{finalTable} object is the main output of the \Rfunction{diffExpressedVariants} function.
 The first 3 rows of the \Robject{myResults\$finalTable} output is as following:
-<<finaltable_description, fig=FALSE, echo=FALSE, keep.source=FALSE>>=
+<<finaltable_description, fig=FALSE, echo=TRUE, keep.source=FALSE>>=
 print(head(myResults$finalTable, n = 3), row.names = FALSE)
 @
 
