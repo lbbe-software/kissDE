@@ -31,7 +31,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 	dimns <- listData$dim
 	n <- listData$n
 	nr <- listData$nr
-	conditionsNames <- sort(unique(myConditions))
+	conditionsNames <- sort(unique(conditions))
 	
 	###################################################
 	### select events with highest variance (on PSI)
