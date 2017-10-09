@@ -383,78 +383,37 @@
 .fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, phiDSScond, 
 																	phiGlobal, nbAll){
 	
-	nbglmA0 <- negbin(counts~cond + path, data=eventdata, random=~1, 
-										fixpar=list(4, 0))
-	nbglmI0 <- negbin(counts~cond * path, data=eventdata, random=~1, 
-										fixpar=list(5, 0))  
-	## S: simple, A: additive, I: interaction models
-	## Poisson model  
-	nbAnov0 <- anova(nbglmA0, nbglmI0)
-	nbAIC0 <- c(AIC(nbglmA0, k=log(nbAll))@istats$AIC, 
-							AIC(nbglmI0, k=log(nbAll))@istats$AIC)
-	## singular.hessian:  true when fitting provided a singular hessian, 
-	## indicating an overparamaterized model.
-	nbSingHes0 <- c(nbglmA0@singular.hessian, nbglmI0@singular.hessian)
-	## code: "code" An integer (returned by "optim") indicating why the 
-	## optimization process terminated.
-	nbCode0 <- c(nbglmA0@code, nbglmI0@code)  
-	
-	## binomial negative model, with global phi
-	nbglmAgb <- negbin(counts~cond + path, data=eventdata, random=~1, 
-										 fixpar=list(4, phiGlobal))
-	nbglmIgb <- negbin(counts~cond * path, data=eventdata, random=~1, 
-										 fixpar=list(5, phiGlobal)) 
-	nbAnovgb <- anova(nbglmAgb, nbglmIgb)
-	nbAICgb <- c(AIC(nbglmAgb, k=log(nbAll))@istats$AIC, 
-							 AIC(nbglmIgb, k=log(nbAll))@istats$AIC)
-	## the BIC in fact, since we use k=log(nobs)
-	nbSingHesgb <- c(nbglmAgb@singular.hessian, nbglmIgb@singular.hessian)
-	nbCodegb <- c(nbglmAgb@code, nbglmIgb@code)
-	
-	## binomial negative model, with phi DSS
-	nbglmA <- negbin(counts~cond + path, data=eventdata, random=~1, 
-									 fixpar=list(4, phiDSS))
-	nbglmI <- negbin(counts~cond * path, data=eventdata, random=~1, 
-									 fixpar=list(5, phiDSS))
-	
-	nbAnov <- anova(nbglmA, nbglmI)
-	nbAIC <- c(AIC(nbglmA, k=log(nbAll))@istats$AIC, 
-						 AIC(nbglmI, k=log(nbAll))@istats$AIC)
-	nbSingHes <- c(nbglmA@singular.hessian, nbglmI@singular.hessian)
-	nbCode <- c(nbglmA@code, nbglmI@code)
-	
-	## binomial negative model, with phi DSS, conditionally to the 
-	## expression mean  	 
-	nbglmAcond <- negbin(counts~cond + path, data=eventdata, random=~1, 
-											 fixpar=list(4, phiDSScond))	 
-	nbglmIcond <- negbin(counts~cond * path, data=eventdata, random=~1, 
-											 fixpar=list(5, phiDSScond))	 
-	
-	nbAnovcond <- anova(nbglmAcond, nbglmIcond)	 
-	nbAICcond <- c(AIC(nbglmAcond, k=log(nbAll))@istats$AIC, 
-								 AIC(nbglmIcond, k=log(nbAll))@istats$AIC)	 
-	nbSingHescond <- c(nbglmAcond@singular.hessian, nbglmIcond@singular.hessian)	 
-	nbCodecond <- c(nbglmAcond@code, nbglmIcond@code)
-	
-	rslts <- c(nbAnov0@anova.table$'P(> Chi2)'[2],       # [1]
-						 nbAnovgb@anova.table$'P(> Chi2)'[2],      # [2]
-						 nbAnov@anova.table$'P(> Chi2)'[2],        # [3]
-						 nbAnovcond@anova.table$'P(> Chi2)'[2],    # [4]	 
-						 nbAIC0,       # [5:6]	 
-						 nbAICgb,      # [7:8]
-						 nbAIC,        # [9:10]	 
-						 nbAICcond,    # [11:12]
-						 
-						 nbCode0,      # [13:14]
-						 nbCodegb,     # [15:16]
-						 nbCode,       # [17:18]
-						 nbCodecond,   # [19:20]
-						 
-						 nbSingHes0,   # [21:22]
-						 nbSingHesgb,  # [23:24]
-						 nbSingHes,    # [25:26]
-						 nbSingHescond)# [27:28]
-	return(rslts)  
+  ## binomial negative model, with phi DSS
+  nbglmA <- negbin(counts~cond + path, data=eventdata, random=~1, 
+                   fixpar=list(4, phiDSS))
+  nbglmI <- negbin(counts~cond * path, data=eventdata, random=~1, 
+                   fixpar=list(5, phiDSS))
+  
+  nbAnov <- anova(nbglmA, nbglmI)
+  nbAIC <- c(AIC(nbglmA, k=log(nbAll))@istats$AIC, 
+             AIC(nbglmI, k=log(nbAll))@istats$AIC)
+  nbSingHes <- c(nbglmA@singular.hessian, nbglmI@singular.hessian)
+  nbCode <- c(nbglmA@code, nbglmI@code)
+  
+  rslts <- c(1,       # [1]
+             1,      # [2]
+             nbAnov@anova.table$'P(> Chi2)'[2],        # [3]
+             1,    # [4]	 
+             c(9000,9000),       # [5:6] nbAIC0 
+             c(9000,9000),      # [7:8] nbAICgb
+             nbAIC,        # [9:10] nbAIC
+             c(9000,9000),    # [11:12] nbAICcond
+             
+             c(0,0),      # [13:14]
+             c(0,0),     # [15:16]
+             nbCode,       # [17:18]
+             c(0,0),   # [19:20]
+             
+             c(0,0),   # [21:22]
+             c(0,0),  # [23:24]
+             nbSingHes,    # [25:26]
+             c(0,0))# [27:28]
+  return(rslts)  
 }
 
 
