@@ -270,6 +270,16 @@
 			psiInfo <- NULL
 		}
 	}
+  
+  if("*"%in%conditions){
+    toRm <- which(conditions=="*")
+    countsEvents <- countsEvents[,-(toRm+2)]
+    conditions <- conditions[-toRm]
+    if(!is.null(psiInfo)) {
+      psiInfo <- psiInfo[,-(toRm+1)]
+    }
+  }
+  
 	sortedconditions <- sort(conditions)
 	n <- length(unique(sortedconditions))
 	nr <- rle(sortedconditions)$lengths
