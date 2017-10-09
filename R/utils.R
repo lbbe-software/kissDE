@@ -505,16 +505,31 @@
 	## the counts matrix
 	dataNormCountsEvent <- as.matrix(dataPart2[, 3:ncol(dataPart2)])
 	colnames(dataNormCountsEvent) <- seq_len(ncol(dataNormCountsEvent))
-	designs <- data.frame(condition=rep(rep(c("C1","C2"),nr),2), 
-	                      path=c(rep("U",sum(nr)),rep("L",sum(nr))))
-	designs <- model.matrix(~condition+path, data=designs)
-	dispData <- newSeqCountSet(dataNormCountsEvent, as.data.frame(designs), 
-	                           normalizationFactor = rep(1, 2*nbAll))
+	
+	# We select the variant with the largest number of reads
+	dataNormCountsEvent1variant <- matrix(nrow=nrow(dataNormCountsEvent), ncol=nbAll)
+	rownames(dataNormCountsEvent1variant) <- rownames(dataNormCountsEvent)
+	colnames(dataNormCountsEvent1variant) <- 1:nbAll
+	for(i in c(1:nrow(dataNormCountsEvent))){
+	  current <- dataNormCountsEvent[i,]
+	  sumUp <- sum(current[1:(sum(nr))])
+	  sumLow <- sum(current[(sum(nr)+1):(2*sum(nr))])
+	  if(sumUp>=sumLow) {
+	    dataNormCountsEvent1variant[i,] <- current[1:(sum(nr))]
+	  }
+	  else {
+	    dataNormCountsEvent1variant[i,] <- current[(sum(nr)+1):(2*sum(nr))]
+	  }
+	}
+	
+	designs <- rep(c(0,1),nr)
+	dispData <- newSeqCountSet(dataNormCountsEvent1variant, as.data.frame(designs), 
+	                           normalizationFactor = rep(1, nbAll))
 	## fix the seed to avoid the stochastic outputs of the 
 	## DSS:estDispersion function
 	set.seed(40)
 	dispData <- estDispersion(dispData)
-	hist(dispersion(dispData))
+	#hist(dispersion(dispData))
 	names(exprs(dispData)) <- rownames(dataPart2)
 	
 	###################################################
