@@ -418,7 +418,7 @@
 
 
 
-.modelFit <-function(countsData, n, nr, ASSBinfo, filterLowCountsVariants){
+.modelFit <-function(countsData, n, nr, ASSBinfo, filterLowCountsVariants, techRep){
 	##################################################
 	## code chunk number 1: event-list
 	##################################################
@@ -544,15 +544,29 @@
 	### code chunk number 6: pALLGlobalPhi.glm.nb
 	###################################################
 	pALLGlobalPhiGlmNb <- data.frame(t(rep(NA, 28)))
-	for (i in seq_along(allEventtables)) {
-		pALLGlobalPhiGlmNb[i, ] <- 
-			try(.fitNBglmModelsDSSPhi(allEventtables[[i]], 
-																dispersion(dispData)[i], 
-																dispersion(dispData)[i], 
-																phi, 
-																nbAll), 
-					silent=TRUE)
+	if(techRep) {
+	  for (i in seq_along(allEventtables)) {
+	    pALLGlobalPhiGlmNb[i, ] <- 
+	      try(.fitNBglmModelsDSSPhi(allEventtables[[i]], 
+	                                0, 
+	                                0, 
+	                                phi, 
+	                                nbAll), 
+	          silent=TRUE)
+	  }
 	}
+	else {
+	  for (i in seq_along(allEventtables)) {
+	    pALLGlobalPhiGlmNb[i, ] <- 
+	      try(.fitNBglmModelsDSSPhi(allEventtables[[i]], 
+	                                dispersion(dispData)[i], 
+	                                dispersion(dispData)[i], 
+	                                phi, 
+	                                nbAll), 
+	          silent=TRUE)
+	  }
+	}
+	
 	
 	###################################################
 	### code chunk number 7: excl_errors
