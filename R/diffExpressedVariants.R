@@ -1,6 +1,7 @@
 diffExpressedVariants <- function(countsData, conditions, pvalue=1, 
 																	filterLowCountsVariants=10, 
-																	flagLowCountsConditions=10) {
+																	flagLowCountsConditions=10,
+																	technicalReplicates=FALSE) {
 	
 	options(warn=-1)  # suppress the warning for the users
 	
@@ -36,7 +37,8 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 		}
 		message("Trying to fit models on data...")
 		chunk1 <- tryCatch({.modelFit(chunk0$countsData, chunk0$n, chunk0$nr, 
-																	ASSBinfo, filterLowCountsVariants)
+																	ASSBinfo, filterLowCountsVariants,
+																	technicalReplicates)
 			#### chunk 1 var ####
 			## chunk1$pALLGlobalPhi.glm.nb 
 			## chunk1$sing.events
