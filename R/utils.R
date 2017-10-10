@@ -467,22 +467,15 @@
 	
 	# We select the variant with the largest number of reads
 	dataNormCountsEvent1variant <- matrix(nrow=nrow(dataNormCountsEvent), ncol=nbAll)
-	rownames(dataNormCountsEvent1variant) <- rownames(dataNormCountsEvent)
-	colnames(dataNormCountsEvent1variant) <- 1:nbAll
+	rownames(dataNormCountsEventSum) <- rownames(dataNormCountsEvent)
+	colnames(dataNormCountsEventSum) <- 1:nbAll
 	for(i in c(1:nrow(dataNormCountsEvent))){
 	  current <- dataNormCountsEvent[i,]
-	  sumUp <- sum(current[1:(sum(nr))])
-	  sumLow <- sum(current[(sum(nr)+1):(2*sum(nr))])
-	  if(sumUp>=sumLow) {
-	    dataNormCountsEvent1variant[i,] <- current[1:(sum(nr))]
-	  }
-	  else {
-	    dataNormCountsEvent1variant[i,] <- current[(sum(nr)+1):(2*sum(nr))]
-	  }
+	  dataNormCountsEventSum <- current[1:(sum(nr))]+current[(sum(nr)+1):(2*sum(nr))]
 	}
 	
 	designs <- rep(c(0,1),nr)
-	dispData <- newSeqCountSet(dataNormCountsEvent1variant, as.data.frame(designs), 
+	dispData <- newSeqCountSet(dataNormCountsEventSum, as.data.frame(designs), 
 	                           normalizationFactor = rep(1, nbAll))
 	## fix the seed to avoid the stochastic outputs of the 
 	## DSS:estDispersion function
