@@ -466,12 +466,12 @@
 	colnames(dataNormCountsEvent) <- seq_len(ncol(dataNormCountsEvent))
 	
 	# We select the variant with the largest number of reads
-	dataNormCountsEvent1variant <- matrix(nrow=nrow(dataNormCountsEvent), ncol=nbAll)
+	dataNormCountsEventSum <- matrix(nrow=nrow(dataNormCountsEvent), ncol=nbAll)
 	rownames(dataNormCountsEventSum) <- rownames(dataNormCountsEvent)
 	colnames(dataNormCountsEventSum) <- 1:nbAll
 	for(i in c(1:nrow(dataNormCountsEvent))){
 	  current <- dataNormCountsEvent[i,]
-	  dataNormCountsEventSum <- current[1:(sum(nr))]+current[(sum(nr)+1):(2*sum(nr))]
+	  dataNormCountsEventSum[i,] <- current[1:(sum(nr))]+current[(sum(nr)+1):(2*sum(nr))]
 	}
 	
 	designs <- rep(c(0,1),nr)
