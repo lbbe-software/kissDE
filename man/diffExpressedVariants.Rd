@@ -9,7 +9,8 @@ data.}
 
 \usage{
 diffExpressedVariants(countsData, conditions, pvalue = 1, 
-filterLowCountsVariants = 10, flagLowCountsConditions = 10)
+filterLowCountsVariants = 10, flagLowCountsConditions = 10,
+technicalReplicates = FALSE)
 }
 
 
@@ -37,6 +38,9 @@ which we flag events as 'lowCounts' in the final data frame. This column aims
 to help seeing which event (variant 1 counts + variant 2 counts) has low
 counts (< \code{flagLowCountsBoundary = 10}) for at least n-1 conditions
 (over n).}
+
+\item{technicalReplicates}{a boolean value indicating if the \code{countsData}
+are from technical replicates.}
 }
 
 
