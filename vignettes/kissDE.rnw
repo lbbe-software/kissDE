@@ -36,7 +36,7 @@ options(digits=3, width=80, prompt=" ", continue=" ")
 % \hypersetup{pdfborder={0 0 0}}
 
 
-\bioctitle{kissDE Reference Manual}
+\bioctitle{The 'kissDE' package}
 
 \author[1]{Clara Benoit-Pilven}
 \author[2]{Camille Marchet}
