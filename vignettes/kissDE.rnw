@@ -184,8 +184,9 @@ It must be a data frame with:
 \label{subsubsec:input_ks}
 \kde~can also deal with \kp~output, which is in fasta format.
 Below is an example of the four first lines of a \kde~output:
-<<kissplice_format, echo=TRUE, keep.source=FALSE>>=
-headfasta <- system.file("extdata", "head_output_kissplice_alt_splicing_fasta.txt", package="kissDE")
+<<kissplice_format, echo=TRUE, keep.source=TRUE>>=
+headfasta <- system.file("extdata", 
+    "head_output_kissplice_alt_splicing_fasta.txt", package = "kissDE")
 writeLines(readLines(headfasta))
 @
 
