@@ -9,8 +9,8 @@ data.}
 
 \usage{
 diffExpressedVariants(countsData, conditions, pvalue = 1, 
-filterLowCountsVariants = 10, flagLowCountsConditions = 10,
-technicalReplicates = FALSE)
+    filterLowCountsVariants = 10, flagLowCountsConditions = 10,
+    technicalReplicates = FALSE)
 }
 
 
@@ -94,6 +94,13 @@ first condition and 2 replicates in the second one has a length of 4
 An unbalanced experimental design defined by 2 replicates in the first
 condition and 3 replicates in the second one has a length of 5 
 (\code{NCR} = 5). 
+}
+
+\references{
+Lopez-Maestre et al., 2016. Snp calling from rna-seq data without a reference genome:
+identification, quantification, differential analysis and impact on the protein sequence.
+\emph{Nucleic Acids Research}, \bold{44}(19):e148. 
+\url{https://doi.org/10.1093/nar/gkw655}
 }
 
 \examples{
