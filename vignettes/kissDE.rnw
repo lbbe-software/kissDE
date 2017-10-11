@@ -336,11 +336,12 @@ myResults <- diffExpressedVariants(countsData = myCounts,
     conditions = myConditions)
 @
 
-The \Rfunction{diffExpressedVariants} function has three other parameters to change the filters or the flags applied on data:
+The \Rfunction{diffExpressedVariants} function has three other parameters to change the filters or the flags applied on data, and one other parameter to indicate if the data are from technical replicates:
 \begin{itemize}
   \item \Rcode{pvalue}: By default, the p-value threshold to output the significant events is set to 1. So all variants are output in the final table. This parameter must be a numeric value between 0 and 1. Be aware that by setting \Rcode{pvalue} to 0.05, only events that have been identified as significant between the conditions with a false discovery rate (FDR) > 5\% will be present in the final table. If you wish to change this threshold, you will need to recompute everything.
   \item \Rcode{filterLowCountsVariants}: This parameter allows to change the threshold to filter low expressed events before testing (as explained in section \ref{subsec:filter}). By default, it is set to 10.
   \item \Rcode{flagLowCountsConditions}: This parameter allows to change the threshold to flag low expressed events (as explained in section \ref{subsec:flag}). By default, it is set to 10.
+  \item \Rcode{technicalReplicates}: boolean value indicating if the user is working with technical replicates. By default, this option is set to FALSE.
 \end{itemize}
 
 The \Rfunction{diffExpressedVariants} function returns a list of 6 objects:
