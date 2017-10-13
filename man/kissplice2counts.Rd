@@ -59,17 +59,16 @@ It is valid to use the \code{kissplice2counts} function only if the
 \code{counts} option is at 2 as the information about junction and exonic
 reads is needed.}
 
-\item{k2rg}{a logical indicating if you are using 
-\code{KisSplice2RefGenome}'s output file instead of \code{KisSplice}'s file}
+\item{k2rg}{a logical indicating if \code{KisSplice2RefGenome}'s output file 
+is used instead of \code{KisSplice}'s file}
 
 \item{keep}{a character vector indicating the names of the events to keep for
 the statistical test. The test will be more sensitive for those events, the
 other ones will not be tested.
 Event(s) name(s) must be: deletion, insertion, IR, ES, altA, altD, altAD, 
-alt, unclassified, unclassifiedSNP, -. If you only want to work with intron
-retention events and altAD events, the vector should be 
-\code{keep = c("IR","altAD")}.
-If you want to work on specific ES events (i.e., ES_MULTI), the vector should
+alt, unclassified, unclassifiedSNP, -. To only work with intron retention 
+events and altAD events, the vector should be \code{keep = c("IR","altAD")}.
+To work on specific ES events (i.e., ES_MULTI), the vector should
 be \code{keep = c("ES")} and the \code{remove} option should be used too.
 By default, all events are kept. This option works only when \code{k2rg}
 option is set to \code{TRUE}.}
@@ -77,13 +76,13 @@ option is set to \code{TRUE}.}
 \item{remove}{a character vector indicating the names of the events to remove
 for the statistical test. The test will be more sensitive for the other
 events. Event(s) name(s) must be: deletion, insertion, IR, ES, altA, altD,
-altAD, alt, unclassified, unclassifiedSNP, -, MULTI. If you want to work on
+altAD, alt, unclassified, unclassifiedSNP, -, MULTI. To work on 
 all events except insertions and deletions, the vector should be 
 \code{remove = c("insertion","deletion")}.
 This option can not be used if the \code{keep} option is used, unless ES is
 one of the event(s) to be kept. In this case, the \code{remove} option will
-work on specific ES events. If you want to work on ES_MULTI, then you should
-do \code{keep=c("ES")} with \code{remove = c("alt","altA","altD","altAD")}.
+work on specific ES events. To work on ES_MULTI, \code{keep} should be set to
+\code{c("ES")} with \code{remove = c("alt","altA","altD","altAD")}.
 By default, not any events are removed.
 This option works only when \code{k2rg} option is set to \code{TRUE}.}
 }
@@ -100,11 +99,11 @@ containing the counts corresponding to the replicates of the conditions.}
 containing the name of the event based on \code{KisSplice} notation, as in
 the first column of the \code{countsEvents} output.}
 
-\item{exonicReadsInfo}{a logical indicating if you are using exonicReads.}
+\item{exonicReadsInfo}{a logical indicating if \code{exonicReads} is used.}
 
 \item{k2rgFile}{a string containing the \code{KisSplice2RefGenome} file's
-name. If you are working with a file coming from KisSplice and not 
-\code{KisSplice2RefGenome}, this object is equal to NULL.}
+name. It is equal to NULL if the input file comes from KisSplice and not from
+\code{KisSplice2RefGenome}.}
 }
 
 

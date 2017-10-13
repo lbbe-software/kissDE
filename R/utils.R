@@ -284,8 +284,8 @@
 	nr <- rle(sortedconditions)$lengths
 	## if at least 1 condition does not contain replicates, stop the analysis
 	if (length(nr[nr == 1]) > 0){
-		stop("Your data does not contain replicates for all conditions. 
-    		 Please change your input data and relaunch.")
+		stop("The data does not contain replicates for all conditions. 
+    		 Please change the input data and relaunch.")
 	}
 	sortedindex <- order(conditions) + 2
 	namesData <- c("ID", "Length", rep(NA, length(conditions)))

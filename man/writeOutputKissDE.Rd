@@ -13,13 +13,13 @@ of the variation, the variable part length, the counts of each variant for
 each conditions, the adjusted p-value, the deltaPSI and a boolean indicating 
 if the splicing event/SNV was correctly cover by reads.
 
-If you were working with a \code{KisSplice2RefGenome} file, this function will
+If a \code{KisSplice2RefGenome} file is used, this function will
 add five columns to the \code{KisSplice2RefGenome}'s file, containing the
 following \code{KissDE} results: normalized counts, normalized PSI, adjusted 
 p-value, deltaPSI, warnings.
 
-If you want to write the table containing the PSI/f values, you should set
-\code{writePSI} to \code{TRUE}. 
+\code{writePSI} must be set to \code{TRUE} to write the table containing the 
+PSI/f values.
 }
 
 
