@@ -15,7 +15,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 		find <- paste("find", pathToFigs)
 		d <- system(find, TRUE, ignore.stderr=TRUE)
 		if (length(d) == 0) { 
-			command <- paste("mkdir", pathToFigs)
+			command <- paste("mkdir -p", pathToFigs)
 			system(command, ignore.stderr=TRUE)
 		}
 	}
