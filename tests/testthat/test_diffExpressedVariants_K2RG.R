@@ -7,7 +7,6 @@ test_that("diffExpressedVariants function works as expected on kissplice2refgeno
   diffSplicing <- diffExpressedVariants(mySplicingcounts, mySplicingconditions)
   expect_equal(names(diffSplicing), c("finalTable", "correctedPVal", "uncorrectedPVal", "resultFitNBglmModel", "f/psiTable", "k2rgFile"))
   expect_equal(dim(diffSplicing$finalTable)[2], 13)
-  expect_equal(dim(diffSplicing$finalTable)[1], dim(mySplicingcounts$countsEvents)[1]/2)
   expect_equal(dim(diffSplicing$finalTable)[1], length(diffSplicing$correctedPVal))
   expect_equal(dim(diffSplicing$finalTable)[1], dim(diffSplicing$`f/psiTable`)[1])
   expect_equal(names(diffSplicing$correctedPVal), names(diffSplicing$uncorrectedPVal))

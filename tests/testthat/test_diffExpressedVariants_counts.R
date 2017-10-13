@@ -7,7 +7,6 @@ test_that("diffExpressedVariants function works as expected on count file", {
   diff <- diffExpressedVariants(tableCounts, conditions)
   expect_equal(names(diff), c("finalTable", "correctedPVal", "uncorrectedPVal", "resultFitNBglmModel", "f/psiTable", "k2rgFile"))
   expect_equal(dim(diff$finalTable)[2], 13)
-  expect_equal(dim(diff$finalTable)[1], dim(tableCounts)[1]/2)
   expect_equal(dim(diff$finalTable)[1], length(diff$correctedPVal))
   expect_equal(dim(diff$finalTable)[1], dim(diff$`f/psiTable`)[1])
   expect_equal(names(diff$correctedPVal), names(diff$uncorrectedPVal))

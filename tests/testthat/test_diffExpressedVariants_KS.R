@@ -7,7 +7,6 @@ test_that("diffExpressedVariants function works as expected on kissplice fasta f
   diffSNV <- diffExpressedVariants(mySNVcounts, mySNVconditions)
   expect_equal(names(diffSNV), c("finalTable", "correctedPVal", "uncorrectedPVal", "resultFitNBglmModel", "f/psiTable", "k2rgFile"))
   expect_equal(dim(diffSNV$finalTable)[2], 13)
-  expect_equal(dim(diffSNV$finalTable)[1], dim(mySNVcounts$countsEvents)[1]/2)
   expect_equal(dim(diffSNV$finalTable)[1], length(diffSNV$correctedPVal))
   expect_equal(dim(diffSNV$finalTable)[1], dim(diffSNV$`f/psiTable`)[1])
   expect_equal(names(diffSNV$correctedPVal), names(diffSNV$uncorrectedPVal))
