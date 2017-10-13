@@ -1,0 +1,17 @@
+context("diffExpressedVariants_K2RG")
+test_that("diffExpressedVariants function works as expected on kissplice2refgenome file", {
+  # test on kissplice2refgenome file
+  fpath2 <- system.file("extdata", "output_k2rg_alt_splicing.txt", package = "kissDE")
+  mySplicingcounts <- kissplice2counts(fpath2, pairedEnd = TRUE, k2rg = TRUE, counts = 2, exonicReads = FALSE)
+  mySplicingconditions <- c("C1", "C1", "C2", "C2")
+  diffSplicing <- diffExpressedVariants(mySplicingcounts, mySplicingconditions)
+  expect_equal(names(diffSplicing), c("finalTable", "correctedPVal", "uncorrectedPVal", "resultFitNBglmModel", "f/psiTable", "k2rgFile"))
+  expect_equal(dim(diffSplicing$finalTable)[2], 13)
+  expect_equal(dim(diffSplicing$finalTable)[1], dim(mySplicingcounts$countsEvents)[1]/2)
+  expect_equal(dim(diffSplicing$finalTable)[1], length(diffSplicing$correctedPVal))
+  expect_equal(dim(diffSplicing$finalTable)[1], dim(diffSplicing$`f/psiTable`)[1])
+  expect_equal(names(diffSplicing$correctedPVal), names(diffSplicing$uncorrectedPVal))
+  expect_equal(names(diffSplicing$correctedPVal), rownames(diffSplicing$resultFitNBglmModel))
+  matches(diffSplicing$k2rgFile, "output_k2rg_alt_splicing.txt")
+  # TODO : tests the final results -> number of significants events...
+})
