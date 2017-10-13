@@ -18,7 +18,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 	    stop(err)
 	})
 	
-	if (!is.na(chunk0)) {  # no error in chunk 0
+	if (!is.na(chunk0[1])) {  # no error in chunk 0
 		## in case counts option in kissplice2counts is at 1 or 2, 
 		## we have info about junction counts (ASSB), 
 		## that will be useful to correct the computation of delta psi in the end.
@@ -54,7 +54,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 		chunk1 <- NA
 	}
 	
-	if (!is.na(chunk1)) {  # no error in chunk 1 nor in chunk 0
+	if (!is.na(chunk1[1])) {  # no error in chunk 1 nor in chunk 0
 		message("Computing pvalues...")
 		chunk2 <- tryCatch({.bestModelandSingular(chunk1$pALLGlobalPhi.glm.nb, 
 																							chunk1$sing.events, 
@@ -75,7 +75,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 		chunk2 <- NA
 	}
 	
-	if (!is.na(chunk2)) {  # no error during chunk1
+	if (!is.na(chunk2[1])) {  # no error during chunk1
 		if (length(chunk2) > 2) {  # no error during chunk2
 			message("Computing size of the effect and last cutoffs...")
 			chunk3 <- tryCatch({
