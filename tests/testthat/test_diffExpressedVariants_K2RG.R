@@ -12,5 +12,6 @@ test_that("diffExpressedVariants function works as expected on kissplice2refgeno
   expect_equal(names(diffSplicing$correctedPVal), names(diffSplicing$uncorrectedPVal))
   expect_equal(names(diffSplicing$correctedPVal), rownames(diffSplicing$resultFitNBglmModel))
   matches(diffSplicing$k2rgFile, "output_k2rg_alt_splicing.txt")
-  # TODO : tests the final results -> number of significants events...
+  expect_equal(dim(diffSplicing$finalTable[which(diffSplicing$finalTable$Adjusted_pvalue <= 0.05),])[1], 18)
+  expect_equal(diffSplicing$finalTable[which(diffSplicing$finalTable$ID == "bcc_83285|Cycle_2"), "Deltaf/DeltaPSI"], -0.8042)
 })

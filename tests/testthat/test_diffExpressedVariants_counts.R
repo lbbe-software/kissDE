@@ -12,6 +12,7 @@ test_that("diffExpressedVariants function works as expected on count file", {
   expect_equal(names(diff$correctedPVal), names(diff$uncorrectedPVal))
   expect_equal(names(diff$correctedPVal), rownames(diff$resultFitNBglmModel))
   expect_null(diff$k2rgFile)
-  # TODO : tests the final results -> number of significants events...
+  expect_equal(dim(diff$finalTable[which(diff$finalTable$Adjusted_pvalue <= 0.05),])[1], 17)
+  expect_equal(diff$finalTable[which(diff$finalTable$ID == "event1"), "Deltaf/DeltaPSI"], -0.7752)
 })
   

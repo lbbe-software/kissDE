@@ -12,5 +12,6 @@ test_that("diffExpressedVariants function works as expected on kissplice fasta f
   expect_equal(names(diffSNV$correctedPVal), names(diffSNV$uncorrectedPVal))
   expect_equal(names(diffSNV$correctedPVal), rownames(diffSNV$resultFitNBglmModel))
   expect_null(diffSNV$k2rgFile)
-  # TODO : tests the final results -> number of significants events...
+  expect_equal(dim(diffSNV$finalTable[which(diffSNV$finalTable$Adjusted_pvalue <= 0.05),])[1], 20)
+  expect_equal(diffSNV$finalTable[which(diffSNV$finalTable$ID == "bcc_44787|Cycle_320265"), "Deltaf/DeltaPSI"], 0.9258)
 })
