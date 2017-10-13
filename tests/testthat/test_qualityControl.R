@@ -1,0 +1,26 @@
+context("qualityControl")
+test_that("qualityControl work as expected", {
+  fpath1 <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
+  mySNVcounts <- kissplice2counts(fpath1, pairedEnd = TRUE)
+  mySNVconditions <- c("C1", "C1", "C2", "C2")
+  # test qualityControl without storing figures
+  qualityControl(mySNVcounts, mySNVconditions, storeFigs = FALSE)
+  expect_true(file.exists("Rplots.pdf"))
+  file.remove("Rplots.pdf")
+  # test qualityControl storing figures in the default directory
+  qualityControl(mySNVcounts, mySNVconditions, storeFigs = TRUE)
+  expect_true(file.exists("kissDEFigures/heatmap.png"))
+  expect_true(file.exists("kissDEFigures/pca.png"))
+  file.remove("kissDEFigures/heatmap.png")
+  file.remove("kissDEFigures/pca.png")
+  unlink("kissDEFigures", recursive = TRUE)
+  # test qualityControl storing figures in a path choosen by the user
+  qualityControl(mySNVcounts, mySNVconditions, storeFigs = "test/path/fig/")
+  expect_true(file.exists("test/path/fig/heatmap.png"))
+  expect_true(file.exists("test/path/fig/pca.png"))
+  file.remove("test/path/fig/heatmap.png")
+  file.remove("test/path/fig/pca.png")
+  unlink("test/path/fig", recursive = TRUE)
+  unlink("test/path", recursive = TRUE)
+  unlink("test", recursive = TRUE)
+})
