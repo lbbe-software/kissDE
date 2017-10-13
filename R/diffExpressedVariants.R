@@ -3,8 +3,6 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 																	flagLowCountsConditions=10,
 																	technicalReplicates=FALSE) {
 	
-	options(warn=-1)  # suppress the warning for the users
-	
 	message("Pre-processing the data...")
 	chunk0 <- tryCatch({.readAndPrepareData(countsData, conditions)
 		#### chunk 0 var ####

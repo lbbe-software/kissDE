@@ -1,5 +1,4 @@
 .lineParse <- function(line, indexStart, isQuality) {
-	options(warn=-1)
 	beginningLineToWrite <- ""
 	splitElements <- strsplit(line, "|", fixed=TRUE)[[1]]  ## splits the line
 	if (indexStart == 6) {

@@ -1,7 +1,5 @@
 qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 	
-	options(warn=-1)  ## suppress the warning for the users
-	
 	if (storeFigs == FALSE) {
 		pathToFigs <- NA
 	} else {
