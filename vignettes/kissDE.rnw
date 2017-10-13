@@ -77,20 +77,19 @@ The workflow for SNPs/SNVs is fully described in Lopez-Maestre et al. \cite{Lope
 \subsection{Use case}
 \kde~is meant to work on pairs of variants that have been quantified across different conditions. It can deal with single nucleotide variations (SNPs, mutations, RNA editing), indels or alternative splicing.\\
 The input count data to \kde~may come from \kp~\cite{KisSplice}, \krg~or any other software which produces count data properly formatted.
-If you use the output files from \kp~or \krg, you can directly import your counts using \Rfunction{kissplice2counts} function.\\
+If the output files from \kp~or \krg are used, the \Rfunction{kissplice2counts} function can be directly applied.\\
 The user must keep in mind that \kde~was designed to work with at least two replicates for each condition, which means that the minimal input contains the variants quantified for 4 different samples, each couple representing a condition and its 2 replicates. There can be more replicates and more conditions. It is not mandatory to have an equal number of replicates in each condition.\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Install and load \kde}
-In a \R{} session, you must first install \Bioconductor{}.
+In a \R{} session, \Bioconductor{} first be installed.
 <<installBC,eval=FALSE, fig=FALSE>>=
 source("http://bioconductor.org/biocLite.R")
 @
-Then you can install the \kde~package from \Bioconductor{}.
+Then the \kde~package can be installed from \Bioconductor{} and finally loaded.
 <<install,eval=FALSE, fig=FALSE>>=
 biocLite("kissDE")
 @
-Finally, load it.
 <<library, fig=FALSE>>=
 library(kissDE)
 @
@@ -138,21 +137,21 @@ Three options are possible, either to provide a table of counts or to work with 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Condition vector}
 \label{subsubsec:condition}
-The first item to prepare is the condition vector that describes the order of the columns in the count table. Considering an example where you have 2 conditions and 2 replicates per condition, the condition vector will be:
+The first item to prepare is the condition vector that describes the order of the columns in the count table. Considering an example where there are 2 conditions and 2 replicates per condition, the condition vector will be:
 <<conditionVector_howto, fig=FALSE, keep.source=FALSE>>=
 myConditions <- c(rep("condition_1", 2), rep("condition_2", 2))
 @
 because the counts have been input in an order that represents first the two replicates of $condition\_1$, then the two replicates of $condition\_2$.\\
 If the count table was loaded from \kp~or~\krg~output, the condition vector must contain the samples in the same order they were given to \kp~(see sections \ref{subsubsec:input_ks} and \ref{subsubsec:input_krg}).\\
 
-\warning{To run \kde, all conditions must have replicates. So each condition must at least be present twice in the condition vector. If this is not the case, you will get an error message.}
+\warning{To run \kde, all conditions must have replicates. So each condition must at least be present twice in the condition vector. If this is not the case, an error message will be printed.}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{You work with your own data (without \kp): table of counts format}
+\subsubsection{User's own data (without \kp): table of counts format}
 \label{subsubsec:input_count}
 Let's assume we work with two conditions ($condition\_1$ and $condition\_2$) and two replicates per condition.
-An input example table contained in a flat file called \file{table_counts_alt_splicing.txt} (\Robject{fpath1} contains the absolute path of the file on your hard disk) is loaded and stored in a \Robject{tableCounts} object.
+An input example table contained in a flat file called \file{table_counts_alt_splicing.txt} (\Robject{fpath1} contains the absolute path of the file on the user's hard disk) is loaded and stored in a \Robject{tableCounts} object.
 <<tablecounts_howto, fig=FALSE, keep.source=FALSE>>=
 fpath1 <- system.file("extdata", "table_counts_alt_splicing.txt", package="kissDE")
 tableCounts <- read.table(fpath1, head = TRUE)
@@ -218,7 +217,7 @@ Headers contain information used in \kde. In the example, there are:
 The user should refer to \kp~manual (\url{http://kissplice.prabi.fr/documentation/user_guide.pdf}) for further questions about \kp~format and output.\\
 
 To be used in \kde, \kp's output must be converted into a table of counts. This can be done with the \Rfunction{kissplice2counts} function.
-In the example below, a \kp's output recorded in a file called \file{output_kissplice_alt_splicing.fa} (\Robject{fpath2} contains the absolute path of the file on your hard disk) is loaded.
+In the example below, a \kp's output recorded in a file called \file{output_kissplice_alt_splicing.fa} (\Robject{fpath2} contains the absolute path of the file on the user's hard disk) is loaded.
 The table of counts yielded by the \Rfunction{kissplice2counts} function is stored in \Robject{myCounts}.
 <<kissplice2counts_howto, fig=FALSE, keep.source=FALSE>>=
 fpath2 <- system.file("extdata", "output_kissplice_alt_splicing.fa", package="kissDE")
@@ -261,7 +260,7 @@ head(myCounts$countsEvents)
 The \Rfunction{kissplice2counts} function can also deal with \krg~output data, thanks to the \Rcode{k2rg} parameter. 
 \krg~allows the annotation of the alternative splicing events. It assigns each event to the gene it maps to and to a type of alternative splicing event: Skipped Exon (ES), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (\url{ftp://pbil.univ-lyon1.fr/pub/logiciel/kissplice/tools/kissplice2refgenome_userguide.pdf}).
 
-In the example below, a \krg's output recorded in a file called \file{output_k2rg_alt_splicing.txt} (\Robject{fpath3} contains the absolute path of the file on your hard disk) is loaded.
+In the example below, a \krg's output recorded in a file called \file{output_k2rg_alt_splicing.txt} (\Robject{fpath3} contains the absolute path of the file on the user's hard disk) is loaded.
 The \Rfunction{kissplice2counts} function here uses the same \Rcode{counts} and \Rcode{pairedEnd} parameters as explained in the section \ref{subsubsec:input_ks}.
 The \Rcode{k2rg} parameter is a boolean value, set to \Rcode{TRUE} to deal with \krg~output data.
 The table of counts yielded by the \Rfunction{kissplice2counts} function in the example below is stored in \Robject{myCounts\_k2rg}.
@@ -275,7 +274,7 @@ head(myCounts_k2rg$countsEvents)
 
 
 The \krg~output contains information about the type of splicing events. 
-It is therefore possible to choose the subtype of events you want to analyse. 
+It is therefore possible to choose the subtype of events to analyse. 
 The \Rcode{keep} and \Rcode{remove} parameters of the \Rfunction{kissplice2counts} function allow to indicate the type of splicing events to analyse or to remove from the analysis. 
 These two parameters take a character vector indicating the types of events to keep or remove. 
 The events names should come from this list: \Rcode{deletion}, \Rcode{insertion}, \Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. 
@@ -339,7 +338,7 @@ myResults <- diffExpressedVariants(countsData = myCounts,
 
 The \Rfunction{diffExpressedVariants} function has three other parameters to change the filters or the flags applied on data, and one other parameter to indicate if the data are technical or biological replicates:
 \begin{itemize}
-  \item \Rcode{pvalue}: By default, the p-value threshold to output the significant events is set to 1. So all variants are output in the final table. This parameter must be a numeric value between 0 and 1. Be aware that by setting \Rcode{pvalue} to 0.05, only events that have been identified as significant between the conditions with a false discovery rate (FDR) $\leqslant$ 5\% will be present in the final table. If you wish to change this threshold, you will need to recompute everything.
+  \item \Rcode{pvalue}: By default, the p-value threshold to output the significant events is set to 1. So all variants are output in the final table. This parameter must be a numeric value between 0 and 1. Be aware that by setting \Rcode{pvalue} to 0.05, only events that have been identified as significant between the conditions with a false discovery rate (FDR) $\leqslant$ 5\% will be present in the final table. 
   \item \Rcode{filterLowCountsVariants}: This parameter allows to change the threshold to filter low expressed events before testing (as explained in section \ref{subsec:filter}). By default, it is set to 10.
   \item \Rcode{flagLowCountsConditions}: This parameter allows to change the threshold to flag low expressed events (as explained in section \ref{subsec:flag}). By default, it is set to 10.
   \item \Rcode{technicalReplicates}: boolean value indicating if the user is working with technical replicates. By default, this option is set to \Rcode{FALSE}.
@@ -561,7 +560,7 @@ The $\Delta$PSI/$\Delta$f is computed as follows:
 \begin{itemize}
   \item First, individual (per replicate) PSI/f are calculated. If counts for both upper and lower paths are too low ($<10$) after normalization, the individual PSI/f is not computed.
   \item Then mean PSI/f are computed for each condition. If more than half of individual PSI/f were not calculated at the previous step, the mean PSI/f is not computed.
-  \item Finally, we output $\Delta$PSI/$\Delta$f. Unless one of the mean PSI/f of a condition could not be estimated, $\Delta$PSI/$\Delta$f is calculated subtracting one condition PSI/f from another. This does not always follow the order of the conditions you entered in the first place. To know the order, you must report to the output file. $\Delta$PSI/$\Delta$f are calculated subtracting the first condition appearing in the header from the one after. $\Delta$PSI/$\Delta$f absolute value vary between 0 and 1, with values close to 0 indicating low effects and values close to 1 strong effects.
+  \item Finally, we output $\Delta$PSI/$\Delta$f. Unless one of the mean PSI/f of a condition could not be estimated, $\Delta$PSI/$\Delta$f is calculated subtracting one condition PSI/f from another. This does not always follow the order of the conditions the user entered in the first place. To know the order, the output file must be consulted. $\Delta$PSI/$\Delta$f are calculated subtracting the first condition appearing in the header from the one after. $\Delta$PSI/$\Delta$f absolute value vary between 0 and 1, with values close to 0 indicating low effects and values close to 1 strong effects.
 \end{itemize}
 
 % TODO: size correction
@@ -622,7 +621,7 @@ This information is particularly important in \kde~since it represents the count
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Load data}
-The first step is to convert this fasta file (here called \file{output_kissplice_SNV.fa}, available at the \Robject{fileIn} path in your hard disk) into a format that will be used in \kde's main functions, thanks to the \Rfunction{kissplice2counts} function. 
+The first step is to convert this fasta file (here called \file{output_kissplice_SNV.fa}, available at the \Robject{fileIn} path in the user's hard disk) into a format that will be used in \kde's main functions, thanks to the \Rfunction{kissplice2counts} function. 
 Due to paired-end RNA-Seq data, the \Rcode{pairedEnd} parameter was set to \Rcode{TRUE}.
 
 This conversion in a table of counts is stored in a \Robject{myCounts\_SNV} object (for a detailed description of its structure, see section \ref{subsubsec:input_ks}) and can be done as follows:
@@ -716,7 +715,7 @@ print(head(exampleK2RG[,c(1:10)], 3), row.names = FALSE)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Load data}
-The \Rfunction{kissplice2counts} function allows to transform this text file (here called \file{output_k2rg_alt_splicing.txt}, available at the \Robject{fileInAS} path in your hard disk) into a format compatible with \kde's main functions. 
+The \Rfunction{kissplice2counts} function allows to transform this text file (here called \file{output_k2rg_alt_splicing.txt}, available at the \Robject{fileInAS} path in the user's hard disk) into a format compatible with \kde's main functions. 
 As these samples are paired-end, the \Rcode{pairedEnd} parameter is set to \Rcode{TRUE}.
 The \Rcode{k2rg} parameter must be set to \Rcode{TRUE} to indicate that the file comes from \krg~and not directly from \kp. 
 The \Rcode{counts} parameter must be set to the same value (i.e., 2) used in \kp~and \krg~to indicate which counts are given in input.
