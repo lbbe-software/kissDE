@@ -69,7 +69,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 			margins=c(10, 10), cexRow=1, cexCol=1, density.info="none", trace="none")
 		par(ask=TRUE)
 	} else {
-		filename <- paste(storeFigs, "/heatmap.png", sep="")
+		filename <- paste(pathToFigs, "/heatmap.png", sep="")
 		png(filename)
 		heatmap.2(as.matrix(as.dist(1 - cor(
 			countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))), 
@@ -99,7 +99,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 		legend("bottom", legend=levels(fac), xpd=TRUE, horiz=TRUE, inset=c(0, 0), 
 					 bty="n", pch=20, col=colors)
 	} else {
-		filename <- paste(storeFigs, "/pca.png", sep="")
+		filename <- paste(pathToFigs, "/pca.png", sep="")
 		png(filename)
 		par(oma=c(2, 1, 1, 1))
 		plot(PC2~PC1, data=as.data.frame(pca$x), bg=colors[fac], pch=21, 
