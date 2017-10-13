@@ -108,7 +108,7 @@ counts <- kissplice2counts("output_kissplice.fa")
 conditions <- c(rep("condition_1", 2), rep("condition_2", 2))
 qualityControl(counts, conditions)
 results <- diffExpressedVariants(counts, conditions)
-writeOutputKissDE(results, adjPvalMax = 0.05, dPSImin = 0.1, output = "kissDE_output.tab")
+writeOutputKissDE(results, output = "kissDE_output.tab")
 @
 
 
@@ -183,7 +183,7 @@ It must be a data frame with:
 \subsubsection{Input table from \kp~output}
 \label{subsubsec:input_ks}
 \kde~can also deal with \kp~output, which is in fasta format.
-Below is an example of the four first lines of a \kde~output:
+Below is an example of the four first lines of a \kp~output:
 <<kissplice_format, echo=TRUE, keep.source=TRUE>>=
 headfasta <- system.file("extdata", 
     "head_output_kissplice_alt_splicing_fasta.txt", package = "kissDE")
@@ -198,12 +198,12 @@ Headers contain information used in \kde. In the example, there are:
 \item elements shared by the headers of the two variants:
 \begin{itemize}
   \item \Rcode{bcc\_68965|Cycle\_4} is the event's ID.
-  \item \Rcode{Type\_1} means that the sequences correspondto a splicing event. \Rcode{Type\_0} would correspond to SNVs.
+  \item \Rcode{Type\_1} means that the sequences correspond to a splicing event. \Rcode{Type\_0} would correspond to SNVs.
 \end{itemize}
 \item elements that are specific to a variant:
 \begin{itemize}
   \item \Rcode{upper\_path\_length\_112} and \Rcode{lower\_path\_length\_82} gives the length of the nucleotide sequences. Upper path and lower path are a denomination for the representation of each variant in \kp's graph. For alternative splicing events, the upper path represents the inclusion isoform and the lower path the exclusion isoform.
-  \item \Rcode{AS1\_1|SB1\_1|S1\_0|ASSB1\_0|...} and \Rcode{AB1\_21|AB2\_12|AB3\_12|AB4\_2|AB5\_5|...} summarizes the counts found by \kp~during the step where reads are used to perform quantification of each variant detected. Here \kp~was run with the option \Rcode{counts} set to 2. For the upper path, we have 4 counts for each sample (the different reads categories are shown on Figure \ref{fig:readstype}), and for the lower path, we have 1 count per sample. There are 8 sets of counts because we gave 8 files in input to \kp. Each count corresponds to the reads coming from each file that could be mapped on the variant, in the order they have been passed to \kp.
+  \item \Rcode{AS1\_1|SB1\_1|S1\_0|ASSB1\_0|...} and \Rcode{AB1\_21|AB2\_12|AB3\_12|AB4\_2|AB5\_5|...} summarize the counts found by \kp~during the step where reads are used to perform quantification of each variant detected. Here \kp~was run with the option \Rcode{counts} set to 2. For the upper path, we have 4 counts for each sample (the different reads categories are shown on Figure \ref{fig:readstype}), and for the lower path, we have 1 count per sample. There are 8 sets of counts because we gave 8 files in input to \kp. Each count corresponds to the reads coming from each file that could be mapped on the variant, in the order they have been passed to \kp.
 \end{itemize}
 \item a rank information which is a deprecated measure.
 \end{itemize}
@@ -337,9 +337,9 @@ myResults <- diffExpressedVariants(countsData = myCounts,
     conditions = myConditions)
 @
 
-The \Rfunction{diffExpressedVariants} function has three other parameters to change the filters or the flags applied on data, and one other parameter to indicate if the data are from technical replicates:
+The \Rfunction{diffExpressedVariants} function has three other parameters to change the filters or the flags applied on data, and one other parameter to indicate if the data are technical or biological replicates:
 \begin{itemize}
-  \item \Rcode{pvalue}: By default, the p-value threshold to output the significant events is set to 1. So all variants are output in the final table. This parameter must be a numeric value between 0 and 1. Be aware that by setting \Rcode{pvalue} to 0.05, only events that have been identified as significant between the conditions with a false discovery rate (FDR) > 5\% will be present in the final table. If you wish to change this threshold, you will need to recompute everything.
+  \item \Rcode{pvalue}: By default, the p-value threshold to output the significant events is set to 1. So all variants are output in the final table. This parameter must be a numeric value between 0 and 1. Be aware that by setting \Rcode{pvalue} to 0.05, only events that have been identified as significant between the conditions with a false discovery rate (FDR) $\leqslant$ 5\% will be present in the final table. If you wish to change this threshold, you will need to recompute everything.
   \item \Rcode{filterLowCountsVariants}: This parameter allows to change the threshold to filter low expressed events before testing (as explained in section \ref{subsec:filter}). By default, it is set to 10.
   \item \Rcode{flagLowCountsConditions}: This parameter allows to change the threshold to flag low expressed events (as explained in section \ref{subsec:flag}). By default, it is set to 10.
   \item \Rcode{technicalReplicates}: boolean value indicating if the user is working with technical replicates. By default, this option is set to \Rcode{FALSE}.
@@ -350,7 +350,7 @@ The \Rfunction{diffExpressedVariants} function returns a list of 6 objects:
 names(myResults)
 @
 The \Rcode{uncorrectedPVal} and \Rcode{correctedPval} outputs are numeric vectors containing p-values before and after correction for multiple testing.
-\Rcode{resultFitNBglmModel} is a data frame containing the results of the fitting of models to the data.
+\Rcode{resultFitNBglmModel} is a data frame containing the results of the fitting of the model to the data.
 \Rcode{k2rgFile} is a string containing either the \krg~file path and name or NULL if no \krg~file was used as input.
 For explanations about the \Rcode{finalTable} and \Rcode{f/psiTable} outputs, see respectively section \ref{subsubsec:finaltable} and section \ref{subsubsec:psitable}.\\
 
@@ -402,7 +402,7 @@ writeOutputKissDE(myResults, output = "results_table.tab")
 @
 
 Users can choose to export only events passing some thresholds on adjusted p-value and/or Deltaf/DeltaPSI using the options \Rcode{adjPvalMax} and \Rcode{dPSImin} of the \Rfunction{writeOutputKissDE} function. 
-For example, if we want to save in a file called \file{results_table_filtered.tab} only events with the adjusted p-value < 0.05 and the Deltaf/DeltaPSI absolute value > 0.10, the following command can be used:
+For example, if we want to save in a file called \file{results_table_filtered.tab} only events with the adjusted p-value $\leqslant$ 0.05 and the Deltaf/DeltaPSI absolute value $\geqslant$ 0.10, the following command can be used:
 <<finaltable_thresholds_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults, output = "results_table_filtered.tab", adjPvalMax = 0.05, dPSImin = 0.10)
 @
@@ -418,14 +418,14 @@ writeOutputKissDE(myResults_K2RG, output = "merge_K2RG_results_table.tab", adjPv
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{f/PSI table}
 \label{subsubsec:psitable}
-The \Rcode{f/psiTable} output of the \Rfunction{diffExpressedVariants} function contains the f values for SNV analysis and PSI values for alternative splicing analysis (see details and computation in section \ref{subsec:psi}) for each event in each sample.
+The \Rcode{f/psiTable} output of the \Rfunction{diffExpressedVariants} function contains the f values for SNV analysis or PSI values for alternative splicing analysis (see details and computation in section \ref{subsec:psi}) for each event in each sample.
 The first three rows of the \Rcode{f/psiTable} output of the \Robject{myResults} object (created in the section \ref{subsec:diffanalysis}) look like this:
 <<fPSItable_description, fig=FALSE, echo=FALSE, keep.source=FALSE>>=
 head(myResults$`f/psiTable`, n = 3)
 @
 
 This output can be useful to carry out downstream analysis or to produce specific plots (like heatmap on f/PSI events). 
-To use this information with external tools, this table can be saved in a tab-delimited file (here called \file{result_PSI.tab}), setting the \Rcode{writePSI} parameter to \Rcode{TRUE}:
+To use this information with external tools, this table can be saved in a tab-delimited file (here called \file{result_PSI.tab}), setting the \Rcode{writePSI} parameter to \Rcode{TRUE} in the \Rfunction{writeOutputKissDE} function:
 <<fPSItable_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults, output = "result_PSI.tab", writePSI = TRUE)
 @
@@ -490,8 +490,8 @@ Here we present an example to explain how \Rcode{filterLowCountsVariants} option
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Model}
-Then we design two models to take into account interactions with variants (SNVs or alternative isoforms) and experimental conditions as main effects. We  use the generalised linear model framework. The expected intensity $\lambda_{ijk}$ can be written as in following:
+\subsection{Model fitting}
+Then we design two models to take into account interactions with variants (SNVs or alternative isoforms) and experimental conditions as main effects. We  use the generalised linear model framework. The expected intensity $\lambda_{ijk}$ can be written as following:
 \begin{equation}
     \mathcal{M_0}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j}\\
 \end{equation}
@@ -541,7 +541,7 @@ Moreover, this event has enough counts for each variant not to be filtered out w
 \label{subsec:psi}
 %just the main computation, particular correction wrt the length will come with examples
 When a gene is found to be differentially spliced between two conditions, or an allele is found to be differentially present in two populations, one concern which remains is to quantify the magnitude of this effect.
-Indeed, especially in RNA-Seq, where some genes are very highly expressed (and hence have very high read counts), it is often the case that we detect significant (p-value < 0.05) but weak effects. 
+Indeed, especially in RNA-Seq, where some genes are very highly expressed (and hence have very high read counts), it is often the case that we detect significant (p-value $\leqslant$ 0.05) but weak effects. 
 
 When dealing with genomic variants, we quantify the magnitude of the effect using the difference of allele frequencies (f) between the two conditions.
 When dealing with splicing variants, we quantify the magnitude of the effect using the difference of Percent Spliced In (PSI) between the two conditions.
@@ -597,7 +597,7 @@ The conditions being compared are the populations.
 \end{figure}
 
 The data are paired-end. So each sample consists of 2 files. 
-In total, 8 files have been used as \kp~input: 4 files about the two TSC samples and 4 files about the two CEU samples. 
+In total, 8 files have been used as \kp~input: 4 files for the two TSC samples and 4 files for the two CEU samples. 
 Paired-end files from a same sample have been input following each other.\\
 
 The output file of \kp~is a fasta file that stores SNVs found in the dataset.
@@ -662,7 +662,7 @@ On the PCA plot (right of Figure \ref{fig:qcSNV}), the first principal component
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Differential analysis}
 The main function of the \kde, \Rfunction{diffExpressedVariants}, can now be run to compute the statistical test. 
-Outputs are stored in a \Robject{myResult\_SNV} object (for a detailed description of its structure, see section \ref{subsubsec:finaltable}) and the sequence of successive events is printed:
+Outputs are stored in a \Robject{myResult\_SNV} object (for a detailed description of its structure, see section \ref{subsubsec:finaltable}) and the result for the first three events is printed:
 <<snv_test, fig=FALSE, keep.source=FALSE>>=
 myResult_SNV <- diffExpressedVariants(myCounts_SNV, myConditions_SNV)
 head(myResult_SNV$finalTable, n = 3)
@@ -701,7 +701,7 @@ The data are paired-end.\\
 Then, the \textit{type 1} results from \kp~were mapped to the reference genome with the \software{STAR} \cite{Dobin2013} software and analyzed with \krg. 
 \krg~enables to annotate the AS events discovered by \kp. 
 It assigns each event to the gene it maps to and to a type of alternative splicing event: Exon Skipping (ES), Intron Retention (IR), Alternatid Donor (AltD), Alternative Acceptor (AltA), \dots. 
-For any question on these tools (\kp~ and \krg), please refer to the manual that can be found on this web page: \url{http://kissplice.prabi.fr/}.\\
+For further questions on these tools (\kp~ and \krg), please refer to the manual that can be found on this web page: \url{http://kissplice.prabi.fr/}.\\
 
 The output file of \krg~is a tab-delimited file that stores the annotated alternative splicing events found in the dataset. 
 Following, is an extract of this file (the first 3 rows and first 11 columns), where each row is one alternative splicing event:
@@ -732,7 +732,7 @@ head(myCounts_AS$countsEvents)
 
 To perform the differential analysis, a vector that describes the experimental plan must also be provided. 
 In the example, there are two replicates of the SK-N-SH cell line without treatment (SKNSH) and two replicates of the same cell line treated with retinoic acid (SKSNH-RA). 
-So the \Robject{myConditions\_AS} vector is defined:
+So the \Robject{myConditions\_AS} vector is defined as follows:
 <<AS_condition, fig=FALSE, keep.source=FALSE>>=
 myConditions_AS <- c(rep("SKNSH",2), rep("SKNSH-RA",2))
 @
@@ -760,7 +760,7 @@ On the PCA plot (right of Figure \ref{fig:qcAS}), the first principal component 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Differential analysis}
 The main function of the \kde, \Rfunction{diffExpressedVariants}, can now be run to compute the statistical test. 
-Outputs are stored in a \Robject{myResult\_AS} object (for a detailed description of its structure, see section \ref{subsubsec:finaltable}) and the sequence of successive events is printed:
+Outputs are stored in a \Robject{myResult\_AS} object (for a detailed description of its structure, see section \ref{subsubsec:finaltable}) and the result for the first three events is printed:
 <<AS_test, fig=FALSE, keep.source=TRUE>>=
 myResult_AS <- diffExpressedVariants(myCounts_AS, myConditions_AS)
 head(myResult_AS$finalTable, n = 3)
