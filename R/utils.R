@@ -1035,6 +1035,45 @@
 							psiTable=psi))
 }
 
+.writeTableOutput <- function(finalTable, pvalMax=1, dPSImin=0, output) {
+  fOut <- file(output, open="w")
+  colNames <- colnames(finalTable)
+  rowNames <- rownames(finalTable)
+  nbRow <- length(rowNames)
+  idDPSI <- length(colNames) - 1
+  idPV <- length(colNames) - 2
+  lHead <- c()
+  j <- 1
+  for (colName in colNames) {
+    lHead <- append(lHead, paste(j, colName, sep="."))
+    j <- j + 1
+  }
+  head <- paste(lHead, collapse="\t")
+  head <- paste("#", head, sep="")
+  writeLines(head,fOut)
+  
+  #fT <- finalTable
+  #rownames(fT) <- NULL
+  #colnames(fT) <- NULL
+  i <- 1
+  while (i <= nbRow) {
+    apv <- finalTable[i, idPV]
+    if (is.na(apv)) {
+      apv <- 1
+    }
+    dpsi <- abs(finalTable[i, idDPSI])
+    if (is.na(dpsi)) {
+      dpsi <- 0
+    }
+    if (dpsi >= dPSImin && apv <= pvalMax) {
+      writeLines(paste(rowNames[i], 
+                       paste(as.character(finalTable[i, ])[-1], collapse="\t"), 
+                       sep="\t"), fOut)
+    }
+    i <- i + 1
+  }
+  close(fOut)
+} 
 
 .writeMergeOutput <- function(resDiffExpr, k2rgFile, pvalMax=1, 
                               dPSImin=0, output) {
