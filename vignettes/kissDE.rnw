@@ -276,7 +276,7 @@ head(myCounts_k2rg$countsEvents)
 
 
 The \krg~output contains information about the type of splicing events. 
-It is therefore possible to choose the subtype of events to analyse. 
+It is therefore possible to choose the subtype of events to analyse, in order to speed up \kde's run and improve statistical power for the selected events. 
 The \Rcode{keep} and \Rcode{remove} parameters of the \Rfunction{kissplice2counts} function allow to indicate the type of splicing events to analyse or to remove from the analysis. 
 These two parameters take a character vector indicating the types of events to keep or remove. 
 The events names should come from this list: \Rcode{deletion}, \Rcode{insertion}, \Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. 
