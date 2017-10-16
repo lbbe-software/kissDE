@@ -96,9 +96,9 @@ library(kissDE)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Quick start}
 Here we present the basic \R{} commands for an analysis with \kde. 
-These commands require an example output file of \kp~called \file{output_kissplice.fa}. 
+These commands require an external output file of \kp~called \file{output_kissplice.fa}. 
 To deal with other types of input file, please refer to section \ref{subsec:input}.
-The used funtions \Rfunction{kissplice2counts}, \Rfunction{qualityControl}, \Rfunction{diffExpressedVariants} and \Rfunction{writeOutputKissDE} of \kde~are detailed in section \ref{sec:workflow}.
+The used funtions \Rfunction{kissplice2counts}, \Rfunction{qualityControl}, \Rfunction{diffExpressedVariants} and \Rfunction{writeOutputKissDE} of \kde~are detailed in section \ref{sec:workflow}. For each function, default values are used.
 Here we assume that there are two conditions ($condition\_1$ and $condition\_2$) with two biological replicates and the RNA-Seq libraries are single-end.
 
 <<quick_start, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
