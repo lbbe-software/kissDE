@@ -260,8 +260,8 @@ head(myCounts$countsEvents)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Input table from \krg~output}
 \label{subsubsec:input_krg}
-The \Rfunction{kissplice2counts} function can also deal with \krg~output data, thanks to the \Rcode{k2rg} parameter. 
-\krg~allows the annotation of the alternative splicing events. It assigns each event to the gene it maps to and to a type of alternative splicing event: Skipped Exon (ES), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (\url{ftp://pbil.univ-lyon1.fr/pub/logiciel/kissplice/tools/kissplice2refgenome_userguide.pdf}).
+The \Rfunction{kissplice2counts} function can also deal with \krg~output data with the \Rcode{k2rg} parameter. 
+\krg~allows the annotation of the alternative splicing events. It assigns each event a gene and a type of alternative splicing event, among which: Exon Skipping (ES), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (\url{ftp://pbil.univ-lyon1.fr/pub/logiciel/kissplice/tools/kissplice2refgenome_userguide.pdf}).
 
 In the example below, a \krg's output recorded in a file called \file{output_k2rg_alt_splicing.txt} (\Robject{fpath3} contains the absolute path of the file on the user's hard disk) is loaded.
 The \Rfunction{kissplice2counts} function here uses the same \Rcode{counts} and \Rcode{pairedEnd} parameters as explained in the section \ref{subsubsec:input_ks}.
