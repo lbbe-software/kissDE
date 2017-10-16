@@ -76,8 +76,7 @@ The workflow for SNPs/SNVs is fully described in Lopez-Maestre et al. \cite{Lope
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Use case}
 \kde~is meant to work on pairs of variants that have been quantified across different conditions. It can deal with single nucleotide variations (SNPs, mutations, RNA editing), indels or alternative splicing.\\
-The input count data to \kde~may come from \kp~\cite{KisSplice}, \krg~or any other software which produces count data properly formatted.
-As \kde~was first designed to be a brick of the KisSplice pipeline (web page: \url{http://kissplice.prabi.fr/}), the \Rfunction{kissplice2counts} function can be directly applied on the output files from \kp~or \krg.\\
+As \kde~was first designed to be a brick of the \kp~\cite{KisSplice} pipeline (web page: \url{http://kissplice.prabi.fr/}), the \Rfunction{kissplice2counts} function can be directly applied on the output files from \kp~or \krg. Still, \kde~can also run with any other software which produces count data as long as this data is properly formatted.\\
 The user must keep in mind that \kde~was designed to work with at least two replicates for each condition, which means that the minimal input contains the variants quantified for 4 different samples, each couple representing a condition and its 2 replicates. There can be more replicates and more conditions. It is not mandatory to have an equal number of replicates in each condition.\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
