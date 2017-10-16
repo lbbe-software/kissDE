@@ -276,15 +276,15 @@ head(myCounts_k2rg$countsEvents)
 
 
 The \krg~output contains information about the type of splicing events. 
-It is therefore possible to choose the subtype of events to analyse, in order to speed up \kde's run and improve statistical power for the selected events. 
-The \Rcode{keep} and \Rcode{remove} parameters of the \Rfunction{kissplice2counts} function allow to indicate the type of splicing events to analyse or to remove from the analysis. 
-These two parameters take a character vector indicating the types of events to keep or remove. 
+It is therefore possible to choose the subtype of events to analyse, in order to speed up \kde's run and improve statistical power for the selected events. To do this, the \Rfunction{kissplice2counts} function contain two parameters: \Rcode{keep} and \Rcode{remove}. 
+Both take a character vector indicating the types of events to keep or remove. 
 The events names should come from this list: \Rcode{deletion}, \Rcode{insertion}, \Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. 
-In the \Rcode{remove} parameter, the event name \Rcode{MULTI} can also be used. By default, all types of events are analysed.
+The \Rcode{keep} and \Rcode{remove} parameters can be used at the same time only if \Rcode{ES} is part of the \Rcode{keep} vector. The \Rcode{remove} vector will then act on the different types of ES : ES_MULTI, ES_altA, ES_altD, ES_altAD, ES_alt. Thus, in this specific case, the \Rcode{remove} vector should countain names from this list: \Rcode{MULTI}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}.
+By default, all types of events are analysed.
 
 If we want to analyse only cassette exon events (i.e., a single exon is skipped or included), the following command should be used:
 <<kissplice2counts_k2rg_ESonly_howto, fig=FALSE, keep.source=FALSE>>=
-myCounts_k2rg_ES <- kissplice2counts(fpath3, counts = 2, pairedEnd = TRUE, k2rg = TRUE, keep = c("ES"), remove = c("MULTI"))
+myCounts_k2rg_ES <- kissplice2counts(fpath3, counts = 2, pairedEnd = TRUE, k2rg = TRUE, keep = c("ES"), remove = c("MULTI", "altA", "altD", "altAD", "alt"))
 @
 
 %TODO : check if it works also on SNV
