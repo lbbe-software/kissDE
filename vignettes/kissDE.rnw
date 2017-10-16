@@ -263,11 +263,10 @@ head(myCounts$countsEvents)
 The \Rfunction{kissplice2counts} function can also deal with \krg~output data with the \Rcode{k2rg} parameter. 
 \krg~allows the annotation of the alternative splicing events. It assigns each event a gene and a type of alternative splicing event, among which: Exon Skipping (ES), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (\url{ftp://pbil.univ-lyon1.fr/pub/logiciel/kissplice/tools/kissplice2refgenome_userguide.pdf}).
 
-In the example below, a \krg's output recorded in a file called \file{output_k2rg_alt_splicing.txt} (\Robject{fpath3} contains the absolute path of the file on the user's hard disk) is loaded.
-The \Rfunction{kissplice2counts} function here uses the same \Rcode{counts} and \Rcode{pairedEnd} parameters as explained in the section \ref{subsubsec:input_ks}.
-The \Rcode{k2rg} parameter is a boolean value, set to \Rcode{TRUE} to deal with \krg~output data.
-The table of counts yielded by the \Rfunction{kissplice2counts} function in the example below is stored in \Robject{myCounts\_k2rg}.
-Its has exactly the same structure as detailed in section \ref{subsubsec:input_ks}.
+In the example below, \file{output_k2rg_alt_splicing.txt}, a \krg's output, is loaded (\Robject{fpath3} contains the absolute path of the file on the user's hard disk).
+The \Rfunction{kissplice2counts} function uses the same \Rcode{counts} and \Rcode{pairedEnd} parameters as explained in the section \ref{subsubsec:input_ks}.
+The \Rcode{k2rg} parameter is a boolean value, set to \Rcode{TRUE} to read \krg~output data.
+The table of counts yielded by the \Rfunction{kissplice2counts} function is stored in \Robject{myCounts\_k2rg}. It has exactly the same structure as detailed in section \ref{subsubsec:input_ks}.
 <<kissplice2counts_k2rg_howto, fig=FALSE, keep.source=FALSE>>=
 fpath3 <- system.file("extdata", "output_k2rg_alt_splicing.txt", package="kissDE")
 myCounts_k2rg <- kissplice2counts(fpath3, counts = 2, pairedEnd = TRUE, k2rg = TRUE)
