@@ -4,21 +4,17 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
 		pathToFigs <- NA
 	} else {
 		if (isTRUE(storeFigs)) {
-			pathToFigs <- "kissDEFigures"
+			pathToFigs <- paste0(getwd(), "/kissDEFigures")
 		} else {
 			pathToFigs <- storeFigs
 		}
 	}
 	
-	## create a new folder if it doesn't exist
-	if (!is.na(pathToFigs)) {
-		find <- paste("find", pathToFigs)
-		d <- system(find, TRUE, ignore.stderr=TRUE)
-		if (length(d) == 0) { 
-			command <- paste("mkdir -p", pathToFigs)
-			system(command, ignore.stderr=TRUE)
-		}
-	}
+    if (!is.na(pathToFigs)) {
+        if(!dir.exists(pathToFigs))
+            dir.create(pathToFigs)
+        message(paste("Figures are stored in", pathToFigs))
+    }
 	
 	###################################################
 	### code chunk number 1: Read and prepare data
