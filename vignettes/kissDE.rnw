@@ -314,9 +314,8 @@ It produces 2 graphs:
   sample-to-sample distances. Right: Principal Component Analysis.}
 \end{figure}
 
-These two graphs show the similarities and the differences between the analyzed samples. 
-We expect to cluster together the replicates of the same condition. 
-If a sample is contaminated or has an abnormality that will influence the differential analysis, it will certainly not be clustered as expected. 
+These two graphs show the similarities and the differences between the analyzed samples. Replicates of the same condition are expected to cluster together.
+If this is not the case, the user should check if the order of the samples in the count table and in the condition vector is the same. If it is, this could mean that a sample is contaminated or has an abnormality that will influence the differential analysis.
 The user can then go back to the quality control of the raw data to solve the problem or decide to remove the sample from the analysis.
 
 In this example, the plots are reassuring. 
