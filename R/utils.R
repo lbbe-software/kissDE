@@ -1013,7 +1013,9 @@
 	colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted))] <-
 		"Deltaf/DeltaPSI"
 	colnames(signifVariants.sorted)[length(colnames(signifVariants.sorted)) - 
-																		1] <- "Adjusted_pvalue"
+        1] <- "Adjusted_pvalue"
+	class(signifVariants.sorted$Adjusted_pvalue) <- c("pval", 
+        class(signifVariants.sorted$Adjusted_pvalue))
 	
 	###################################################
 	### code chunk 3: flagging low counts

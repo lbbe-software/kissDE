@@ -78,6 +78,8 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 	if (!is.na(chunk2[1])) {  # no error during chunk1
 		if (length(chunk2) > 2) {  # no error during chunk2
 			message("Computing size of the effect and last cutoffs...")
+		    class(chunk2$correctedPVal) <- c("pval", class(chunk2$correctedPVal))
+		    class(chunk2$noCorrectPVal) <- c("pval", class(chunk2$noCorrectPVal))
 			chunk3 <- tryCatch({
 				sizeOfEffect <- .sizeOfEffectCalc(chunk2$signifVariants, 
 																					chunk1$ASSBinfo, chunk0$n, 
@@ -105,3 +107,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
   }
 }
 
+print.pval <- function(x, ...) {
+    x <- format.pval(x)
+    print(x, quote = FALSE)
+}
