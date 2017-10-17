@@ -1131,15 +1131,15 @@
                                        by.y = 1)
   rownames(finalAndPsiTable) <- finalAndPsiTable$ID
   
+  COUNTSEND <- ncol(finalTable)-COUNTSENDBEFOREEND
+  PSISTART <- ncol(finalTable)+1
+  PSIEND <- ncol(finalAndPsiTable)
+  
   countsLabel <- 
     paste(colnames(finalAndPsiTable)[COUNTSSTART:COUNTSEND], collapse=",")
   countsName <- paste("CountsNorm(", countsLabel,")", sep="")
   psiLabel <- paste(colnames(finalAndPsiTable)[PSISTART:PSIEND], collapse=",")
   psiName <- paste("psiNorm(", psiLabel, ")", sep="")
-  
-  COUNTSEND <- ncol(finalTable)-COUNTSENDBEFOREEND
-  PSISTART <- ncol(finalTable)+1
-  PSIEND <- ncol(finalAndPsiTable)
   
   finalAndPsiTable$counts <- apply(X = finalAndPsiTable[,COUNTSSTART:COUNTSEND],
                                    MARGIN = 1,
