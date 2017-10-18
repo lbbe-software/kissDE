@@ -18,13 +18,17 @@ using the GLM (Genralized Linear Model) framework.
 
 \details{Main functions:
 
-diffExpressedVariants(countsData, conditions, storeFigs=FALSE, pvalue=0.05,
-filterLowCountsVariants=10, flagLowCountsConditions=10, discoSNP=FALSE)
+diffExpressedVariants(countsData, conditions, pvalue = 1, 
+    filterLowCountsVariants = 10, flagLowCountsConditions = 10,
+    technicalReplicates = FALSE)
+    
+qualityControl(countsData, conditions, storeFigs = FALSE)
 
-qualityControl(countsData, conditions, storeFigs=FALSE)
+kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL, 
+    exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL)
 
-kissplice2counts(fileName, counts=0, pairedEnd=FALSE, order=NULL, 
-exonicReads=TRUE, discoSNP=FALSE, k2rg=FALSE)
+writeOutputKissDE(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, output, 
+    writePSI = FALSE)
 }
 
 
