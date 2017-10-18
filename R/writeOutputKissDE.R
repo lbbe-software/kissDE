@@ -11,6 +11,9 @@ writeOutputKissDE <- function(resDiffExprVariant, output, adjPvalMax=1,
   if(!is.logical(writePSI)) {
     stop("Input error : writePSI option must be a boolean.")
   }
+  if(length(output)>1 | !is.character(output)) {
+    stop("Input error : output option must be a character.")
+  }
 	
 	k2rgFile <- resDiffExprVariant$k2rgFile
 	
