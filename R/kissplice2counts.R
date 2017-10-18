@@ -8,6 +8,15 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
   if(!counts%in%[0,1,2]){
     stop("Input error : counts option is not equal to 0, 1 or 2.")
   }
+  if(!logical(pairedEnd)){
+    stop("Input error : pairedEnd option must be a boolean.")
+  }
+  if(!logical(exonicReads)){
+    stop("Input error : exonicReads option must be a boolean.")
+  }
+  if(!logical(k2rg)){
+    stop("Input error : k2rg option must be a boolean.")
+  }
   
 	## check options compatibility
 	if (counts == 1 & exonicReads == TRUE) { 
