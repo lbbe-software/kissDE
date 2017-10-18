@@ -8,6 +8,9 @@ writeOutputKissDE <- function(resDiffExprVariant, output, adjPvalMax=1,
 		stop("Input error : dPSImin option must be a double between 0 and 1. A dPSImin = 0.1 
             will catch all dPSI from -1 to -0.1 and all dPSI from 0.1 to 1.")
 	}
+  if(!is.logical(writePSI)) {
+    stop("Input error : writePSI option must be a boolean.")
+  }
 	
 	k2rgFile <- resDiffExprVariant$k2rgFile
 	
