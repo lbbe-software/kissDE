@@ -6,13 +6,13 @@
 \title{Retrieves condition-specific variants in RNA-seq data}
 
 \description{The \pkg{kissDE} package retrieves condition-specific variants in 
-RNA-seq data. Each variation (SNPs, alternative-splicings, indels) is 
+RNA-seq data. Each variation (SNVs, alternative-splicing) is 
 represented as a pair of variants. The quantification of each variant is 
 summarized as a count, in each condition and each replicate where it was 
 measured. The package tests for enrichment of a variant in a condition. Data 
-counts are modelled using either a poisson or a negative binomial (with several 
-ways of estimating the variance). Likelihood ratio tests are then performed 
-using the GLM (Genralized Linear Model) framework.
+counts are modelled using either a poisson or a negative binomial.
+Likelihood ratio tests are then performed 
+using the GLM (Generalized Linear Model) framework.
 }
 
 
