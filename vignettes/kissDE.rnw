@@ -550,7 +550,7 @@ When dealing with splicing variants, we quantify the magnitude of the effect usi
 These two measures turn out to be equivalent and can be summarized using the following formula:
 
 \begin{equation}
-    PSI \:=\: f  \:=\:  \frac{\#counts\_variant_1}{\#counts\_variant_1 + \#counts\_variant_2}
+    PSI \:=\: f  \:=\:  \frac{\#counts*\_variant_1}{\#counts*\_variant_1 + \#counts\_variant_2}
 \end{equation}
 \begin{equation}
     \Delta PSI \:=\: PSI_{cond1} - PSI_{cond2}
@@ -558,6 +558,9 @@ These two measures turn out to be equivalent and can be summarized using the fol
 \begin{equation}
     \Delta f \:=\: f_{cond1} - f_{cond2}
 \end{equation}
+
+In this formula, \#counts*\_variant_1 correspond to the normalized number of reads of the variant_1, itself normalized for the variant length. Indeed, variant_1 always have a length equal or greater than the variant_2, that's why we divide the normalized number of reads of the variant_1 by the ratio of the length of the variant_1 and the variant_2.
+
 
 The $\Delta$PSI/$\Delta$f is computed as follows:
 \begin{itemize}
