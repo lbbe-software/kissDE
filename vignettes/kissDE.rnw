@@ -343,7 +343,7 @@ The \Rfunction{diffExpressedVariants} function has three other parameters to cha
   \item \Rcode{pvalue}: By default, the p-value threshold to output the significant events is set to 1. So all variants are output in the final table. This parameter must be a numeric value between 0 and 1. Be aware that by setting \Rcode{pvalue} to 0.05, only events that have been identified as significant between the conditions with a false discovery rate (FDR) $\leqslant$ 5\% will be present in the final table. 
   \item \Rcode{filterLowCountsVariants}: This parameter allows to change the threshold to filter low expressed events before testing (as explained in section \ref{subsec:filter}). By default, it is set to 10.
   \item \Rcode{flagLowCountsConditions}: This parameter allows to change the threshold to flag low expressed events (as explained in section \ref{subsec:flag}). By default, it is set to 10.
-  \item \Rcode{technicalReplicates}: boolean value indicating if the user is working with technical replicates. By default, this option is set to \Rcode{FALSE}.
+  \item \Rcode{technicalReplicates}: boolean value indicating if the user is working with technical replicates only (for counts modelisation reasons, we do not advise users to mix biological and technical replicates in their analyses). If this is \Rcode{TRUE}, the counts will be modeled with a Poisson distribution. If this is \Rcode{FALSE}, the counts will be modeled with a Negative Binomial distribution. For more informations, see section \ref{subsec:dispersion}. By default, this option is set to \Rcode{FALSE}.
 \end{itemize}
 
 The \Rfunction{diffExpressedVariants} function returns a list of 6 objects:
@@ -460,6 +460,7 @@ By using \Biocpkg{DESeq2} normalization, we correct for library size, because th
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Estimation of dispersion}
+\label{subsec:dispersion}
 A model to describe the counts distribution is first chosen.
 When working with technical replicates (\Rcode{technicalReplicates} = \Rcode{TRUE} in \Rfunction{diffExpressedVariants}), the Poisson model is chosen in \kde and the \CRANpkg{glmnet} \R{} package \cite{glmnet} (model $\mathcal{M}(\phi=0)$) is used.
 When working with biological replicates (\Rcode{technicalReplicates} = \Rcode{FALSE} in \Rfunction{diffExpressedVariants}), the Poisson distribution's variance parameter is in general not flexible enough to describe the data, because replicates add several sources of variance.
