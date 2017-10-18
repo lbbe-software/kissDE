@@ -44,12 +44,26 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
     for(element in remove) {
       if(!element%in%c("deletion", "insertion", "IR", "ES", "altA",
                        "altD", "altAD", "alt", "unclassified","MULTI")) {
-        stop(paste("Input error : element ",element," of option keep is not recognize. 
-                   Each elements of the keep vector must be in the following list :
+        stop(paste("Input error : element ",element," of option remove is not recognize. 
+                   Each elements of the remove vector must be in the following list :
                    deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified,
                    MULTI.",
                    sep=""))
       }
+    }
+    if(keep!=c("All") & "ES"%in%keep) {
+      for(element in remove) {
+        if(!element%in%c("altA", "altD", "altAD", "alt", "MULTI")) {
+          stop(paste("Input error : element ",element," of option remove is not recognize.
+                     When used is association with the keep option, each elements of the 
+                     remove vector must be in the following list : altA, altD, altAD, 
+                     alt, MULTI."))
+        }
+      }
+    }
+    else {
+      stop("Input error : keep and remove options can not be used together, unless \"ES\" 
+           is one of the element(s) of the keep option (see the vignette for more informations).")
     }
   }
   
