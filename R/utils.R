@@ -272,19 +272,16 @@
   
   # Check options
   countsID <- countsEvents[[1]]
-  print(countsID)
   i <- 1
   for(thisID in countsID) {
     if(i%%2) {
       savedID <- thisID
     }
     else{
-      print(thisID)
-      print(savedID)
       if(thisID!=savedID) {
         stop(paste("Input error : countsData must contain two following row for the same 
 event name (first column). The row with the ID ",savedID," is alone. See the 
-                   vignette for more informations."))
+                   vignette for more informations.",sep=""))
       }
     }
     i <- i + 1
@@ -292,13 +289,23 @@ event name (first column). The row with the ID ",savedID," is alone. See the
   if(!i%%2) {
     stop(paste("Input error : countsData must contain two following row for the same
                event name (first column). The last row (ID : ",savedID,") is alone.
-               See the vignette for more informations."))
+               See the vignette for more informations.",sep=""))
   }
   
   tableID <- table(countsEvents[[1]])
   if(max(tableID) != 2){
     stop(paste("Input error : in countsData, the event(s) ",names(tableID[tableID==max(tableID)]),
-               " has(have) more than two lines."))
+               " has(have) more than two lines.",sep=""))
+  }
+  
+  countsLength <- countsEvents[[2]]
+  if(!is.vector(countsLength,mode="numeric")){
+    stop("Input error : in countsData, the second column (length) is not composed of 
+         numerical values.")
+  }
+  if(min(countsLength)<0) {
+    stop(paste("Input error : in coutsData, the smallest value for the second column (length)
+         should be 0 (the minimal value in the current data is",min(countsLength),").",sep=""))
   }
   
     if("*"%in%conditions){
