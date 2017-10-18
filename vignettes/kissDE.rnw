@@ -784,18 +784,18 @@ writeOutputKissDE(myResults_AS, output = "psi_table.tab", writePSI = TRUE)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Time / Requirements}
-The data conversion with the \Rfunction{kissplice2counts} function, the statistical analysis done with the \Rfunction{diffExpressedVariants} function and the writing of the results in a file with the \Rfunction{writeOutputKissDE} function can take some time to run. Here is an example of the running time of this 3 functions on the two complete datasets presented in the case studies (section \ref{sec:casestudies}). The time presented were evaluated on a desktop computer with the following caracteristics: Intel Core i7, CPU 2,60 GHz, 16G RAM.
+The data conversion with the \Rfunction{kissplice2counts} function, the statistical analysis done with the \Rfunction{diffExpressedVariants} function can take some time to run. Here is an example of the running time of this 2 functions on the two complete datasets presented in the case studies (section \ref{sec:casestudies}). The time presented were evaluated on a desktop computer with the following caracteristics: Intel Core i7, CPU 2,60 GHz, 16G RAM.
 \begin{table}[h]
-\begin{tabular}{c|c|c|c|c|c}
-   \multirow{2}{*}{Dataset} & \multirow{2}{*}{Options} & Number of & \multicolumn{3}{|c}{Running time}  \\
-    & & events & \footnotesize{\Rfunction{kissplice2counts}} & \footnotesize{\Rfunction{diffExpressedVariants}} & \footnotesize{\Rfunction{writeOutputKissDE}} \\ \hline
-  \multirow{3}{*}{AS data} & \Rcode{counts=2},  & \multirow{3}{*}{68497} & \multirow{3}{*}{12m} & \multirow{3}{*}{38m} & \multirow{3}{*}{15m} \\ 
-    & \Rcode{pairedEnd=TRUE} & & & & \\
-    & \Rcode{k2rg=TRUE} & & & & \\ \hline
-  \multirow{2}{*}{SNV data} & \Rcode{counts=0}, & \multirow{2}{*}{64824} & \multirow{2}{*}{5m} & \multirow{2}{*}{36m} & \multirow{3}{*}{10s} \\
-    & \Rcode{pairedEnd=TRUE} & & & & \\
+\begin{tabular}{c|c|c|c|c}
+   \multirow{2}{*}{Dataset} & \multirow{2}{*}{Options} & Number of & \multicolumn{2}{|c}{Running time}  \\
+    & & events & \footnotesize{\Rfunction{kissplice2counts}} & \footnotesize{\Rfunction{diffExpressedVariants}} \\ \hline
+  \multirow{3}{*}{AS data} & \Rcode{counts=2},  & \multirow{3}{*}{68497} & \multirow{3}{*}{12m} & \multirow{3}{*}{38m} \\ 
+    & \Rcode{pairedEnd=TRUE} & & & \\
+    & \Rcode{k2rg=TRUE} & & & \\ \hline
+  \multirow{2}{*}{SNV data} & \Rcode{counts=0}, & \multirow{2}{*}{64824} & \multirow{2}{*}{5m} & \multirow{2}{*}{36m} \\
+    & \Rcode{pairedEnd=TRUE} & & & \\
 \end{tabular}
-\caption{Profiling. Running time of the three principal functions of \kde~(\Rfunction{kissplice2counts}, \Rfunction{diffExpressedVariants} and \Rfunction{writeOutputKissDE}) for two datasets (AS dataset from the ENCODE project \cite{Djebali2012} described in section \ref{subsec:AS} and SNP dataset from the GEUVADIS project \cite{Lappalainen2013} described in section \ref{subsec:SNV}). \Rfunction{writeOutputKissDE} function running time can be very different if a \kp~file or \krg~file was given as input in the initial step. Indeed when a \krg~file is given as input, the \Rfunction{writeOutputKissDE} function will merge the \kde~results with the informations coming from \krg.}
+\caption{Profiling. Running time of the two principal functions of \kde~(\Rfunction{kissplice2counts} and \Rfunction{diffExpressedVariants} for two datasets (AS dataset from the ENCODE project \cite{Djebali2012} described in section \ref{subsec:AS} and SNP dataset from the GEUVADIS project \cite{Lappalainen2013} described in section \ref{subsec:SNV}).}
 \label{tab:time}
 \end{table}
 
