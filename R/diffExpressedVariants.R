@@ -6,6 +6,15 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
   if(length(pvalue)>1 | !is.double(pvalue) | pvalue<0 | pvalue>1) {
     stop("Input error : pvalue option must be a double between 0 and 1.")
   }
+  if(length(filterLowCountsVariants)>1 | filterLowCountsVariants-round(filterLowCountsVariants+0.5)!=0 | filterLowCountsVariants<0) {
+    stop("Input error : filterLowCountsVariants option must be a positive integer.")
+  }
+  if(length(flagLowCountsConditions)>1 | flagLowCountsConditions-round(flagLowCountsConditions+0.5)!=0 | flagLowCountsConditions<0) {
+    stop("Input error : flagLowCountsConditions option must be a positive integer.")
+  }
+  if(!is.logical(technicalReplicates)) {
+    stop("Input error : technicalReplicates option must be a boolean.")
+  }
 	
 	message("Pre-processing the data...")
 	chunk0 <- tryCatch({.readAndPrepareData(countsData, conditions)
