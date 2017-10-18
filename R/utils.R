@@ -308,6 +308,14 @@ event name (first column). The row with the ID ",savedID," is alone. See the
          should be 0 (the minimal value in the current data is",min(countsLength),").",sep=""))
   }
   
+  if(!is.vector(conditions)){
+    stop("Input error : condition option must be a vector.")
+  }
+  if(ncol(countsEvents)-2!=length(conditions)){
+    stop("Input error : not the same amount of conditions in the options countsData (starting at
+         column 3) and condition.")
+  }
+  
     if("*"%in%conditions){
         toRm <- which(conditions=="*")
         countsEvents <- countsEvents[, -(toRm+2)]
