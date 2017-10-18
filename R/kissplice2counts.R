@@ -3,7 +3,10 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
                              remove=NULL) {
   ## check options 
   if(!file.exists(fileName)) {
-    stop(paste("Input error : user's file ",fileName," does not exist. Is the path and/or file's name corect ?",sep="")
+    stop(paste("Input error : user's file ",fileName," does not exist. Is the path and/or file's name corect ?",sep=""))
+  }
+  if(!counts%in%[0,1,2]){
+    stop("Input error : counts option is not equal to 0, 1 or 2.")
   }
   
 	## check options compatibility
