@@ -535,7 +535,7 @@ Moreover, this event has enough counts for each variant not to be filtered out w
 \label{tab:flag1}
 \end{table}
 
-\paragraph{}However, in $n-1$ (here 1) condition, the global count for one condition is less than 10 (9 for condition 1), so \Rcode{flagLowCountsConditions} option will classify this in event in \Rcode{'Low\_Counts'} column with a \Rcode{TRUE} value. This event may be interesting because it has the potential to be found as differential. However, it will be hard to validate it experimentally, because the gene is poorly expressed in condition 1.
+\paragraph{}However, in $n-1$ (here 1) condition, the global count for one condition is less than 10 (9 for condition 1), so \Rcode{flagLowCountsConditions} option will flag this event as \Rcode{'Low\_Counts'}. This event may be interesting because it has the potential to be found as differential. However, it will be hard to validate it experimentally, because the gene is poorly expressed in condition 1.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
