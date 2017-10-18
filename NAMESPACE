@@ -30,7 +30,6 @@ importFrom("R.utils", "countLines")
 export(diffExpressedVariants,
        kissplice2counts,
        qualityControl,
-       wantedEvents, 
        writeOutputKissDE)
 
 S3method("print", "countsData")
