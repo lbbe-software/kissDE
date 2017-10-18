@@ -11,7 +11,7 @@ functions of the \code{KissDE} package.
 
 \usage{
 kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL, 
-exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL)
+    exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL)
 }
 
 
