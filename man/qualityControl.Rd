@@ -17,12 +17,10 @@ qualityControl(countsData, conditions, storeFigs = FALSE)
 
 \arguments{
 \item{countsData}{the output of the \code{kissplice2counts} function or a data
-frame containing in its first column the names of the events, in its second
-column the lengths of the events, and in the following columns, the	counts
-corresponding to each pair of conditions/replicates}
+frame containing the counts in the appropriate format (see Details below).}
 
-\item{conditions}{a character vector that gives the conditions, it has as 
-many elements as there are replicates in total.}
+\item{conditions}{a character vector of length \code{NCR} that gives the conditions (see Details below). It has as 
+many elements as there are samples in total.}
 
 \item{storeFigs}{a logical or a string indicating if the plots should be 
 stored and in which directory.	By default (\code{FALSE}), the figures are not
@@ -40,6 +38,19 @@ to a personal value.}
 The figures are stored or displayed in the R session.
 }
 
+\details{
+\code{countsData} input must be formatted as follows: in its first column the 
+names of the events, in its second column the lengths of the events, and in 
+the following columns, the counts corresponding to each replicate of each 
+experimental condition of one variant. Each row corresponds to one variant.
+
+\code{NCR} is the total number of samples in the input data. For more 
+informations, see \code{\link{diffExpressedVariants}}.
+}
+
+\seealso{
+\code{\link{diffExpressedVariants}}
+}
 
 \examples{
 fpath <- system.file("extdata", "output_kissplice_SNV.fa", package="kissDE")
