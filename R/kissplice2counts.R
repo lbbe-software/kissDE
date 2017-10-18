@@ -18,7 +18,10 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
     stop("Input error : k2rg option must be a boolean.")
   }
   if(!is.null(order) & !is.vector(order, mode="numeric")) {
-    stop("Input error : order option must be a vector.")
+    stop("Input error : order option must be a numeric vector.")
+  }
+  if(!pairedEnd & !is.null(order)) {
+    stop("Input error : order option can be set only if pairedEnd is TRUE.")
   }
   
   if(k2rg & keep!=c("All")) {
@@ -66,6 +69,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
            is one of the element(s) of the keep option (see the vignette for more informations).")
     }
   }
+  ## Check options end
   
 	## check options compatibility
 	if (counts == 1 & exonicReads == TRUE) { 
