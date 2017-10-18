@@ -3,8 +3,8 @@
 
 \title{Pre-treatment of \code{KisSplice} outputs}
 
-\description{Function that converts \code{KisSplice} \code{.fa} outputs and
-\code{KisSplice2RefGenome} outputs to data frame that can be used by others
+\description{Function that converts \code{KisSplice} (\code{.fa}) output and
+\code{KisSplice2RefGenome} output to data frame that can be used by other
 functions of the \code{KissDE} package.
 }
 
@@ -17,72 +17,44 @@ kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL,
 
 \arguments{
 \item{fileName}{a string indicating the path to the \code{KisSplice} 
-\code{.fa} or the \code{KisSplice2RefGenome} file that must be pre-treated.}
+(\code{.fa}) or the \code{KisSplice2RefGenome} file that must be converted.}
 
 \item{counts}{an interger (0, 1 or 2) corresponding with the \code{KisSplice}
-\code{counts} option used. By default, as in \code{KisSplice}, it is set
-to 0, assuming there is no special counting option. If the data used has been
-produced using \code{counts} 1 or 2 in \code{KisSplice}, this option sums the
-counts on the junctions provided by \code{counts} to obtain counts by
-condition. In this example, there is a part of a \code{KisSplice} output with
-\code{counts} = 2:
-
-|AS1_0|SB1_0|S1_0|ASSB1_0|AS2_27|SB2_41|S2_0|ASSB2_21| 
-
-AS3_0|SB3_0|S3_0|ASSB3_0|AS4_7|SB4_8|S4_0|ASSB4_2
-
-In a regular \code{KisSplice} output, it would be
-
-|C1_0|C2_47|C3_1|C4_13 (with 47 = 27+41-0-21 and 13 = 7+8-0-2)}
+\code{counts} option used (see Details below).}
 
 \item{pairedEnd}{a logical indicating if the data is paired-end (not by
-default), this function realises the sum of the counts from the two reads of
-the pair. It can be used along with \code{counts} option. By default, it is
+default). This function computes the sum of the counts from the pair of reads.
+It can be used along with \code{counts} option. By default, it is
 assumed that the data is "in order", which means two reads of the same pair
 has been put next to each other in \code{KisSplice} output. If it is not the
 case, see option \code{order}.}
 
 \item{order}{a numeric vector indicating the actual order of the reads so
-that they can be summed. This option goes with \code{pairedEnd} option. If
-the data is not organised, the reads corresponding to a pair have not been
-input one after another, we need to explicitely give the order. For instance,
-if there are two pairs and if the input in \code{KisSplice} has been
--r sample1_reads1.fa -r sample2_reads1.fa -r sample1_reads2.fa 
--r sample2_reads2.fa, 
-the input is not organised as two sets of reads coming from the same pair (1
-or 2) which are not next to each other. The vector order to give would be
-\code{order = c(1, 2, 1, 2)}.}
+that they can be summed. This option goes with \code{pairedEnd} option.
+For more information on this parameter, see Details below.}
 
 \item{exonicReads}{a logical indicating if exonic reads will be taken into
-account in the counts. 
-It is valid to use the \code{kissplice2counts} function only if the 
-\code{counts} option is at 2 as the information about junction and exonic
-reads is needed.}
+account in the counts.It is valid to use the \code{kissplice2counts} function
+only if the \code{counts} option is set to 2 as the information about junction
+and exonic reads is needed.}
 
-\item{k2rg}{a logical indicating if \code{KisSplice2RefGenome}'s output file 
-is used instead of \code{KisSplice}'s file}
+\item{k2rg}{a logical indicating if the input file is a 
+\code{KisSplice2RefGenome} output file instead of a \code{KisSplice} file}
 
 \item{keep}{a character vector indicating the names of the events to keep for
 the statistical test. The test will be more sensitive for those events, the
-other ones will not be tested.
-Event(s) name(s) must be: deletion, insertion, IR, ES, altA, altD, altAD, 
-alt, unclassified, unclassifiedSNP, -. To only work with intron retention 
-events and altAD events, the vector should be \code{keep = c("IR","altAD")}.
-To work on specific ES events (i.e., ES_MULTI), the vector should
-be \code{keep = c("ES")} and the \code{remove} option should be used too.
-By default, all events are kept. This option works only when \code{k2rg}
-option is set to \code{TRUE}.}
+other ones will not be tested. Event(s) name(s) must be: deletion, insertion,
+IR, ES, altA, altD, altAD, alt, unclassified, unclassifiedSNP, -.
+By default, all events are kept.
+This option works only when \code{k2rg} option is set to \code{TRUE}.}
 
 \item{remove}{a character vector indicating the names of the events to remove
-for the statistical test. The test will be more sensitive for the other
-events. Event(s) name(s) must be: deletion, insertion, IR, ES, altA, altD,
-altAD, alt, unclassified, unclassifiedSNP, -, MULTI. To work on 
-all events except insertions and deletions, the vector should be 
-\code{remove = c("insertion","deletion")}.
+for the statistical test. The test will be more sensitive for the other events.
+Event(s) name(s) must be: deletion, insertion, IR, ES, altA, altD, altAD, alt,
+unclassified, unclassifiedSNP, -, MULTI.
 This option can not be used if the \code{keep} option is used, unless ES is
-one of the event(s) to be kept. In this case, the \code{remove} option will
-work on specific ES events. To work on ES_MULTI, \code{keep} should be set to
-\code{c("ES")} with \code{remove = c("alt","altA","altD","altAD")}.
+one of the events to be kept. In this case, the \code{remove} option will
+work on specific ES events.
 By default, not any events are removed.
 This option works only when \code{k2rg} option is set to \code{TRUE}.}
 }
@@ -95,9 +67,8 @@ This option works only when \code{k2rg} option is set to \code{TRUE}.}
 length of the event, and several others (\code{counts1} to \code{countsN})
 containing the counts corresponding to the replicates of the conditions.}
 
-\item{psiInfo}{a data frame containing only one column (\code{events.names})
-containing the name of the event based on \code{KisSplice} notation, as in
-the first column of the \code{countsEvents} output.}
+\item{psiInfo}{a data frame containing informations to compute the PSI values.
+This data frame is used only when \code{counts} is different from 0.}
 
 \item{exonicReadsInfo}{a logical indicating if \code{exonicReads} is used.}
 
@@ -108,8 +79,51 @@ name. It is equal to NULL if the input file comes from KisSplice and not from
 
 
 \details{
-The \code{kissplice2counts} function returns a list of 5 elements but only
+The \code{kissplice2counts} function returns a list of 4 elements but only
 the \code{countsEvents} one is showed when the output is printed.
+
+
+The \code{counts} parameter:
+
+By default, as in \code{KisSplice}, ths \code{counts} option is set
+to 0, assuming there is no special counting option. If the data used has been
+produced using \code{counts} 1 or 2 in \code{KisSplice}, the different
+counts are summed by variant to obtain two counts for each events in each 
+sample. Below, an example of the upper path counts format output by
+\code{KisSplice} when \code{counts} is set to 2:
+
+|AS1_0|SB1_0|S1_0|ASSB1_0|AS2_27|SB2_41|S2_0|ASSB2_21|
+
+AS3_0|SB3_0|S3_0|ASSB3_0|AS4_7|SB4_8|S4_0|ASSB4_2.
+
+In a regular \code{KisSplice} output (\code{counts = 0}), it would be:
+
+|C1_0|C2_47|C3_1|C4_13 (with 47 = 27+41+0-21 and 13 = 7+8+0-2)
+
+
+The \code{order} parameter:
+
+If the reads corresponding to a pair have not been input one after another,
+the order need to be explicitely given to the \code{kissplice2counts} function.
+For instance, if there are two pairs and if the input in \code{KisSplice} has 
+been -r sample1_reads1.fa -r sample2_reads1.fa -r sample1_reads2.fa 
+-r sample2_reads2.fa, the input is not organised as two sets of reads coming 
+from the same pair (1 or 2) which are not next to each other. The vector order
+to give would be \code{order = c(1, 2, 1, 2)}.
+
+
+The \code{keep} and \code{remove} parameters:
+
+The options \code{keep} and \code{remove} allow the user to select the type of
+alternative splicing events that should be analysed. For example, to only work
+with intron retention events and alternative donor events, the vector should
+be \code{keep = c("IR","altD")}. To work on all events except insertions and
+deletions, the vector should be \code{remove = c("insertion","deletion")}.
+To work on specific exon skipping (ES) events like the simple ES events (only
+one exon can be included or excluded), both \code{keep}
+and \code{remove} options must be used. The \code{keep} option should
+be set to \code{c("ES")} and the \code{remove} option should be set to
+\code{c("alt","altA","altD","altAD","MULTI")}.
 }
 
 
