@@ -17,6 +17,9 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
   if(!logical(k2rg)){
     stop("Input error : k2rg option must be a boolean.")
   }
+  if(!is.null(order) & !is.vector(order)) {
+    stop("Input error : order option must be a vector.")
+  }
   
 	## check options compatibility
 	if (counts == 1 & exonicReads == TRUE) { 
