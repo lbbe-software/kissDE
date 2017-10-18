@@ -77,7 +77,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
 		COVERAGELOW <- 21
 		CANONICAL <- 22
 		
-		keepEvents <- wantedEvents(keep, remove)
+		keepEvents <- .wantedEvents(keep, remove)
 		
 		index <- 1
 		iEvents <- 0  ## number of unique and duplicated bcc = number of events
