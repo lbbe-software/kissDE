@@ -1,6 +1,11 @@
 kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
                              exonicReads=TRUE, k2rg=FALSE, keep=c("All"), 
                              remove=NULL) {
+  ## check options 
+  if(!file.exists(fileName)) {
+    stop(paste("Input error : user's file ",fileName," does not exist. Is the path and/or file's name corect ?",sep="")
+  }
+  
 	## check options compatibility
 	if (counts == 1 & exonicReads == TRUE) { 
 		## when counts=1 set automatically exonicReads=TRUE
