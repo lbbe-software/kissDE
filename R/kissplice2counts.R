@@ -78,6 +78,12 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
 		warning("Changing 'exonicReads' value to FALSE for consistency with 
 						counts=1.")
 	}
+  if (counts == 0 & exonicReads == FALSE) { 
+    ## when counts=1 set automatically exonicReads=TRUE
+    exonicReads <- TRUE
+    warning("Changing 'exonicReads' value to TRUE for consistency with 
+						counts=0.")
+  }
 	if (k2rg == FALSE & (keep != c("All") | !is.null(remove))) {
 		## keep and remove should only be used when k2rg=TRUE
 		keep <- c("All")
