@@ -20,6 +20,21 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
   if(!is.null(order) & !is.vector(order)) {
     stop("Input error : order option must be a vector.")
   }
+  if(k2rg & keep!=c("All")) {
+    if(!is.vector(keep)) {
+      stop("Input error : keep option must be a vector.")
+    }
+    keep <- unique(keep)
+    for(element in keep) {
+      if(!element%in%c("deletion", "insertion", "IR", "ES", "altA",
+                       "altD", "altAD", "alt", "unclassified")) {
+        stop(paste("Input error : element ",element," of option keep is not recognize. 
+                   Each elements of the keep vector must be in the following list :
+                   deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified.",
+                   sep=""))
+      }
+    }
+  }
   
 	## check options compatibility
 	if (counts == 1 & exonicReads == TRUE) { 
