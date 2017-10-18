@@ -2,6 +2,10 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 																	filterLowCountsVariants=10, 
 																	flagLowCountsConditions=10,
 																	technicalReplicates=FALSE) {
+  # Check options
+  if(length(pvalue)>1 | !is.double(pvalue) | pvalue<0 | pvalue>1) {
+    stop("Input error : pvalue option must be a double between 0 and 1.")
+  }
 	
 	message("Pre-processing the data...")
 	chunk0 <- tryCatch({.readAndPrepareData(countsData, conditions)
