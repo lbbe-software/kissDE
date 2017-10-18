@@ -270,6 +270,37 @@
 		}
 	}
   
+  # Check options
+  countsID <- countsEvents[[1]]
+  print(countsID)
+  i <- 1
+  for(thisID in countsID) {
+    if(i%%2) {
+      savedID <- thisID
+    }
+    else{
+      print(thisID)
+      print(savedID)
+      if(thisID!=savedID) {
+        stop(paste("Input error : countsData must contain two following row for the same 
+event name (first column). The row with the ID ",savedID," is alone. See the 
+                   vignette for more informations."))
+      }
+    }
+    i <- i + 1
+  }
+  if(!i%%2) {
+    stop(paste("Input error : countsData must contain two following row for the same
+               event name (first column). The last row (ID : ",savedID,") is alone.
+               See the vignette for more informations."))
+  }
+  
+  tableID <- table(countsEvents[[1]])
+  if(max(tableID) != 2){
+    stop(paste("Input error : in countsData, the event(s) ",names(tableID[tableID==max(tableID)]),
+               " has(have) more than two lines."))
+  }
+  
     if("*"%in%conditions){
         toRm <- which(conditions=="*")
         countsEvents <- countsEvents[, -(toRm+2)]
