@@ -462,10 +462,10 @@ By using \Biocpkg{DESeq2} normalization, we correct for library size, because th
 \subsection{Estimation of dispersion}
 \label{subsec:dispersion}
 A model to describe the counts distribution is first chosen.
-When working with technical replicates (\Rcode{technicalReplicates} = \Rcode{TRUE} in \Rfunction{diffExpressedVariants}), the Poisson model is chosen in \kde and the \CRANpkg{glmnet} \R{} package \cite{glmnet} (model $\mathcal{M}(\phi=0)$) is used.
-When working with biological replicates (\Rcode{technicalReplicates} = \Rcode{FALSE} in \Rfunction{diffExpressedVariants}), the Poisson distribution's variance parameter is in general not flexible enough to describe the data, because replicates add several sources of variance.
-This overdispersion is often modeled using a Negative Binomial distribution, which is chosen in \kde. In this cases, the overdispersion parameter $\phi$ is estimated using the \Biocpkg{DSS} \R{} package \cite{DSS1, DSS2, DSS3, DSS4} (model $\mathcal{M}(\phi=\phi^i_{\text{DSS}})$. 
-The \Biocpkg{DSS} package (and, to our knowledge, every other packages estimating the overdispersion of the Negative Binomial model) is suited for differential expression analysis (one counts per sample). In differential splicing analysis, two counts (one for each splice variant) are associated with each sample. In order to mimic gene expression, the overdispersion parameter $\phi$ is estimated on the sum of the splice variant counts of each sample.
+When working with technical replicates (\Rcode{technicalReplicates} = \Rcode{TRUE} in \Rfunction{diffExpressedVariants}), the Poisson model is chosen in \kde and the \CRANpkg{glmnet} \R{} package \cite{glmnet} (model $\mathcal{M}(\phi=0)$) is used.\\
+When working with biological replicates (\Rcode{technicalReplicates} = \Rcode{FALSE} in \Rfunction{diffExpressedVariants}), the Poisson distribution's variance parameter is in general not flexible enough to describe the data, because replicates add several sources of variance.\\
+This overdispersion is often modeled using a Negative Binomial distribution, which is chosen in \kde. In this cases, the overdispersion parameter $\phi$ is estimated using the \Biocpkg{DSS} \R{} package \cite{DSS1, DSS2, DSS3, DSS4} (model $\mathcal{M}(\phi=\phi^i_{\text{DSS}})$.\\
+The \Biocpkg{DSS} package (and, to our knowledge, every other packages estimating the overdispersion of the Negative Binomial model) is suited for differential expression analysis (one counts per sample). In differential splicing and SNV analysis, two counts (one for each splice variant or SNV) are associated with each sample. In order to mimic gene expression, the overdispersion parameter $\phi$ is estimated on the sum of the splice variant or SNV counts of each sample.
 
 %TODO : rewrite this part...
 
