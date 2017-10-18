@@ -5,21 +5,22 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
   if(!file.exists(fileName)) {
     stop(paste("Input error : user's file ",fileName," does not exist. Is the path and/or file's name corect ?",sep=""))
   }
-  if(!counts%in%[0,1,2]){
+  if(!counts%in%c(0,1,2)){
     stop("Input error : counts option is not equal to 0, 1 or 2.")
   }
-  if(!logical(pairedEnd)){
+  if(!is.logical(pairedEnd)){
     stop("Input error : pairedEnd option must be a boolean.")
   }
-  if(!logical(exonicReads)){
+  if(!is.logical(exonicReads)){
     stop("Input error : exonicReads option must be a boolean.")
   }
-  if(!logical(k2rg)){
+  if(!is.logical(k2rg)){
     stop("Input error : k2rg option must be a boolean.")
   }
   if(!is.null(order) & !is.vector(order, mode="numeric")) {
     stop("Input error : order option must be a vector.")
   }
+  
   if(k2rg & keep!=c("All")) {
     if(!is.vector(keep)) {
       stop("Input error : keep option must be a vector.")
@@ -31,6 +32,22 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         stop(paste("Input error : element ",element," of option keep is not recognize. 
                    Each elements of the keep vector must be in the following list :
                    deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified.",
+                   sep=""))
+      }
+    }
+  }
+  if(k2rg & !is.null(remove)) {
+    if(!is.vector(remove)) {
+      stop("Input error : remove option must be a vector.")
+    }
+    remove <- unique(remove)
+    for(element in remove) {
+      if(!element%in%c("deletion", "insertion", "IR", "ES", "altA",
+                       "altD", "altAD", "alt", "unclassified","MULTI")) {
+        stop(paste("Input error : element ",element," of option keep is not recognize. 
+                   Each elements of the keep vector must be in the following list :
+                   deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified,
+                   MULTI.",
                    sep=""))
       }
     }
