@@ -235,9 +235,10 @@ Then, the user should also specify the \Rcode{pairedEnd} parameter in \Rfunction
 If RNA-Seq libraries are single-end, \Rcode{pairedEnd} should be set to \Rcode{FALSE} (the default value). 
 If RNA-Seq libraries are paired-end, \Rcode{pairedEnd} should be set to \Rcode{TRUE}. 
 In this case, the \Rfunction{kissplice2counts} function expects the counts of the paired-end reads to be next to each other. 
-If it is not the case, an additional \Rcode{order} parameter should be used to indicate the actual order of the counts.\\
+If it is not the case, an additional \Rcode{order} parameter should be used to indicate the actual order of the counts. For instance, if the experimental design is composed of two conditions with two paired-end replicates and if the input in \kp~ followed this order:\\
+cond1\_sample1\_read1, cond1\_sample2\_read1, cond2\_sample1\_read1, cond2\_sample2\_read1, cond1\_sample1\_read2, cond1\_sample2\_read2, cond2\_sample1\_read2 and cond2\_sample2\_read2.\\
+The order vector should be equal to \Rcode{c(1,2,3,4,1,2,3,4)}.\\
 An example of a paired-end dataset run with \Rcode{counts} equal to 0 is shown in section \ref{subsec:SNV}.
-%TODO : give an example of the order option ?
 
 \Rfunction{kissplice2counts} returns a list of four elements, including \Rcode{countsEvents} which contains the table of counts required in \kde.
 <<kissplice2counts_head, fig=FALSE, keep.source=FALSE>>=
