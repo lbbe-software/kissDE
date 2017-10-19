@@ -566,7 +566,7 @@ The $\Delta$PSI/$\Delta$f is computed as follows:
 \begin{itemize}
   \item First, individual (per replicate) PSI/f are calculated. If counts for both upper and lower paths are too low ($<10$) after normalization, the individual PSI/f is not computed.
   \item Then mean PSI/f are computed for each condition. If more than half of individual PSI/f were not calculated at the previous step, the mean PSI/f is not computed.
-  \item Finally, we output $\Delta$PSI/$\Delta$f. Unless one of the mean PSI/f of a condition could not be estimated, $\Delta$PSI/$\Delta$f is calculated subtracting one condition PSI/f from another. This does not always follow the order of the conditions the user entered in the first place. To know the order, the output file must be consulted. $\Delta$PSI/$\Delta$f are calculated subtracting the first condition appearing in the header from the one after. $\Delta$PSI/$\Delta$f absolute value vary between 0 and 1, with values close to 0 indicating low effects and values close to 1 strong effects.
+  \item Finally, we output $\Delta$PSI/$\Delta$f. Unless one of the mean PSI/f of a condition could not be estimated, $\Delta$PSI/$\Delta$f is calculated subtracting one condition PSI/f from another. This does not always follow the order of the conditions the user entered in the first place: the conditions are ordered alphabeticaly. To check the final order of the conditions, the output file must be consulted. $\Delta$PSI/$\Delta$f are calculated subtracting the first condition appearing in the header from the one after. $\Delta$PSI/$\Delta$f absolute value vary between 0 and 1, with values close to 0 indicating low effects and values close to 1 strong effects.
 \end{itemize}
 
 % TODO: size correction
