@@ -560,7 +560,7 @@ These two measures turn out to be equivalent and can be summarized using the fol
     \Delta f \:=\: f_{cond1} - f_{cond2}
 \end{equation}
 
-In this formula, \#counts*\_variant_1 correspond to the normalized number of reads of the variant_1, itself normalized for the variant length. Indeed, variant_1 always have a length equal or greater than the variant_2, that's why we divide the normalized number of reads of the variant_1 by the ratio of the length of the variant_1 and the variant_2.
+In this formula, $\#counts*\_variant_1$ correspond to the normalized number of reads of the $variant_1$, itself normalized for the variant length. Indeed, $variant_1$ always have a length greater than or equal to the $variant_2$, that's why we divide the normalized number of reads of the $variant_1$ by the ratio of the length of the $variant_1$ and the $variant_2$.
 
 The $\Delta$PSI/$\Delta$f is computed as follows:
 \begin{itemize}
