@@ -109,7 +109,7 @@ results <- diffExpressedVariants(counts, conditions)
 writeOutputKissDE(results, output = "kissDE_output.tab")
 @
 
-Be aware that the functions \Rfunction{kissplice2counts} and  \Rfunction{diffExpressedVariants} may take some time to run (see section \ref{subsec:time}) for more details on running time).
+Be aware that the functions \Rfunction{kissplice2counts} and  \Rfunction{diffExpressedVariants} may take some time to run (see section \ref{subsec:time} for more details on running time).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
