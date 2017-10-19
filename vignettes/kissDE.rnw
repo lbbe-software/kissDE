@@ -278,10 +278,10 @@ head(myCounts_k2rg$countsEvents)
 
 
 The \krg~output contains information about the type of splicing events. 
-It is therefore possible to choose the subtype of events to analyse, in order to speed up \kde's run and improve statistical power for the selected events. To do this, the \Rfunction{kissplice2counts} function contain two parameters: \Rcode{keep} and \Rcode{remove}. 
+It is therefore possible to choose the subtype of events to analyse, in order to speed up \kde's running time and improve statistical power for the selected events. To do this, the \Rfunction{kissplice2counts} function contain two parameters: \Rcode{keep} and \Rcode{remove}. 
 Both take a character vector indicating the types of events to keep or remove. 
 The events names should come from this list: \Rcode{deletion}, \Rcode{insertion}, \Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. 
-The \Rcode{keep} and \Rcode{remove} parameters can be used at the same time only if \Rcode{ES} is part of the \Rcode{keep} vector. The \Rcode{remove} vector will then act on the different types of ES : ES\_MULTI, ES\_altA, ES\_altD, ES\_altAD, ES\_alt. Thus, in this specific case, the \Rcode{remove} vector should countain names from this list: \Rcode{MULTI}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}.
+The \Rcode{keep} and \Rcode{remove} parameters can be used at the same time only if \Rcode{ES} is part of the \Rcode{keep} vector. The \Rcode{remove} vector will then act on the different types of exon skipping: multi-exon skipping (\Rcode{MULTI}) or exon skipping associated with an alternative acceptor site (\Rcode{altA}), an alternative donor site (\Rcode{altD}), both alternative acceptor and donor site (\Rcode{altAD}) or an undetermined alternative splice site (\Rcode{alt}). Thus, in this specific case, the \Rcode{remove} vector should countain names from this list: \Rcode{MULTI}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}.
 By default, all types of events are analysed.
 
 If we want to analyse only cassette exon events (i.e., a single exon is skipped or included), the following command should be used:
