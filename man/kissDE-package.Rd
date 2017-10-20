@@ -27,7 +27,7 @@ qualityControl(countsData, conditions, storeFigs = FALSE)
 kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL, 
     exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL)
 
-writeOutputKissDE(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, output, 
+writeOutputKissDE(resDiffExprVariant, output, adjPvalMax = 1, dPSImin = 0, 
     writePSI = FALSE)
 }
 
