@@ -46,9 +46,8 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
 			}
 			ASSBinfo <- ASSBinfo[li, ]
 		}
-		message("Trying to fit models on data...
-		        This is a time-consuming step, so do not hesitate to have
-		        a look at the very well-written vignette !")
+		message("Trying to fit models on data...")
+		message("This can be a time-consuming step, so do not hesitate to have a look at the very well-written vignette !")
 		chunk1 <- tryCatch({.modelFit(chunk0$countsData, chunk0$n, chunk0$nr, 
 																	ASSBinfo, filterLowCountsVariants,
 																	technicalReplicates)
