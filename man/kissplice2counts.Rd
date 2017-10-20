@@ -44,19 +44,21 @@ and exonic reads is needed.}
 \item{keep}{a character vector indicating the names of the events to keep for
 the statistical test. The test will be more sensitive for those events, the
 other ones will not be tested. Event(s) name(s) must be: deletion, insertion,
-IR, ES, altA, altD, altAD, alt, unclassified, unclassifiedSNP, -.
+IR, ES, altA, altD, altAD, alt, unclassified.
 By default, all events are kept.
-This option works only when \code{k2rg} option is set to \code{TRUE}.}
+This option works only when \code{k2rg} option is set to \code{TRUE}.
+For more information on this parameter, see Details below.}
 
 \item{remove}{a character vector indicating the names of the events to remove
 for the statistical test. The test will be more sensitive for the other events.
 Event(s) name(s) must be: deletion, insertion, IR, ES, altA, altD, altAD, alt,
-unclassified, unclassifiedSNP, -, MULTI.
+unclassified, MULTI.
 This option can not be used if the \code{keep} option is used, unless ES is
 one of the events to be kept. In this case, the \code{remove} option will
 work on specific ES events.
 By default, not any events are removed.
-This option works only when \code{k2rg} option is set to \code{TRUE}.}
+This option works only when \code{k2rg} option is set to \code{TRUE}.
+For more information on this parameter, see Details below.}
 }
 
 
