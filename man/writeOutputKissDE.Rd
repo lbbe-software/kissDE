@@ -25,13 +25,16 @@ f/PSI values.
 
 
 \usage{
-writeOutputKissDE(resDiffExprVariant, adjPvalMax = 1, dPSImin = 0, output, 
+writeOutputKissDE(resDiffExprVariant, output, adjPvalMax = 1, dPSImin = 0, 
     writePSI = FALSE)
 }
 
 
 \arguments{
 \item{resDiffExprVariant}{a list, returned by \code{diffExpressedVariants}.}
+
+\item{output}{a character indicating the name of the file to save 
+\code{writeOutputKissDE} output.}
 
 \item{adjPvalMax}{a double indicating the threshold for adjusted p-value. Only
 SNVs/splicing events with an adjusted p-value lower than this threshold will be
@@ -40,9 +43,6 @@ written in the output file.}
 \item{dPSImin}{a double indicating the threshold for the deltaPSI. Only
 SNVs/splicing events which has the absolute value of their deltaf/deltaPSI
 higher than this threshold will be written in the output file.}
-
-\item{output}{a character indicating the name of the file to save 
-\code{writeOutputKissDE} output.}
 
 \item{writePSI}{a boolean indicating if the user wants the f/PSI table to be
 printed instead of the final table.}
