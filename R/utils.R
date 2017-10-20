@@ -1273,6 +1273,12 @@ event name (first column). The row with the ID ",savedID," is alone. See the
 }
 
 .wantedEvents <- function(keep=c("All"), remove=NULL){
+  if("unclassified"%in%keep) {
+    keep <- append(keep,c("-", " ", "", "unclassifiedSNP"))
+  }
+  if("unclassified"%in%remove) {
+    remove <- append(remove,c("-", " ", "", "unclassifiedSNP"))
+  }
   EVENTS <- c("deletion", "insertion", "IR", "ES", "altA", "altD", "altAD", 
               "alt", "unclassified", "-", " ", "", "unclassifiedSNP")
   ES_EVENTS <- c("MULTI", "alt", "altA", "altD", "altAD")
