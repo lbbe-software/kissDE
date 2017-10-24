@@ -59,7 +59,7 @@ It can be used to study splice variants, where the two variant of the pair diffe
 It can also be used to study genomic variants (whenever they are transcribed), which differ by a single nucleotide variation (SNV) or an indel.\\
 The statistical framework is similar to \Biocpkg{DESeq2}. Counts are modelled using the negative binomial distribution. We use the framework of the generalised linear model, and we test for association of a variant with a condition using a likelihood ratio test.\\
 This vignette explains how to use this package.\\
-The workflow for SNPs/SNVs is fully described in Lopez-Maestre et al. \cite{Lopez-Maestre2016}, the workflow for splicing is fully described in Benoit-Pilven et al.
+The workflow for SNPs/SNVs is fully described in Lopez-Maestre et al. \cite{Lopez-Maestre2016}, the workflow for splicing is fully described in Benoit-Pilven et al. \cite{Benoit-Pilven}
 \end{abstract}
 
 \packageVersion{\Sexpr{BiocStyle::pkg_ver("kissDE")}}
@@ -692,8 +692,7 @@ writeOutputKissDE(myResults_SNV, output = "final_table_significants.tab", adjPva
 \subsection{\kde~on alternative splicing data}
 \label{subsec:AS}
 This second example corresponds to the case of differential analysis of alternative splicing (AS) events. 
-The sample data presented here is a subset of the case study used in Benoit-Pilven et al.
-%TODO ref
+The sample data presented here is a subset of the case study used in Benoit-Pilven et al. \cite{Benoit-Pilven}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Dataset}
