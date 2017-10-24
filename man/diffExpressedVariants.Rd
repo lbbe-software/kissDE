@@ -15,18 +15,17 @@ diffExpressedVariants(countsData, conditions, pvalue = 1,
 
 
 \arguments{
-\item{countsData}{the output of the \code{kissplice2counts} function or a data
-frame containing the counts in the appropiate format (see Details below).}
+\item{countsData}{a data frame containing the counts in the appropriate format
+(see Details below).}
 
-\item{conditions}{a character vector containing the experimental conditions,
-of length \code{NCR} (see Details below).}
+\item{conditions}{a character vector containing the experimental conditions.}
 
 \item{pvalue}{a numerical value indicating the p-value threshold below which
 the events will be kept in the final data frame.}
 
 \item{filterLowCountsVariants}{a numerical value indicating the count value
 below which events are filtered out. After having computed the overdispersion,
-we screen out events which both variants have global counts 
+we screen out events for which both variants have global counts 
 < \code{filterLowCountsVariants} (sum of each replicate and each condition)
 in order to increase statistical power of the analysis.}
 
@@ -34,7 +33,7 @@ in order to increase statistical power of the analysis.}
 which we flag events as 'lowCounts' in the final data frame. This column aims
 to help see which event (sum of counts of the two variants) has low
 counts (< \code{flagLowCountsBoundary}) for at least n-1 conditions
-(over n).}
+(over n) and is therefore harder to validate experimentally.}
 
 \item{technicalReplicates}{a boolean value indicating if the counts in 
 \code{countsData} come from technical replicates only or not.}
@@ -46,7 +45,7 @@ counts (< \code{flagLowCountsBoundary}) for at least n-1 conditions
 \item{finalTable}{a data frame containing the columns
     \itemize{
         \item \code{ID}: the variation identifier
-        \item \code{Length_diff}: the size of the variable part
+        \item \code{Length_diff}: the size of the variable region
         \item \code{UP_Condi_Rj_Norm (resp LP_Condi_Rj_Norm)}: returns the
         normalized counts for the first variant (UP, resp. second variant: LP),
         for the condition i (\code{Condi}) and the replicate j (\code{Rj})
@@ -63,7 +62,7 @@ counts (< \code{flagLowCountsBoundary}) for at least n-1 conditions
         (lower_variant_lenght + readLength - 2 * overlap + 1) with readLength
         and overlap coming from the input options.
         \item \code{lowcounts}: a column to highlight low counts in data. 
-        If \code{TRUE}, at least one condition have less than 10 reads, \code{FALSE} else.
+        If \code{TRUE}, at least one condition have less than 10 reads.
 }}
 \item{correctedPval}{a numeric vector containing p-values after correction 
 for multiple testing}
@@ -83,19 +82,7 @@ path and name or NULL if no \code{KisSplice2RefGenome} file was used as input}
 names of the events, in its second column the lengths of the events, and in 
 the following columns, the counts corresponding to each replicate of each 
 experimental condition of one variant. Each row corresponds to one variant.
-
-\code{NCR} is defined as the number of combinaisons Condition/Replicate. 
-It is the length of the experimental design.
-If we define \eqn{C_i} the \eqn{i^{th}} experimental condition and 
-\eqn{R_{ij}} the \eqn{j^{th}} replicate of the \eqn{i^{th}} experimental
-condition, \code{NCR} is equal to \eqn{\sum_{i}\sum_{j} \left | C_iR_{ij}
-\right |}.
-For example, a balanced experimental design defined by 2 replicates in the
-first condition and 2 replicates in the second one has a length of 4
-(\code{NCR} = 4). 
-An unbalanced experimental design defined by 2 replicates in the first
-condition and 3 replicates in the second one has a length of 5 
-(\code{NCR} = 5). 
+This data frame can be obtained using \code{kissplice2counts} function.
 }
 
 \references{
