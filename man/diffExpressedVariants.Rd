@@ -54,13 +54,8 @@ counts (< \code{flagLowCountsBoundary}) for at least n-1 conditions
         \item \code{Deltaf/DeltaPSI}: difference of relative abundance of
         variants across conditions. For instance if there are 2 conditions, 
         \code{deltaPSI} returns relative abudance in condition 2 - relative
-        abundance in condition 1. If \code{counts} is at 1 or 2, inclusion
-        variants are corrected for the length of the variant so that we do not
-        overestimate the PSI value. If \code{counts} is at 0, we correct the
-        longer variant by diving by this correcting factor: 
-        (longer_variant_length + readLength - 2 *overlap + 1) / 
-        (lower_variant_lenght + readLength - 2 * overlap + 1) with readLength
-        and overlap coming from the input options.
+        abundance in condition 1. Inclusion variant's counts are corrected for
+        the length of the variant so that we do not overestimate the PSI value.
         \item \code{lowcounts}: a column to highlight low counts in data. 
         If \code{TRUE}, at least one condition have less than 10 reads.
 }}
