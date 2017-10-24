@@ -6,7 +6,7 @@
 \title{Retrieves condition-specific variants in RNA-seq data}
 
 \description{The \pkg{kissDE} package retrieves condition-specific variants in 
-RNA-seq data. Each variation (SNVs, alternative-splicing) is 
+RNA-seq data. Each variation (SNVs, alternative splicing events) is 
 represented as a pair of variants. The quantification of each variant is 
 summarized as a count, in each condition and each replicate where it was 
 measured. The package tests for enrichment of a variant in a condition. Data 
