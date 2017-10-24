@@ -949,25 +949,26 @@ event name (first column). The row with the ID ",savedID," is alone. See the
 				subsetUp <- signifVariants[namesUp]
 				subsetLow <- signifVariants[namesLow]
 				## counts correction
-				if (!is.null(ASSBinfo)) {
-					if (exonicReads){
-						## apparent size of upper path other apparent size of lower path
-						correctFactor <- lengths2$upper / lengths2$lower
-						subsetUp <- subsetUp / correctFactor
-					}
-					else{
-						nameASSBinfo <- c(paste(condi[nbRepli], "_repl", i, sep=""))
-						subsetUp[which(subsetUp > 0), ] <- 
-							subsetUp[which(subsetUp > 0), ] / 
-							(2 - ASSBinfo[which(subsetUp > 0), nameASSBinfo] / 
-							 	subsetUp[which(subsetUp > 0), ])
-					}
-					
+				if (!is.null(ASSBinfo) & !is.null(exonicReads) && !exonicReads) {
+				  ## ExonicReads=FALSE and counts=2
+				  nameASSBinfo <- c(paste(condi[nbRepli], "_repl", i, sep=""))
+				  subsetUp[which(subsetUp > 0), ] <- 
+				    subsetUp[which(subsetUp > 0), ] / 
+				    (2 - ASSBinfo[which(subsetUp > 0), nameASSBinfo] / 
+				       subsetUp[which(subsetUp > 0), ])
 				} else {
 					## counts correction if there is no info about the junction counts
-					
 					## apparent size of upper path other apparent size of lower path
-					correctFactor <- lengths2$upper / lengths2$lower
+				  if(lengths2$lower==0) {
+				    ## User didn't know the length.
+				    ## We do as if the counts correspond to junctions counts (exonicReads=FALSE)
+				    correctFactor <- 2
+				  }
+				  else {
+				    ## In every other cases (eR=F and counts=1, eR=T and counts=0 or 2), we do :
+				    ## Note that if eR=F and counts=1, the correctFactor will be 2 or very close to 2
+				    correctFactor <- lengths2$upper / lengths2$lower
+				  }
 					subsetUp <- subsetUp / correctFactor
 				}
 				
