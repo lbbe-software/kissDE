@@ -341,12 +341,12 @@ myResults <- diffExpressedVariants(countsData = myCounts,
     conditions = myConditions)
 @
 
-The \Rfunction{diffExpressedVariants} function has three other parameters to change the filters or the flags applied on data, and one other parameter to indicate if the data are technical or biological replicates:
+The \Rfunction{diffExpressedVariants} function has three other parameters to change the filters or the flags applied on data, and one other parameter to indicate if the replicates are technical or biological:
 \begin{itemize}
-  \item \Rcode{pvalue}: By default, the p-value threshold to output the significant events is set to 1. So all variants are output in the final table. This parameter must be a numeric value between 0 and 1. Be aware that by setting \Rcode{pvalue} to 0.05, only events that have been identified as significant between the conditions with a false discovery rate (FDR) $\leqslant$ 5\% will be present in the final table. 
+  \item \Rcode{pvalue}: By default, the p-value threshold to output the significant events is set to 1. So all variants are output in the final table. This parameter must be a numeric value between 0 and 1. Be aware that by setting \Rcode{pvalue} to 0.05, only events that have been identified as significant between the conditions with a false discovery rate (FDR) $\leqslant$ 5\% will be present in the final table. A posteriori changing this threshold will require to re-run the differential analysis.
   \item \Rcode{filterLowCountsVariants}: This parameter allows to change the threshold to filter low expressed events before testing (as explained in section \ref{subsec:filter}). By default, it is set to 10.
   \item \Rcode{flagLowCountsConditions}: This parameter allows to change the threshold to flag low expressed events (as explained in section \ref{subsec:flag}). By default, it is set to 10.
-  \item \Rcode{technicalReplicates}: boolean value indicating if the user is working with technical replicates only (for counts modelisation reasons, we do not advise users to mix biological and technical replicates in their analyses). If this parameter is dset to \Rcode{TRUE}, the counts will be modeled with a Poisson distribution. If it is equal to \Rcode{FALSE}, the counts will be modeled with a Negative Binomial distribution. For more informations, see section \ref{subsec:dispersion}. By default, this option is set to \Rcode{FALSE}.
+  \item \Rcode{technicalReplicates}: boolean value indicating if the user is working with technical replicates only (we do not advise users to mix biological and technical replicates in their analyses). If this parameter is set to \Rcode{TRUE}, the counts will be modeled with a Poisson distribution. If it is equal to \Rcode{FALSE}, the counts will be modeled with a Negative Binomial distribution. For more information, see section \ref{subsec:dispersion}. By default, this option is set to \Rcode{FALSE}.
 \end{itemize}
 
 The \Rfunction{diffExpressedVariants} function returns a list of 6 objects:
@@ -358,21 +358,21 @@ The \Rcode{uncorrectedPVal} and \Rcode{correctedPval} outputs are numeric vector
 \Rcode{k2rgFile} is a string containing either the \krg~file path and name or NULL if no \krg~file was used as input.
 For explanations about the \Rcode{finalTable} and \Rcode{f/psiTable} outputs, see respectively section \ref{subsubsec:finaltable} and section \ref{subsubsec:psitable}.\\
 
-To control that the condition of application of the Benjamini Hochberg multiple testing correction procedure is fulfilled, the histogram of the p-values before correction can be plotted by using the following command:
+To control that the conditions of application of the Benjamini Hochberg multiple testing correction procedure are fulfilled, the histogram of the p-values before correction can be plotted by using the following command:
 <<hist_pvalue_before_correction, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 hist(myResults$uncorrectedPVal, main="Histogram of p-values", xlab = "p-values", breaks = 50)
 @
 
 Because the dataset used here is small, the distribution obtained is not representative. Representative histograms can be obtained with the two complete datasets presented in the case studies (section \ref{sec:casestudies}). As expected, the histograms show a uniform distribution with a peak near 0 (Figure \ref{fig:distribpvalue}).
 
-\begin{figure}
+\begin{figure*}
   \includegraphics[width=0.49\textwidth]{hist_pvalue_uncorrected_SNP.png}
   \includegraphics[width=0.49\textwidth]{hist_pvalue_uncorrected_AS.png}
   \caption{\label{fig:distribpvalue}Distribution of p-values before correction 
   for multiple testing. Left: for the complete dataset presented in section 
   \ref{subsec:SNV}. Right: for the complete dataset presented in section 
   \ref{subsec:AS}.}
-\end{figure}
+\end{figure*}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -381,14 +381,14 @@ Because the dataset used here is small, the distribution obtained is not represe
 \subsubsection{Final table}
 \label{subsubsec:finaltable}
 The \Rcode{finalTable} object is the main output of the \Rfunction{diffExpressedVariants} function.
-The first 3 rows of the \Robject{myResults\$finalTable} output is as following:
+The first 3 rows of the \Robject{myResults\$finalTable} output are as follows:
 <<finaltable_description, fig=FALSE, echo=TRUE, keep.source=FALSE>>=
 print(head(myResults$finalTable, n = 3), row.names = FALSE)
 @
 
 This table contains in columns the following information:
 \begin{itemize}
-  \item \Rcode{ID} is the event identifier. An event is represented by one row in the table.
+  \item \Rcode{ID} is the event identifier. Each event is represented by one row in the table.
   \item \Rcode{Length\_diff} contains the variable part length in a splicing event. It is the length difference between the upper and lower path. This column is not relevant for SNVs. 
   \item \Rcode{Variant1\_condition\_1\_repl1\_Norm} and following columns contain the counts for each replicate of each variant after normalization (raw counts are normalized as in the \Biocpkg{DESeq2} \Bioconductor{} \R{} package, see details in section \ref{subsec:norm}). The first half of these columns concerns the first variant of each event, the second half the second variant.
   \item \Rcode{Adjusted\_pvalue} contains p-values adjusted by a Benjamini-Hochberg procedure.
@@ -413,7 +413,7 @@ writeOutputKissDE(myResults, output = "results_table_filtered.tab", adjPvalMax =
 
 
 If the counts table was built from a \krg~output with the \Rfunction{kissplice2counts} function, running the \Rfunction{writeOutputKissDE} will write a file merging results of differential analysis with \krg~data. 
-Like previously explained (section \ref{subsubsec:finaltable}), users can choose to save only events passing thresholds, in a file called \file{merge_K2RG_results_table.tab}:
+As previously explained (section \ref{subsubsec:finaltable}), users can choose to save only events passing thresholds, in a file called \file{merge_K2RG_results_table.tab}:
 <<krg_output_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults_K2RG, output = "merge_K2RG_results_table.tab", adjPvalMax = 0.05, dPSImin = 0.10)
 @
