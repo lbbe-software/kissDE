@@ -55,7 +55,7 @@ options(digits=3, width=80, prompt=" ", continue=" ")
 
 \begin{abstract}
 \kde~is a package dedicated to the analysis of count data obtained from quantification of pairs of variants in RNA-Seq data.\\
-It can be used to study splice variants, where the two variant of the pair differ by the inclusion/exclusion of an exonic region.
+It can be used to study splice variants, where the two variants of the pair differ by the inclusion/exclusion of an exonic region.
 It can also be used to study genomic variants (whenever they are transcribed), which differ by a single nucleotide variation (SNV) or an indel.\\
 The statistical framework is similar to \Biocpkg{DESeq2}. Counts are modelled using the negative binomial distribution. We use the framework of the generalised linear model, and we test for association of a variant with a condition using a likelihood ratio test.\\
 This vignette explains how to use this package.\\
@@ -77,7 +77,7 @@ The workflow for SNPs/SNVs is fully described in Lopez-Maestre et al. \cite{Lope
 \subsection{Use case}
 \kde~is meant to work on pairs of variants that have been quantified across different conditions. It can deal with single nucleotide variations (SNPs, mutations, RNA editing), indels or alternative splicing.\\
 As \kde~was first designed to be a brick of the \kp~\cite{KisSplice} pipeline (web page: \url{http://kissplice.prabi.fr/}), the \Rfunction{kissplice2counts} function can be directly applied on the output files from \kp~or \krg. Still, \kde~can also run with any other software which produces count data as long as this data is properly formatted.\\
-The user must keep in mind that \kde~was designed to work with at least two replicates for each condition, which means that the minimal input contains the variants quantified for 4 different samples, each couple representing a condition and its 2 replicates. There can be more replicates and more conditions. It is not mandatory to have an equal number of replicates in each condition.\\
+The user must keep in mind that \kde~was designed to work with at least two replicates for each condition, which means that the minimal input contains the read counts of the variants for 4 different samples, each couple representing a condition and its 2 replicates. There can be more replicates and more conditions. It is not mandatory to have an equal number of replicates in each condition.\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Install and load \kde}
@@ -99,7 +99,7 @@ Here we present the basic \R{} commands for an analysis with \kde.
 These commands require an external output file of \kp~called \file{output_kissplice.fa} (which is not included in this package). 
 To deal with other types of input file, please refer to section \ref{subsec:input}.
 The used funtions \Rfunction{kissplice2counts}, \Rfunction{qualityControl}, \Rfunction{diffExpressedVariants} and \Rfunction{writeOutputKissDE} of \kde~are detailed in section \ref{sec:workflow}. For each function, default values are used.
-Here we assume that there are two conditions ($condition\_1$ and $condition\_2$) with two biological replicates and the RNA-Seq libraries are single-end.
+Here we assume that there are two conditions ($condition\_1$ and $condition\_2$) with two biological replicates and we also assume that the RNA-Seq libraries are single-end.
 
 <<quick_start, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 counts <- kissplice2counts("output_kissplice.fa")
@@ -130,8 +130,7 @@ In this section, the successive steps and functions of a differential analysis w
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Input data}
 \label{subsec:input}
-\kde's input is a table of raw counts and a vector describing the number of conditions and replicates per condition. 
-Three options are possible, either to provide a table of counts or to work with \kp's output or with \krg's output.
+\kde's input is a table of raw counts and a vector describing the number of conditions and replicates per condition. The table of raw counts can either be directly provided by the user or obtained with \kp~or \krg~(\url{http://kissplice.prabi.fr/training/}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Condition vector}
