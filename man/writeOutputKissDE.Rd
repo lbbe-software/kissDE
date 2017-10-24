@@ -2,22 +2,22 @@
 \alias{writeOutputKissDE}
 
 \title{Create and store the output of the \code{diffExpressedVariants} function 
-in a readable file.}
+in a file.}
 
 
 \description{If a \code{KisSplice} fasta file was used in input of the 
 analysis, \code{writeOutputKissDE} will output a tab-delimited table
 containing one alternative splicing event/SNV per line. The fields are: the ID
 of the variation, the variable part length, the counts of each variant for 
-each conditions, the adjusted p-value, the deltaPSI and a boolean indicating 
-if the splicing event/SNV was correctly expressed in at least half of the
+each condition, the adjusted p-value, the deltaPSI and a boolean indicating 
+if the splicing event/SNV was sufficiently expressed in at least half of the
 conditions.
 
 If a \code{KisSplice2RefGenome} file was used in input of the analysis,
 this function will add five columns to the \code{KisSplice2RefGenome}
 file, containing the following \code{KissDE} results: normalized counts,
 normalized PSI, adjusted p-value, deltaPSI and a boolean indicating if the
-splicing event/SNV was correctly expressed in at least half of the conditions.
+splicing event/SNV was sufficiently expressed in at least half of the conditions.
 
 \code{writePSI} must be set to \code{TRUE} to write the table containing the 
 f/PSI values.
@@ -41,7 +41,7 @@ SNVs/splicing events with an adjusted p-value lower than this threshold will be
 written in the output file.}
 
 \item{dPSImin}{a double indicating the threshold for the deltaPSI. Only
-SNVs/splicing events which has the absolute value of their deltaf/deltaPSI
+SNVs/splicing events which have the absolute value of their deltaf/deltaPSI
 higher than this threshold will be written in the output file.}
 
 \item{writePSI}{a boolean indicating if the user wants the f/PSI table to be
