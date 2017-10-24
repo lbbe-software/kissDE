@@ -144,7 +144,7 @@ The "*" character can be used to remove samples from the analysis:
 <<conditionVectorRemove_howto, fig=FALSE, keep.source=FALSE, eval=FALSE>>=
 myConditions <- c(rep("condition_1", 2), rep("*", 2), rep("condition_3", 2))
 @
-Here, there are 3 conditions and 2 replicates per condition, but only $condition\_1$ and $condition\_3$ will be considered during the \kde's processing.\\
+Here, there are 3 conditions and 2 replicates per condition, but only $condition\_1$ and $condition\_3$ will be considered in the analysis.\\
 If the count table was loaded from \kp~or~\krg~output, the condition vector must contain the samples in the same order they were given to \kp~(see sections \ref{subsubsec:input_ks} and \ref{subsubsec:input_krg}).\\
 
 \warning{To run \kde, all conditions must have replicates. So each condition must at least be present twice in the condition vector. If this is not the case, an error message will be printed.}
@@ -175,7 +175,7 @@ It must be a data frame with:
   \item \textbf{in columns:}
     \begin{itemize}
       \item The first column (\Rcode{eventsName}) contains the name of the variation.
-      \item The second column (\Rcode{eventsLength}) contains the variant effective size in nucleotide (bp). Note that the size is used only in the context of alternative splicing. If this size is unknown, or if the user only work with junction counts, this value can be set to 0 for the inclusion and exclusion variant. Otherwise (if the user include reads from the variable part of the inclusion variant in his inclusion variant's counts), the effective size is mendatory. Because the exclusion variant (2nd line) almost always correspond to an exon-exon junction, a way of getting its effective size is to do: readLength - 2 * overhang + 1 (with the overhang corresponding to the minimal number of bases needed to accept that a read is aligned to a junction). The effective length of the inclusion variant (1st line) is then: effectiveLengthExclusion + variablePartLength (with variablePartLength being the length of the part only present in the inclusion variant). This is usefull for precise magnitude of effect computation and it also indicates whether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus inducing a frameshift in the open reading frame (ORF)).
+      \item The second column (\Rcode{eventsLength}) contains the variant effective size in nucleotide (bp). Note that the size is used only in the context of alternative splicing. If this size is unknown, or if the user only work with junction counts, this value can be set to 0 for the inclusion and exclusion variant. Otherwise (if the user include reads from the variable part of the inclusion variant in his inclusion variant's counts), the effective size is mendatory. Because the exclusion variant (2nd line) almost always correspond to an exon-exon junction, a way of getting its effective size is to do: readLength - 2 * overhang + 1 (with the overhang corresponding to the minimal number of bases needed to accept that a read is aligned to a junction). The effective length of the inclusion variant (1st line) is then: effectiveLengthExclusion + variablePartLength (with variablePartLength being the length of the part only present in the inclusion variant). Accurately providing the variant length is useful for precisely computing $\Delta$PSI (magnitude of the effect). Variant lengths are also used to assess if the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus inducing a frameshift in the open reading frame (ORF)).
       \item  All other columns (\Rcode{cond1rep1}, \Rcode{cond1rep2}, \Rcode{cond2rep1}, \Rcode{cond2rep2}) contain read counts of a variant in each sample. In the example above, \Rcode{cond1rep1} is the number of reads supporting this variant in the first replicate of $condition\_1$, \Rcode{cond1rep2} is the number of reads sequenced for replicate 2 in $condition\_1$, \Rcode{cond2rep1} and \Rcode{cond2rep2} are counts for replicates 1 and 2 of $condition\_2$.
     \end{itemize}
 \end{itemize}
@@ -212,11 +212,11 @@ Headers contain information used in \kde. In the example, there are:
 
 \begin{figure}
   \includegraphics{reads_type.png}
-  \caption{\label{fig:readstype}Different categories of reads. In this figure, we show an example of an alternative skipped exon. AS corresponds to reads spanning the junction between the excluded sequence and its left flanking exon, SB to reads spanning the junction between the excluded sequence and its right flanking exon, ASSB to reads spanning the two inclusion junctions, S to reads entirely included in the alternative sequence and AB to reads spanning the junction between the two flanking exons. S reads correspond to exonic reads and all other categories of reads represented here correspond to junction reads.}
+  \caption{\label{fig:readstype}Different categories of reads. In this figure, we show an example of an alternative skipped exon. AS reads correspond to reads spanning the junction between the excluded sequence and its left flanking exon, SB to reads spanning the junction between the excluded sequence and its right flanking exon, ASSB to reads spanning the two inclusion junctions, S to reads entirely included in the alternative sequence and AB to reads spanning the junction between the two flanking exons. S reads correspond to exonic reads and all other categories of reads represented here correspond to junction reads.}
 \end{figure}
 
 
-\kde~can be used on any type output from \kp~(0: SNV, 1: alternative splicing events, 3: indels,...). 
+\kde~can be used on any type of events output by \kp~(0: SNV, 1: alternative splicing events, 3: indels,...). 
 The user should refer to \kp~manual (\url{http://kissplice.prabi.fr/documentation/}) for further questions about \kp~format and output.\\
 
 To be used in \kde, \kp's output must be converted into a table of counts. This can be done with the \Rfunction{kissplice2counts} function.
@@ -245,13 +245,13 @@ names(myCounts)
 head(myCounts$countsEvents)
 @
 
-\Robject{myCounts\$countsEvents} has the same structure of the \Robject{tableCounts} object in the section \ref{subsubsec:input_count}. It is a data frame with:
+\Robject{myCounts\$countsEvents} has the same structure as the \Robject{tableCounts} object in the section \ref{subsubsec:input_count}. It is a data frame with:
 \begin{itemize}
 \item \textbf{in rows:} One variation is represented by two lines, one for each variant. For instance for SNVs, one allele is described in the first line and the other in the second line. For alternative splicing events (as in this example), the inclusion and the exclusion isoform have one line each.
 \item \textbf{in columns:}
 \begin{itemize}
 \item The first column (\Rcode{events.names}) contains the name of the variation, using \kp~notation.
-\item The second column (\Rcode{events.length}) contains the size of the variant in bp, extracted from the \kp~header. It indicates whether the size difference due to the switch from one isoform to the other is a multiple of 3 or not (thus induces a frameshift in the ORF).
+\item The second column (\Rcode{events.length}) contains the size of the variant in bp, extracted from the \kp~header.
 \item  All others columns (\Rcode{counts1, counts2, counts3, counts4}) contain counts for each replicate in each condition for the variant.
 \end{itemize}
 ~
@@ -261,12 +261,12 @@ head(myCounts$countsEvents)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Input table from \krg~output}
 \label{subsubsec:input_krg}
-The \Rfunction{kissplice2counts} function can also deal with \krg~output data with the \Rcode{k2rg} parameter. 
+The \Rfunction{kissplice2counts} function can also deal with \krg~output data using the \Rcode{k2rg} parameter. 
 \krg~allows the annotation of the alternative splicing events. It assigns each event a gene and a type of alternative splicing event, among which: Exon Skipping (ES), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (\url{http://kissplice.prabi.fr/tools/kiss2refgenome/}).
 
 In the example below, \file{output_k2rg_alt_splicing.txt}, a \krg's output, is loaded (\Robject{fpath3} contains the absolute path of the file on the user's hard disk).
 The \Rfunction{kissplice2counts} function uses the same \Rcode{counts} and \Rcode{pairedEnd} parameters as explained in the section \ref{subsubsec:input_ks}.
-The \Rcode{k2rg} parameter is a boolean value, set to \Rcode{TRUE} to read \krg~output data.
+The \Rcode{k2rg} parameter is a boolean value, set to \Rcode{TRUE} if the data comes from \krg~output.
 The table of counts yielded by the \Rfunction{kissplice2counts} function is stored in \Robject{myCounts\_k2rg}. It has exactly the same structure as detailed in section \ref{subsubsec:input_ks}.
 <<kissplice2counts_k2rg_howto, fig=FALSE, keep.source=FALSE>>=
 fpath3 <- system.file("extdata", "output_k2rg_alt_splicing.txt", package="kissDE")
@@ -277,7 +277,7 @@ head(myCounts_k2rg$countsEvents)
 
 
 The \krg~output contains information about the type of splicing events. 
-It is therefore possible to choose the subtype of events to analyse, in order to speed up \kde's running time and improve statistical power for the selected events. To do this, the \Rfunction{kissplice2counts} function contain two parameters: \Rcode{keep} and \Rcode{remove}. 
+It is therefore possible to choose the subtype of events to analyse, in order to speed up \kde's running time and improve statistical power for the selected events. To do this, the \Rfunction{kissplice2counts} function contains two parameters: \Rcode{keep} and \Rcode{remove}. 
 Both take a character vector indicating the types of events to keep or remove. 
 The events names should come from this list: \Rcode{deletion}, \Rcode{insertion}, \Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. 
 The \Rcode{keep} and \Rcode{remove} parameters can be used at the same time only if \Rcode{ES} is part of the \Rcode{keep} vector. The \Rcode{remove} vector will then act on the different types of exon skipping: multi-exon skipping (\Rcode{MULTI}) or exon skipping associated with an alternative acceptor site (\Rcode{altA}), an alternative donor site (\Rcode{altD}), both alternative acceptor and donor site (\Rcode{altAD}) or an undetermined alternative splice site (\Rcode{alt}). Thus, in this specific case, the \Rcode{remove} vector should countain names from this list: \Rcode{MULTI}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}.
