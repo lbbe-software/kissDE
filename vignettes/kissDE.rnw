@@ -365,14 +365,13 @@ hist(myResults$uncorrectedPVal, main="Histogram of p-values", xlab = "p-values",
 
 Because the dataset used here is small, the distribution obtained is not representative. Representative histograms can be obtained with the two complete datasets presented in the case studies (section \ref{sec:casestudies}). As expected, the histograms show a uniform distribution with a peak near 0 (Figure \ref{fig:distribpvalue}).
 
-\begin{figure*}
-  \includegraphics[width=0.49\textwidth]{hist_pvalue_uncorrected_SNP.png}
-  \includegraphics[width=0.49\textwidth]{hist_pvalue_uncorrected_AS.png}
+\begin{figure}
+  \includegraphics[width=\textwidth]{hist_pvalue_uncorrected.png}
   \caption{\label{fig:distribpvalue}Distribution of p-values before correction 
   for multiple testing. Left: for the complete dataset presented in section 
   \ref{subsec:SNV}. Right: for the complete dataset presented in section 
   \ref{subsec:AS}.}
-\end{figure*}
+\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
