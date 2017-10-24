@@ -402,20 +402,20 @@ In the \Rcode{finalTable} output, events are sorted by p-values and then by magn
 \paragraph{}To save results, a tab-delimited file can be created using the \Rfunction{writeOutputKissDE} function where an \Rcode{output} parameter (containing the name of the saved file) is required. 
 Here, the \Robject{myResults} output is saved in a file called \file{results_table.tab}:
 <<finaltable_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
-writeOutputKissDE(myResults, output = "results_table.tab")
+writeOutputKissDE(myResults, output = "kissDE_results_table.tab")
 @
 
 Users can choose to export only events passing some thresholds on adjusted p-value and/or Deltaf/DeltaPSI using the options \Rcode{adjPvalMax} and \Rcode{dPSImin} of the \Rfunction{writeOutputKissDE} function. 
 For example, if we want to save in a file called \file{results_table_filtered.tab} only events with the adjusted p-value $\leqslant$ 0.05 and the Deltaf/DeltaPSI absolute value $\geqslant$ 0.10, the following command can be used:
 <<finaltable_thresholds_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
-writeOutputKissDE(myResults, output = "results_table_filtered.tab", adjPvalMax = 0.05, dPSImin = 0.10)
+writeOutputKissDE(myResults, output = "kissDE_results_table_filtered.tab", adjPvalMax = 0.05, dPSImin = 0.10)
 @
 
 
 If the counts table was built from a \krg~output with the \Rfunction{kissplice2counts} function, running the \Rfunction{writeOutputKissDE} will write a file merging results of differential analysis with \krg~data. 
-As previously explained (section \ref{subsubsec:finaltable}), users can choose to save only events passing thresholds, in a file called \file{merge_K2RG_results_table.tab}:
+As previously explained (section \ref{subsubsec:finaltable}), users can choose to save only events passing thresholds, in a file called \file{kissDE_K2RG_results_table.tab}:
 <<krg_output_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
-writeOutputKissDE(myResults_K2RG, output = "merge_K2RG_results_table.tab", adjPvalMax = 0.05, dPSImin = 0.10)
+writeOutputKissDE(myResults_K2RG, output = "kissDE_K2RG_results_table.tab", adjPvalMax = 0.05, dPSImin = 0.10)
 @
 
 
