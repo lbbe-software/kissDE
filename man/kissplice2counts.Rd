@@ -34,9 +34,7 @@ that they can be summed. This option goes with \code{pairedEnd} option.
 For more information on this parameter, see Details below.}
 
 \item{exonicReads}{a logical indicating if exonic reads will be taken into
-account in the counts.It is valid to use the \code{kissplice2counts} function
-only if the \code{counts} option is set to 2 as the information about junction
-and exonic reads is needed.}
+account in the counts. This option only works if \code{counts} is set to 2.}
 
 \item{k2rg}{a logical indicating if the input file is a 
 \code{KisSplice2RefGenome} output file instead of a \code{KisSplice} file}
@@ -69,10 +67,10 @@ For more information on this parameter, see Details below.}
 length of the event, and several others (\code{counts1} to \code{countsN})
 containing the counts corresponding to the replicates of the conditions.}
 
-\item{psiInfo}{a data frame containing informations to compute the PSI values.
+\item{psiInfo}{a data frame containing information to compute the PSI values.
 This data frame is used only when \code{counts} is different from 0.}
 
-\item{exonicReadsInfo}{a logical indicating if \code{exonicReads} is used.}
+\item{exonicReadsInfo}{a logical indicating if \code{exonicReads} are used.}
 
 \item{k2rgFile}{a string containing the \code{KisSplice2RefGenome} file's
 name. It is equal to NULL if the input file comes from KisSplice and not from
@@ -81,17 +79,17 @@ name. It is equal to NULL if the input file comes from KisSplice and not from
 
 
 \details{
-The \code{kissplice2counts} function returns a list of 4 elements but only
-the \code{countsEvents} one is showed when the output is printed.
+The \code{kissplice2counts} function returns a list of 4 elements 
+(\code{countsEvents}, \code{psiInfo}, \code{exonicReadsInfo} and
+\code{k2rgFile}) but only \code{countsEvents} is showed when the output is
+printed.
 
 
 The \code{counts} parameter:
 
-By default, as in \code{KisSplice}, ths \code{counts} option is set
-to 0, assuming there is no special counting option. If the data used has been
-produced using \code{counts} 1 or 2 in \code{KisSplice}, the different
-counts are summed by variant to obtain two counts for each events in each 
-sample. Below, an example of the upper path counts format output by
+By default, as in \code{KisSplice}, the \code{counts} option is set
+to 0, assuming there is no special counting option. Below, an example of the
+upper path counts format output by
 \code{KisSplice} when \code{counts} is set to 2:
 
 |AS1_0|SB1_0|S1_0|ASSB1_0|AS2_27|SB2_41|S2_0|ASSB2_21|
@@ -117,11 +115,11 @@ to give would be \code{order = c(1, 2, 1, 2)}.
 The \code{keep} and \code{remove} parameters:
 
 The options \code{keep} and \code{remove} allow the user to select the type of
-alternative splicing events that should be analysed. For example, to only work
+alternative splicing events that should be analysed. For example, to work only
 with intron retention events and alternative donor events, the vector should
 be \code{keep = c("IR","altD")}. To work on all events except insertions and
 deletions, the vector should be \code{remove = c("insertion","deletion")}.
-To work on specific exon skipping (ES) events like the simple ES events (only
+To work specifically on single exon skipping (ES) events (only
 one exon can be included or excluded), both \code{keep}
 and \code{remove} options must be used. The \code{keep} option should
 be set to \code{c("ES")} and the \code{remove} option should be set to
