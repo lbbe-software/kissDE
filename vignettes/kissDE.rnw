@@ -218,7 +218,7 @@ Headers contain information used in \kde. In the example, there are:
 
 
 \kde~can be used on any type output from \kp~(0: SNV, 1: alternative splicing events, 3: indels,...). 
-The user should refer to \kp~manual (\url{http://kissplice.prabi.fr/documentation/user_guide.pdf}) for further questions about \kp~format and output.\\
+The user should refer to \kp~manual (\url{http://kissplice.prabi.fr/documentation/}) for further questions about \kp~format and output.\\
 
 To be used in \kde, \kp's output must be converted into a table of counts. This can be done with the \Rfunction{kissplice2counts} function.
 In the example below, a \kp's output recorded in a file called \file{output_kissplice_alt_splicing.fa} (\Robject{fpath2} contains the absolute path of the file on the user's hard disk) is loaded.
@@ -263,7 +263,7 @@ head(myCounts$countsEvents)
 \subsubsection{Input table from \krg~output}
 \label{subsubsec:input_krg}
 The \Rfunction{kissplice2counts} function can also deal with \krg~output data with the \Rcode{k2rg} parameter. 
-\krg~allows the annotation of the alternative splicing events. It assigns each event a gene and a type of alternative splicing event, among which: Exon Skipping (ES), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (\url{ftp://pbil.univ-lyon1.fr/pub/logiciel/kissplice/tools/kissplice2refgenome_userguide.pdf}).
+\krg~allows the annotation of the alternative splicing events. It assigns each event a gene and a type of alternative splicing event, among which: Exon Skipping (ES), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (\url{http://kissplice.prabi.fr/tools/kiss2refgenome/}).
 
 In the example below, \file{output_k2rg_alt_splicing.txt}, a \krg's output, is loaded (\Robject{fpath3} contains the absolute path of the file on the user's hard disk).
 The \Rfunction{kissplice2counts} function uses the same \Rcode{counts} and \Rcode{pairedEnd} parameters as explained in the section \ref{subsubsec:input_ks}.
@@ -585,7 +585,7 @@ The $\Delta$PSI/$\Delta$f is computed as follows:
 RNA-Seq data can be used to study SNVs (SNPs, mutations, RNA editing) in expressed regions of the genome. 
 Such SNVs can be detected and reported by \kp. 
 In this first following example, an analysis of SNPs is done with \kde~on RNA-Seq data from the human GEUVADIS project \cite{Lappalainen2013}. 
-The sample data presented here is a subset of the case study presented in \cite{Lopez-Maestre2016}.
+The sample data presented here is a subset of the case study presented in \cite{Lopez-Maestre2016} (\url{http://kissplice.prabi.fr/TWAS/}).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -692,7 +692,7 @@ writeOutputKissDE(myResults_SNV, output = "final_table_significants.tab", adjPva
 \subsection{\kde~on alternative splicing data}
 \label{subsec:AS}
 This second example corresponds to the case of differential analysis of alternative splicing (AS) events. 
-The sample data presented here is a subset of the case study used in Benoit-Pilven et al. \cite{Benoit-Pilven}
+The sample data presented here is a subset of the case study used in \cite{Benoit-Pilven} (\url{http://kissplice.prabi.fr/pipeline_ks_farline/}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Dataset}
