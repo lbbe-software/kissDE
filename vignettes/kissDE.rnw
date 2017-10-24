@@ -154,7 +154,8 @@ If the count table was loaded from \kp~or~\krg~output, the condition vector must
 \subsubsection{User's own data (without \kp): table of counts format}
 \label{subsubsec:input_count}
 Let's assume we work with two conditions ($condition\_1$ and $condition\_2$) and two replicates per condition.
-An input example table contained in a flat file called \file{table_counts_alt_splicing.txt} (\Robject{fpath1} contains the absolute path of the file on the user's hard disk) is loaded and stored in a \Robject{tableCounts} object.
+An input example table contained in a flat file called \file{table_counts_alt_splicing.txt} is loaded and stored in a \Robject{tableCounts} object.\\
+\bioccomment{\Robject{fpath1} contains the absolute path of the file on the user's hard disk.}
 <<tablecounts_howto, fig=FALSE, keep.source=FALSE>>=
 fpath1 <- system.file("extdata", "table_counts_alt_splicing.txt", package="kissDE")
 tableCounts <- read.table(fpath1, head = TRUE)
@@ -220,8 +221,9 @@ Headers contain information used in \kde. In the example, there are:
 The user should refer to \kp~manual (\url{http://kissplice.prabi.fr/documentation/}) for further questions about \kp~format and output.\\
 
 To be used in \kde, \kp's output must be converted into a table of counts. This can be done with the \Rfunction{kissplice2counts} function.
-In the example below, a \kp's output recorded in a file called \file{output_kissplice_alt_splicing.fa} (\Robject{fpath2} contains the absolute path of the file on the user's hard disk) is loaded.
-The table of counts yielded by the \Rfunction{kissplice2counts} function is stored in \Robject{myCounts}.
+In the example below, a \kp's output recorded in a file called \file{output_kissplice_alt_splicing.fa} is loaded.
+The table of counts yielded by the \Rfunction{kissplice2counts} function is stored in \Robject{myCounts}.\\
+\bioccomment{\Robject{fpath2} contains the absolute path of the file on the user's hard disk.}
 <<kissplice2counts_howto, fig=FALSE, keep.source=FALSE>>=
 fpath2 <- system.file("extdata", "output_kissplice_alt_splicing.fa", package="kissDE")
 myCounts <- kissplice2counts(fpath2, counts = 2, pairedEnd = TRUE)
@@ -264,10 +266,11 @@ head(myCounts$countsEvents)
 The \Rfunction{kissplice2counts} function can also deal with \krg~output data using the \Rcode{k2rg} parameter. 
 \krg~allows the annotation of the alternative splicing events. It assigns each event a gene and a type of alternative splicing event, among which: Exon Skipping (ES), Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor (AltA). Interested users should refer to \krg~manual for further questions about \krg~format and output (\url{http://kissplice.prabi.fr/tools/kiss2refgenome/}).
 
-In the example below, \file{output_k2rg_alt_splicing.txt}, a \krg's output, is loaded (\Robject{fpath3} contains the absolute path of the file on the user's hard disk).
+In the example below, \file{output_k2rg_alt_splicing.txt}, a \krg's output, is loaded.
 The \Rfunction{kissplice2counts} function uses the same \Rcode{counts} and \Rcode{pairedEnd} parameters as explained in the section \ref{subsubsec:input_ks}.
 The \Rcode{k2rg} parameter is a boolean value, set to \Rcode{TRUE} if the data comes from \krg~output.
-The table of counts yielded by the \Rfunction{kissplice2counts} function is stored in \Robject{myCounts\_k2rg}. It has exactly the same structure as detailed in section \ref{subsubsec:input_ks}.
+The table of counts yielded by the \Rfunction{kissplice2counts} function is stored in \Robject{myCounts\_k2rg}. It has exactly the same structure as detailed in section \ref{subsubsec:input_ks}.\\
+\bioccomment{\Robject{fpath3} contains the absolute path of the file on the user's hard disk.}
 <<kissplice2counts_k2rg_howto, fig=FALSE, keep.source=FALSE>>=
 fpath3 <- system.file("extdata", "output_k2rg_alt_splicing.txt", package="kissDE")
 myCounts_k2rg <- kissplice2counts(fpath3, counts = 2, pairedEnd = TRUE, k2rg = TRUE)
@@ -626,7 +629,8 @@ This information is particularly important in \kde~since it represents the count
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Load data}
-The first step is to convert this fasta file (here called \file{output_kissplice_SNV.fa}, available at the \Robject{fileIn} path in the user's hard disk) into a format that will be used in \kde's main functions, thanks to the \Rfunction{kissplice2counts} function. 
+The first step is to convert this fasta file (here called \file{output_kissplice_SNV.fa}) into a format that will be used in \kde's main functions, thanks to the \Rfunction{kissplice2counts} function.\\
+\bioccomment{\Robject{fileIn} contains the absolute path of the file on the user's hard disk.}\\
 Due to paired-end RNA-Seq data, the \Rcode{pairedEnd} parameter was set to \Rcode{TRUE}.
 
 This conversion in a table of counts is stored in a \Robject{myCounts\_SNV} object (for a detailed description of its structure, see section \ref{subsubsec:input_ks}) and can be done as follows:
@@ -719,7 +723,8 @@ print(head(exampleK2RG[,c(1:10)], 3), row.names = FALSE)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Load data}
-The \Rfunction{kissplice2counts} function allows to transform this text file (here called \file{output_k2rg_alt_splicing.txt}, available at the \Robject{fileInAS} path in the user's hard disk) into a format compatible with \kde's main functions. 
+The \Rfunction{kissplice2counts} function allows to transform this text file (here called \file{output_k2rg_alt_splicing.txt}) into a format compatible with \kde's main functions.\\
+\bioccomment{\Robject{fpathinAS} contains the absolute path of the file on the user's hard disk.}\\
 As these samples are paired-end, the \Rcode{pairedEnd} parameter is set to \Rcode{TRUE}.
 The \Rcode{k2rg} parameter must be set to \Rcode{TRUE} to indicate that the file comes from \krg~and not directly from \kp. 
 The \Rcode{counts} parameter must be set to the same value (i.e., 2) used in \kp~and \krg~to indicate which counts are given in input.
