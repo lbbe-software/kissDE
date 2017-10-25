@@ -959,16 +959,11 @@ event name (first column). The row with the ID ",savedID," is alone. See the
 				} else {
 					## counts correction if there is no info about the junction counts
 					## apparent size of upper path other apparent size of lower path
-				  if(lengths2$lower==0) {
-				    ## User didn't know the length.
-				    ## We do as if the counts correspond to junctions counts (exonicReads=FALSE)
-				    correctFactor <- 2
-				  }
-				  else {
-				    ## In every other cases (eR=F and counts=1, eR=T and counts=0 or 2), we do :
-				    ## Note that if eR=F and counts=1, the correctFactor will be 2 or very close to 2
-				    correctFactor <- lengths2$upper / lengths2$lower
-				  }
+				  ## Default is : the user don't know the length for each events/eR=FALSE
+				  correctFactor <- rep(2, length(lengths2$lower))
+				  ## We adjust this factor for every other cases (eR=F and counts=1, eR=T and counts=0 or 2)
+				  ## Note that if eR=F and counts=1, the correctFactor will be 2 or very close to 2
+				  correctFactor[lengths2$lower!=0] <- lengths2$upper[lengths2$lower!=0] / lengths2$lower[lengths2$lower!=0]
 					subsetUp <- subsetUp / correctFactor
 				}
 				
