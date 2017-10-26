@@ -292,7 +292,7 @@ If we want to analyse only cassette exon events (i.e., a single exon is skipped 
 myCounts_k2rg_ES <- kissplice2counts(fpath3, counts = 2, pairedEnd = TRUE, k2rg = TRUE, keep = c("ES"), remove = c("MULTI", "altA", "altD", "altAD", "alt"))
 @
 
-%TODO : check if it works also on SNV
+%TODO: check if it works also on SNV
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -470,7 +470,7 @@ When working with biological replicates (\Rcode{technicalReplicates} = \Rcode{FA
 This overdispersion is often modeled using a Negative Binomial distribution. In \kde, the overdispersion parameter $\phi$ is estimated using the \Biocpkg{DSS} \R{} package \cite{DSS1, DSS2, DSS3, DSS4} (model $\mathcal{M}(\phi=\phi^i_{\text{DSS}})$.\\
 The \Biocpkg{DSS} package (and, to our knowledge, every other packages estimating the overdispersion of the Negative Binomial model) is suited for differential expression analysis (one counts per sample). In differential splicing and SNV analysis, two counts (one for each splice variant or allele) are associated with each sample. In order to mimic gene expression, the overdispersion parameter $\phi$ is estimated on the sum of the splice variant or allele counts of each sample.
 
-%TODO : rewrite this part...
+%TODO: rewrite this part...
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

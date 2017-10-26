@@ -279,7 +279,7 @@
     }
     else{
       if(thisID!=savedID) {
-        stop(paste("Input error : countsData must contain two following row for the same 
+        stop(paste("Input error: countsData must contain two following row for the same 
 event name (first column). The row with the ID ",savedID," is alone. See the 
                    vignette for more informations.",sep=""))
       }
@@ -287,32 +287,32 @@ event name (first column). The row with the ID ",savedID," is alone. See the
     i <- i + 1
   }
   if(!i%%2) {
-    stop(paste("Input error : countsData must contain two following row for the same
-               event name (first column). The last row (ID : ",savedID,") is alone.
+    stop(paste("Input error: countsData must contain two following row for the same
+               event name (first column). The last row (ID: ", savedID,") is alone.
                See the vignette for more informations.",sep=""))
   }
   
   tableID <- table(countsEvents[[1]])
   if(max(tableID) != 2){
-    stop(paste("Input error : in countsData, the event(s) ",names(tableID[tableID==max(tableID)]),
+    stop(paste("Input error: in countsData, the event(s) ",names(tableID[tableID==max(tableID)]),
                " has(have) more than two lines.",sep=""))
   }
   
   countsLength <- countsEvents[[2]]
   if(!is.vector(countsLength,mode="numeric")){
-    stop("Input error : in countsData, the second column (length) is not composed of 
+    stop("Input error: in countsData, the second column (length) is not composed of 
          numerical values.")
   }
   if(min(countsLength)<0) {
-    stop(paste("Input error : in coutsData, the smallest value for the second column (length)
+    stop(paste("Input error: in coutsData, the smallest value for the second column (length)
          should be 0 (the minimal value in the current data is",min(countsLength),").",sep=""))
   }
   
   if(!is.vector(conditions)){
-    stop("Input error : condition option must be a vector.")
+    stop("Input error: condition option must be a vector.")
   }
   if(ncol(countsEvents)-2!=length(conditions)){
-    stop("Input error : not the same amount of conditions in the options countsData (starting at
+    stop("Input error: not the same amount of conditions in the options countsData (starting at
          column 3) and condition.")
   }
   
@@ -959,7 +959,7 @@ event name (first column). The row with the ID ",savedID," is alone. See the
 				} else {
 					## counts correction if there is no info about the junction counts
 					## apparent size of upper path other apparent size of lower path
-				  ## Default is : the user don't know the length for each events/eR=FALSE
+				  ## Default is: the user don't know the length for each events/eR=FALSE
 				  correctFactor <- rep(2, length(lengths2$lower))
 				  ## We adjust this factor for every other cases (eR=F and counts=1, eR=T and counts=0 or 2)
 				  ## Note that if eR=F and counts=1, the correctFactor will be 2 or very close to 2

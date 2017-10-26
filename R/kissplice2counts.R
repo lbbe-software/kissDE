@@ -3,37 +3,37 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
                              remove=NULL) {
   ## check options 
   if(!file.exists(fileName)) {
-    stop(paste("Input error : user's file ",fileName," does not exist. Is the path and/or file's name corect ?",sep=""))
+    stop(paste("Input error: user's file ",fileName," does not exist. Is the path and/or file's name corect ?",sep=""))
   }
   if(!counts%in%c(0,1,2)){
-    stop("Input error : counts option is not equal to 0, 1 or 2.")
+    stop("Input error: counts option is not equal to 0, 1 or 2.")
   }
   if(!is.logical(pairedEnd)){
-    stop("Input error : pairedEnd option must be a boolean.")
+    stop("Input error: pairedEnd option must be a boolean.")
   }
   if(!is.logical(exonicReads)){
-    stop("Input error : exonicReads option must be a boolean.")
+    stop("Input error: exonicReads option must be a boolean.")
   }
   if(!is.logical(k2rg)){
-    stop("Input error : k2rg option must be a boolean.")
+    stop("Input error: k2rg option must be a boolean.")
   }
   if(!is.null(order) & !is.vector(order, mode="numeric")) {
-    stop("Input error : order option must be a numeric vector.")
+    stop("Input error: order option must be a numeric vector.")
   }
   if(!pairedEnd & !is.null(order)) {
-    stop("Input error : order option can be set only if pairedEnd is TRUE.")
+    stop("Input error: order option can be set only if pairedEnd is TRUE.")
   }
   
   if(k2rg & keep!=c("All")) {
     if(!is.vector(keep)) {
-      stop("Input error : keep option must be a vector.")
+      stop("Input error: keep option must be a vector.")
     }
     keep <- unique(keep)
     for(element in keep) {
       if(!element%in%c("deletion", "insertion", "IR", "ES", "altA",
                        "altD", "altAD", "alt", "unclassified")) {
-        stop(paste("Input error : element ",element," of option keep is not recognize. 
-                   Each elements of the keep vector must be in the following list :
+        stop(paste("Input error: element ",element," of option keep is not recognize. 
+                   Each elements of the keep vector must be in the following list:
                    deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified.",
                    sep=""))
       }
@@ -41,14 +41,14 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
   }
   if(k2rg & !is.null(remove)) {
     if(!is.vector(remove)) {
-      stop("Input error : remove option must be a vector.")
+      stop("Input error: remove option must be a vector.")
     }
     remove <- unique(remove)
     for(element in remove) {
       if(!element%in%c("deletion", "insertion", "IR", "ES", "altA",
                        "altD", "altAD", "alt", "unclassified","MULTI")) {
-        stop(paste("Input error : element ",element," of option remove is not recognize. 
-                   Each elements of the remove vector must be in the following list :
+        stop(paste("Input error: element ",element," of option remove is not recognize. 
+                   Each elements of the remove vector must be in the following list:
                    deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified,
                    MULTI.",
                    sep=""))
@@ -57,15 +57,15 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
     if(keep!=c("All") & "ES"%in%keep) {
       for(element in remove) {
         if(!element%in%c("altA", "altD", "altAD", "alt", "MULTI")) {
-          stop(paste("Input error : element ",element," of option remove is not recognize.
+          stop(paste("Input error: element ",element," of option remove is not recognize.
                      When used is association with the keep option, each elements of the 
-                     remove vector must be in the following list : altA, altD, altAD, 
+                     remove vector must be in the following list: altA, altD, altAD, 
                      alt, MULTI."))
         }
       }
     }
     else {
-      stop("Input error : keep and remove options can not be used together, unless \"ES\" 
+      stop("Input error: keep and remove options can not be used together, unless \"ES\" 
            is one of the element(s) of the keep option (see the vignette for more informations).")
     }
   }
