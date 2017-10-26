@@ -6,24 +6,11 @@
 BiocStyle::latex2()
 @
 \usepackage{booktabs} % book-quality tables
-% \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-% \usepackage{geometry}
-% \usepackage[english]{babel}
 \usepackage{multicol}
 \usepackage{multirow}
-% \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{amssymb}
-% \usepackage{amsthm}
-% \usepackage[dvips]{graphicx}
-% \usepackage{color}
-% \usepackage{alltt}
-% \usepackage{dsfont}
-% \usepackage{fancyvrb}
-% \usepackage{listings}
-% % \usepackage[round]{natbib}
-% \usepackage{calc}
 
 <<options, results=hide, echo=FALSE>>=
 options(digits=3, width=80, prompt=" ", continue=" ")
@@ -32,9 +19,6 @@ options(digits=3, width=80, prompt=" ", continue=" ")
 \newcommand{\kde}{\Biocpkg{kissDE}}
 \newcommand{\kp}{\software{KisSplice}}
 \newcommand{\krg}{\software{KisSplice2refgenome}}
-
-% \hypersetup{pdfborder={0 0 0}}
-
 
 \bioctitle{The 'kissDE' package}
 
