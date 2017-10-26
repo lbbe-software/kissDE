@@ -23,7 +23,7 @@ frame containing the counts in the appropriate format (see Details below).}
 many elements as there are samples in total.}
 
 \item{storeFigs}{a logical or a string indicating if the plots should be 
-stored and in which directory.	By default (\code{FALSE}), the figures are not
+stored and in which directory. By default (\code{FALSE}), the figures are not
 stored but plotted one at a time when Enter is pressed. If \code{storeFigs} is
 \code{TRUE}, the figures are stored in a \code{kissDEFigures} directory which
 is created in the working directory. If \code{storeFigs} is a path (string, 

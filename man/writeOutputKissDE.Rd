@@ -17,7 +17,8 @@ If a \code{KisSplice2RefGenome} file was used in input of the analysis,
 this function will add five columns to the \code{KisSplice2RefGenome}
 file, containing the following \code{KissDE} results: normalized counts,
 normalized PSI, adjusted p-value, deltaPSI and a boolean indicating if the
-splicing event/SNV was sufficiently expressed in at least half of the conditions.
+splicing event/SNV was sufficiently expressed in at least half of the 
+conditions.
 
 \code{writePSI} must be set to \code{TRUE} to write the table containing the 
 f/PSI values.
@@ -61,10 +62,10 @@ mySplicingconditions <- c("C1", "C1", "C2", "C2")
 counts <- kissplice2counts(fileName=kissplice2refgenome_file, counts=2,
     pairedEnd=TRUE, k2rg=TRUE)
 # res <- diffExpressedVariants(countsData=counts, 
-#	    conditions=mySplicingconditions)
+#   conditions=mySplicingconditions)
 # writeOutputKissDE(res, output="results.tsv")
 # writeOutputKissDE(res, output="significants_results.tsv", 
-#			adjPvalMax=0.05, dPSImin=0.1)
+#   adjPvalMax=0.05, dPSImin=0.1)
 # writeOutputKissDE(res, output="psi_results.tsv", adjPvalMax=0.05,
-#     dPSImin=0.1, writePSI=TRUE)
+#   dPSImin=0.1, writePSI=TRUE)
 }

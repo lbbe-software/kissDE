@@ -65,8 +65,8 @@ for multiple testing}
 for multiple testing}
 \item{resultFitNBglmModel}{a data frame containing the results of the fitting
 of the model to the data}
-\item{f/psiTable}{a data frame containing the allele frequency (f)/Percent Spliced In 
-(PSI) of each replicates}
+\item{f/psiTable}{a data frame containing the allele frequency (f)/Percent 
+Spliced In (PSI) of each replicates}
 \item{k2rgFile}{a string containing either the \code{KisSplice2RefGenome} file
 path and name or NULL if no \code{KisSplice2RefGenome} file was used as input}
 }
@@ -81,9 +81,9 @@ This data frame can be obtained using \code{kissplice2counts} function.
 }
 
 \references{
-Lopez-Maestre et al., 2016. Snp calling from rna-seq data without a reference genome:
-identification, quantification, differential analysis and impact on the protein sequence.
-\emph{Nucleic Acids Research}, \bold{44}(19):e148. 
+Lopez-Maestre et al., 2016. Snp calling from rna-seq data without a reference 
+genome: identification, quantification, differential analysis and impact on the 
+protein sequence. \emph{Nucleic Acids Research}, \bold{44}(19):e148. 
 \url{https://doi.org/10.1093/nar/gkw655}
 }
 
