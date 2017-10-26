@@ -1,36 +1,37 @@
 importFrom("aod", "AIC", "anova", "deviance", "negbin")
 importFrom("Biobase", "exprs", "exprs<-")
 importFrom("DESeq2", "counts", 
-           "DESeqDataSetFromMatrix", 
-           "estimateSizeFactors", 
-           "sizeFactors")
+            "DESeqDataSetFromMatrix", 
+            "estimateSizeFactors", 
+            "sizeFactors")
 importFrom("DSS", "dispersion", "estDispersion", "newSeqCountSet")
 importFrom("glmnet", "glmnet")
 importFrom("gplots", "heatmap.2")
-importFrom("graphics", "abline", "hist", "legend", "lines", "par", "plot", "points")
+importFrom("graphics", "abline", "hist", "legend", "lines", "par", 
+            "plot", "points")
 importFrom("grDevices", "adjustcolor", "dev.off", "palette", "png")
 importFrom("stats", "aggregate", 
-           "as.dist", 
-           "coef", 
-           "complete.cases", 
-           "cor", 
-           "hclust", 
-           "heatmap", 
-           "lm", 
-           "model.matrix",
-           "nls",
-           "p.adjust",
-           "pchisq",
-           "prcomp",
-           "var",
-           "reshape")
+            "as.dist", 
+            "coef", 
+            "complete.cases", 
+            "cor", 
+            "hclust", 
+            "heatmap", 
+            "lm", 
+            "model.matrix",
+            "nls",
+            "p.adjust",
+            "pchisq",
+            "prcomp",
+            "var",
+            "reshape")
 importFrom("utils", "tail", "write.table")
 importFrom("R.utils", "countLines")
 
 export(diffExpressedVariants,
-       kissplice2counts,
-       qualityControl,
-       writeOutputKissDE)
+        kissplice2counts,
+        qualityControl,
+        writeOutputKissDE)
 
 S3method("print", "countsData")
 S3method("print", "pval")
