@@ -65,7 +65,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
                 }
             }
         }
-        else {
+        else if(keep!=c("All")) {
             stop("Input error: keep and remove options can not be used together,
                 unless \"ES\" is one of the element(s) of the keep option (see
                 the vignette for more informations).")
