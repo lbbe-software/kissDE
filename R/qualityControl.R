@@ -50,12 +50,13 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
     countsData2$vars <- apply(
         as.matrix(countsData2[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]),
         1, var, na.rm=TRUE)
+    ## remove all NAs
+    countsData2 <- countsData2[complete.cases(
+      countsData2[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]), ]
     ntop <- min(500, dim(countsData2)[1])
     selectntop <- order(countsData2$vars, decreasing=TRUE)[seq_len(ntop)]
     countsData2Selected <- countsData2[selectntop,]
-    ## remove all NAs
-    countsData2Selected <- countsData2Selected[complete.cases(
-        countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]), ]
+    
     
     ###################################################
     ### code chunk number 3: heatmap
