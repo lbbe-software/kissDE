@@ -25,7 +25,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
     dimns <- listData$dim
     n <- listData$n
     nr <- listData$nr
-    conditionsNames <- sort(unique(conditions))
+    conditionsNames <- sort(unique(conds))
     
     ###################################################
     ### select events with highest variance (on PSI)
@@ -85,7 +85,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
     ###################################################
     pca <- prcomp(t(
         countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))
-    fac <- factor(sort(conditions))
+    fac <- factor(sort(conds))
     colorpalette <- c("#192823", "#DD1E2F", "#EBB035", "#06A2CB", 
         "#218559", "#D0C6B1")
     colors <- colorpalette[seq_len(n)]
