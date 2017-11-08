@@ -1,4 +1,4 @@
-qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
+qualityControl <- function(countsData, conditions, storeFigs=FALSE, returnPCAdata=FALSE) {
     
     if (storeFigs == FALSE) {
         pathToFigs <- NA
@@ -105,5 +105,9 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
         p <- ggplot(data=d, aes_string(x="PC1", y="PC2", color="group")) + geom_point(size=3) + 
           xlab(pc1lab) + ylab(pc2lab)
         ggsave(filename, plot = p, device = "png")
+    }
+    
+    if (returnPCAdata == TRUE){
+      return(d)
     }
 }
