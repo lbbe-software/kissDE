@@ -85,32 +85,20 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
     ###################################################
     pca <- prcomp(t(
         countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))
-    fac <- factor(sort(conds))
-    colorpalette <- c("#192823", "#DD1E2F", "#EBB035", "#06A2CB", 
-        "#218559", "#D0C6B1")
-    colors <- colorpalette[seq_len(n)]
     pc1var <- round(summary(pca)$importance[2,1]*100, digits=1)
     pc2var <- round(summary(pca)$importance[2,2]*100, digits=1)
     pc1lab <- paste0("PC1 (", as.character(pc1var), "%)")
     pc2lab <- paste0("PC2 (", as.character(pc2var), "%)")
+    # create the data.frame for ggplot
+    d <- data.frame(PC1=pca$x[,1], PC2=pca$x[,2], group=sort(conds))
     if (storeFigs == FALSE) {
-        par(oma=c(2, 1, 1, 1))
-        plot(PC2~PC1, data=as.data.frame(pca$x), bg=colors[fac], pch=21, 
-            xlab=pc1lab, ylab=pc2lab, main="PCA plot")
-        par(fig=c(0, 1, 0, 1), oma=c(0, 0, 0, 0), mar=c(0, 0, 0, 0), new=TRUE)
-        plot(0, 0, type="n", bty="n", xaxt="n", yaxt="n")
-        legend("bottom", legend=levels(fac), xpd=TRUE, horiz=TRUE, 
-            inset=c(0, 0), bty="n", pch=20, col=colors)
+        p <- ggplot(data=d, aes_string(x="PC1", y="PC2", color="group")) + geom_point(size=3) + 
+               xlab(pc1lab) + ylab(pc2lab)
+        print(p)
     } else {
         filename <- paste(pathToFigs, "/pca.png", sep="")
-        png(filename)
-        par(oma=c(2, 1, 1, 1))
-        plot(PC2~PC1, data=as.data.frame(pca$x), bg=colors[fac], pch=21, 
-            xlab=pc1lab, ylab=pc2lab, main="PCA plot")
-        par(fig=c(0, 1, 0, 1), oma=c(0, 0, 0, 0), mar=c(0, 0, 0, 0), new=TRUE)
-        plot(0, 0, type="n", bty="n", xaxt="n", yaxt="n")
-        legend("bottom", legend=levels(fac), xpd=TRUE, horiz=TRUE, 
-            inset=c(0, 0), bty="n", pch=20, col=colors)
-        void <- dev.off()
+        p <- ggplot(data=d, aes_string(x="PC1", y="PC2", color="group")) + geom_point(size=3) + 
+          xlab(pc1lab) + ylab(pc2lab)
+        ggsave(filename, plot = p, device = "png")
     }
 }
