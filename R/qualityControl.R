@@ -25,7 +25,12 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
     dimns <- listData$dim
     n <- listData$n
     nr <- listData$nr
-    conditionsNames <- sort(unique(conds))
+    # remove the * in the condition vector
+    if("*"%in%conditions){
+      toRm <- which(conditions=="*")
+      conditions <- conditions[-toRm]
+    }
+    conditionsNames <- sort(unique(conditions))
     
     ###################################################
     ### select events with highest variance (on PSI)
@@ -90,7 +95,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE) {
     pc1lab <- paste0("PC1 (", as.character(pc1var), "%)")
     pc2lab <- paste0("PC2 (", as.character(pc2var), "%)")
     # create the data.frame for ggplot
-    d <- data.frame(PC1=pca$x[,1], PC2=pca$x[,2], group=sort(conds))
+    d <- data.frame(PC1=pca$x[,1], PC2=pca$x[,2], group=sort(conditions))
     if (storeFigs == FALSE) {
         p <- ggplot(data=d, aes_string(x="PC1", y="PC2", color="group")) + geom_point(size=3) + 
                xlab(pc1lab) + ylab(pc2lab)
