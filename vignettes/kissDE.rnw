@@ -517,6 +517,12 @@ directory) or to the path where the user wants to store his/her graphs.
 We recommend to use this parameter when the \Rfunction{qualityControl} 
 function is used in an automatized workflow.
 
+To customize the PCA plot, the data frame used for this plot can be extracted
+by setting the option \Rcode{returnPCAdata} to \Rcode{TRUE} as follows:
+<<returnPCAdata_howto, include=FALSE, eval=FALSE, keep.source=FALSE>>=
+PCAdata <- qualityControl(myCounts, myConditions, returnPCAdata = TRUE)
+@
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Differential analysis}
