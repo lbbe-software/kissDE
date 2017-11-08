@@ -11,7 +11,7 @@ about the data. This function is meant to be used before launching
 
 
 \usage{
-qualityControl(countsData, conditions, storeFigs = FALSE)
+qualityControl(countsData, conditions, storeFigs = FALSE, returnPCAdata = FALSE)
 }
 
 
@@ -31,6 +31,10 @@ e.g. '/path/to/figs'), this directory is created to store the figures. Plots
 are stored in .png format. If the \code{qualityControl} function is a part 
 of an automatised worflow, we recommand to set this option to \code{TRUE} or 
 to a user defined value.}
+
+\item{returnPCAdata}{a logical indicating if the data frame used in the PCA
+analysis should be output. By default (\code{FALSE}), the data frame is not
+returned.}
 }
 
 
