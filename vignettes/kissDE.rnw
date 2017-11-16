@@ -291,7 +291,7 @@ a denomination for the representation of each variant in \kp's graph.
 For alternative splicing events, the upper path represents the inclusion 
 isoform and the lower path the exclusion isoform.
 \item \Rcode{AS1\_1|SB1\_1|S1\_0|ASSB1\_0|...} and 
-\Rcode{AB1\_21|AB2\_12|AB3\_12|AB4\_2|AB5\_5|...} summarize the counts found 
+\Rcode{AB1\_21|AB2\_12|AB3\_12|AB4\_2|AB5\_5|...} summarizes the counts found 
 by \kp~quantification step. Here \kp~was run with the option \Rcode{counts} 
 set to 2. For the upper path, we have 4 counts for each sample (the different 
 reads categories are shown on Figure \ref{fig:readstype}), and for the lower 
@@ -565,7 +565,7 @@ in section \ref{subsec:filter}). By default, it is set to 10.
 threshold to flag low expressed events (as explained in section 
 \ref{subsec:flag}). By default, it is set to 10.
 
-\item \Rcode{technicalReplicates}: boolean value indicating if the user is 
+\item \Rcode{technicalReplicates}: Boolean value indicating if the user is 
 working with technical replicates only (we do not advise users to mix 
 biological and technical replicates in their analyses). If this parameter 
 is set to \Rcode{TRUE}, the counts will be modeled with a Poisson distribution.
@@ -1135,7 +1135,7 @@ with \software{STAR} \cite{Dobin2013} and analyzed with \krg.
 \krg~enables to annotate the AS events discovered by \kp. 
 It assigns each event to the gene it maps to and to a type of alternative 
 splicing event: Exon Skipping (ES), Intron Retention (IR), Alternative Donor 
-(AltD), Alternative Acceptor (AltA), \dots. 
+(AltD), Alternative Acceptor (AltA), \dots 
 For further questions on these tools (\kp~ and \krg), please refer to the 
 manual that can be found on this web page: \url{http://kissplice.prabi.fr/}.\\
 
