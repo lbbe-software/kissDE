@@ -1,4 +1,5 @@
-qualityControl <- function(countsData, conditions, storeFigs=FALSE, returnPCAdata=FALSE) {
+qualityControl <- function(countsData, conditions, storeFigs=FALSE, 
+                            returnPCAdata=FALSE) {
     
     if (storeFigs == FALSE) {
         pathToFigs <- NA
@@ -27,8 +28,8 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE, returnPCAdat
     nr <- listData$nr
     # remove the * in the condition vector
     if("*"%in%conditions){
-      toRm <- which(conditions=="*")
-      conditions <- conditions[-toRm]
+        toRm <- which(conditions=="*")
+        conditions <- conditions[-toRm]
     }
     conditionsNames <- sort(unique(conditions))
     
@@ -57,7 +58,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE, returnPCAdat
         1, var, na.rm=TRUE)
     ## remove all NAs
     countsData2 <- countsData2[complete.cases(
-      countsData2[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]), ]
+        countsData2[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]), ]
     ntop <- min(500, dim(countsData2)[1])
     selectntop <- order(countsData2$vars, decreasing=TRUE)[seq_len(ntop)]
     countsData2Selected <- countsData2[selectntop,]
@@ -97,17 +98,17 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE, returnPCAdat
     # create the data.frame for ggplot
     d <- data.frame(PC1=pca$x[,1], PC2=pca$x[,2], group=sort(conditions))
     if (storeFigs == FALSE) {
-        p <- ggplot(data=d, aes_string(x="PC1", y="PC2", color="group")) + geom_point(size=3) + 
-               xlab(pc1lab) + ylab(pc2lab)
+        p <- ggplot(data=d, aes_string(x="PC1", y="PC2", color="group")) + 
+            geom_point(size=3) + xlab(pc1lab) + ylab(pc2lab)
         print(p)
     } else {
         filename <- paste(pathToFigs, "/pca.png", sep="")
-        p <- ggplot(data=d, aes_string(x="PC1", y="PC2", color="group")) + geom_point(size=3) + 
-          xlab(pc1lab) + ylab(pc2lab)
+        p <- ggplot(data=d, aes_string(x="PC1", y="PC2", color="group")) + 
+            geom_point(size=3) + xlab(pc1lab) + ylab(pc2lab)
         ggsave(filename, plot = p, device = "png")
     }
     
     if (returnPCAdata == TRUE){
-      return(d)
+        return(d)
     }
 }
