@@ -30,7 +30,7 @@ options(digits=3, width=80, prompt=" ", continue=" ")
 \author[1]{Vincent Lacroix\thanks{\email{vincent.lacroix@univ-lyon1.fr}}}
 \affil[1]{Université de Lyon, Université Lyon 1, CNRS UMR5558, Laboratoire de 
     Biométrie et Biologie Evolutive, Villeurbanne, France}
-\affil[2]{Université de Rennes, Equipe GenScale, IRISA, Rennes, France}
+\affil[2]{Univ Rennes, Inria, CNRS, IRISA, France}
 \affil[3]{Synergie Lyon Cancer, Université Lyon 1, Centre Léon Berard, 
     Lyon, France}
 
