@@ -590,7 +590,7 @@ For explanations about the \Rcode{finalTable} and \Rcode{f/psiTable} outputs,
 see respectively section \ref{subsubsec:finaltable} and section 
 \ref{subsubsec:psitable}.\\
 
-To control that the conditions of application of the Benjamini Hochberg 
+To control that the conditions of application of the Benjamini-Hochberg 
 multiple testing correction procedure are fulfilled, the histogram of the 
 p-values before correction can be plotted by using the following command:
 
