@@ -431,14 +431,18 @@ head(myCounts_k2rg$countsEvents)
 @
 
 The \krg~output contains information about the type of splicing events. 
-It is therefore possible to choose the subtype of events to analyse, 
-in order to speed up \kde's running time and improve statistical power for 
-the selected events. To do this, the \Rfunction{kissplice2counts} function 
+By default, all of the splicing events are analysed in \kde, but
+it is also possible to focus on subtypes of events. This events 
+selection will speed up \kde's running time and improve statistical power for 
+choosen events. To do this, the \Rfunction{kissplice2counts} function 
 contains two parameters: \Rcode{keep} and \Rcode{remove}. 
 Both take a character vector indicating the types of events to keep or remove. 
 The events names should come from this list: \Rcode{deletion}, 
 \Rcode{insertion}, \Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, 
-\Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. 
+\Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. Thus, if the user is only
+interessed in intron rentention events, the \Rcod{keep = c("IR")} option
+should be used. If the user isn't interessed in deletions and insertions,
+the \Rcode{remove = c("insertion", "deletion")} option should be used.
 The \Rcode{keep} and \Rcode{remove} parameters can be used at the same time 
 only if \Rcode{ES} is part of the \Rcode{keep} vector. The \Rcode{remove} 
 vector will then act on the different types of exon skipping: multi-exon
@@ -448,9 +452,8 @@ both alternative acceptor and donor site (\Rcode{altAD}) or an undetermined
 alternative splice site (\Rcode{alt}). Thus, in this specific case, the 
 \Rcode{remove} vector should countain names from this list: \Rcode{MULTI}, 
 \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}.
-By default, all types of events are analysed.
 
-If we want to analyse only cassette exon events (i.e., a single exon is 
+If the user want to analyse only cassette exon events (i.e., a single exon is 
 skipped or included), the following command should be used:
 
 <<kissplice2counts_k2rg_ESonly_howto, fig=FALSE, keep.source=FALSE>>=
