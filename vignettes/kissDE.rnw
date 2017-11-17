@@ -164,17 +164,19 @@ be directly provided by the user or obtained with \kp~or
 \subsubsection{Condition vector}
 \label{subsubsec:condition}
 
-The first item to prepare is the condition vector that describes the order of 
-the columns in the count table. Considering an example where there are 2 
-conditions and 2 replicates per condition, the condition vector will be:
+The condition vector describes the order of the columns in the count table.\\
+As an example, the counts are ordered as follow: the two first counts represent
+the two replicates of $condition\_1$ and the two following counts the two
+replicates of $condition\_2$. In this case, the condition vector for these 2
+conditions with 2 replicates per condition, would be:
 
 <<conditionVector_howto, fig=FALSE, keep.source=FALSE>>=
 myConditions <- c(rep("condition_1", 2), rep("condition_2", 2))
 @
 
-because the counts have been input in an order that represents first the 
-two replicates of $condition\_1$, then the two replicates of $condition\_2$.\\
-The "*" character can be used to remove samples from the analysis:
+In case, the input data contains more than 2 conditions, only the conditions
+of interest should be kept. To remove samples from the analysis the "*"
+character can be used:
 
 <<conditionVectorRemove_howto, fig=FALSE, keep.source=FALSE, eval=FALSE>>=
 myConditions <- c(rep("condition_1", 2), rep("*", 2), rep("condition_3", 2))
