@@ -30,7 +30,7 @@ options(digits=3, width=80, prompt=" ", continue=" ")
 \author[1]{Vincent Lacroix\thanks{\email{vincent.lacroix@univ-lyon1.fr}}}
 \affil[1]{Université de Lyon, Université Lyon 1, CNRS UMR5558, Laboratoire de 
     Biométrie et Biologie Evolutive, Villeurbanne, France}
-\affil[2]{Université de Rennes, Equipe GenScale, IRISA, Rennes, France}
+\affil[2]{Univ Rennes, Inria, CNRS, IRISA, France}
 \affil[3]{Synergie Lyon Cancer, Université Lyon 1, Centre Léon Berard, 
     Lyon, France}
 
@@ -47,7 +47,7 @@ differ by the inclusion/exclusion of an exonic or intronic region.
 It can also be used to study genomic variants (whenever they are transcribed),
 which differ by a single nucleotide variation (SNV) or an indel.\\
 The statistical framework is base on similar hypotheses as \Biocpkg{DESeq2} 
-and includes its normalization method using geometric means. Counts are 
+\cite{DESeq2} and includes its normalization method using geometric means. Counts are 
 modelled using the negative binomial distribution. We use the framework of the 
 generalised linear model, and we test for association of a variant with a 
 condition using a likelihood ratio test.\\
@@ -292,7 +292,7 @@ a denomination for the representation of each variant in \kp's graph.
 For alternative splicing events, the upper path represents the inclusion 
 isoform and the lower path the exclusion isoform.
 \item \Rcode{AS1\_1|SB1\_1|S1\_0|ASSB1\_0|...} and 
-\Rcode{AB1\_21|AB2\_12|AB3\_12|AB4\_2|AB5\_5|...} summarize the counts found 
+\Rcode{AB1\_21|AB2\_12|AB3\_12|AB4\_2|AB5\_5|...} summarizes the counts found 
 by \kp~quantification step. Here \kp~was run with the option \Rcode{counts} 
 set to 2. For the upper path, we have 4 counts for each sample (the different 
 reads categories are shown on Figure \ref{fig:readstype}), and for the lower 
@@ -432,14 +432,18 @@ head(myCounts_k2rg$countsEvents)
 @
 
 The \krg~output contains information about the type of splicing events. 
-It is therefore possible to choose the subtype of events to analyse, 
-in order to speed up \kde's running time and improve statistical power for 
-the selected events. To do this, the \Rfunction{kissplice2counts} function 
+By default, all of the splicing events are analysed in \kde, but
+it is also possible to focus on subtypes of events. This events 
+selection will speed up \kde's running time and improve statistical power for 
+choosen events. To do this, the \Rfunction{kissplice2counts} function 
 contains two parameters: \Rcode{keep} and \Rcode{remove}. 
 Both take a character vector indicating the types of events to keep or remove. 
 The events names should come from this list: \Rcode{deletion}, 
 \Rcode{insertion}, \Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, 
-\Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. 
+\Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. Thus, if the user is only
+interessed in intron rentention events, the \Rcod{keep = c("IR")} option
+should be used. If the user isn't interessed in deletions and insertions,
+the \Rcode{remove = c("insertion", "deletion")} option should be used.
 The \Rcode{keep} and \Rcode{remove} parameters can be used at the same time 
 only if \Rcode{ES} is part of the \Rcode{keep} vector. The \Rcode{remove} 
 vector will then act on the different types of exon skipping: multi-exon
@@ -449,9 +453,8 @@ both alternative acceptor and donor site (\Rcode{altAD}) or an undetermined
 alternative splice site (\Rcode{alt}). Thus, in this specific case, the 
 \Rcode{remove} vector should countain names from this list: \Rcode{MULTI}, 
 \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}.
-By default, all types of events are analysed.
 
-If we want to analyse only cassette exon events (i.e., a single exon is 
+If the user want to analyse only cassette exon events (i.e., a single exon is 
 skipped or included), the following command should be used:
 
 <<kissplice2counts_k2rg_ESonly_howto, fig=FALSE, keep.source=FALSE>>=
@@ -566,7 +569,7 @@ in section \ref{subsec:filter}). By default, it is set to 10.
 threshold to flag low expressed events (as explained in section 
 \ref{subsec:flag}). By default, it is set to 10.
 
-\item \Rcode{technicalReplicates}: boolean value indicating if the user is 
+\item \Rcode{technicalReplicates}: Boolean value indicating if the user is 
 working with technical replicates only (we do not advise users to mix 
 biological and technical replicates in their analyses). If this parameter 
 is set to \Rcode{TRUE}, the counts will be modeled with a Poisson distribution.
@@ -591,7 +594,7 @@ For explanations about the \Rcode{finalTable} and \Rcode{f/psiTable} outputs,
 see respectively section \ref{subsubsec:finaltable} and section 
 \ref{subsubsec:psitable}.\\
 
-To control that the conditions of application of the Benjamini Hochberg 
+To control that the conditions of application of the Benjamini-Hochberg 
 multiple testing correction procedure are fulfilled, the histogram of the 
 p-values before correction can be plotted by using the following command:
 
@@ -1136,7 +1139,7 @@ with \software{STAR} \cite{Dobin2013} and analyzed with \krg.
 \krg~enables to annotate the AS events discovered by \kp. 
 It assigns each event to the gene it maps to and to a type of alternative 
 splicing event: Exon Skipping (ES), Intron Retention (IR), Alternative Donor 
-(AltD), Alternative Acceptor (AltA), \dots. 
+(AltD), Alternative Acceptor (AltA), \dots 
 For further questions on these tools (\kp~ and \krg), please refer to the 
 manual that can be found on this web page: \url{http://kissplice.prabi.fr/}.\\
 
