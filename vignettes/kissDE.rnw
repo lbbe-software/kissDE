@@ -79,17 +79,17 @@ As \kde~was first designed to be a brick of the \kp~\cite{KisSplice} pipeline
 function can be directly applied on the output files from \kp~or \krg. Still, 
 \kde~can also run with any other software which produces count data as long as 
 this data is properly formatted.\\
-The user must keep in mind that \kde~was designed to work with at least two 
+\kde~was designed to work with at least two 
 replicates for each condition, which means that the minimal input contains the 
 read counts of the variants for 4 different samples, each couple representing 
-a condition and its 2 replicates. There can be more replicates and more 
-conditions. It is not mandatory to have an equal number of replicates in each 
+a biological condition and its 2 replicates. There can be more replicates and more 
+conditions, but it is not mandatory to have an equal number of replicates in each 
 condition.\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Install and load \kde}
 
-In a \R{} session, \Bioconductor{} first be installed.
+In a \R{} session, \Bioconductor{} has first to be installed.
 
 <<installBC,eval=FALSE, fig=FALSE>>=
 source("http://bioconductor.org/biocLite.R")
@@ -109,14 +109,14 @@ library(kissDE)
 \subsection{Quick start}
 
 Here we present the basic \R{} commands for an analysis with \kde. 
-These commands require an external output file of \kp~called 
+These commands require an external output file of \kp~, for example
 \file{output_kissplice.fa} (which is not included in this package). 
-To deal with other types of input file, please refer to section 
+To deal with other types of input files, please refer to section 
 \ref{subsec:input}.
-The used funtions \Rfunction{kissplice2counts}, \Rfunction{qualityControl}, 
-\Rfunction{diffExpressedVariants} and \Rfunction{writeOutputKissDE} of
-\kde~are detailed in section \ref{sec:workflow}. For each function, default 
-values are used.
+The funtions used in \kde~are \Rfunction{kissplice2counts}, \Rfunction{qualityControl}, 
+\Rfunction{diffExpressedVariants} and \Rfunction{writeOutputKissDE}. 
+For each function, default values of the parameters are used.
+For more details on functions and their parameters see section \ref{sec:workflow}.
 Here we assume that there are two conditions ($condition\_1$ and 
 $condition\_2$) with two biological replicates and we also assume that the 
 RNA-Seq libraries are single-end.
