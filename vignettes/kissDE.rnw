@@ -41,13 +41,14 @@ options(digits=3, width=80, prompt=" ", continue=" ")
 
 \begin{abstract}
 \kde~is a package dedicated to the analysis of count data obtained from 
-quantification of pairs of variants in RNA-Seq data.\\
+the quantification of pairs of variants in RNA-Seq data.\\
 It can be used to study splice variants, where the two variants of the pair 
-differ by the inclusion/exclusion of an exonic region.
+differ by the inclusion/exclusion of an exonic or intronic region.
 It can also be used to study genomic variants (whenever they are transcribed),
 which differ by a single nucleotide variation (SNV) or an indel.\\
-The statistical framework is similar to \Biocpkg{DESeq2}. Counts are modelled 
-using the negative binomial distribution. We use the framework of the 
+The statistical framework is base on similar hypotheses as \Biocpkg{DESeq2} 
+and includes its normalization method using geometric means. Counts are 
+modelled using the negative binomial distribution. We use the framework of the 
 generalised linear model, and we test for association of a variant with a 
 condition using a likelihood ratio test.\\
 This vignette explains how to use this package.\\
