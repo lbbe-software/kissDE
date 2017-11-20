@@ -47,10 +47,10 @@ differ by the inclusion/exclusion of an exonic or intronic region.
 It can also be used to study genomic variants (whenever they are transcribed),
 which differ by a single nucleotide variation (SNV) or an indel.\\
 The statistical framework is base on similar hypotheses as \Biocpkg{DESeq2} 
-\cite{DESeq2} and includes its normalization method using geometric means. Counts are 
-modelled using the negative binomial distribution. We use the framework of the 
-generalised linear model, and we test for association of a variant with a 
-condition using a likelihood ratio test.\\
+\cite{DESeq2} and includes its normalization method using geometric means. 
+Counts are modelled using the negative binomial distribution. We use the 
+framework of the generalised linear model, and we test for association of a 
+variant with a condition using a likelihood ratio test.\\
 This vignette explains how to use this package.\\
 The workflow for SNPs/SNVs is fully described in Lopez-Maestre et al. 
 \cite{Lopez-Maestre2016}, the workflow for splicing is fully described in 
@@ -82,9 +82,9 @@ this data is properly formatted.\\
 \kde~was designed to work with at least two 
 replicates for each condition, which means that the minimal input contains the 
 read counts of the variants for 4 different samples, each couple representing 
-a biological condition and its 2 replicates. There can be more replicates and more 
-conditions, but it is not mandatory to have an equal number of replicates in each 
-condition.\\
+a biological condition and its 2 replicates. There can be more replicates and 
+more conditions, but it is not mandatory to have an equal number of replicates 
+in each condition.\\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Install and load \kde}
@@ -113,10 +113,12 @@ These commands require an external output file of \kp~, for example
 \file{output_kissplice.fa} (which is not included in this package). 
 To deal with other types of input files, please refer to section 
 \ref{subsec:input}.
-The funtions used in \kde~are \Rfunction{kissplice2counts}, \Rfunction{qualityControl}, 
+The funtions used in \kde~are \Rfunction{kissplice2counts}, 
+\Rfunction{qualityControl}, 
 \Rfunction{diffExpressedVariants} and \Rfunction{writeOutputKissDE}. 
 For each function, default values of the parameters are used.
-For more details on functions and their parameters see section \ref{sec:workflow}.
+For more details on functions and their parameters see section 
+\ref{sec:workflow}.
 Here we assume that there are two conditions ($condition\_1$ and 
 $condition\_2$) with two biological replicates and we also assume that the 
 RNA-Seq libraries are single-end.
@@ -443,7 +445,7 @@ Both take a character vector indicating the types of events to keep or remove.
 The events names should come from this list: \Rcode{deletion}, 
 \Rcode{insertion}, \Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, 
 \Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. Thus, if the user is only
-interessed in intron rentention events, the \Rcod{keep = c("IR")} option
+interessed in intron rentention events, the \Rcode{keep = c("IR")} option
 should be used. If the user isn't interessed in deletions and insertions,
 the \Rcode{remove = c("insertion", "deletion")} option should be used.
 The \Rcode{keep} and \Rcode{remove} parameters can be used at the same time 
