@@ -868,7 +868,7 @@ usage of a variant across conditions.
 The LRT is performed with one degree of freedom, which  corresponds to the
 supplementary interaction parameter. 
 p-values are then adjusted with a 5\% false discovery rate (FDR) following 
-a Benjamini-Hochberg procedure to account for multiple testing, 
+a Benjamini-Hochberg procedure \cite{benjamini1995} to account for multiple testing, 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
