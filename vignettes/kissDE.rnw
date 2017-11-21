@@ -416,8 +416,8 @@ contain counts for each replicate in each condition for the variant.
 \label{subsubsec:input_krg}
 
 The \Rfunction{kissplice2counts} function can also deal with \krg~output 
-data using the \Rcode{k2rg} parameter. 
-\krg~allows the annotation of the alternative splicing events. 
+data, in this case the \Rcode{k2rg} parameter has to be set to \Rcode{TRUE}.
+\krg~allows the annotation of the alternative splicing events.
 It assigns each event a gene and a type of alternative splicing event,
 among which: Exon Skipping (ES), Intron Retention (IR), 
 Alternative Donor (AltD), Alternative Acceptor (AltA). 
@@ -429,8 +429,6 @@ is loaded.
 The \Rfunction{kissplice2counts} function uses the same \Rcode{counts} and 
 \Rcode{pairedEnd} parameters as explained in the section 
 \ref{subsubsec:input_ks}.
-The \Rcode{k2rg} parameter is a boolean value, set to \Rcode{TRUE} if the data
-comes from \krg~output.
 The table of counts yielded by the \Rfunction{kissplice2counts} function is
 stored in \Robject{myCounts\_k2rg}. 
 It has exactly the same structure as detailed in section
@@ -454,7 +452,7 @@ selection will speed up \kde's running time and improve statistical power for
 choosen events. To do this, the \Rfunction{kissplice2counts} function 
 contains two parameters: \Rcode{keep} and \Rcode{remove}. 
 Both take a character vector indicating the types of events to keep or remove. 
-The events names should come from this list: \Rcode{deletion}, 
+The event names should come from this list: \Rcode{deletion}, 
 \Rcode{insertion}, \Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, 
 \Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. Thus, if the user is only
 interessed in intron rentention events, the \Rcode{keep = c("IR")} option
@@ -467,10 +465,10 @@ skipping (\Rcode{MULTI}) or exon skipping associated with an alternative
 acceptor site (\Rcode{altA}), an alternative donor site (\Rcode{altD}), 
 both alternative acceptor and donor site (\Rcode{altAD}) or an undetermined
 alternative splice site (\Rcode{alt}). Thus, in this specific case, the 
-\Rcode{remove} vector should countain names from this list: \Rcode{MULTI}, 
+\Rcode{remove} vector should contain names from this list: \Rcode{MULTI}, 
 \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}.
 
-If the user want to analyse only cassette exon events (i.e., a single exon is 
+If the user wants to analyse only cassette exon events (i.e., a single exon is
 skipped or included), the following command should be used:
 
 <<kissplice2counts_k2rg_ESonly_howto, fig=FALSE, keep.source=FALSE>>=
