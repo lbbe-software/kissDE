@@ -561,8 +561,8 @@ myResults <- diffExpressedVariants(countsData = myCounts,
     conditions = myConditions)
 @
 
-The \Rfunction{diffExpressedVariants} function has three other parameters 
-to change the filters or the flags applied on data, and one other parameter 
+The \Rfunction{diffExpressedVariants} function has three parameters to change
+the filters or the flags applied on the data, and one parameter 
 to indicate if the replicates are technical or biological:
 
 \begin{itemize}
@@ -599,18 +599,18 @@ names(myResults)
 @
 
 The \Rcode{uncorrectedPVal} and \Rcode{correctedPval} outputs are numeric
-vectors containing p-values before and after correction for multiple testing.
+vectors with p-values before and after correction for multiple testing.
 \Rcode{resultFitNBglmModel} is a data frame containing the results of the 
 fitting of the model to the data.
 \Rcode{k2rgFile} is a string containing either the \krg~file path and name or 
 NULL if no \krg~file was used as input.
 For explanations about the \Rcode{finalTable} and \Rcode{f/psiTable} outputs, 
-see respectively section \ref{subsubsec:finaltable} and section 
-\ref{subsubsec:psitable}.\\
+see section \ref{subsubsec:finaltable} and section 
+\ref{subsubsec:psitable}, respectively.\\
 
-To control that the conditions of application of the Benjamini-Hochberg 
-multiple testing correction procedure \cite{benjamini1995} are fulfilled, the 
-histogram of the p-values before correction can be plotted by using the 
+To visualize the distribution of the p-values before the application of the
+Benjamini-Hochberg \cite{benjamini1995} multiple testing correction procedure,
+the histogram of the p-values before correction can be plotted by using the 
 following command:
 
 <<hist_pvalue_before_correction, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
@@ -618,10 +618,9 @@ hist(myResults$uncorrectedPVal, main="Histogram of p-values",
     xlab = "p-values", breaks = 50)
 @
 
-Because the dataset used here is small, the distribution obtained is not 
-representative. Representative histograms can be obtained with the two 
-complete datasets presented in the case studies (section 
-\ref{sec:casestudies}). As expected, the histograms show a uniform 
+Because the dataset used here is small ($\sim$ 100 lines), the histograms of the two 
+complete datasets presented in the case studies (section \ref{sec:casestudies})
+are represented. As expected, the histograms show a uniform 
 distribution with a peak near 0 (Figure \ref{fig:distribpvalue}).
 
 \begin{figure}
