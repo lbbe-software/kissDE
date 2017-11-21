@@ -645,7 +645,7 @@ The first 3 rows of the \Robject{myResults\$finalTable} output are as follows:
 print(head(myResults$finalTable, n = 3), row.names = FALSE)
 @
 
-This table contains in columns the following information:
+The columns of this table contain the following information:
 
 \begin{itemize}
 \item \Rcode{ID} is the event identifier. Each event is represented by one 
@@ -675,7 +675,7 @@ of the output.\\
 \warning{When the p-value computed by \kde~is lower than the smallest number
 greater than zero that can be stored (i.e., 2.2e-16), this p-value is set to 0.}
 
-\paragraph{}To save results, a tab-delimited file can be created using the 
+\paragraph{}To save results, a tab-delimited file can be written with 
 \Rfunction{writeOutputKissDE} function where an \Rcode{output} parameter 
 (containing the name of the saved file) is required. 
 Here, the \Robject{myResults} output is saved in a file called 
@@ -704,8 +704,7 @@ If the counts table was built from a \krg~output with the
 \Rfunction{writeOutputKissDE} will write a file merging results of differential 
 analysis with \krg~data. 
 As previously explained (section \ref{subsubsec:finaltable}), users can choose 
-to save only events passing thresholds, in a file called 
-\file{kissDE_K2RG_results_table.tab}:
+to save only events passing thresholds:
 
 <<krg_output_write, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults_K2RG, output = "kissDE_K2RG_results_table.tab", 
