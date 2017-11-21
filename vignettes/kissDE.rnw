@@ -226,34 +226,45 @@ It must be a data frame with:
 instance, for SNVs, one allele is described in the first line, and the other 
 in the second line. For alternative splicing events, the inclusion isoform and 
 the exclusion isoform have one line each.
-\item A head row must contain the columns name in the flat file.
+\item The header must contain the column names in the flat file.
 \end{itemize}
 
 \item \textbf{in columns:}
 \begin{itemize}
 \item The first column (\Rcode{eventsName}) contains the name of the variation.
-\item The second column (\Rcode{eventsLength}) contains the variant effective 
-size in nucleotides (bp). This information is used only in the context of 
-alternative splicing. In the context of SNVs, it can be set to 0. It is used 
-to assess which splice variants may induce a frameshift (the difference of 
-length between the inclusion and exclusion variant is not a multiple of 3). 
-It is also used to precisely estimate the PSI (Percent Spliced In). 
-For this purpose, we need the effective size, which corresponds to the number 
-of read mapping positions used when estimating the abundance of a variant. 
+\item The second column (\Rcode{eventsLength}) contains the effective size of
+the variant in nucleotides (bp). The effective size corresponds to the number 
+of read mapping positions used when estimating the abundance of a variant.\\
 For the exclusion variant (2nd line), which should correspond to an exon-exon 
-junction, it corresponds to readLength - 2 * overhang +1 (with the overhang 
-corresponding to the minimal number of bases needed to accept that a read is 
-aligned to a junction). For the inclusion variant (1st line), it corresponds 
-to effectiveLengthExclusion + variablePartLength (with variablePartLength 
-being the length of the region only present in the inclusion variant).
-In the special case where the abundance of the inclusion variant has been 
-estimated using only junction reads, then the effective length of the 
-inclusion variant is 2*effectiveLengthExclusion.
+junction, it corresponds to:
+\begin{equation}
+effectiveLengthExclu = readLength - 2 * overhang +1
+\end{equation}
+where $overhang$ corresponds to the minimal number of bases needed to accept
+that a read is aligned to a junction.\\
+For the inclusion variant (1st line), it
+corresponds to:
+\begin{equation}
+effectiveLengthInclu = effectiveLengthExclu + variablePartLength
+\end{equation}
+where $variablePartLength$ is the length of the region only present in the
+inclusion variant.\\
+In the special case where the abundance of the inclusion
+variant has been estimated using only junction reads, then the effective length
+of the inclusion variant is:
+\begin{equation}
+effectiveLengthInclu = 2*effectiveLengthExclu
+\end{equation}
+This information is used only in the context of alternative splicing. In the
+context of SNVs, it can be set to 0. It is used to assess which splice variants
+may induce a frameshift (the difference of length between the inclusion and
+exclusion variant is not a multiple of 3). 
+It is also used to precisely estimate the PSI (Percent Spliced In). 
 \item All other columns (\Rcode{cond1rep1}, \Rcode{cond1rep2}, 
 \Rcode{cond2rep1}, \Rcode{cond2rep2}) contain read counts of a variant in 
-each sample. In the example above, \Rcode{cond1rep1} is the number of reads 
+a sample. In the example above, \Rcode{cond1rep1} is the number of reads 
 supporting this variant in the first replicate of $condition\_1$, 
-\Rcode{cond1rep2} is the number of reads sequenced for replicate 2 in 
+\Rcode{cond1rep2} is the number of reads supporting replicate 2 in 
 $condition\_1$, \Rcode{cond2rep1} and \Rcode{cond2rep2} are counts for 
 replicates 1 and 2 of $condition\_2$.
 \end{itemize}
