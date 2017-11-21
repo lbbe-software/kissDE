@@ -275,8 +275,8 @@ replicates 1 and 2 of $condition\_2$.
 \subsubsection{Input table from \kp~output}
 \label{subsubsec:input_ks}
 
-\kde~can also deal with \kp~output, which is in fasta format.
-Below is an example of the four first lines of a \kp~output:
+\kde~was developped to deal with \kp~output, which is in fasta format.
+Below is an example of the first four lines of an example of \kp~output:
 
 <<kissplice_format, echo=TRUE, keep.source=TRUE>>=
 headfasta <- system.file("extdata", 
@@ -284,11 +284,12 @@ headfasta <- system.file("extdata",
 writeLines(readLines(headfasta))
 @
 
-Events are reported in blocks of 4 lines, the two first are about one variant 
-of the splicing event (or one allele of the SNV), the following two lines 
-about the other variant (or the other allele). 
-For each variant, there is a header beginning with the \Rcode{>} symbol 
-and a sequence. 
+Events are reported in blocks of 4 lines, the first two lines correspond to
+one variant of the splicing event (or one allele of the SNV), the following
+two lines correspond to the other variant (or the other allele). 
+As for all fasta file, there is a header line beginning with the \Rcode{>}
+symbol and a line with the sequence. Each variant correspond to one entry in
+the fasta file.
 
 Headers contain information used in \kde. In the example, there are:
 \begin{itemize}
@@ -296,7 +297,7 @@ Headers contain information used in \kde. In the example, there are:
 \begin{itemize}
 \item \Rcode{bcc\_68965|Cycle\_4} is the event's ID.
 \item \Rcode{Type\_1} means that the sequences correspond to a splicing event. 
-\Rcode{Type\_0} would correspond to SNVs.
+\Rcode{Type\_0} corresponds to SNVs.
 \end{itemize}
 
 \item elements that are specific to a variant:
@@ -306,12 +307,13 @@ gives the length of the nucleotide sequences. Upper path and lower path are
 a denomination for the representation of each variant in \kp's graph. 
 For alternative splicing events, the upper path represents the inclusion 
 isoform and the lower path the exclusion isoform.
-\item \Rcode{AS1\_1|SB1\_1|S1\_0|ASSB1\_0|...} and 
+\item \Rcode{AS1\_1|SB1\_1|S1\_0|ASSB1\_0|AS2\_0|SB2\_0|S2\_0|ASSB2\_0|...} and
 \Rcode{AB1\_21|AB2\_12|AB3\_12|AB4\_2|AB5\_5|...} summarizes the counts found 
-by \kp~quantification step. Here \kp~was run with the option \Rcode{counts} 
-set to 2. For the upper path, we have 4 counts for each sample (the different 
-reads categories are shown on Figure \ref{fig:readstype}), and for the lower 
-path, we have 1 count per sample. There are 8 sets of counts because we gave
+by \kp~quantification step.
+Here \kp~was run with the option \Rcode{counts} set to 2. 
+For the upper path, we have 4 counts for each sample: AS, SB, S and ASS. For
+the lower path, we have 1 count per sample: AB. The different reads categories
+are shown on Figure \ref{fig:readstype}. There are 8 sets of counts because we gave
 8 files in input to \kp. Each count corresponds to the reads coming from each 
 file that could be mapped on the variant, in the order they have been
 passed to \kp.
@@ -337,11 +339,11 @@ reads.}
 \kp~(0: SNV, 1: alternative splicing events, 3: indels,...). 
 The user should refer to \kp~manual 
 (\url{http://kissplice.prabi.fr/documentation/}) for further 
-questions about \kp~format and output.\\
+questions about the \kp~format and its output.\\
 
 To be used in \kde, \kp's output must be converted into a table of counts. 
 This can be done with the \Rfunction{kissplice2counts} function.
-In the example below, a \kp's output recorded in a file called
+In the example below, the \kp output file called
 \file{output_kissplice_alt_splicing.fa} is loaded.
 The table of counts yielded by the \Rfunction{kissplice2counts} function
 is stored in \Robject{myCounts}.\\
@@ -356,16 +358,13 @@ myCounts <- kissplice2counts(fpath2, counts = 2, pairedEnd = TRUE)
 
 The counts returned by \Rfunction{kissplice2counts} are extracted from the 
 \kp~header. By default, \Rfunction{kissplice2counts} expects single-end reads 
-and one count for each variant. If this is not the case, some parameters need 
-to be adapted.\\
-First, the \Rcode{counts} parameter of \Rfunction{kissplice2counts} must be 
+and one count for each variant.\\
+The \Rcode{counts} parameter of \Rfunction{kissplice2counts} must be 
 the same as the \Rcode{counts} parameter used to obtain data with \kp. 
 The possible values are 0, 1 or 2. 0 is the default value for both 
 \Rfunction{kissplice2counts} and \kp.\\
-Then, the user should also specify the \Rcode{pairedEnd} parameter in 
-\Rfunction{kissplice2counts}. 
-If RNA-Seq libraries are single-end, \Rcode{pairedEnd} should be set to 
-\Rcode{FALSE} (the default value). 
+The user can also specify the \Rcode{pairedEnd} parameter in 
+\Rfunction{kissplice2counts}.
 If RNA-Seq libraries are paired-end, \Rcode{pairedEnd} should be set to 
 \Rcode{TRUE}. 
 In this case, the \Rfunction{kissplice2counts} function expects the counts
@@ -374,9 +373,11 @@ If it is not the case, an additional \Rcode{order} parameter should be used
 to indicate the actual order of the counts. For instance, if the experimental 
 design is composed of two conditions with two paired-end replicates and if 
 the input in \kp~ followed this order:\\
-cond1\_sample1\_read1, cond1\_sample2\_read1, cond2\_sample1\_read1, 
-cond2\_sample2\_read1, cond1\_sample1\_read2, cond1\_sample2\_read2, 
-cond2\_sample1\_read2 and cond2\_sample2\_read2.\\
+cond1\_sample1\_readpair1, cond1\_sample2\_readpair1,
+cond2\_sample1\_readpair1,\\
+cond2\_sample2\_readpair1, cond1\_sample1\_readpair2,
+cond1\_sample2\_readpair2,\\
+cond2\_sample1\_readpair2 and cond2\_sample2\_readpair2.\\
 The order vector should be equal to \Rcode{c(1,2,3,4,1,2,3,4)}.\\
 An example of a paired-end dataset run with \Rcode{counts} equal to 0 is
 shown in section \ref{subsec:SNV}.
