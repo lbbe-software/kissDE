@@ -498,10 +498,11 @@ qualityControl(myCounts, myConditions)
 
 It produces 2 graphs:
 \begin{itemize}
-\item{a heatmap of the sample-to-sample distances (see left panel of
-Figure \ref{fig:qualityControl})}
+\item{a heatmap of the sample-to-sample distances using the 500 most variant
+events (see left panel of Figure \ref{fig:qualityControl})}
 \item{the factor map formed by the first two axes of a principal 
-component analysis (PCA) (see right panel of Figure \ref{fig:qualityControl})}
+component analysis (PCA) using the 500 most variant events (see right panel of
+Figure \ref{fig:qualityControl})}
 \end{itemize}
 
 \begin{figure}
@@ -521,8 +522,7 @@ that will influence the differential analysis.
 The user can then go back to the quality control of the raw data to solve 
 the problem or decide to remove the sample from the analysis.
 
-In this example, the plots are reassuring. 
-Indeed, in the heatmap plot, the samples that cluster together are from 
+In the heatmap plot, the samples that cluster together are from 
 the same condition. 
 In the PCA plot, the first principal component (PC1) summarize 90.2\% of 
 the total variance of the dataset. 
