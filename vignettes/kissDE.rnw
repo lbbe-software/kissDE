@@ -95,7 +95,7 @@ In a \R{} session, \Bioconductor{} has first to be installed.
 source("http://bioconductor.org/biocLite.R")
 @
 
-Then the \kde~package can be installed from \Bioconductor{} and finally loaded.
+Then, the \kde~package can be installed from \Bioconductor{} and finally loaded.
 
 <<install,eval=FALSE, fig=FALSE>>=
 biocLite("kissDE")
@@ -131,7 +131,7 @@ results <- diffExpressedVariants(counts, conditions)
 writeOutputKissDE(results, output = "kissDE_output.tab")
 @
 
-Be aware that the functions \Rfunction{kissplice2counts} and 
+Note that the functions \Rfunction{kissplice2counts} and 
 \Rfunction{diffExpressedVariants} may take some time to run (see section 
 \ref{subsec:time} for more details on running time).
 
