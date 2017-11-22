@@ -1216,8 +1216,8 @@ myConditions_SNV <- c(rep("TSC",2), rep("CEU",2))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Quality control}
 
-Before running the differential analysis, we check if the data was correctly
-loaded, by running the \Rfunction{qualityControl} function.
+Before running the differential analysis, we recommand t ocheck if the data was 
+correctly loaded, by running the \Rfunction{qualityControl} function.
 
 <<qualityControl_SNV, include=FALSE, fig=TRUE, keep.source=FALSE>>=
 qualityControl(myCounts_SNV, myConditions_SNV)
@@ -1231,11 +1231,10 @@ the sample-to-sample distances on SNV data. Right: Principal Component
 Analysis on SNV data.}
 \end{figure}
 
-On both plots returned by the \Rfunction{qualityControl} function (Figure
-\ref{fig:qcSNV}), the replicates of the same condition seem to be more similar
-between themselves than to the samples of the other condition. 
-On the heatmap (left of Figure \ref{fig:qcSNV}), the samples of the same
-condition cluster together. 
+On both plots outputed (Figure \ref{fig:qcSNV}), the replicates of the same 
+condition seem to be more similar between themselves than to the samples of 
+the other condition. On the heatmap (left of Figure \ref{fig:qcSNV}), the 
+samples of the same condition cluster together. 
 On the PCA plot (right of Figure \ref{fig:qcSNV}), the first principal 
 component (which summarises 88\% of the total variance) clearly discriminates 
 the two conditions.
