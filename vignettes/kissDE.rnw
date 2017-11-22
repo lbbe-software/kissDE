@@ -789,9 +789,9 @@ This overdispersion is often modeled using a Negative Binomial distribution.
 In \kde, the overdispersion parameter, $\phi$, is estimated using the 
 \Biocpkg{DSS} \R{} package \cite{DSS1, DSS2, DSS3, DSS4} 
 (model $\mathcal{M}(\phi=\phi^i_{\text{DSS}})$.\\
-The \Biocpkg{DSS} package (and, to our knowledge, every other packages
+The \Biocpkg{DSS} package (and, to our knowledge, every other package
 estimating the overdispersion of the Negative Binomial model) is suited 
-for differential expression analysis (one counts per sample). 
+for differential expression analysis (one count per sample). 
 In differential splicing and SNV analysis, two counts (one for each 
 splice variant or allele) are associated with each sample. In order to
 mimic gene expression, the overdispersion parameter $\phi$ is estimated
@@ -940,27 +940,24 @@ PSI \:=\: f  \:=\:  \frac{\#counts*\_variant_1}{\#counts*\_variant_1 +
 In this formula, $\#counts*\_variant_1$ correspond to the normalized number
 of reads of the $variant_1$, itself normalized for the variant length.
 Indeed, by construction, $variant_1$ always have a length greater than or equal
-to the $variant_2$, that's why we divide the normalized number of reads of the
+to the $variant_2$. That's why we divide the normalized number of reads of the
 $variant_1$ by the ratio of the length of the $variant_1$ and the $variant_2$.
 
 The $\Delta$PSI/$\Delta$f is computed as follows:
 \begin{itemize}
 \item First, individual (per replicate) PSI/f are calculated. If counts for
 both upper and lower paths are too low ($<10$) after normalization, the
-individual PSI/f is not computed.
-\item Then mean PSI/f are computed for each condition. If more than half of
+individual PSI/f are not computed.
+\item Then mean PSI/f are computed for each condition. If more than half of the
 individual PSI/f were not calculated at the previous step, the mean PSI/f is 
-not computed.
+not computed either.
 \item Finally, we output $\Delta$PSI/$\Delta$f. Unless one of the mean PSI/f 
-of a condition could not be estimated, $\Delta$PSI/$\Delta$f is calculated 
-subtracting one condition PSI/f from another.
-This does not always follow the order of the conditions the user entered in 
-the first place: the conditions are ordered alphabetically. 
-To check the final order of the conditions, the output file must be consulted.
-$\Delta$PSI/$\Delta$f are calculated subtracting the first condition appearing 
-in the header from the one after. $\Delta$PSI/$\Delta$f absolute value vary 
-between 0 and 1, with values close to 0 indicating low effects and values
-close to 1 strong effects.
+of a condition could not be computed, $\Delta$PSI/$\Delta$f is calculated 
+subtracting one condition PSI/f from another. $\Delta$PSI/$\Delta$f absolute 
+value vary between 0 and 1, with values close to 0 indicating low effects and 
+values close to 1 strong effects.
+Note that the conditions are ordered alphabetically, and that \kde~substract
+the condition coming first in the alphabet to the other.
 \end{itemize}
 
 
