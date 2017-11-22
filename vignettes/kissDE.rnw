@@ -313,9 +313,9 @@ by \kp~quantification step.
 Here \kp~was run with the option \Rcode{counts} set to 2. 
 For the upper path, we have 4 counts for each sample: AS, SB, S and ASS. For
 the lower path, we have 1 count per sample: AB. The different reads categories
-are shown on Figure \ref{fig:readstype}. There are 8 sets of counts because we gave
-8 files in input to \kp. Each count corresponds to the reads coming from each 
-file that could be mapped on the variant, in the order they have been
+are shown on Figure \ref{fig:readstype}. There are 8 sets of counts because we 
+gave 8 files in input to \kp. Each count corresponds to the reads coming from 
+each file that could be mapped on the variant, in the order they have been
 passed to \kp.
 \end{itemize}
 \item a rank information which is a deprecated measure.
@@ -618,10 +618,10 @@ hist(myResults$uncorrectedPVal, main="Histogram of p-values",
     xlab = "p-values", breaks = 50)
 @
 
-Because the dataset used here is small ($\sim$ 100 lines), the histograms of the two 
-complete datasets presented in the case studies (section \ref{sec:casestudies})
-are represented. As expected, the histograms show a uniform 
-distribution with a peak near 0 (Figure \ref{fig:distribpvalue}).
+Because the dataset used here is small ($\sim$ 100 lines), the histograms of 
+the two complete datasets presented in the case studies (section 
+\ref{sec:casestudies}) are represented. As expected, the histograms show a 
+uniform distribution with a peak near 0 (Figure \ref{fig:distribpvalue}).
 
 \begin{figure}
 \includegraphics[width=\textwidth]{hist_pvalue_uncorrected.png}
