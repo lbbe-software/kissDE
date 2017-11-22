@@ -1018,23 +1018,23 @@ print(head(exampleK2RG[,c(1:10)], 3), row.names = FALSE)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Load data}
 
-The \Rfunction{kissplice2counts} function allows to transform this text file
-(here called \file{output_k2rg_alt_splicing.txt}) into a format compatible 
-with \kde's main functions.\\
+The \Rfunction{kissplice2counts} function allows to load directly the \krg 
+output file (here called \file{output_k2rg_alt_splicing.txt}) into a format 
+compatible with \kde's main functions.\\
 \bioccomment{\Robject{fpathinAS} contains the absolute path of the file on 
 the user's hard disk.}\\
+The \Rcode{k2rg} parameter is set to \Rcode{TRUE} to indicate that the 
+file comes from \krg~and not directly from \kp.
 As these samples are paired-end, the \Rcode{pairedEnd} parameter is set to 
 \Rcode{TRUE}.
-The \Rcode{k2rg} parameter must be set to \Rcode{TRUE} to indicate that the 
-file comes from \krg~and not directly from \kp. 
 The \Rcode{counts} parameter must be set to the same value (i.e., 2) used in 
-\kp~and \krg~to indicate which counts are given in input.
+\kp~and \krg~to indicate which type of counts are given in the input.
 Here the exonic reads are not taken into account (\Rcode{exonicReads = FALSE}).
 Only junction reads will be used (see Figure \ref{fig:readstype}).
 
-This conversion in a table of counts is stored in a \Robject{myCounts\_AS} 
+The table of counts is stored in a \Robject{myCounts\_AS} 
 object (for a detailed description of its structure, see section 
-\ref{subsubsec:input_krg}) and can be done as follows:
+\ref{subsubsec:input_krg}):
 
 <<AS_counts, tidy=TRUE, highlight=FALSE, fig=FALSE, keep.source=FALSE>>=
 fileInAS <- system.file("extdata", "output_k2rg_alt_splicing.txt",
@@ -1045,9 +1045,9 @@ head(myCounts_AS$countsEvents)
 @
 
 To perform the differential analysis, a vector that describes the experimental 
-plan must also be provided. 
-In the example, there are two replicates of the SK-N-SH cell line without 
-treatment (SKNSH) and two replicates of the same cell line treated with
+plan is needed. 
+In this case study, there are two replicates of the SK-N-SH cell line without 
+treatment (SKNSH) followed by two replicates of the same cell line treated with
 retinoic acid (SKSNH-RA). 
 So the \Robject{myConditions\_AS} vector is defined as follows:
 
