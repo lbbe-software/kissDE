@@ -428,8 +428,8 @@ Alternative Donor (AltD), Alternative Acceptor (AltA).
 Interested users should refer to \krg~manual for further questions about
 \krg~format and output (\url{http://kissplice.prabi.fr/tools/kiss2refgenome/}).
 
-In the example below, \file{output_k2rg_alt_splicing.txt}, a \krg's output, 
-is loaded.
+In the example below, \file{output_k2rg_alt_splicing.txt}, a \krg's output 
+included in the \kde~package, is loaded.
 The \Rfunction{kissplice2counts} function uses the same \Rcode{counts} and 
 \Rcode{pairedEnd} parameters as explained in the section 
 \ref{subsubsec:input_ks}.
@@ -456,10 +456,10 @@ selection will speed up \kde's running time and improve statistical power for
 choosen events. To do this, the \Rfunction{kissplice2counts} function 
 contains two parameters: \Rcode{keep} and \Rcode{remove}. 
 Both take a character vector indicating the types of events to keep or remove. 
-The event names should come from this list: \Rcode{deletion}, 
+The event names must be part of this list: \Rcode{deletion}, 
 \Rcode{insertion}, \Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, 
 \Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. Thus, if the user is only
-interessed in intron rentention events, the \Rcode{keep = c("IR")} option
+interested in intron rentention events, the \Rcode{keep = c("IR")} option
 should be used. If the user isn't interessed in deletions and insertions,
 the \Rcode{remove = c("insertion", "deletion")} option should be used.
 The \Rcode{keep} and \Rcode{remove} parameters can be used at the same time 
