@@ -278,7 +278,7 @@ replicates 1 and 2 of $condition\_2$.
 \label{subsubsec:input_ks}
 
 \kde~was developped to deal with \kp~output, which is in fasta format.
-Below is an example of the first four lines of an example of \kp~output:
+Below is the first four lines of an example of \kp~output:
 
 <<kissplice_format, echo=TRUE, keep.source=TRUE>>=
 headfasta <- system.file("extdata", 
@@ -313,12 +313,13 @@ isoform and the lower path the exclusion isoform.
 \Rcode{AB1\_21|AB2\_12|AB3\_12|AB4\_2|AB5\_5|...} summarizes the counts found 
 by \kp~quantification step.
 Here \kp~was run with the option \Rcode{counts} set to 2. 
-For the upper path, we have 4 counts for each sample: AS, SB, S and ASS. For
+For the upper path, we have 4 counts for each sample: AS, SB, S and ASSB. For
 the lower path, we have 1 count per sample: AB. The different reads categories
 are shown on Figure \ref{fig:readstype}. There are 8 sets of counts because we 
-gave 8 files in input to \kp. Each count corresponds to the reads coming from 
-each file that could be mapped on the variant, in the order they have been
-passed to \kp.
+gave 8 files in input to \kp (denotated by the number before the "_" character). 
+Each count (denotated by the number after the "_" character) corresponds to the 
+reads coming from each file that could be mapped on the variant, in the order 
+they have been passed to \kp.
 \end{itemize}
 \item a rank information which is a deprecated measure.
 \end{itemize}
@@ -346,7 +347,8 @@ questions about the \kp~format and its output.\\
 To be used in \kde, \kp's output must be converted into a table of counts. 
 This can be done with the \Rfunction{kissplice2counts} function.
 In the example below, the \kp output file called
-\file{output_kissplice_alt_splicing.fa} is loaded.
+\file{output_kissplice_alt_splicing.fa}, included in the \kde~package, is 
+loaded.
 The table of counts yielded by the \Rfunction{kissplice2counts} function
 is stored in \Robject{myCounts}.\\
 \bioccomment{\Robject{fpath2} contains the absolute path of the file on 
