@@ -1280,13 +1280,13 @@ writeOutputKissDE(myResults_SNV, output = "final_table_significants.tab",
 \subsection{Time / Requirements}
 \label{subsec:time}
 
-The data conversion with the \Rfunction{kissplice2counts} function and the 
-statistical analysis done with the \Rfunction{diffExpressedVariants} function 
-can take some time to run. Here is an example of the running time of these 
-two functions on the two complete datasets presented in the case studies
-(section \ref{sec:casestudies}). The time presented were evaluated on a
-desktop computer with the following caracteristics: 
-Intel Core i7, CPU 2,60 GHz, 16G RAM.
+The data loading function (\Rfunction{kissplice2counts}) and the 
+statistical analysis function (\Rfunction{diffExpressedVariants})  
+are the most time-consuming steps. Here is an example of the running time 
+of these two functions on the two complete datasets presented in the case 
+studies(section \ref{sec:casestudies}). The time presented were evaluated 
+on adesktop computer with the following caracteristics: Intel Core i7, CPU 
+2,60 GHz, 16G RAM.
 
 \begin{table}[h]
 \begin{tabular}{c|c|c|c|c}
