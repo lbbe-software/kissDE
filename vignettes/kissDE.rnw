@@ -1255,9 +1255,9 @@ head(myResult_SNV$finalTable, n = 3)
 @
 
 The first event in the \Robject{myResult\_SNV} output has a low p-value 
-(\Rcode{Adjusted\_pvalue} column, equal to \Rcode{4.975013e-09}) and a very 
-contrasted $\Delta f$ (\Rcode{Deltaf/DeltaPSI} column, equal to 
-\Rcode{-0.9258}) close to the maximum value (1 in absolute). 
+(\Rcode{Adjusted\_pvalue} column, equal to \Rcode{8.63e-13}) and a very 
+high absolute value of $\Delta f$ (\Rcode{Deltaf/DeltaPSI} column, equal to 
+\Rcode{-0.926}) close to the maximum value (1 in absolute). 
 This SNP would typically be population specific. 
 One allele is enriched in the Toscan population, the other in the European
 population.
