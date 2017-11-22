@@ -23,17 +23,16 @@ diffExpressedVariants(countsData, conditions, pvalue = 1,
 \item{pvalue}{a numerical value indicating the p-value threshold below which
 the events will be kept in the final data frame.}
 
-\item{filterLowCountsVariants}{a numerical value indicating the count value
-below which events are filtered out. After having computed the overdispersion,
-we screen out events for which both variants have global counts 
-< \code{filterLowCountsVariants} (sum of each replicate and each condition)
-in order to increase statistical power of the analysis.}
+\item{filterLowCountsVariants}{a numerical value indicating the global variant 
+count value (see Details below) below which events are filtered out in order 
+to increase statistical power of the analysis. Both variant must have a read
+coverage below this value in order to remove the event. This filter is done 
+after the normalization and the overdispersion estimation.}
 
-\item{flagLowCountsConditions}{a numerical value indicating the value below
-which we flag events as 'lowCounts' in the final data frame. This column aims
-to help see which event (sum of counts of the two variants) has low
-counts (< \code{flagLowCountsBoundary}) for at least n-1 conditions
-(over n) and is therefore harder to validate experimentally.}
+\item{flagLowCountsConditions}{a numerical value indicating the global condition 
+count value (see Details below) below which we flag events as 'lowCounts' in the 
+final data frame. At least n-1 conditions (over n conditions) must have low counts 
+to flag the event as 'lowCounts'.}
 
 \item{technicalReplicates}{a boolean value indicating if the counts in 
 \code{countsData} come from technical replicates only or not.}
@@ -47,7 +46,7 @@ counts (< \code{flagLowCountsBoundary}) for at least n-1 conditions
         \item \code{ID}: the variation identifier
         \item \code{Length_diff}: the size of the variable region
         \item \code{UP_Condi_Rj_Norm (resp LP_Condi_Rj_Norm)}: returns the
-        normalized counts for the first variant (UP, resp. second variant: LP),
+        normalized counts of the first variant (UP, resp. second variant: LP),
         for the condition i (\code{Condi}) and the replicate j (\code{Rj})
         \item \code{Adjusted_pvalue}: p-value adjusted for multiple testing with
         Benjamini & Hochberg method
@@ -56,8 +55,9 @@ counts (< \code{flagLowCountsBoundary}) for at least n-1 conditions
         \code{deltaPSI} returns relative abudance in condition 2 - relative
         abundance in condition 1. Inclusion variant's counts are corrected for
         the length of the variant so that we do not overestimate the PSI value.
-        \item \code{lowcounts}: a column to highlight low counts in data. 
-        If \code{TRUE}, at least one condition have less than 10 reads.
+        \item \code{lowcounts}: a column that flag low counts in data. 
+        If \code{TRUE}, at least n-1 conditions over n conditions have less than 
+        10 reads.
 }}
 \item{correctedPval}{a numeric vector containing p-values after correction 
 for multiple testing}
@@ -66,19 +66,29 @@ for multiple testing}
 \item{resultFitNBglmModel}{a data frame containing the results of the fitting
 of the model to the data}
 \item{f/psiTable}{a data frame containing the allele frequency (f)/Percent 
-Spliced In (PSI) of each replicates}
+Spliced In (PSI) of each replicate}
 \item{k2rgFile}{a string containing either the \code{KisSplice2RefGenome} file
-path and name or NULL if no \code{KisSplice2RefGenome} file was used as input}
+path and name or NULL if no \code{KisSplice2RefGenome} input file was given}
 }
 
 
 \details{
-\code{countsData} input must be formatted as follows: in its first column the 
-names of the events, in its second column the lengths of the events, and in 
-the following columns, the counts corresponding to each replicate of each 
-experimental condition of one variant. Each row corresponds to one variant.
-This data frame can be obtained using \code{kissplice2counts} function.
-}
+The \code{countsData} data frame must be formatted as follows: 
+  \itemize{
+    \item Column 1: names of the events
+    \item Column 2: lengths (in bp) of the variants
+    \item Column 3 to n: counts corresponding to each replicate of each 
+experimental condition of one variant
+  } 
+Each row corresponds to one variant, thus an event correspond to two rows with
+the longest variant (or inclusion variant) in the first row (thus denotated as 
+upper path: UP) and the smallest variant (or exclusion variant) in the second 
+row (thus denotated as lower path: LP).
+This data frame can be obtained using \code{kissplice2counts} function.\\
+The global variant count is the minimal number of reads that cover one or the 
+other variant across all the replicates (sum by variant).\\
+The global condition count is the minimal number of reads that cover one or 
+the other condition (sum by replicates for each conditions).}
 
 \references{
 Lopez-Maestre et al., 2016. Snp calling from rna-seq data without a reference 
