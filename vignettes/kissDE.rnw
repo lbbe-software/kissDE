@@ -1193,7 +1193,7 @@ user's hard disk.}\\
 Due to paired-end RNA-Seq data, the \Rcode{pairedEnd} parameter was set to 
 \Rcode{TRUE}.
 
-This conversion in a table of counts is stored in a \Robject{myCounts\_SNV} 
+This conversion in a table of counts is stored in the \Robject{myCounts\_SNV} 
 object (for a detailed description of its structure, see section
 \ref{subsubsec:input_ks}) and can be done as follows:
 
@@ -1203,10 +1203,10 @@ myCounts_SNV <- kissplice2counts(fileIn, pairedEnd = TRUE)
 head(myCounts_SNV$countsEvents)
 @
 
-To perform the differential analysis, a vector that describes the experimental 
-plan must also be provided. 
-In the example, there are two replicates of TSC and two replicates of CEU.
-So the \Robject{myConditions\_SNV} vector is defined:
+To perform the differential analysis, a vector with the conditions has to be 
+provided. 
+In the example, there are two replicates of TSC and two replicates of CEU, thus
+the condition vector \Robject{myConditions\_SNV} is:
 
 <<snv_condition, fig=FALSE, keep.source=FALSE>>=
 myConditions_SNV <- c(rep("TSC",2), rep("CEU",2))
