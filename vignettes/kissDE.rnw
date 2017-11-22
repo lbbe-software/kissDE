@@ -1149,7 +1149,7 @@ The conditions being compared are the populations.
 
 \begin{figure}
 \includegraphics[width=0.7\textwidth]{experimental_design_SNP.png}
-\caption{\label{fig:designSNP}Experimental design of the SNP dataset.}
+\caption{\label{fig:designSNP}Experimental design of the SNP dataset. Each cross corresponds to an individual.}
 \end{figure}
 
 The data are paired-end. So each sample consists of 2 files. 
