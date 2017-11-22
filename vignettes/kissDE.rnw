@@ -177,9 +177,9 @@ myConditions <- c(rep("condition_1", 2), rep("condition_2", 2))
 @
 
 
-In the case where input data contains more than 2 conditions, we advise the user
+In the case where the input data contains more than 2 conditions, we advise the user
 to remove samples from the analysis in order to compare 2 conditions only, because 
-\kde was only tested in this context. To remove samples from the analysis the "*"
+\kde was uniquely tested in this context. To remove samples from the analysis the "*"
 character can be used:
 
 <<conditionVectorRemove_howto, fig=FALSE, keep.source=FALSE, eval=FALSE>>=
@@ -240,7 +240,7 @@ of read mapping positions used when estimating the abundance of a variant.\\
 For the exclusion variant (2nd line), which should correspond to an exon-exon 
 junction, it corresponds to:
 \begin{equation}
-effectiveLengthExclu = readLength - 2 * overhang +1
+effectiveLengthExclu = readLength - 2 * overhang + 1
 \end{equation}
 where $overhang$ corresponds to the minimal number of bases needed to accept
 that a read is aligned to a junction.\\
@@ -255,7 +255,7 @@ In the special case where the abundance of the inclusion
 variant has been estimated using only junction reads, then the effective length
 of the inclusion variant is:
 \begin{equation}
-effectiveLengthInclu = 2*effectiveLengthExclu
+effectiveLengthInclu = 2 * effectiveLengthExclu
 \end{equation}
 This information is used only in the context of alternative splicing. In the
 context of SNVs, it can be set to 0. It is used to assess which splice variants
