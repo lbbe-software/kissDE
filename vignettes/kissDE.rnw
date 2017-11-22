@@ -1059,8 +1059,8 @@ myConditions_AS <- c(rep("SKNSH",2), rep("SKNSH-RA",2))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Quality control}
 
-Before running the differential analysis, we check if the data was correctly
-loaded, by running the \Rfunction{qualityControl} function.
+Before running the differential analysis, we check that the data was loaded
+correctly, using the \Rfunction{qualityControl} function.
 
 <<qualityControl_AS, include=FALSE, fig=TRUE, keep.source=FALSE>>=
 qualityControl(myCounts_AS, myConditions_AS)
