@@ -176,8 +176,10 @@ conditions with 2 replicates per condition, would be:
 myConditions <- c(rep("condition_1", 2), rep("condition_2", 2))
 @
 
-In case, the input data contains more than 2 conditions, only the conditions
-of interest should be kept. To remove samples from the analysis the "*"
+
+In the case where input data contains more than 2 conditions, we advise the user
+to remove samples from the analysis in order to compare 2 conditions only, because 
+\kde was only tested in this context. To remove samples from the analysis the "*"
 character can be used:
 
 <<conditionVectorRemove_howto, fig=FALSE, keep.source=FALSE, eval=FALSE>>=
