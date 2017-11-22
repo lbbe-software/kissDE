@@ -1267,9 +1267,8 @@ population.
 \subsubsection{Export results}
 
 We consider as significant the events that have an adjusted p-value lower
-than 5\%. Results passing this threshold are thus extracted from 
-\Robject{myResults\_SNV} thanks to the \Rcode{adjPvalMax} parameter and are 
-saved in a \file{final_table_significants.tab} file, thanks to the 
+than 5\%, so we set \Rcode{adjPvalMax = 0.05}. Results passing this threshold 
+are saved in a \file{final_table_significants.tab} file, with the 
 \Rfunction{writeOutputKissDE} function, as follows:
 
 <<snv_export_result, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
