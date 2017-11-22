@@ -972,7 +972,7 @@ the condition coming first in the alphabet to the other.
 \subsection{\kde~on alternative splicing data}
 \label{subsec:AS}
 
-This second example corresponds to the case of differential analysis of 
+This first example corresponds to the case of differential analysis of 
 alternative splicing (AS) events. 
 The sample data presented here is a subset of the case study used in 
 \cite{Benoit-Pilven} (\url{http://kissplice.prabi.fr/pipeline_ks_farline/}).
@@ -981,27 +981,27 @@ The sample data presented here is a subset of the case study used in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Dataset}
 
-The data used in this example of AS comes from the ENCODE project 
+The data used in this example comes from the ENCODE project 
 \cite{Djebali2012}. 
-The chosen samples are from a neuroblastoma cell line, SK-N-SH, with 
+The samples are from a neuroblastoma cell line, SK-N-SH, with 
 or without a retinoic acid treatment. 
 Each condition is composed of two biological replicates. 
 The data are paired-end.\\
 
-\kp~has been used to analyse these two conditions. 
+In a preliminary step, \kp~has been run to analyse these two conditions. 
 Results from \kp~(type 1 events) were then mapped to the reference genome 
 with \software{STAR} \cite{Dobin2013} and analyzed with \krg. 
 \krg~enables to annotate the AS events discovered by \kp. 
-It assigns each event to the gene it maps to and to a type of alternative 
-splicing event: Exon Skipping (ES), Intron Retention (IR), Alternative Donor 
-(AltD), Alternative Acceptor (AltA), \dots 
-For further questions on these tools (\kp~ and \krg), please refer to the 
+It assigns each event a type of alternative splicing (Exon Skipping (ES), 
+Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor 
+(AltA), \dots) and the gene the event maps to.
+For further information on these tools (\kp~ and \krg), please refer to the 
 manual that can be found on this web page: \url{http://kissplice.prabi.fr/}.\\
 
 The output file of \krg~is a tab-delimited file that stores the annotated 
 alternative splicing events found in the dataset. 
-Following is an extract of this file (the first 3 rows and first 11 columns),
-where each row is one alternative splicing event:
+Bellow is an extract of this file (the first 3 rows and first 11 columns),
+where each row is one alternative splicing event of our data:
 
 <<AS_data, fig=FALSE, echo=FALSE, keep.source=FALSE>>=
 fileInAS <- system.file("extdata", "output_k2rg_alt_splicing.txt",
