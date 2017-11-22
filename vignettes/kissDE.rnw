@@ -973,7 +973,7 @@ To detect SNVs (SNPs, mutations, RNA editing) or alternative splicing
 (AS) in the expressed regions of the genome, \kp~can be run on RNA-seq 
 data. Counts can then be analysed using \kde. 
 We present two distinct case study with \kde: analysis of AS events and 
-analysis of SNPs.
+analysis of SNVs.
 
 \subsection{\kde~on alternative splicing data}
 \label{subsec:AS}
@@ -1130,9 +1130,9 @@ writeOutputKissDE(myResults_AS, output = "psi_table.tab", writePSI = TRUE)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\kde~on SNP data}
+\subsection{\kde~on SNV data}
 \label{subsec:SNV}
-This second example present an analysis of SNPs done with \kde~on 
+This second example present an analysis of SNVs done with \kde~on 
 RNA-Seq data from a subset of the case study presented in 
 \cite{Lopez-Maestre2016} (\url{http://kissplice.prabi.fr/TWAS/}).
 
@@ -1140,7 +1140,7 @@ RNA-Seq data from a subset of the case study presented in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Dataset}
 
-The dataset used in this example comes from the human GEUVADIS project. 
+The dataset comes from the human GEUVADIS project. 
 Two populations were selected: Toscans (TSC) and Central Europeans (CEU). 
 For each population, we selected 10 individuals, which are pooled in two
 groups of 5. 
@@ -1153,13 +1153,14 @@ The conditions being compared are the populations.
 \end{figure}
 
 The data are paired-end. So each sample consists of 2 files. 
-In total, 8 files have been used as \kp~input: 4 files for the two TSC 
+In total, 8 files have been used: 4 files for the two TSC 
 samples and 4 files for the two CEU samples. 
-Paired-end files from a same sample have been input following each other.\\
+Paired-end files from a same sample have been given as following each other
+to \kp.\\
 
-The output file of \kp~is a fasta file that stores SNVs found in the dataset.
-Its structure is described in section \ref{subsubsec:input_ks}.
-The four first lines of this fasta output file are as follows:
+\kp~output a fasta file that stores SNVs found in the dataset. Its structure 
+is described in section \ref{subsubsec:input_ks}. The first SNV is presented
+below:
 
 <<snv_kissplice_data, fig=FALSE, echo=FALSE, keep.source=FALSE>>=
 headfasta <- system.file("extdata", "head_output_kissplice_SNV_fasta.txt", 
@@ -1170,7 +1171,7 @@ writeLines(readLines(headfasta))
 Events are reported in 4 lines, the two first represent one allele of the SNV, 
 the two last the other allele. 
 Thus the sequences only differ from each other at one position which
-corresponds to the SNV, here A/C at position 42.
+corresponds to the SNV, here A/C in the center of the sequence (at position 42).
 
 Because \kp~was run with the default value of the \Rcode{counts} parameter 
 (i.e., 0), the counts have the following format \Rcode{C1\_x|C2\_y|...|Cn\_z}. 
