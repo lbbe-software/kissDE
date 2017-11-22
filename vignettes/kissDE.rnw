@@ -969,9 +969,14 @@ the condition coming first in the alphabet to the other.
 \section{Case studies}
 \label{sec:casestudies}
 
+To detect SNVs (SNPs, mutations, RNA editing) or alternative splicing 
+(AS) in the expressed regions of the genome, \kp~can be run on RNA-seq 
+data. Counts can then be analysed using \kde. 
+We present two distinct case study with \kde: analysis of AS events and 
+analysis of SNPs.
+
 \subsection{\kde~on alternative splicing data}
 \label{subsec:AS}
-
 This first example corresponds to the case of differential analysis of 
 alternative splicing (AS) events. 
 The sample data presented here is a subset of the case study used in 
@@ -1125,14 +1130,10 @@ writeOutputKissDE(myResults_AS, output = "psi_table.tab", writePSI = TRUE)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\kde~on SNV data}
+\subsection{\kde~on SNP data}
 \label{subsec:SNV}
-RNA-Seq data can be used to study SNVs (SNPs, mutations, RNA editing) in 
-expressed regions of the genome. 
-Such SNVs can be detected and reported by \kp. 
-In this first following example, an analysis of SNPs is done with \kde~on 
-RNA-Seq data from the human GEUVADIS project \cite{Lappalainen2013}. 
-The sample data presented here is a subset of the case study presented in
+This second example present an analysis of SNPs done with \kde~on 
+RNA-Seq data from a subset of the case study presented in 
 \cite{Lopez-Maestre2016} (\url{http://kissplice.prabi.fr/TWAS/}).
 
 
