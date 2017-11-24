@@ -27,13 +27,14 @@ default). If set to \code{TRUE}, the sum of the counts from the pair of reads
 will be computed.
 It can be used along with \code{counts} option. By default, it is
 assumed that, in the \code{KisSplice} command line, two reads of the same pair 
-has been inputed as following each other in. If it is not the case, see option 
+has been inputed as following each other. If it is not the case, see option 
 \code{order}.}
 
 \item{order}{a numeric vector indicating the actual order of the corresponding 
-paired reads in the columns of the \code{KisSplice} output suh that they can be 
+paired reads in the columns of the \code{KisSplice} output such that they can be 
 summed. This option goes along with \code{pairedEnd = TRUE}, if the read pairs
 are not in the expected order (see \code{pairedEnd} option).
+It has as many elements as there are samples in total.
 For more information on this parameter, see Details below.}
 
 \item{exonicReads}{a logical indicating if exonic/intronic read counts will be 
