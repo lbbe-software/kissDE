@@ -391,10 +391,17 @@
         design=~ condition))
     
     ddsSF <- estimateSizeFactors(dds)
+    sizeFactorsSum <- sizeFactors(ddsSF)
+    suppressMessages(ddsSF <- DESeqDataSetFromMatrix(
+      countData=countsEventsCounts, 
+      colData=data.frame(condition=conds),
+      design=~ condition))
+    sizeFactors(ddsSF) <- sizeFactorsSum
     shouldWeNormalize <- sum(is.na(sizeFactors(ddsSF))) < 1
     dimns <- NCOL(countsEvents)
     
     # add columns containing normalized data
+    
     countsEvents[, (dimns + 1):(dimns + length(conds))] <- 
         round(counts(ddsSF, normalized=shouldWeNormalize))
     colnames(countsEvents)[(dimns + 1):(dimns + length(conds))] <- 
