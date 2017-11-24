@@ -316,7 +316,7 @@ Here \kp~was run with the option \Rcode{counts} set to 2.
 For the upper path, we have 4 counts for each sample: AS, SB, S and ASSB. For
 the lower path, we have 1 count per sample: AB. The different reads categories
 are shown on Figure \ref{fig:readstype}. There are 8 sets of counts because 
-we gave 8 files in input to \kp (denotated by the number before the "\_"
+we gave 8 files in input to \kp~(denotated by the number before the "\_"
 character). Each count (denotated by the number after the "\_" character)
 corresponds to the reads coming from each file that could be mapped on the
 variant, in the order they have been passed to \kp.
@@ -344,9 +344,9 @@ The user should refer to \kp~manual
 (\url{http://kissplice.prabi.fr/documentation/}) for further 
 questions about the \kp~format and its output.\\
 
-To be used in \kde, \kp's output must be converted into a table of counts. 
+To be used in \kde, \kp~output must be converted into a table of counts. 
 This can be done with the \Rfunction{kissplice2counts} function.
-In the example below, the \kp output file called
+In the example below, the \kp~output file called
 \file{output_kissplice_alt_splicing.fa}, included in the \kde~package, is 
 loaded.
 The table of counts yielded by the \Rfunction{kissplice2counts} function
@@ -456,12 +456,13 @@ selection will speed up \kde's running time and improve statistical power for
 choosen events. To do this, the \Rfunction{kissplice2counts} function 
 contains two parameters: \Rcode{keep} and \Rcode{remove}. 
 Both take a character vector indicating the types of events to keep or remove. 
-The event names must be part of this list: \Rcode{deletion}, 
-\Rcode{insertion}, \Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, 
-\Rcode{altAD}, \Rcode{alt}, \Rcode{unclassified}. Thus, if the user is only
-interested in intron rentention events, the \Rcode{keep = c("IR")} option
-should be used. If the user isn't interessed in deletions and insertions,
-the \Rcode{remove = c("insertion", "deletion")} option should be used.
+The event names must be part of this list: \Rcode{deletion}, \Rcode{insertion},
+\Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt},
+\Rcode{unclassified}.\\
+Thus, if the user is only interested in intron retention events, the
+\Rcode{keep} option should be set to \Rcode{c("IR")}. If the user isn't
+interessed in deletions and insertions, the \Rcode{remove} option should be
+equal to \Rcode{c("insertion", "deletion")}.\\
 The \Rcode{keep} and \Rcode{remove} parameters can be used at the same time 
 only if \Rcode{ES} is part of the \Rcode{keep} vector. The \Rcode{remove} 
 vector will then act on the different types of exon skipping: multi-exon
@@ -469,7 +470,7 @@ skipping (\Rcode{MULTI}) or exon skipping associated with an alternative
 acceptor site (\Rcode{altA}), an alternative donor site (\Rcode{altD}), 
 both alternative acceptor and donor site (\Rcode{altAD}) or an undetermined
 alternative splice site (\Rcode{alt}). Thus, in this specific case, the 
-\Rcode{remove} vector should contain names from this list: \Rcode{MULTI}, 
+\Rcode{remove} vector should contain names from this list: \Rcode{MULTI},
 \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}.
 
 If the user wants to analyse only cassette exon events (i.e., a single exon is
@@ -668,8 +669,8 @@ Benjamini-Hochberg procedure.
 \item \Rcode{Deltaf/DeltaPSI} summarizes the magnitude of the effect 
 (see details in section \ref{subsec:psi}).
 \item \Rcode{lowcounts} contains booleans which flag low counts events 
-as described in section \ref{subsec:flag}. A \Rcode{FALSE} value means 
-that the event has high counts (counts above the chosen threshold).
+as described in section \ref{subsec:flag}. A \Rcode{TRUE} value means 
+that the event has low counts (counts below the chosen threshold).
 \end{itemize}
 In the \Rcode{finalTable} output, events are sorted by p-values and then by 
 magnitude of effect (based on their absolute values), so that the top 
