@@ -309,17 +309,17 @@ gives the length of the nucleotide sequences. Upper path and lower path are
 a denomination for the representation of each variant in \kp's graph. 
 For alternative splicing events, the upper path represents the inclusion 
 isoform and the lower path the exclusion isoform.
-\item \Rcode{AS1\_1|SB1\_1|S1\_0|ASSB1\_0|AS2\_0|SB2\_0|S2\_0|ASSB2\_0|...} and
-\Rcode{AB1\_21|AB2\_12|AB3\_12|AB4\_2|AB5\_5|...} summarizes the counts found 
-by \kp~quantification step.
+\item \Rcode{AS1\_1|SB1\_1|S1\_0|ASSB1\_0|AS2\_0|SB2\_0|S2\_0|ASSB2\_0|AS3\_0|
+SB3\_0|...} and \Rcode{AB1\_21|AB2\_12|AB3\_12|AB4\_2|AB5\_5|...}
+summarizes the counts found by \kp~quantification step.
 Here \kp~was run with the option \Rcode{counts} set to 2. 
 For the upper path, we have 4 counts for each sample: AS, SB, S and ASSB. For
 the lower path, we have 1 count per sample: AB. The different reads categories
-are shown on Figure \ref{fig:readstype}. There are 8 sets of counts because we 
-gave 8 files in input to \kp (denotated by the number before the "_" character). 
-Each count (denotated by the number after the "_" character) corresponds to the 
-reads coming from each file that could be mapped on the variant, in the order 
-they have been passed to \kp.
+are shown on Figure \ref{fig:readstype}. There are 8 sets of counts because 
+we gave 8 files in input to \kp (denotated by the number before the "\_"
+character). Each count (denotated by the number after the "\_" character)
+corresponds to the reads coming from each file that could be mapped on the
+variant, in the order they have been passed to \kp.
 \end{itemize}
 \item a rank information which is a deprecated measure.
 \end{itemize}
