@@ -998,15 +998,15 @@ In a preliminary step, \kp~has been run to analyse these two conditions.
 Results from \kp~(type 1 events) were then mapped to the reference genome 
 with \software{STAR} \cite{Dobin2013} and analyzed with \krg. 
 \krg~enables to annotate the AS events discovered by \kp. 
-It assigns each event a type of alternative splicing (Exon Skipping (ES), 
-Intron Retention (IR), Alternative Donor (AltD), Alternative Acceptor 
-(AltA), \dots) and the gene the event maps to.
+It assigns to each event a gene and a type of alternative splicing 
+(Exon Skipping (ES), Intron Retention (IR), Alternative Donor (AltD), 
+Alternative Acceptor (AltA), \dots).\\
 For further information on these tools (\kp~ and \krg), please refer to the 
 manual that can be found on this web page: \url{http://kissplice.prabi.fr/}.\\
 
 The output file of \krg~is a tab-delimited file that stores the annotated 
 alternative splicing events found in the dataset. 
-Bellow is an extract of this file (the first 3 rows and first 11 columns),
+Below is an extract of this file (the first 3 rows and first 10 columns),
 where each row is one alternative splicing event of our data:
 
 <<AS_data, fig=FALSE, echo=FALSE, keep.source=FALSE>>=
@@ -1024,10 +1024,10 @@ print(head(exampleK2RG[,c(1:10)], 3), row.names = FALSE)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Load data}
 
-The \Rfunction{kissplice2counts} function allows to load directly the \krg 
+The \Rfunction{kissplice2counts} function allows to load directly the \krg~ 
 output file (here called \file{output_k2rg_alt_splicing.txt}) into a format 
 compatible with \kde's main functions.\\
-\bioccomment{\Robject{fpathinAS} contains the absolute path of the file on 
+\bioccomment{\Robject{fileInAS} contains the absolute path of the file on 
 the user's hard disk.}\\
 The \Rcode{k2rg} parameter is set to \Rcode{TRUE} to indicate that the 
 file comes from \krg~and not directly from \kp.
@@ -1106,7 +1106,7 @@ head(myResult_AS$finalTable, n = 3)
 The first event in the \Robject{myResult\_AS} output has a very low p-value 
 (\Rcode{Adjusted\_pvalue} column, less than \Rcode{2.2e-16}) and a very
 contrasted $\Delta PSI$ (\Rcode{Deltaf/DeltaPSI} column, equal to 
-\Rcode{-0.8042}) close to the maximum value (1 in absolute). 
+\Rcode{-0.804}) close to the maximum value (1 in absolute). 
 This gene is differentially spliced. 
 When the SK-N-SH cell line is treated with retinoic acid, the inclusion variant
 becomes the major isoform. 
@@ -1187,9 +1187,9 @@ counts used for the test.
 \subsubsection{Load data}
 
 The first step is to convert this fasta file (here called 
-\file{output_kissplice_SNV.fa}) into a format that will be used in \kde's
+\file{output_kissplice_SNV.fa}) into a format that will be used in \kde~
 main functions, thanks to the \Rfunction{kissplice2counts} function.\\
-\bioccomment{\Robject{fileIn} contains the absolute path of the file on the 
+\bioccomment{\Robject{fileInSNV} contains the absolute path of the file on the 
 user's hard disk.}\\
 Due to paired-end RNA-Seq data, the \Rcode{pairedEnd} parameter was set to 
 \Rcode{TRUE}.
@@ -1199,13 +1199,13 @@ object (for a detailed description of its structure, see section
 \ref{subsubsec:input_ks}) and can be done as follows:
 
 <<snv_counts, fig=FALSE , keep.source=FALSE>>=
-fileIn <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
-myCounts_SNV <- kissplice2counts(fileIn, pairedEnd = TRUE)
+fileInSNV <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
+myCounts_SNV <- kissplice2counts(fileInSNV, pairedEnd = TRUE)
 head(myCounts_SNV$countsEvents)
 @
 
 To perform the differential analysis, a vector with the conditions has to be 
-provided. 
+provided.\\
 In the example, there are two replicates of TSC and two replicates of CEU, thus
 the condition vector \Robject{myConditions\_SNV} is:
 
@@ -1217,7 +1217,7 @@ myConditions_SNV <- c(rep("TSC",2), rep("CEU",2))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Quality control}
 
-Before running the differential analysis, we recommand t ocheck if the data was 
+Before running the differential analysis, we recommand to check if the data was
 correctly loaded, by running the \Rfunction{qualityControl} function.
 
 <<qualityControl_SNV, include=FALSE, fig=TRUE, keep.source=FALSE>>=
@@ -1245,7 +1245,7 @@ the two conditions.
 \subsubsection{Differential analysis}
 
 The main function of \kde, \Rfunction{diffExpressedVariants}, can now be run 
-to compute the statistical test. 
+to compute the statistical test.\\
 Outputs are stored in a \Robject{myResult\_SNV} object (for a detailed 
 description of its structure, see section \ref{subsubsec:finaltable}) and 
 the result for the first three events is printed:
@@ -1286,7 +1286,7 @@ statistical analysis function (\Rfunction{diffExpressedVariants})
 are the most time-consuming steps. Here is an example of the running time 
 of these two functions on the two complete datasets presented in the case 
 studies(section \ref{sec:casestudies}). The time presented were evaluated 
-on adesktop computer with the following caracteristics: Intel Core i7, CPU 
+on a desktop computer with the following caracteristics: Intel Core i7, CPU
 2,60 GHz, 16G RAM.
 
 \begin{table}[h]
