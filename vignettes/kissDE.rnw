@@ -758,7 +758,7 @@ They are summarized in the Figure \ref{fig:kdetheory}.
 \centering
 \includegraphics[width=0.5\textwidth]{Workflow_diffExpressedVariants.png}
 \caption{\label{fig:kdetheory}The different steps of the 
-\Rfunction{diffExpressedVariants} function. Numbers in light red point to the 
+\Rfunction{diffExpressedVariants} function. Numbers in light blue point to the 
 section of this vignette explaining the step.}
 \end{figure}
 
@@ -769,6 +769,8 @@ section of this vignette explaining the step.}
 
 In a first step, counts are normalized with the default normalization
 methods provided by the \Biocpkg{DESeq2} \cite{DESeq2} package.
+The size factors are estimated using the sum of counts of both
+variants for each event, which is a proxy of the gene expression.
 By using this normalization, we correct for library size, 
 because the sequencing depth can vary between samples.
 
@@ -798,8 +800,6 @@ splice variant or allele) are associated with each sample. In order to
 mimic gene expression, the overdispersion parameter $\phi$ is estimated
 on the sum of the splice variant or allele counts of each sample.
 
-%TODO: rewrite this part...
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Pre-test filtering}
@@ -808,7 +808,7 @@ on the sum of the splice variant or allele counts of each sample.
 If global counts for both variants are too low (option 
 \Rcode{filterLowCountsVariants}), the event is not tested.
 The rationale behind this filter is to speed up the analysis and gain 
-statistical power.
+statistical power.\\
 Here we present an example to explain how \Rcode{filterLowCountsVariants} 
 option works. Let's assume that there are two conditions and two replicates
 per condition. \Rcode{filterLowCountsVariants} keeps its default value, 10.\\
