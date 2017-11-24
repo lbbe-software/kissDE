@@ -373,12 +373,20 @@
     for (i in seq_len(n)) {
         conds <- c(conds, rep(paste("Cond", i, sep="", collapse=""), nr[i]))
     } 
+    # Creating every 2 rows sum table :
+    ## This was the object previously used
+    countsEventsCounts <- countsEvents[, !(names(countsEvents) %in% 
+                                             c("ID", "Length", "Path"))]
+    
+    ## This is the object that we use now
+    countsEventsSum <- rowsum(countsEventsCounts, 
+                              as.integer(gl(nrow(countsEventsCounts),
+                                            2,
+                                            nrow(countsEventsCounts))))
     
     ## create a DESeqDataSet object
     suppressMessages(dds <- DESeqDataSetFromMatrix(
-        countData=
-            countsEvents[, !(names(countsEvents) %in% 
-                            c("ID", "Length", "Path"))], 
+        countData=countsEventsSum, 
         colData=data.frame(condition=conds),
         design=~ condition))
     
