@@ -4,7 +4,8 @@ importFrom("DESeq2",
             "counts", 
             "DESeqDataSetFromMatrix", 
             "estimateSizeFactors", 
-            "sizeFactors")
+            "sizeFactors",
+            "sizeFactors<-")
 importFrom("DSS", "dispersion", "estDispersion", "newSeqCountSet")
 importFrom("ggplot2", 
             "ggplot", 
