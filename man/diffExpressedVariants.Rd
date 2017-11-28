@@ -40,7 +40,7 @@ to flag the event as 'lowCounts'.}
 
 
 \value{
-\code{diffExpressedVariants} returns a list of 6 objects:
+\code{\link{diffExpressedVariants}} returns a list of 6 objects:
 \item{finalTable}{a data frame containing the columns
     \itemize{
         \item \code{ID}: the variation identifier
@@ -84,7 +84,8 @@ Each row corresponds to one variant, thus an event correspond to two rows with
 the longest variant (or inclusion variant) in the first row (thus denotated as 
 upper path: UP) and the smallest variant (or exclusion variant) in the second 
 row (thus denotated as lower path: LP).
-This data frame can be obtained using \code{kissplice2counts} function.\\
+This data frame can be obtained using \code{\link{kissplice2counts}}
+function.\\
 The global variant count is the minimal number of reads that cover one or the 
 other variant across all the replicates (sum by variant).\\
 The global condition count is the minimal number of reads that cover one or 

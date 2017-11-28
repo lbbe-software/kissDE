@@ -1,18 +1,18 @@
 \name{writeOutputKissDE}
 \alias{writeOutputKissDE}
 
-\title{Create and store the output of the \code{diffExpressedVariants} function 
-in a file.}
+\title{Create and store the output of the \code{\link{diffExpressedVariants}}
+function in a file.}
 
 
 \description{If a \code{KisSplice} fasta file was used as input for the 
-analysis, \code{writeOutputKissDE} will output a tab-delimited file
+analysis, \code{\link{writeOutputKissDE}} will output a tab-delimited file
 containing one alternative splicing event/SNV per line. The columns are: the 
 ID of the variation, the variable part length, the counts of each variant for 
 each condition, the adjusted p-value (FDR), the deltaPSI and a boolean 
 indicating if the splicing event/SNV was sufficiently expressed (controled by 
-the \code{flagLowCountsConditions} option from the\code{diffExpressedVariants} 
-function).
+the \code{flagLowCountsConditions} option from the
+\code{\link{diffExpressedVariants}} function).
 
 If a \code{KisSplice2RefGenome} file was used as input for the analysis,
 this function will add five columns to the \code{KisSplice2RefGenome}
@@ -20,7 +20,7 @@ file, with the following \code{KissDE} results: normalized counts,
 PSI computed from normalized counts, adjusted p-value, deltaPSI and a boolean 
 indicating if the splicing event/SNV was sufficiently expressed in at least half 
 of the conditions (controled by the \code{flagLowCountsConditions} option from 
-the\code{diffExpressedVariants} function).
+the \code{\link{diffExpressedVariants}} function).
 }
 
 
@@ -31,10 +31,11 @@ writeOutputKissDE(resDiffExprVariant, output, adjPvalMax = 1, dPSImin = 0,
 
 
 \arguments{
-\item{resDiffExprVariant}{a list, returned by \code{diffExpressedVariants}.}
+\item{resDiffExprVariant}{a list, returned by 
+\code{\link{diffExpressedVariants}}.}
 
 \item{output}{a character indicating the path and file name to save 
-\code{writeOutputKissDE} output.}
+\code{\link{writeOutputKissDE}} output.}
 
 \item{adjPvalMax}{a double indicating the threshold for adjusted p-value. Only
 SNVs/splicing events with an adjusted p-value lower than this threshold will be

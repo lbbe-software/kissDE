@@ -79,8 +79,8 @@ This data frame is used only when \code{counts} is different from 0.}
 \item{k2rgFile}{a string containing the \code{KisSplice2RefGenome} path and 
 file name. It is equal to NULL if the input file comes from KisSplice.}
 
-Only \code{countsEvents} is shown when \code{kissplice2counts} output is
-printed. 
+Only \code{countsEvents} is shown when \code{\link{kissplice2counts}} output
+is printed. 
 }
 
 
@@ -104,8 +104,8 @@ In a regular \code{KisSplice} output (\code{counts = 0}), it would be:
 The \code{order} parameter:
 
 If the reads corresponding to the same pair have not been inputted one after 
-another, the order need to be explicitely given to the \code{kissplice2counts} 
-function.
+another, the order need to be explicitely given to the 
+\code{\link{kissplice2counts}} function.
 For instance, if there are two pairs and if the input in \code{KisSplice} has 
 been -r sample1_readPair1.fa -r sample2_readPair1.fa -r sample1_readPair2.fa 
 -r sample2_readPair2.fa, the two sets of reads coming from the same pair 
