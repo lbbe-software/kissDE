@@ -17,7 +17,7 @@ kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL,
 
 \arguments{
 \item{fileName}{a string indicating the path to the \code{KisSplice} 
-(\code{.fa}) or the \code{KisSplice2RefGenome (tab-delimited)} file.}
+(\code{.fa}) or the \code{KisSplice2RefGenome} (tab-delimited) file.}
 
 \item{counts}{an interger (0, 1 or 2) corresponding to the \code{KisSplice}
 \code{counts} option used (see Details below).}
@@ -103,14 +103,15 @@ In a regular \code{KisSplice} output (\code{counts = 0}), it would be:
 
 The \code{order} parameter:
 
-If the reads corresponding to the same pair have not been inputted one after 
-another, the order need to be explicitely given to the 
-\code{\link{kissplice2counts}} function.
-For instance, if there are two pairs and if the input in \code{KisSplice} has 
-been -r sample1_readPair1.fa -r sample2_readPair1.fa -r sample1_readPair2.fa 
--r sample2_readPair2.fa, the two sets of reads coming from the same pair 
-(readPair1 or readPair2) are not following each other. The vector order
-to give would be \code{order = c(1, 2, 1, 2)}.
+If the reads corresponding to a paired-end fragments have not been passed to
+\code{Kissplice} next to each other, the order needs to be explicitly given to
+the \code{\link{kissplice2counts}} function.
+For instance, if there are two paired-end samples and if the input in
+\code{Kissplice} has been: \code{-r sample1_readPair1.fa} 
+\code{-r sample2_readPair1.fa} \code{-r sample1_readPair2.fa}
+\code{-r sample2_readPair2.fa},
+the input is not organised with the reads of one pair next to each other.
+The vector \code{order} to give would be \code{order = c(1, 2, 1, 2)}.
 
 
 The \code{keep} and \code{remove} parameters:
