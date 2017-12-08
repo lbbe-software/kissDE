@@ -18,9 +18,9 @@ If a \code{KisSplice2RefGenome} file was used as input for the analysis,
 this function will add five columns to the \code{KisSplice2RefGenome}
 file, with the following \code{KissDE} results: normalized counts,
 PSI computed from normalized counts, adjusted p-value, deltaPSI and a boolean 
-indicating if the splicing event/SNV was sufficiently expressed in at least half 
-of the conditions (controled by the \code{flagLowCountsConditions} option from 
-the \code{\link{diffExpressedVariants}} function).
+indicating if the splicing event/SNV was sufficiently expressed in at least 
+half of the conditions (controled by the \code{flagLowCountsConditions} option 
+from the \code{\link{diffExpressedVariants}} function).
 }
 
 

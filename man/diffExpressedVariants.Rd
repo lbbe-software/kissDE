@@ -29,10 +29,10 @@ to increase statistical power of the analysis. Both variant must have a read
 coverage below this value in order to remove the event. This filter is done 
 after the normalization and the overdispersion estimation.}
 
-\item{flagLowCountsConditions}{a numerical value indicating the global condition 
-count value (see Details below) below which we flag events as 'lowCounts' in the 
-final data frame. At least n-1 conditions (over n conditions) must have low counts 
-to flag the event as 'lowCounts'.}
+\item{flagLowCountsConditions}{a numerical value indicating the global 
+condition count value (see Details below) below which we flag events as 
+'lowCounts' in the final data frame. At least n-1 conditions (over n 
+conditions) must have low counts to flag the event as 'lowCounts'.}
 
 \item{technicalReplicates}{a boolean value indicating if the counts in 
 \code{countsData} come from technical replicates only or not.}
@@ -56,8 +56,8 @@ to flag the event as 'lowCounts'.}
         abundance in condition 1. Inclusion variant's counts are corrected for
         the length of the variant so that we do not overestimate the PSI value.
         \item \code{lowcounts}: a column that flag low counts in data. 
-        If \code{TRUE}, at least n-1 conditions over n conditions have less than 
-        10 reads.
+        If \code{TRUE}, at least n-1 conditions over n conditions have less 
+        than 10 reads.
 }}
 \item{correctedPval}{a numeric vector containing p-values after correction 
 for multiple testing}
@@ -74,12 +74,12 @@ path and name or NULL if no \code{KisSplice2RefGenome} input file was given}
 
 \details{
 The \code{countsData} data frame must be formatted as follows: 
-  \itemize{
-    \item Column 1: names of the events
-    \item Column 2: lengths (in bp) of the variants
-    \item Column 3 to n: counts corresponding to each replicate of each 
-experimental condition of one variant
-  } 
+    \itemize{
+        \item Column 1: names of the events
+        \item Column 2: lengths (in bp) of the variants
+        \item Column 3 to n: counts corresponding to each replicate of each 
+            experimental condition of one variant
+    }
 Each row corresponds to one variant, thus an event correspond to two rows with
 the longest variant (or inclusion variant) in the first row (thus denotated as 
 upper path: UP) and the smallest variant (or exclusion variant) in the second 

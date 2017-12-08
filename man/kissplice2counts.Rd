@@ -31,25 +31,25 @@ has been inputed as following each other. If it is not the case, see option
 \code{order}.}
 
 \item{order}{a numeric vector indicating the actual order of the corresponding 
-paired reads in the columns of the \code{KisSplice} output such that they can be 
-summed. This option goes along with \code{pairedEnd = TRUE}, if the read pairs
-are not in the expected order (see \code{pairedEnd} option).
+paired reads in the columns of the \code{KisSplice} output such that they can 
+be summed. This option goes along with \code{pairedEnd = TRUE}, if the read 
+pairs are not in the expected order (see \code{pairedEnd} option).
 It has as many elements as there are samples in total.
 For more information on this parameter, see Details below.}
 
 \item{exonicReads}{a logical indicating if exonic/intronic read counts will be 
-kept (\code{TRUE}, default) or discareded (\code{FALSE}). This option only works 
-if \code{counts = 2}.}
+kept (\code{TRUE}, default) or discareded (\code{FALSE}). This option only 
+works if \code{counts = 2}.}
 
 \item{k2rg}{a logical indicating if the input file is a 
 \code{KisSplice2RefGenome} (\code{TRUE}) output or a 
 \code{KisSplice} (\code{FALSE}, default) output file.}
 
 \item{keep}{a character vector listing the names of the events to be kept for
-the statistical test (for \code{k2rg = TRUE}, analyses all of the events by default). 
-The test will be more sensitive the selected events. Event(s) name(s) must be part 
-of this list: deletion, insertion, IR, ES, altA, altD, altAD, alt, unclassified.
-For more information on this parameter, see Details below.}
+the statistical test (for \code{k2rg = TRUE}, analyses all of the events by 
+default). The test will be more sensitive the selected events. Event(s) name(s) 
+must be part of this list: deletion, insertion, IR, ES, altA, altD, altAD, alt, 
+unclassified. For more information on this parameter, see Details below.}
 
 \item{remove}{a character vector listing the names of the events to remove
 for the statistical test (for \code{k2rg = TRUE}, does not remove any event by 

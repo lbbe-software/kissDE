@@ -376,13 +376,11 @@
     # Creating every 2 rows sum table :
     ## This was the object previously used
     countsEventsCounts <- countsEvents[, !(names(countsEvents) %in% 
-                                             c("ID", "Length", "Path"))]
+        c("ID", "Length", "Path"))]
     
     ## This is the object that we use now
     countsEventsSum <- rowsum(countsEventsCounts, 
-                              as.integer(gl(nrow(countsEventsCounts),
-                                            2,
-                                            nrow(countsEventsCounts))))
+        as.integer(gl(nrow(countsEventsCounts), 2, nrow(countsEventsCounts))))
     
     ## create a DESeqDataSet object
     suppressMessages(dds <- DESeqDataSetFromMatrix(
@@ -393,9 +391,9 @@
     ddsSF <- estimateSizeFactors(dds)
     sizeFactorsSum <- sizeFactors(ddsSF)
     suppressMessages(ddsSF <- DESeqDataSetFromMatrix(
-      countData=countsEventsCounts, 
-      colData=data.frame(condition=conds),
-      design=~ condition))
+        countData=countsEventsCounts, 
+        colData=data.frame(condition=conds),
+        design=~ condition))
     sizeFactors(ddsSF) <- sizeFactorsSum
     shouldWeNormalize <- sum(is.na(sizeFactors(ddsSF))) < 1
     dimns <- NCOL(countsEvents)

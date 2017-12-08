@@ -177,10 +177,10 @@ myConditions <- c(rep("condition_1", 2), rep("condition_2", 2))
 @
 
 
-In the case where the input data contains more than 2 conditions, we advise the user
-to remove samples from the analysis in order to compare 2 conditions only, because 
-\kde was uniquely tested in this context. To remove samples from the analysis the "*"
-character can be used:
+In the case where the input data contains more than 2 conditions, we advise 
+the user to remove samples from the analysis in order to compare 2 conditions 
+only, because \kde was uniquely tested in this context. To remove samples from 
+the analysis the "*" character can be used:
 
 <<conditionVectorRemove_howto, fig=FALSE, keep.source=FALSE, eval=FALSE>>=
 myConditions <- c(rep("condition_1", 2), rep("*", 2), rep("condition_3", 2))
@@ -1150,7 +1150,8 @@ The conditions being compared are the populations.
 
 \begin{figure}
 \includegraphics[width=0.7\textwidth]{experimental_design_SNP.png}
-\caption{\label{fig:designSNP}Experimental design of the SNP dataset. Each cross corresponds to an individual.}
+\caption{\label{fig:designSNP}Experimental design of the SNP dataset. Each 
+cross corresponds to an individual.}
 \end{figure}
 
 The data are paired-end. So each sample consists of 2 files. 
@@ -1199,7 +1200,8 @@ object (for a detailed description of its structure, see section
 \ref{subsubsec:input_ks}) and can be done as follows:
 
 <<snv_counts, fig=FALSE , keep.source=FALSE>>=
-fileInSNV <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
+fileInSNV <- system.file("extdata", "output_kissplice_SNV.fa", 
+    package = "kissDE")
 myCounts_SNV <- kissplice2counts(fileInSNV, pairedEnd = TRUE)
 head(myCounts_SNV$countsEvents)
 @
