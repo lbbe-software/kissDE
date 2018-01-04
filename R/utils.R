@@ -534,10 +534,10 @@
     # We select the variant with the largest number of reads
     dataNormCountsEventSum <- matrix(nrow=nrow(dataNormCountsEvent), ncol=nbAll)
     rownames(dataNormCountsEventSum) <- rownames(dataNormCountsEvent)
-    colnames(dataNormCountsEventSum) <- 1:nbAll
-    for(i in c(1:nrow(dataNormCountsEvent))){
+    colnames(dataNormCountsEventSum) <- seq_len(nbAll)
+    for(i in seq_len(nrow(dataNormCountsEvent))){
         current <- dataNormCountsEvent[i,]
-        dataNormCountsEventSum[i,] <- current[1:(sum(nr))]+
+        dataNormCountsEventSum[i,] <- current[seq_len(sum(nr))]+
             current[(sum(nr)+1):(2*sum(nr))]
     }
     
@@ -916,9 +916,11 @@
         }
         else{
             ## to put the lines of the 2 data frames in the same order
-            newindex <- unlist(sapply(rownames(signifVariants), 
-                            function(x) res <- which(ASSBinfo[, 1] == x)), 
-                            use.names=FALSE)
+            newindex  <- unlist(vapply(rownames(signifVariants),
+                                function(x) res <- which(ASSBinfo[, 1] == x),
+                                FUN.VALUE = integer(1)),
+                              use.names=FALSE)
+            
             ASSBinfo <- ASSBinfo[newindex, ]
         }
         
