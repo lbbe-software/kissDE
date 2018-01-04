@@ -1,6 +1,6 @@
 Package: kissDE
 Version: 0.99.0
-Date: 2017-08-17
+Date: 2018-01-04
 Title: Retrieves Condition-Specific Variants in RNA-Seq Data
 Description: Retrieves condition-specific variants in RNA-seq data (SNVs, alternative-splicings, indels). It has been developed as a post-treatment of 'KisSplice' but can also be used with user's own data.
 Authors@R: c(
