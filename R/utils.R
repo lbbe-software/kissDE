@@ -919,7 +919,7 @@
             newindex  <- unlist(vapply(rownames(signifVariants),
                                 function(x) res <- which(ASSBinfo[, 1] == x),
                                 FUN.VALUE = integer(1)),
-                              use.names=FALSE)
+                                use.names=FALSE)
             
             ASSBinfo <- ASSBinfo[newindex, ]
         }
