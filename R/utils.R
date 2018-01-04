@@ -283,7 +283,7 @@
                 stop(paste("Input error: countsData must contain two following 
                     row for the same event name (first column). The row with 
                     the ID ", savedID," is alone. See the vignette for more 
-                    informations.",sep=""))
+                    informations.", sep=""))
             }
         }
         i <- i + 1
