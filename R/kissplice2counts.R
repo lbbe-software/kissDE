@@ -30,14 +30,15 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
             stop("Input error: keep option must be a vector.")
         }
         keep <- unique(keep)
-        for(element in keep) {
-            if(!element%in%c("deletion", "insertion", "IR", "ES", "altA",
-                            "altD", "altAD", "alt", "unclassified")) {
-                stop(paste("Input error: element ",element," of option keep is 
+        values <- c("deletion", "insertion", "IR", "ES", "altA", "altD", 
+            "altAD", "alt", "unclassified")
+        notinvalues <- keep[!keep%in%values] # vector of unauthorized 'keep' values
+        if(length(notinvalues) > 0)
+            notinvalues <- paste(notinvalues, collapse = ", ")
+            stop(paste("Input error: element ", element," of option keep is 
                     not recognize. Each elements of the keep vector must be in 
                     the following list: deletion, insertion, IR, ES, altA, altD,
                     altAD, alt, unclassified.", sep=""))
-            }
         }
     }
     if(k2rg & !is.null(remove)) {
