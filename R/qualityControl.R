@@ -5,7 +5,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
         pathToFigs <- NA
     } else {
         if (isTRUE(storeFigs)) {
-            pathToFigs <- paste0(getwd(), "/kissDEFigures")
+            pathToFigs <- paste0(tempdir(), "/kissDEFigures")
         } else {
             pathToFigs <- storeFigs
         }
