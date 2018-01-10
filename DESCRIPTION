@@ -14,7 +14,7 @@ Authors@R: c(
 	person("Frank", "Picard", role = "ctb"), 
 	person("Laurent", "Jacob", role = "ctb"), 
 	person("Vincent", "Miele", role = "ctb"))
-Imports: aod, Biobase, DESeq2, DSS, ggplot2, glmnet, gplots, graphics, grDevices, R.utils, stats, utils
+Imports: aod, Biobase, DESeq2, DSS, ggplot2, glmnet, gplots, graphics, grDevices, matrixStats, R.utils, stats, utils
 Suggests: BiocStyle, testthat
 License: GPL (>= 2)
 Contact: Vincent Lacroix <vincent.lacroix@univ-lyon1.fr>

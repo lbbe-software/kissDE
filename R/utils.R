@@ -555,11 +555,9 @@
     ### code chunk number 3: variance - mean - Event level1
     ###################################################
     ## compute mean and variance per Event (instead of per allele)
+    dd <- dataPart2[, which(grepl("_Norm", names(dataPart2)))]
     event.mean.variance.df <- as.data.frame(
-        cbind(apply(dataPart2[, 
-                which(grepl("_Norm", names(dataPart2)))], 1, mean),
-            apply(dataPart2[, 
-                which(grepl("_Norm", names(dataPart2)))], 1, var)))
+        cbind(rowSums(dd), rowVars(as.matrix(dd))))
     names(event.mean.variance.df) <- c("Mean", "Variance")
     rownames(event.mean.variance.df) <- as.character(dataPart2[, 1])
     ## estimate the dispersion parameter D of the Quasi-Poisson distribution

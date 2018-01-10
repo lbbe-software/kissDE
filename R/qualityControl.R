@@ -53,9 +53,9 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
                 paste(conditionsNames[i], paste0("repl", j), sep="_")
         }
     }
-    countsData2$vars <- apply(
+    countsData2$vars <- rowVars(
         as.matrix(countsData2[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]),
-        1, var, na.rm=TRUE)
+        na.rm=TRUE)
     ## remove all NAs
     countsData2 <- countsData2[complete.cases(
         countsData2[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]), ]
