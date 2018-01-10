@@ -117,7 +117,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
             if (length(line) == 0) {
                 break
             }
-            if (substr(line, start=0, stop=1) != ">"){
+            if (!startsWith(line, ">")) {
                 next
             }
             if (index == 1){
@@ -178,7 +178,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
             if (length(line) == 0) {
                 break
             }
-            if(substr(line[1], 0, 1) == "#"){
+            if(startsWith(line, "#")) {
                 index <- index + 1
                 next
             }
@@ -203,7 +203,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
             if(length(line) == 0) {
                 break
             }
-            if(substr(line[1], 0, 1) == "#") {
+            if(startsWith(line, "#")) {
                 index <- index + 1
                 indexNames <- 1
                 next

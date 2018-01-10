@@ -1235,7 +1235,7 @@
     fOut <- file(output, open="w")
     
     line <- lines[1]
-    if(substr(line[1], 0, 1) == "#"){
+    if(startsWith(line, "#")) {
         nCol <- length(strsplit(line, split="\t")[[1]])
         countsHead <- paste(nCol+1, countsName, sep=".")
         psiHead <- paste(nCol+2, psiName, sep=".")
