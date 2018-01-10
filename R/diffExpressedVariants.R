@@ -44,7 +44,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
         ## They are stored here.
         ASSBinfo <- chunk0$ASSBinfo  
         if (!is.null(ASSBinfo)) {
-            li <- seq_len(10)
+            li <- seq_len(NROW(ASSBinfo))
             li <- li[which(li%%2 != 0)] ## select odd indexes
             ASSBinfo <- ASSBinfo[li, ]
         }
