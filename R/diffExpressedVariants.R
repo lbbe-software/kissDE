@@ -44,12 +44,8 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
         ## They are stored here.
         ASSBinfo <- chunk0$ASSBinfo  
         if (!is.null(ASSBinfo)) {
-            li <- c()
-            for (i in seq_len(NROW(ASSBinfo))) {
-                if (i%%2 != 0) {
-                    li <- c(li, i)
-                }
-            }
+            li <- seq_len(10)
+            li <- li[which(li%%2 != 0)] ## select odd indexes
             ASSBinfo <- ASSBinfo[li, ]
         }
         message("Trying to fit models on data...")
