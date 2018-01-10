@@ -107,13 +107,13 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
             consistency with k2rg=FALSE.")
     }
     
-    toConvert <- file(fileName, open="r")
+    fpath <- file(fileName, open="r")
     nbLines <- countLines(fileName)
     if (k2rg == FALSE) {
         fileNameK2RG <- NULL
         index <- 1
         while (TRUE) {
-            line <- readLines(toConvert, n=1)
+            line <- readLines(fpath, n=1)
             if (length(line) == 0) {
                 break
             }
@@ -174,7 +174,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         iEvents <- 0  ## number of unique and duplicated bcc = number of events
         lEvents <- list()
         while (TRUE) {
-            line <- readLines(toConvert, n=1)
+            line <- readLines(fpath, n=1)
             if (length(line) == 0) {
                 break
             }
@@ -197,9 +197,9 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         index <- 1
         indexNames <- 1
         ## reinitialize the cursor at the beginning of the file
-        seek(toConvert, 0) 
+        seek(fpath, 0) 
         while (TRUE) {
-            line <- readLines(toConvert, n=1)
+            line <- readLines(fpath, n=1)
             if(length(line) == 0) {
                 break
             }
@@ -247,7 +247,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
     colnames(events.df) <- c("events.names", "events.length", paste("counts", 
         seq_len(length(colnames(events.df)) - 2), sep=""))
     
-    close(toConvert)
+    close(fpath)
     psiInfo <- data.frame(events.names, as.data.frame(psiInfo))
     
     output <- list(countsEvents=events.df, psiInfo=psiInfo, 
