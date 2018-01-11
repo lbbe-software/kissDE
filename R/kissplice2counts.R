@@ -1,10 +1,11 @@
 kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
                             exonicReads=TRUE, k2rg=FALSE, keep=c("All"),
                             remove=NULL) {
-    ## check options 
+    
+    ######## check function inputs
+    
     if(!file.exists(fileName)) {
-        stop(paste("Input error: user's file ", fileName," does not exist. 
-                    Is the path and/or file's name corect ?",sep=""))
+        stop("Input error: user's file does not exist.")
     }
     if(!counts%in%c(0,1,2)){
         stop("Input error: counts option is not equal to 0, 1 or 2.")
@@ -38,16 +39,15 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         notinValues <- keep[!keep%in%values]
         if(length(notinValues) > 0) {
             notinValues <- paste(notinValues, collapse = ", ")
-            stop(paste("Input error: element(s) ", notinValues," of the 'keep'
-                option is(are) not recognized. Each elements of the 'keep'
-                vector must be in the following list: deletion, insertion, IR, 
-                ES, altA, altD, altAD, alt, unclassified.", sep=""))
+            stop("Input error: 'keep' must be a vector of values in 
+    c('deletion', 'insertion', 'IR', 'ES', 'altA', 'altD', 'altAD', 
+    'alt', 'unclassified'.")
         }
     }
     
     if(k2rg & !is.null(remove)) {
         if(!is.vector(remove)) {
-            stop("Input error: remove option must be a vector.")
+            stop("Input error: 'remove' must be a vector.")
         }
 
         remove <- unique(remove)
@@ -58,11 +58,9 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         notinValues <- remove[!remove%in%values]
         if(length(notinValues) > 0) {
             notinValues <- paste(notinValues, collapse = ", ")
-            stop(paste("Input error: element(s)", notinValues," of the 'remove' 
-                    option is(are) not recognized. Each elements of the 
-                    'remove' vector must be in the following list: deletion, 
-                    insertion, IR, ES, altA, altD, altAD, alt, unclassified, 
-                    MULTI.", sep=""))
+            stop("Input error: 'remove' must be a vector of values in 
+    c('deletion', 'insertion', 'IR', 'ES', 'altA', 'altD', 'altAD', 
+    'alt', 'unclassified', 'MULTI'.")
         }
         
         if(keep!=c("All") & "ES"%in%keep) {
@@ -72,40 +70,38 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
             notinValues <- remove[!remove%in%values]
             if(length(notinValues) > 0) {
                 notinValues <- paste(notinValues, collapse = ", ")
-                stop(paste("Input error: element(s) ", notinValues," of the 
-                        'remove' option is(are) not recognized. When used is 
-                        association with the 'keep' option, each elements of 
-                        the remove vector must be in the following list: altA, 
-                        altD, altAD, alt, MULTI."))
+                stop("Input error: if 'keep' contains 'ES', 'remove' must be a 
+    vector of values in: c('altA', 'altD', 'altAD', 'alt', 'MULTI'.")
             }
         } else if(keep!=c("All")) {
-            stop("Input error: keep and remove options can not be used together,
-                unless \"ES\" is one of the element(s) of the 'keep' option (see
-                the vignette for more informations).")
+            stop("Input error: 'keep' and 'remove' can not be used together,
+    unless 'keep' contains 'ES' (see the vignette for more informations).")
         }
     }
-    ## Check options end
     
-    ## check options compatibility
+    ######## check options compatibility
+    
     if (counts == 1 & exonicReads == TRUE) { 
         ## when counts=1 set automatically exonicReads=TRUE
         exonicReads <- FALSE
         warning("Changing 'exonicReads' value to FALSE for consistency with
-            counts=1.")
+    counts=1.")
     }
     if (counts == 0 & exonicReads == FALSE) { 
         ## when counts=1 set automatically exonicReads=TRUE
         exonicReads <- TRUE
         warning("Changing 'exonicReads' value to TRUE for consistency with
-            counts=0.")
+    counts=0.")
     }
     if (k2rg == FALSE & (keep != c("All") | !is.null(remove))) {
         ## keep and remove should only be used when k2rg=TRUE
         keep <- c("All")
         remove <- NULL
         warning("Changing 'keep' and 'remove' options to default value for 
-            consistency with k2rg=FALSE.")
+    consistency with k2rg=FALSE.")
     }
+    
+    ########
     
     fpath <- file(fileName, open="r")
     nbLines <- countLines(fileName)

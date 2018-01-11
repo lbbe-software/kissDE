@@ -14,7 +14,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
     if (!is.na(pathToFigs)) {
         if(!dir.exists(pathToFigs))
             dir.create(pathToFigs, recursive = TRUE)
-        message(paste("Figures are stored in", pathToFigs))
+        message("Figures are stored in ", pathToFigs)
     }
     
     ###################################################

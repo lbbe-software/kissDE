@@ -2,25 +2,32 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
                                     filterLowCountsVariants=10, 
                                     flagLowCountsConditions=10,
                                     technicalReplicates=FALSE) {
-    # Check options
+    
+    ######## check function inputs
+    
     if(length(pvalue)>1 | !is.double(pvalue) | pvalue<0 | pvalue>1) {
-        stop("Input error: pvalue option must be a double between 0 and 1.")
+        stop("Input error: 'pvalue' must be a double between 0 and 1.")
     }
+    
     if((length(filterLowCountsVariants)>1) | 
         (filterLowCountsVariants-round(filterLowCountsVariants+0.5)!=0) | 
         (filterLowCountsVariants<0)) {
-            stop("Input error: filterLowCountsVariants option must 
-                    be a positive integer.")
+            stop("Input error: 'filterLowCountsVariants' must be a 
+    positive integer.")
     }
+    
     if((length(flagLowCountsConditions)>1) | 
         (flagLowCountsConditions-round(flagLowCountsConditions+0.5)!=0) | 
         (flagLowCountsConditions<0)) {
-            stop("Input error: flagLowCountsConditions option must 
-                    be a positive integer.")
+            stop("Input error: 'flagLowCountsConditions' must be a 
+    positive integer.")
     }
+    
     if(!is.logical(technicalReplicates)) {
-        stop("Input error: technicalReplicates option must be a boolean.")
+        stop("Input error: 'technicalReplicates' must be a boolean.")
     }
+    
+    ########
     
     message("Pre-processing the data...")
     chunk0 <- tryCatch({.readAndPrepareData(countsData, conditions)
@@ -50,7 +57,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
         }
         message("Trying to fit models on data...")
         message("This can be a time-consuming step, so do not hesitate to have 
-                    a look at the very well-written vignette !")
+    a look at the very well-written vignette !")
         chunk1 <- tryCatch({.modelFit(chunk0$countsData, chunk0$n, chunk0$nr, 
                                         ASSBinfo, filterLowCountsVariants,
                                         technicalReplicates)
@@ -65,7 +72,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
             ## chunk1$dispData
         }, error=function(err) {
             return(NA)
-            stop(paste(err, "An error occured, unable to fit models on data." ))
+            stop(err, " An error occured, unable to fit models on data.")
         }) 
     } else {  # error in chunk 0
         chunk1 <- NA
@@ -86,8 +93,8 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
             ## chunk2$correctedPVal
             ## chunk2$signifVariants
         }, error=function(err) {
-            message(paste(err, "Returning only resultFitNBglmModel and 
-                            sing.events")) 
+            message(err, " Returning only 'resultFitNBglmModel' 
+    and 'sing.events'")
             return(list(resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb, 
                         sing.events=chunk1$sing.events))
         })
@@ -117,8 +124,8 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
                             `f/psiTable`=sizeOfEffect$psiTable,
                             k2rgFile=countsData$k2rgFile))
             }, error=function(err) {
-                message(paste(err, "Returning only resultFitNBglmModel and 
-                    pvalues tab"))
+                message(err, " Returning only 'resultFitNBglmModel' and 
+                    pvalues tab")
                 return(list(correctedPVal=chunk2$correctedPVal,
                             uncorrectedPVal=chunk2$noCorrectPVal,
                             resultFitNBglmModel=chunk1$pALLGlobalPhi.glm.nb))

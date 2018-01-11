@@ -162,7 +162,7 @@
                             rep(2, ((NROW(sums)) / 2)))
             } else {
                 if (!is.vector(order)) {
-                    stop("Order vector seems to be in a wrong format.")
+                    stop("'order' vector seems to be in a wrong format.")
                 }
             }
             d2 <- data.frame(order, sums)
@@ -186,7 +186,7 @@
                             rep(2, dim(countsperCond)[2] / 2))
             } else {
                 if (!is.vector(order)) {
-                    stop("Order vector seems to be in a wrong format.")
+                    stop("'order' vector seems to be in a wrong format.")
                 }
             }
         } else {
@@ -280,44 +280,42 @@
         }
         else{
             if(thisID!=savedID) {
-                stop(paste("Input error: countsData must contain two following 
-                    row for the same event name (first column). The row with 
-                    the ID ", savedID," is alone. See the vignette for more 
-                    informations.", sep=""))
+                stop("Input error: 'countsData' must contains two following 
+    rows for the same event name (first column). The row with the ID ", savedID,
+    " is alone. See the vignette for more informations.")
             }
         }
         i <- i + 1
     }
     if(!i%%2) {
-        stop(paste("Input error: countsData must contain two following row for 
-            the same event name (first column). The last row (ID: ", savedID,
-            ") is alone. See the vignette for more informations.", sep=""))
+        stop("Input error: 'countsData' must contains two following rows for 
+    the same event name (first column). The last row (ID: ", savedID,
+    ") is alone. See the vignette for more informations.")
     }
     
     tableID <- table(countsEvents[[1]])
     if(max(tableID) != 2){
-        stop(paste("Input error: in countsData, the event(s) ",
-            names(tableID[tableID==max(tableID)]), 
-            " has(have) more than two lines.", sep=""))
+        stop("Input error: in 'countsData', the event(s) ",
+    names(tableID[tableID==max(tableID)]), " has(have) more than two lines.")
     }
     
     countsLength <- countsEvents[[2]]
     if(!is.vector(countsLength,mode="numeric")){
-        stop("Input error: in countsData, the second column (length) is 
-            not composed of numerical values.")
+        stop("Input error: in 'countsData', the second column ('length') is 
+    not composed of numerical values.")
     }
     if(min(countsLength)<0) {
-        stop(paste("Input error: in coutsData, the smallest value for the 
-            second column (length) should be 0 (the minimal value in the 
-            current data is",min(countsLength),").", sep=""))
+        stop("Input error: in 'coutsData', the smallest value for the 
+    second column (length) should be 0 (the minimal value in the current 
+    data is ", min(countsLength), ").")
     }
     
     if(!is.vector(conditions)){
-        stop("Input error: condition option must be a vector.")
+        stop("Input error: 'condition' must be a vector.")
     }
     if(ncol(countsEvents)-2!=length(conditions)){
-        stop("Input error: not the same amount of conditions in the options 
-            countsData (starting at column 3) and condition.")
+        stop("Input error: not the same amount of conditions in 'countsData' 
+    (starting at column 3) and 'condition'.")
     }
     
     if("*"%in%conditions){
@@ -335,7 +333,7 @@
     ## if at least 1 condition does not contain replicates, stop the analysis
     if (length(nr[nr == 1]) > 0){
         stop("The data does not contain replicates for all conditions. 
-            Please change the input data and relaunch.")
+    Please change the input data and relaunch.")
     }
     sortedindex <- order(conditions) + 2
     namesData <- c("ID", "Length", rep(NA, length(conditions)))
@@ -1324,7 +1322,7 @@
     if (!is.null(remove)) {
         for (i in seq_along(remove)) {
             if (!remove[i] %in% append(EVENTS, "MULTI")) {
-                message(paste("In remove: couldn't find", remove[i]))
+                message("In remove: couldn't find ", remove[i])
                 stop("One of the element(s) of the remove vector is not part of:
                     deletion, insertion, IR, ES, altA, altD, altAD, alt, 
                     unclassified, -, MULTI, unclassifiedSNP")
@@ -1350,7 +1348,7 @@
     }
     for (i in seq_along(keep)) {
         if (!keep[i] %in% EVENTS) {
-            message(paste("In keep: couldn't find", keep[i]))
+            message("In keep: couldn't find", keep[i])
             stop("One of the element(s) of the keep vector is not part of:
                 deletion, insertion, IR, ES, altA, altD, altAD, alt, 
                 unclassified, -, unclassifiedSNP")
@@ -1375,7 +1373,7 @@
     }
     for (i in seq_along(remove)){
         if (!remove[i] %in% ES_EVENTS) {
-            message(paste("In remove: couldn't find",remove[i]))
+            message("In remove: couldn't find",remove[i])
             stop("One of the element(s) of the remove vector is not part of: 
                 altA, altD, altAD, alt, MULTI")
         }
