@@ -32,33 +32,37 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
         conditions <- conditions[-toRm]
     }
     conditionsNames <- sort(unique(conditions))
+    n_conds <- length(conds)
     
     ###################################################
     ### select events with highest variance (on PSI)
     ###################################################
-    countsData2 <- reshape(countsData[, c(1,(dimns):(dimns + length(conds)))], 
+    countsData2 <- reshape(countsData[, c(1,(dimns):(dimns + n_conds))], 
         timevar="Path", idvar="ID", direction="wide")
+    
+    nr_tot <- sum(nr)
+    
     for (i in seq_len(n)) {
         for (j in seq_len(nr[i])) {
             countsData2$PSI <- countsData2[, (1+j+sum(nr[0:(i-1)]))] /
                 (countsData2[, (1+j+sum(nr[0:(i-1)]))] + 
-                    countsData2[, (1+sum(nr)+j+sum(nr[0:(i-1)]))])
+                    countsData2[, (1+nr_tot+j+sum(nr[0:(i-1)]))])
             ## replace PSI by NA if count less or equal to 10 reads 
             ## for the 2 isoforms
             indexNA <- intersect(
                 which(countsData2[, (1+j+sum(nr[0:(i-1)]))] < 10), 
-                which(countsData2[, (1+sum(nr)+j+sum(nr[0:(i-1)]))] < 10))
+                which(countsData2[, (1+nr_tot+j+sum(nr[0:(i-1)]))] < 10))
             countsData2$PSI[indexNA] <- NA
-            colnames(countsData2)[(sum(nr)*2+1)+j+sum(nr[0:(i-1)])] <- 
+            colnames(countsData2)[(nr_tot*2+1)+j+sum(nr[0:(i-1)])] <- 
                 paste(conditionsNames[i], paste0("repl", j), sep="_")
         }
     }
     countsData2$vars <- rowVars(
-        as.matrix(countsData2[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]),
+        as.matrix(countsData2[, ((nr_tot+1)*2):(nr_tot*2+1+n_conds)]),
         na.rm=TRUE)
     ## remove all NAs
     countsData2 <- countsData2[complete.cases(
-        countsData2[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]), ]
+        countsData2[, ((nr_tot+1)*2):(nr_tot*2+1+n_conds)]), ]
     ntop <- min(500, dim(countsData2)[1])
     selectntop <- order(countsData2$vars, decreasing=TRUE)[seq_len(ntop)]
     countsData2Selected <- countsData2[selectntop,]
@@ -71,7 +75,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
         heatmap.2(
             as.matrix(as.dist(1 - cor(
                 countsData2Selected[, 
-                    ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))), 
+                    ((nr_tot+1)*2):(nr_tot*2+1+n_conds)]))), 
             margins=c(10, 10), cexRow=1, cexCol=1, 
             density.info="none", trace="none")
         par(ask=TRUE)
@@ -80,7 +84,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
         png(filename)
         heatmap.2(as.matrix(as.dist(1 - cor(
             countsData2Selected[, 
-                ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))), 
+                ((nr_tot+1)*2):(nr_tot*2+1+n_conds)]))), 
             margins=c(10, 10), cexRow=1, cexCol=1, 
             density.info="none", trace="none")
         void <- dev.off()
@@ -90,7 +94,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
     ### PCA plot
     ###################################################
     pca <- prcomp(t(
-        countsData2Selected[, ((sum(nr)+1)*2):(sum(nr)*2+1+length(conds))]))
+        countsData2Selected[, ((nr_tot+1)*2):(nr_tot*2+1+n_conds)]))
     pc1var <- round(summary(pca)$importance[2,1]*100, digits=1)
     pc2var <- round(summary(pca)$importance[2,2]*100, digits=1)
     pc1lab <- paste0("PC1 (", as.character(pc1var), "%)")
