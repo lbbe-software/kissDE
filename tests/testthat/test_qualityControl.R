@@ -9,8 +9,9 @@ test_that("qualityControl work as expected", {
   file.remove("Rplots.pdf")
   # test qualityControl storing figures in the default directory
   qualityControl(mySNVcounts, mySNVconditions, storeFigs = TRUE)
-  expect_true(file.exists("kissDEFigures/heatmap.png"))
-  expect_true(file.exists("kissDEFigures/pca.png"))
+  dirname <- tempdir()
+  expect_true(file.exists(paste0(dirname, "/kissDEFigures/heatmap.png")))
+  expect_true(file.exists(paste0(dirname, "/kissDEFigures/pca.png")))
   file.remove("kissDEFigures/heatmap.png")
   file.remove("kissDEFigures/pca.png")
   unlink("kissDEFigures", recursive = TRUE)
