@@ -27,12 +27,14 @@ as many elements as there are samples in total.}
 \item{storeFigs}{a logical or a string indicating if the plots should be 
 stored and in which directory. If the \code{\link{qualityControl}} function is 
 a part of an automatised worflow, we recommand to set this option to 
-\code{TRUE} (or to a user defined value). Thus, the figures will be stored in a
-\code{kissDEFigures} directory which is created in the working directory. If 
-\code{storeFigs} is a path (string, e.g. '/path/to/figs'), this directory is 
-created to store the figures. Note that if the directory already exist, it will
-be overwritten. Plots are stored in .png format. By default (\code{FALSE}), 
-the interactive mode is enabled and plots are returned to the graphics device.}
+\code{TRUE} or to a user defined value. If \code{storeFigs} is \code{TRUE}, 
+the figures will be stored in a \code{kissDEFigures} directory which is created
+in a temporary directory. This directory will be removed when the R session is 
+closed. If \code{storeFigs} is a path (a string, e.g. '/path/to/figs'), this 
+directory is created to store the figures. Note that if the directory already 
+exist, it will be overwritten. Plots are stored in .png format. By default 
+(\code{FALSE}), the interactive mode is enabled and plots are returned to the 
+graphics device.}
 
 \item{returnPCAdata}{a logical indicating if the data frame used in the PCA
 analysis should be returned. By default (\code{FALSE}), the data frame is not

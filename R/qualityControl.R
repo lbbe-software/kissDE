@@ -15,6 +15,10 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
         if(!dir.exists(pathToFigs))
             dir.create(pathToFigs, recursive = TRUE)
         message("Figures are stored in ", pathToFigs)
+        if (isTRUE(storeFigs)) {
+            message("This directory is temporary.
+  It will be removed when the R session is closed.")
+        }
     }
     
     ###################################################
