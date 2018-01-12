@@ -1,4 +1,4 @@
-.lineParse <- function(line, indexStart, isQuality) {
+.lineParse <- function(line, indexStart) {
     beginningLineToWrite <- ""
     splitElements <- strsplit(line, "|", fixed=TRUE)[[1]]  ## splits the line
     if (indexStart == 6) {
@@ -121,9 +121,9 @@
 
 
 .countsSet <- function(line, indexStart, counts=0, pairedEnd=FALSE, 
-                        order=NULL, exonicReads=TRUE, isQuality) {
+                        order=NULL, exonicReads=TRUE) {
     
-    resultParsing <- .lineParse(line, indexStart, isQuality)
+    resultParsing <- .lineParse(line, indexStart)
     beginningLineInfo <- resultParsing$beginning
     countsperCond <- resultParsing$countsperCond
     nbVec <- rep.int(0, dim(countsperCond)[2])
@@ -207,14 +207,14 @@
 
 
 .getInfoLine <- function(line, counts=0, pairedEnd=FALSE, order=NULL, 
-                            exonicReads=TRUE, isQuality) {
+                            exonicReads=TRUE) {
     if (grepl("branching_nodes", line)) {
         indexStart <- 6 
     } else {
         indexStart <- 5
     }
     resultCountsSet <- .countsSet(line, indexStart, counts, pairedEnd, order, 
-                            exonicReads, isQuality)
+                            exonicReads)
     lineFirstPart <- resultCountsSet$firstPart
     lineFirstPartSplit <- strsplit(lineFirstPart, "|", fixed=TRUE)[[1]]
     eventName <- paste(lineFirstPartSplit[2], lineFirstPartSplit[3], sep="|")

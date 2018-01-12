@@ -116,12 +116,9 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
             if (!startsWith(line, ">")) {
                 next
             }
-            if (index == 1){
-                isQuality <- grepl("Q", line[1])
-            }
             ## get all the informations for the line
             resultLine <- .getInfoLine(line, counts, pairedEnd, order, 
-                exonicReads, isQuality)
+                exonicReads)
             eventName <- resultLine$eventName
             variantLength <- resultLine$variantLength
             variantCounts <- resultLine$variantCounts
