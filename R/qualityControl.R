@@ -113,7 +113,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
         filename <- paste(pathToFigs, "/pca.png", sep="")
         p <- ggplot(data=d, aes_string(x="PC1", y="PC2", color="group")) + 
             geom_point(size=3) + xlab(pc1lab) + ylab(pc2lab)
-        ggsave(filename, plot = p, device = "png", width = 7, heigh = 7)
+        ggsave(filename, plot = p, device = "png", width = 7, height = 7)
     }
     
     if (returnPCAdata == TRUE){
