@@ -535,10 +535,10 @@ This first axis clearly separates the 2 conditions.
 
 The created graphs can be saved by setting the \Rcode{storeFigs} parameter 
 of the \Rfunction{qualityControl} function to \Rcode{TRUE} (then graphs 
-are stored in a \file{kissDEFigures} folder created in the \R{} working 
-directory) or to the path where the user wants to store his/her graphs. 
-We recommend to use this parameter when the \Rfunction{qualityControl} 
-function is used in an automatized workflow.
+are stored in a \file{kissDEFigures} folder, created in a temporary directory, 
+which is removed at the end of the user \R{} session) or to the path where the 
+user wants to store his/her graphs. We recommend to use this parameter when the
+\Rfunction{qualityControl} function is used in an automatized workflow.
 
 To customize the PCA plot, the data frame used for this plot can be extracted
 by setting the option \Rcode{returnPCAdata} to \Rcode{TRUE} as follows:
