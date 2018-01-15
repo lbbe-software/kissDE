@@ -104,32 +104,32 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
     ########
     
     fpath <- file(fileName, open="r")
-    nbLines <- countLines(fileName)
+    
     if (k2rg == FALSE) {
         fileNameK2RG <- NULL
         lines <- readLines(fpath)
         lines <- lines[startsWith(lines, ">")]
         lines <- sub("^>", "", lines)
         lines <- strsplit(lines, "|", fixed=TRUE)
+        
         ## get all the informations for all lines
         infoLines <- lapply(lines, .getInfoLine, counts, pairedEnd, order, 
                             exonicReads)
-        lengthVariantCounts <- length(unlist(infoLines[[1]][3]))
-        lengthPsiInfo <- length(unlist(infoLines[[1]][4]))
-        events.mat <- matrix(NA, nbLines/2, lengthVariantCounts+1)
-        events.names <- rep(NA, nbLines/ 2)
-        psiInfo <- matrix(NA, nbLines/2, lengthPsiInfo)
-        index <- 1
-        while (index <= nbLines/2) {
-            event <- infoLines[[index]]
-            events.names[index] <- event[[1]]
-            events.mat[index, 1] <- as.numeric(event[[2]])
-            events.mat[index, 2:NCOL(events.mat)] <- event[[3]]
-            psiInfo[index, ] <- event[[4]]
-            index <- index + 1
-            class(events.mat) <- "numeric"
-        }
-        events.df <- data.frame(events.names, events.mat)
+        
+        events.names <- unlist(lapply(infoLines, function(X) X$eventName))
+        
+        nbLines <- length(infoLines)
+        events.mat <- cbind(
+            unlist(lapply(infoLines, function(X) X$variantLength)),
+            matrix(unlist(lapply(infoLines, function(X) X$variantCounts)), nbLines, byrow = TRUE))
+            
+        infoFirstLine <- infoLines[[1]]
+        psiInfo <- matrix(NA, nbLines, length(infoFirstLine$psiInfo))
+        for (index in seq_len(nbLines))
+            psiInfo[index, ] <- infoLines[[index]]$psiInfo
+        
+        events.df <- data.frame(events.names = events.names,
+                               events.mat = events.mat)
         
     } else {
         fileNameK2RG <- fileName
@@ -228,7 +228,8 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
             }
             index <- index + 1
         }
-        events.df <- data.frame(events.names, events.mat)
+        events.df <- data.frame(events.names = events.names,
+                               events.mat = events.mat)
     }
     
     ## update col names
