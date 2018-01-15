@@ -196,7 +196,7 @@
     }
     beginningLine <- line[1:indexStart]
     eventName <- paste(beginningLine[1], beginningLine[2], sep="|")
-    variantLength <- strsplit(beginningLine[4], "_")[[1]][4]
+    variantLength <- as.numeric(strsplit(beginningLine[4], "_")[[1]][4])
     endLine <- line[indexStart:length(line)]
     resultCountsSet <- .countsSet(endLine, counts, pairedEnd, order, 
                             exonicReads)
