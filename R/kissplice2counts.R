@@ -107,30 +107,25 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
     nbLines <- countLines(fileName)
     if (k2rg == FALSE) {
         fileNameK2RG <- NULL
+        lines <- readLines(fpath)
+        lines <- lines[startsWith(lines, ">")]
+        lines <- sub("^>", "", lines)
+        lines <- strsplit(lines, "|", fixed=TRUE)
+        ## get all the informations for all lines
+        infoLines <- lapply(lines, .getInfoLine, counts, pairedEnd, order, 
+                            exonicReads)
+        lengthVariantCounts <- length(unlist(infoLines[[1]][3]))
+        lengthPsiInfo <- length(unlist(infoLines[[1]][4]))
+        events.mat <- matrix(NA, nbLines/2, lengthVariantCounts+1)
+        events.names <- rep(NA, nbLines/ 2)
+        psiInfo <- matrix(NA, nbLines/2, lengthPsiInfo)
         index <- 1
-        while (TRUE) {
-            line <- readLines(fpath, n=1)
-            if (length(line) == 0) {
-                break
-            }
-            if (!startsWith(line, ">")) {
-                next
-            }
-            ## get all the informations for the line
-            resultLine <- .getInfoLine(line, counts, pairedEnd, order, 
-                exonicReads)
-            eventName <- resultLine$eventName
-            variantLength <- resultLine$variantLength
-            variantCounts <- resultLine$variantCounts
-            if (index == 1){
-                events.mat <- matrix(NA, nbLines[1]/2, length(variantCounts)+1)
-                events.names <- rep(NA, nbLines[1] / 2)
-                psiInfo <- matrix(NA, nbLines[1]/2, length(resultLine$psiInfo))
-            }
-            events.mat[index, 1] <- as.numeric(variantLength)
-            events.mat[index, 2:NCOL(events.mat)] <- variantCounts
-            events.names[index] <- eventName
-            psiInfo[index, ] <- resultLine$psiInfo
+        while (index <= nbLines/2) {
+            event <- infoLines[[index]]
+            events.names[index] <- event[[1]]
+            events.mat[index, 1] <- as.numeric(event[[2]])
+            events.mat[index, 2:NCOL(events.mat)] <- event[[3]]
+            psiInfo[index, ] <- event[[4]]
             index <- index + 1
             class(events.mat) <- "numeric"
         }

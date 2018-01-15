@@ -1,39 +1,23 @@
-.lineParse <- function(line, indexStart) {
-    beginningLineToWrite <- ""
-    splitElements <- strsplit(line, "|", fixed=TRUE)[[1]]  ## splits the line
-    if (indexStart == 6) {
-        for (k in seq_len(4)) { ## indexStart - 2 = 4
-            ## writes the firsts elements of the line: bcc, cycle... 
-            ## but NOT branching_nodes
-            beginningLineToWrite <- paste(beginningLineToWrite, 
-                splitElements[k], sep="|")
-        }
-    } else {
-        for (k in seq_len(indexStart - 1)) {
-            ## writes the firsts elements of the line: bcc, cycle... 
-            beginningLineToWrite <- paste(beginningLineToWrite, 
-                splitElements[k], sep="|")
-        }
-    }
-    allcondi <- gregexpr(pattern="C[[:digit:]]+_[[:digit:]]+", text=line, 
+.lineParse <- function(line) {
+    allcondi <- regexpr(pattern="C[[:digit:]]+_[[:digit:]]+", text=line, 
                     perl=TRUE)
     if (allcondi[[1]][1] == -1) {  # no C in the header => ASSB counts
-        allcondi <- gregexpr(pattern="[ASB]{1,4}[[:digit:]]+_[[:digit:]]+", 
+        allcondi <- regexpr(pattern="[ASB]{1,4}[[:digit:]]+_[[:digit:]]+", 
                         text=line, perl=TRUE)
     }
     splittedCounts <- regmatches(x=line, m=allcondi)
     ## gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
-    countsperCond <- vapply(splittedCounts[[1]], .getJunctionCounts, 
+    countsperCond <- vapply(splittedCounts, .getJunctionCounts, 
         c("jct_id"="0", "count"="0"))
     
-    return(list(beginning=beginningLineToWrite, countsperCond=countsperCond))
+    return(countsperCond)
 }
 
 
 
 .getJunctionCounts <- function(X){
-    return(unlist(regmatches(x=X[[1]], 
-        m=gregexpr(pattern="[0-9]+", text=X[[1]]))))
+    return(unlist(regmatches(x=X[1], 
+        m=gregexpr(pattern="[0-9]+", text=X[1]))))
 }
 
 
@@ -120,12 +104,10 @@
 
 
 
-.countsSet <- function(line, indexStart, counts=0, pairedEnd=FALSE, 
+.countsSet <- function(line, counts=0, pairedEnd=FALSE, 
                         order=NULL, exonicReads=TRUE) {
     
-    resultParsing <- .lineParse(line, indexStart)
-    beginningLineInfo <- resultParsing$beginning
-    countsperCond <- resultParsing$countsperCond
+    countsperCond <- .lineParse(line)
     nbVec <- rep.int(0, dim(countsperCond)[2])
     countsVec <- rep.int(0, dim(countsperCond)[2])
     psiVec <- rep.int(0, dim(countsperCond)[2])
@@ -199,8 +181,7 @@
     }
     listCounts <- t(sums)[2, ]
     
-    return(list(firstPart=beginningLineInfo, 
-                vCounts=listCounts, 
+    return(list(vCounts=listCounts, 
                 psiCounts=listASSB))
 }
 
@@ -208,18 +189,17 @@
 
 .getInfoLine <- function(line, counts=0, pairedEnd=FALSE, order=NULL, 
                             exonicReads=TRUE) {
-    if (grepl("branching_nodes", line)) {
-        indexStart <- 6 
+    if (any(grepl("branching_nodes", line))) {
+        indexStart <- 6
     } else {
         indexStart <- 5
     }
-    resultCountsSet <- .countsSet(line, indexStart, counts, pairedEnd, order, 
+    beginningLine <- line[1:indexStart]
+    eventName <- paste(beginningLine[1], beginningLine[2], sep="|")
+    variantLength <- strsplit(beginningLine[4], "_")[[1]][4]
+    endLine <- line[indexStart:length(line)]
+    resultCountsSet <- .countsSet(endLine, counts, pairedEnd, order, 
                             exonicReads)
-    lineFirstPart <- resultCountsSet$firstPart
-    lineFirstPartSplit <- strsplit(lineFirstPart, "|", fixed=TRUE)[[1]]
-    eventName <- paste(lineFirstPartSplit[2], lineFirstPartSplit[3], sep="|")
-    eventName <- substr(eventName, start=2, stop=nchar(eventName))
-    variantLength <- strsplit(lineFirstPartSplit[5], "_")[[1]][4]
     
     return(list(eventName=eventName, 
                 variantLength=variantLength, 
