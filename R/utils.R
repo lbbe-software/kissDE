@@ -92,55 +92,41 @@
                         order=NULL, exonicReads=TRUE) {
     
     countsperCond <- .lineParse(line)
-    nbVec <- rep.int(0, dim(countsperCond)[2])
-    countsVec <- rep.int(0, dim(countsperCond)[2])
+    ## Create the vectors of counts and samples
+    nbVec <- as.numeric(countsperCond[1,])
+    countsVec <- as.numeric(countsperCond[2,])
     psiVec <- rep.int(0, dim(countsperCond)[2])
-    for (i in seq_len(dim(countsperCond)[2])) {
-        nbVec[i] <- as.numeric(countsperCond[1, i])
-        countsVec[i] <- as.numeric(countsperCond[2, i])
-        if (counts >= 1) {  ## specific issues linked with --counts option
-            if (grepl("ASSB", colnames(countsperCond)[i]) == TRUE) {
-                ## so that counts on ASSB junction are not counted twice.
-                psiVec[i] <- countsVec[i]
-                countsVec[i] <- -countsVec[i]
-            }
-            if ((counts == 2) & (exonicReads == FALSE)) {
-                if (grepl("^S[0-9]+", colnames(countsperCond)[i]) == TRUE) {
-                    ## when exonic reads are not wanted we must discard 
-                    ## reads counted in S_X
-                    countsVec[i] <- 0
-                }
-            }
+    if (counts >= 1) {
+        ## Replace all ASSB counts by their opposite and fill psiVec
+        assbIndex <- grepl("ASSB", colnames(countsperCond))
+        countsVec <- mapply(function(X,Y) if(X){-Y}else{Y}, assbIndex, 
+                          countsVec)
+        psiVec <- mapply(function(X,Y) if(X){Y}else{0}, assbIndex, countsVec)
+        if ((counts == 2) & (exonicReads == FALSE)) {
+            ## Replace all S counts by 0
+            countsVec <- mapply(function(X,Y) if(X){0}else{Y}, 
+                            grepl("^S[0-9]+", colnames(countsperCond)), 
+                            countsVec)
         }
     }
     if (counts >= 1) {
-        d <- data.frame(nbVec, countsVec)
-        names(d) <- c("NB", "COUNTS")
         ## sums the counts for each junction that belongs to the same event
-        sums <- aggregate(d$COUNTS, by=list(d$NB), sum)
+        sums <- aggregate(countsVec, by=list(nbVec), sum)
         ## dpsi will store counts of ASSB counts 
-        dpsi <- data.frame(nbVec, psiVec)
-        names(dpsi) <- c("NB", "ASSB")
-        assbPsi <- aggregate(dpsi$ASSB, by=list(dpsi$NB), sum)
+        assbPsi <- aggregate(psiVec, by=list(nbVec), sum)
         if (pairedEnd == TRUE) {
             if (is.null(order)) {
                 order <- rep(seq_len((NROW(sums)) / 2), 
                             rep(2, ((NROW(sums)) / 2)))
             } else {
                 if (!is.vector(order)) {
-                    stop("'order' vector seems to be in a wrong format.")
+                    stop("Order vector seems to be in a wrong format.")
                 }
             }
-            d2 <- data.frame(order, sums)
-            names(d2)[3] <- "sums"
             ## in case data is paired-end, there is one more sum to do, 
             ## for each part of the pair
-            sums2 <- aggregate(d2$sums, by=list(d2$order), sum)
-            sums <- sums2
-            dpsi2 <- data.frame(order, assbPsi)
-            names(dpsi2)[3] <- "sums"
-            assbPsi2 <- aggregate(dpsi2$sums, by=list(dpsi2$order), sum)
-            assbPsi <- assbPsi2
+            sums <- aggregate(sums$x, by=list(order), sum)
+            assbPsi <- aggregate(assbPsi$x, by=list(order), sum)
         } 
         listASSB <- t(assbPsi)[2, ]
     } else { ## counts == 0 
@@ -158,9 +144,7 @@
         } else {
             order <- c(seq_len(dim(countsperCond)[2]))
         }
-        d <- data.frame(order, countsVec)
-        names(d) <- c("ORDER", "COUNTS")
-        sums <- aggregate(d$COUNTS, by=list(d$ORDER), sum)
+        sums <- aggregate(countsVec, by=list(order), sum)
         listASSB <- NULL
     }
     listCounts <- t(sums)[2, ]
