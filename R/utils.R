@@ -211,18 +211,17 @@
 
 .getInfoLineK2rg <- function(line, counts=0, pairedEnd=FALSE, order=NULL, 
                             exonicReads=TRUE) {
-    splitElements <- strsplit(line, "\t", fixed=TRUE)[[1]]
-    firstPart <- splitElements[16]
+    firstPart <- line[16]
     firstPartSplit <- strsplit(firstPart, "|", fixed=TRUE)[[1]]
     eventName <- paste(firstPartSplit[1], firstPartSplit[2], sep="|")
-    countsUp <- strsplit(splitElements[20], ",")
-    countsLow <- strsplit(splitElements[21], ",")
+    countsUp <- strsplit(line[20], ",")
+    countsLow <- strsplit(line[21], ",")
     resultCountsSetUp <- .countsSetk2rg(countsUp, counts, pairedEnd, 
                             order, exonicReads)
     resultCountsSetLow <- .countsSetk2rg(countsLow, counts, pairedEnd, 
                             order, exonicReads)
-    variantLengthUp <- sum(as.integer(strsplit(splitElements[11],",")[[1]]))
-    variantLengthLow <- sum(as.integer(strsplit(splitElements[17],",")[[1]]))
+    variantLengthUp <- sum(as.integer(strsplit(line[11],",")[[1]]))
+    variantLengthLow <- sum(as.integer(strsplit(line[17],",")[[1]]))
     
     return(list(eventName=eventName, 
                 variantLengthUp=variantLengthUp, 
