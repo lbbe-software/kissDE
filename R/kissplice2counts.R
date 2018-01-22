@@ -133,29 +133,8 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         
     } else {
         fileNameK2RG <- fileName
-        GENEID <- 1
-        GENENAME <- 2
-        POS <- 3
-        STRAND <- 4
         EVENT <- 5
-        VARPARTLENGTH <- 6
-        FRAMESHIFT <- 7
-        CDS <- 8
-        GENEBIOTYPE <- 9
-        SPLICESITE <- 10
-        BLOCSIZEUP <- 11
-        SPLICESITEPOSUP <- 12
-        PARALOGS <- 13
-        COMPLEX <- 14
-        SNPVARREGION <- 15
         EVENTNAME <- 16
-        BLOCSIZELOW <- 17
-        SPLICESITEPOSLOW <- 18
-        PSIS <- 19
-        COVERAGEUP <- 20
-        COVERAGELOW <- 21
-        CANONICAL <- 22
-        
         keepEvents <- .wantedEvents(keep, remove)
         
         lines <- readLines(fpath)
