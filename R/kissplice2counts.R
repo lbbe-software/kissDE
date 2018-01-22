@@ -157,17 +157,17 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         rownames(matBccApp) <- lBcc
         ## Initialization of matrix
         events.mat <- matrix(NA, iBcc * 2, 
-                             length(infoLines[1][[1]]$variantCountsUp) + 1)
+                             length(infoLines[[1]]$variantCountsUp) + 1)
         events.names <- rep(NA, iBcc * 2)
-        psiInfo <- matrix(NA, iBcc * 2, length(infoLines[1][[1]]$psiInfoUp))
+        psiInfo <- matrix(NA, iBcc * 2, length(infoLines[[1]]$psiInfoUp))
         index <- 1
         indexNames <- 1
         for (index in seq_len(nbLines)){
-            lLine <- keptLines[index][[1]]
+            lLine <- keptLines[[index]]
             bcc <- lLine[EVENTNAME]
             matBccApp[bcc, 1] <- matBccApp[bcc, 1] + 1
             if (matBccApp[bcc, 1] == 1) {
-              resultLine <- infoLines[index][[1]]
+              resultLine <- infoLines[[index]]
               events.mat[indexNames, 1] <- 
                 as.numeric(resultLine$variantLengthUp)
               events.mat[indexNames, 2:NCOL(events.mat)] <- 
