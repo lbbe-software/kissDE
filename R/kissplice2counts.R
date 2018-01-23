@@ -142,7 +142,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         lines <- strsplit(lines, "\t")
         ## keep only events of the selected type (keepEvents)
         keptLines <- lapply(lines, function(X) {if(X[EVENT] %in% keepEvents) X})
-        keptLines <- keptLines[!sapply(keptLines, is.null)]
+        keptLines <- keptLines[!vapply(keptLines, is.null, isTRUE(1))]
         lEvents <- unlist(lapply(keptLines, function(X) X[EVENTNAME]))
         
         nbLines <- length(keptLines)
