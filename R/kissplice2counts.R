@@ -116,10 +116,10 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         infoLines <- lapply(lines, .getInfoLine, counts, pairedEnd, order, 
                             exonicReads)
         
-        events.names <- unlist(lapply(infoLines, function(X) X$eventName))
+        eventsnames <- unlist(lapply(infoLines, function(X) X$eventName))
         
         nbLines <- length(infoLines)
-        events.mat <- cbind(
+        eventsmat <- cbind(
             unlist(lapply(infoLines, function(X) X$variantLength)),
             matrix(unlist(lapply(infoLines, function(X) X$variantCounts)), nbLines, byrow = TRUE))
             
@@ -128,8 +128,8 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         for (index in seq_len(nbLines))
             psiInfo[index, ] <- infoLines[[index]]$psiInfo
         
-        events.df <- data.frame(events.names = events.names,
-                               events.mat = events.mat)
+        events.df <- data.frame(events.names = eventsnames,
+                               events.mat = eventsmat)
         
     } else {
         fileNameK2RG <- fileName
@@ -141,7 +141,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         lines <- lines[!startsWith(lines, "#")]
         lines <- strsplit(lines, "\t")
         ## keep only events of the selected type (keepEvents)
-        keptLines <- lapply(lines, function(X) if(X[EVENT] %in% keepEvents)X)
+        keptLines <- lapply(lines, function(X) {if(X[EVENT] %in% keepEvents) X})
         keptLines <- keptLines[!sapply(keptLines, is.null)]
         lEvents <- unlist(lapply(keptLines, function(X) X[EVENTNAME]))
         
@@ -155,37 +155,33 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         iBcc <- length(lBcc)  ## number of unique bcc
         matBccApp <- matrix(0, nrow=iBcc) ## number of occurrences of each bcc
         rownames(matBccApp) <- lBcc
+        
         ## Initialization of matrix
-        events.mat <- matrix(NA, iBcc * 2, 
-                             length(infoLines[[1]]$variantCountsUp) + 1)
-        events.names <- rep(NA, iBcc * 2)
+        eventsmat <- matrix(NA, iBcc * 2, length(infoLines[[1]]$variantCountsUp) + 1)
+        eventsnames <- rep(NA, iBcc * 2)
         psiInfo <- matrix(NA, iBcc * 2, length(infoLines[[1]]$psiInfoUp))
         index <- 1
         indexNames <- 1
         for (index in seq_len(nbLines)){
-            lLine <- keptLines[[index]]
-            bcc <- lLine[EVENTNAME]
+            bcc <- keptLines[[index]][EVENTNAME]
             matBccApp[bcc, 1] <- matBccApp[bcc, 1] + 1
-            if (matBccApp[bcc, 1] == 1) {
+            if (matBccApp[bcc, 1] == 1) { # ça veut dire qu'on ne prend pas le deuxième ??
               resultLine <- infoLines[[index]]
-              events.mat[indexNames, 1] <- 
-                as.numeric(resultLine$variantLengthUp)
-              events.mat[indexNames, 2:NCOL(events.mat)] <- 
-                resultLine$variantCountsUp
-              events.names[indexNames] <- resultLine$eventName
+              eventsmat[indexNames, 1] <- as.numeric(resultLine$variantLengthUp)
+              eventsmat[indexNames, 2:NCOL(eventsmat)] <- resultLine$variantCountsUp
+              eventsnames[indexNames] <- resultLine$eventName
               psiInfo[indexNames, ] <- resultLine$psiInfoUp
-              events.mat[indexNames + 1, 1] <- 
-                as.numeric(resultLine$variantLengthLow)
-              events.mat[indexNames + 1, 2:NCOL(events.mat)] <- 
-                resultLine$variantCountsLow
-              events.names[indexNames + 1] <- resultLine$eventName
+              
+              eventsmat[indexNames + 1, 1] <- as.numeric(resultLine$variantLengthLow)
+              eventsmat[indexNames + 1, 2:NCOL(eventsmat)] <- resultLine$variantCountsLow
+              eventsnames[indexNames + 1] <- resultLine$eventName
               psiInfo[indexNames + 1, ] <- resultLine$psiInfoLow
-              class(events.mat) <- "numeric"
+              class(eventsmat) <- "numeric"
               indexNames <- indexNames + 2
             }
         }
-        events.df <- data.frame(events.names = events.names,
-                               events.mat = events.mat)
+        events.df <- data.frame(events.names = eventsnames,
+                               events.mat = eventsmat)
     }
     
     ## update col names
