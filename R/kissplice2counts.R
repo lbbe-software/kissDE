@@ -189,7 +189,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         seq_len(length(colnames(events.df)) - 2), sep=""))
     
     close(fpath)
-    psiInfo <- data.frame(events.names, as.data.frame(psiInfo))
+    psiInfo <- data.frame(events.names = eventsnames, as.data.frame(psiInfo))
     
     output <- list(countsEvents=events.df, psiInfo=psiInfo, 
         exonicReadsInfo=exonicReads, k2rgFile=fileNameK2RG)
