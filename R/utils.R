@@ -188,8 +188,8 @@
                             order, exonicReads)
     resultCountsSetLow <- .countsSetk2rg(countsLow, counts, pairedEnd, 
                             order, exonicReads)
-    variantLengthUp <- sum(as.integer(strsplit(line[11],",")[[1]]))
-    variantLengthLow <- sum(as.integer(strsplit(line[17],",")[[1]]))
+    variantLengthUp <- sum(as.numeric(strsplit(line[11],",")[[1]]))
+    variantLengthLow <- sum(as.numeric(strsplit(line[17],",")[[1]]))
     
     return(list(eventName=eventName, 
                 variantLengthUp=variantLengthUp, 
