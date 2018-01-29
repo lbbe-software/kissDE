@@ -110,7 +110,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         lines <- readLines(fpath)
         lines <- lines[startsWith(lines, ">")]
         lines <- sub("^>", "", lines)
-        lines <- strsplit(lines, "|", fixed=TRUE)
+        lines <- strsplit(x = lines, split = "|", fixed = TRUE)
         
         ## get all the informations for all lines
         infoLines <- lapply(lines, .getInfoLine, counts, pairedEnd, order, 
@@ -139,7 +139,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         
         lines <- readLines(fpath)
         lines <- lines[!startsWith(lines, "#")]
-        lines <- strsplit(lines, "\t")
+        lines <- strsplit(x = lines, split = "\t")
         ## keep only events of the selected type (keepEvents)
         keptLines <- lapply(lines, function(X) {if(X[EVENT] %in% keepEvents) X})
         keptLines <- keptLines[!vapply(keptLines, is.null, isTRUE(1))]

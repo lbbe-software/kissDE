@@ -172,7 +172,7 @@
     }
     beginningLine <- line[1:indexStart]
     eventName <- paste(beginningLine[1], beginningLine[2], sep="|")
-    variantLength <- as.numeric(strsplit(beginningLine[4], "_")[[1]][4])
+    variantLength <- as.numeric(strsplit(x = beginningLine[4], split = "_")[[1]][4])
     endLine <- line[indexStart:length(line)]
     resultCountsSet <- .countsSet(endLine, counts, pairedEnd, order, 
                             exonicReads)
@@ -188,16 +188,16 @@
 .getInfoLineK2rg <- function(line, counts=0, pairedEnd=FALSE, order=NULL, 
                             exonicReads=TRUE) {
     firstPart <- line[16]
-    firstPartSplit <- strsplit(firstPart, "|", fixed=TRUE)[[1]]
+    firstPartSplit <- strsplit(x = firstPart, split = "|", fixed = TRUE)[[1]]
     eventName <- paste(firstPartSplit[1], firstPartSplit[2], sep="|")
-    countsUp <- strsplit(line[20], ",")
-    countsLow <- strsplit(line[21], ",")
+    countsUp <- strsplit(x = line[20], split = ",")
+    countsLow <- strsplit(x = line[21], split = ",")
     resultCountsSetUp <- .countsSetk2rg(countsUp, counts, pairedEnd, 
                             order, exonicReads)
     resultCountsSetLow <- .countsSetk2rg(countsLow, counts, pairedEnd, 
                             order, exonicReads)
-    variantLengthUp <- sum(as.numeric(strsplit(line[11],",")[[1]]))
-    variantLengthLow <- sum(as.numeric(strsplit(line[17],",")[[1]]))
+    variantLengthUp <- sum(as.numeric(strsplit(x = line[11], split = ",")[[1]]))
+    variantLengthLow <- sum(as.numeric(strsplit(x = line[17], split = ",")[[1]]))
     
     return(list(eventName=eventName, 
                 variantLengthUp=variantLengthUp, 
@@ -373,13 +373,13 @@
     eventTab <- data.frame(
         ID=rep(as.factor(df["ID"]), endPosCol4Counts-startPosColumn4Counts+1),
         cond=as.factor(unlist(lapply(
-            strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "_"), 
+            strsplit(x = names(df)[startPosColumn4Counts:endPosCol4Counts], split = "_"), 
             FUN=function(d){paste(d[2:(length(d) - 2)], collapse="_")}), 
             use.names=FALSE)), 
         ## to manage the conditions names which contains "_"
         counts=as.numeric(df[startPosColumn4Counts:endPosCol4Counts]),
         path=as.factor(unlist(lapply(
-            strsplit(names(df)[startPosColumn4Counts:endPosCol4Counts], "|"), 
+            strsplit(x = names(df)[startPosColumn4Counts:endPosCol4Counts], split = "|"), 
             FUN=function(d){d[1]}), 
             use.names=FALSE)),
         row.names=NULL)
@@ -1189,7 +1189,7 @@
     
     line <- lines[1]
     if(startsWith(line, "#")) {
-        nCol <- length(strsplit(line, split="\t")[[1]])
+        nCol <- length(strsplit(x = line, split = "\t")[[1]])
         countsHead <- paste(nCol+1, countsName, sep=".")
         psiHead <- paste(nCol+2, psiName, sep=".")
         pvHead <- paste(nCol+3, K2RGKDE_APV, sep=".")
@@ -1221,8 +1221,8 @@
     }
     
     # Transform lines in a data.frame
-    t <- lapply(lapply(lapply(strsplit(lines,"\t"),"[[",16),
-                        strsplit,"\\|"),"[[",1)
+    t <- lapply(lapply(lapply(strsplit(x = lines, split = "\t"), "[[", 16),
+                        strsplit, "\\|"), "[[", 1)
     t1 <- lapply(t,"[[",1)
     t2 <- lapply(t,"[[",2)
     lines <- data.frame(paste(t1,t2,sep="|"),lines)
