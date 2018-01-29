@@ -45,9 +45,11 @@
     }
     if (counts >= 1) {
         ## sums the counts for each junction that belongs to the same event
-        sums <- aggregate(countsVec, by=list(nbVec), sum)
+        myby <- list(nbVec)
+        sums <- aggregate(x = countsVec, by = myby, FUN = function(x) {sum(x)})
         ## dpsi will store counts of ASSB counts 
-        assbPsi <- aggregate(psiVec, by=list(nbVec), sum)
+        assbPsi <- aggregate(x = psiVec, by = myby, FUN = function(x) {sum(x)})
+        
         if (pairedEnd == TRUE) {
             if (is.null(order)) {
             order <- rep(seq_len((NROW(sums)) / 2), 
@@ -59,8 +61,9 @@
             }
             ## in case data is paired-end, there is one more sum to do, 
             ## for each part of the pair
-            sums <- aggregate(sums$x, by=list(order), sum)
-            assbPsi <- aggregate(assbPsi$x, by=list(order), sum)
+            myby <- list(order)
+            sums <- aggregate(x = sums$x, by = myby, FUN = function(x) {sum(x)})
+            assbPsi <- aggregate(x = assbPsi$x, by = myby, FUN = function(x) {sum(x)})
         } 
         listASSB <- t(assbPsi)[2, ]
     } else {  # counts == 0 
@@ -78,7 +81,8 @@
         } else {
             order <- c(seq_along(countsperCond[2,]))
         }
-        sums <- aggregate(countsVec, by=list(order), sum)
+        myby <- list(order)
+        sums <- aggregate(x = countsVec, by = myby, FUN = function(x) {sum(x)})
         listASSB <- NULL
     }
     listCounts <- t(sums)[2, ]
@@ -111,9 +115,11 @@
     }
     if (counts >= 1) {
         ## sums the counts for each junction that belongs to the same event
-        sums <- aggregate(countsVec, by=list(nbVec), sum)
+        myby <- list(nbVec)
+        sums <- aggregate(x = countsVec, by = myby, FUN = function(x) {sum(x)})
         ## dpsi will store counts of ASSB counts 
-        assbPsi <- aggregate(psiVec, by=list(nbVec), sum)
+        assbPsi <- aggregate(x = psiVec, by = myby, FUN = function(x) {sum(x)})
+        
         if (pairedEnd == TRUE) {
             if (is.null(order)) {
                 order <- rep(seq_len((NROW(sums)) / 2), 
@@ -125,8 +131,9 @@
             }
             ## in case data is paired-end, there is one more sum to do, 
             ## for each part of the pair
-            sums <- aggregate(sums$x, by=list(order), sum)
-            assbPsi <- aggregate(assbPsi$x, by=list(order), sum)
+            myby <- list(order)
+            sums <- aggregate(x = sums$x, by = myby, FUN = function(x) {sum(x)})
+            assbPsi <- aggregate(x = assbPsi$x, by = myby, FUN = function(x) {sum(x)})
         } 
         listASSB <- t(assbPsi)[2, ]
     } else { ## counts == 0 
@@ -144,7 +151,8 @@
         } else {
             order <- c(seq_len(dim(countsperCond)[2]))
         }
-        sums <- aggregate(countsVec, by=list(order), sum)
+        myby <- list(order)
+        sums <- aggregate(x = countsVec, by = myby, FUN = function(x) {sum(x)})
         listASSB <- NULL
     }
     listCounts <- t(sums)[2, ]
