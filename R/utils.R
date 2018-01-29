@@ -1079,7 +1079,7 @@
     lHead <- c()
     j <- 1
     for (colName in colNames) {
-        lHead <- append(lHead, paste(j, colName, sep="."))
+        lHead <- append(x = lHead, values = paste(j, colName, sep="."))
         j <- j + 1
     }
     head <- paste(lHead, collapse="\t")
@@ -1206,15 +1206,15 @@
         lHead <- c()
         j <- 1
         for (k2rg_field in LK2RG) {
-            lHead <- append(lHead, paste(j, k2rg_field, sep="."))
+            lHead <- append(x = lHead, values = paste(j, k2rg_field, sep="."))
             j <- j + 1
         }
         
-        lHead <- append(lHead, paste(j, countsName, sep="."))
-        lHead <- append(lHead, paste(j + 1, psiName, sep="."))
-        lHead <- append(lHead, paste(j + 2, K2RGKDE_APV, sep="."))
-        lHead <- append(lHead, paste(j + 3, K2RGKDE_DPSI, sep="."))
-        lHead <- append(lHead, paste(j + 4, K2RGKDE_WARN, sep="."))
+        lHead <- append(x = lHead, values = paste(j, countsName, sep="."))
+        lHead <- append(x = lHead, values = paste(j + 1, psiName, sep="."))
+        lHead <- append(x = lHead, values = paste(j + 2, K2RGKDE_APV, sep="."))
+        lHead <- append(x = lHead, values = paste(j + 3, K2RGKDE_DPSI, sep="."))
+        lHead <- append(x = lHead, values = paste(j + 4, K2RGKDE_WARN, sep="."))
         toWrite <- paste(lHead, collapse="\t")
         toWrite <- paste("#", toWrite, sep="")
         writeLines(toWrite,fOut)
@@ -1257,10 +1257,11 @@
 
 .wantedEvents <- function(keep=c("All"), remove=NULL){
     if("unclassified"%in%keep) {
-        keep <- append(keep,c("-", " ", "", "unclassifiedSNP"))
+        keep <- append(x = keep, values = c("-", " ", "", "unclassifiedSNP"))
     }
     if("unclassified"%in%remove) {
-        remove <- append(remove,c("-", " ", "", "unclassifiedSNP"))
+        remove <- append(x = remove, 
+            values = c("-", " ", "", "unclassifiedSNP"))
     }
     EVENTS <- c("deletion", "insertion", "IR", "ES", "altA", "altD", "altAD", 
         "alt", "unclassified", "-", " ", "", "unclassifiedSNP")
@@ -1269,14 +1270,15 @@
     if (keep == c("All") && is.null(remove)) {
         wEvents <- EVENTS
         for (i in seq_along(ES_EVENTS)) {
-            wEvents <- append(wEvents, paste("ES_", ES_EVENTS[i], sep=""))
+            wEvents <- append(x = wEvents, 
+                values = paste("ES_", ES_EVENTS[i], sep=""))
         }
         return(wEvents)
     }
     
     if (!is.null(remove)) {
         for (i in seq_along(remove)) {
-            if (!remove[i] %in% append(EVENTS, "MULTI")) {
+            if (!remove[i] %in% append(x = EVENTS, values = "MULTI")) {
                 message("In remove: couldn't find ", remove[i])
                 stop("One of the element(s) of the remove vector is not part of:
                     deletion, insertion, IR, ES, altA, altD, altAD, alt, 
@@ -1288,7 +1290,7 @@
     if (keep[1] == "All") {
         for (i in seq_along(EVENTS)) {
             if (!EVENTS[i] %in% remove) {
-                wEvents <- append(wEvents, EVENTS[i])
+                wEvents <- append(x = wEvents, values = EVENTS[i])
             }
         }
         if ("ES" %in% remove) {
@@ -1296,7 +1298,8 @@
         }
         if (ES == FALSE) {
             for (i in seq_along(ES_EVENTS)) {
-                wEvents <- append(wEvents, paste("ES_", ES_EVENTS[i], sep=""))
+                wEvents <- append(x = wEvents, 
+                    values = paste("ES_", ES_EVENTS[i], sep=""))
             }
         }
         return(wEvents)
@@ -1311,7 +1314,7 @@
         if (ES == FALSE && keep[i] == "ES") {
             ES <- TRUE
         }
-        wEvents <- append(wEvents, keep[i])
+        wEvents <- append(x = wEvents, values = keep[i])
     }
     if (ES == FALSE && !is.null(remove)) {
         stop("Keep and remove can not be set together, unless keep contain ES 
@@ -1322,7 +1325,8 @@
     }
     if (is.null(remove)) {
         for (i in seq_along(ES_EVENTS)) {
-            wEvents <- append(wEvents, paste("ES_", ES_EVENTS[i], sep=""))
+            wEvents <- append(x = wEvents, 
+                values = paste("ES_", ES_EVENTS[i], sep=""))
         }
         return(wEvents)
     }
@@ -1335,7 +1339,8 @@
     }
     for (i in seq_along(ES_EVENTS)) {
         if (!ES_EVENTS[i] %in% remove) {
-            wEvents <- append(wEvents, paste("ES_", ES_EVENTS[i], sep=""))
+            wEvents <- append(x = wEvents, 
+                values = paste("ES_", ES_EVENTS[i], sep=""))
         }
     }
     return(wEvents)
