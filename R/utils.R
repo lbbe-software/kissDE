@@ -52,8 +52,8 @@
         
         if (pairedEnd == TRUE) {
             if (is.null(order)) {
-            order <- rep(seq_len((NROW(sums)) / 2), 
-                       rep(2, ((NROW(sums)) / 2)))
+                nr <- NROW(sums)/2
+                order <- rep(x = seq_len(nr), times = rep(2, nr))
             } else {
                 if (!is.vector(order)) {
                     stop("Order vector seems to be in a wrong format.")
@@ -71,8 +71,8 @@
             if (is.null(order)) {
                 ## for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) 
                 ## (assuming data is ordered)
-                order <- rep(seq_len(dim(countsperCond)[2] / 2), 
-                       rep(2, dim(countsperCond)[2] / 2))
+                nr <- dim(countsperCond)[2] / 2
+                order <- rep(x = seq_len(nr), times = rep(2, nr))
             } else {
                 if (!is.vector(order)) {
                     stop("Order vector seems to be in a wrong format.")
@@ -122,8 +122,8 @@
         
         if (pairedEnd == TRUE) {
             if (is.null(order)) {
-                order <- rep(seq_len((NROW(sums)) / 2), 
-                            rep(2, ((NROW(sums)) / 2)))
+                nr <- NROW(sums) / 2
+                order <- rep(x = seq_len(nr), times = rep(2, nr))
             } else {
                 if (!is.vector(order)) {
                     stop("Order vector seems to be in a wrong format.")
@@ -141,8 +141,8 @@
             if (is.null(order)) {
                 ## for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) 
                 ## (assuming data is ordered)
-                order <- rep(seq_len(dim(countsperCond)[2] / 2), 
-                            rep(2, dim(countsperCond)[2] / 2))
+                nr <- dim(countsperCond)[2] / 2
+                order <- rep(x = seq_len(nr), times = rep(2, nr))
             } else {
                 if (!is.vector(order)) {
                     stop("'order' vector seems to be in a wrong format.")
