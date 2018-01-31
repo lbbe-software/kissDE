@@ -44,21 +44,22 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
     countsData2 <- reshape(countsData[, c(1,(dimns):(dimns + n_conds))], 
         timevar="Path", idvar="ID", direction="wide")
     
+    nr_cumsum <- c(1, 1 + cumsum(nr))
     nr_tot <- sum(nr)
     
     for (i in seq_len(n)) {
+        nr_i <- seq_len(nr[i]) + nr_cumsum[i]
+        denominator <- (countsData2[, nr_i] + countsData2[, nr_tot + nr_i])
+        PSI <- countsData2[, nr_i] / denominator
+        colnames(PSI) <- paste(conditionsNames[i], paste0("repl", seq_len(nr[i])), sep="_")
+        countsData2 <- cbind(countsData2, PSI)
         for (j in seq_len(nr[i])) {
-            countsData2$PSI <- countsData2[, (1+j+sum(nr[0:(i-1)]))] /
-                (countsData2[, (1+j+sum(nr[0:(i-1)]))] + 
-                    countsData2[, (1+nr_tot+j+sum(nr[0:(i-1)]))])
+            nr_j <- j + nr_cumsum[i]
             ## replace PSI by NA if count less or equal to 10 reads 
             ## for the 2 isoforms
-            indexNA <- intersect(
-                which(countsData2[, (1+j+sum(nr[0:(i-1)]))] < 10), 
-                which(countsData2[, (1+nr_tot+j+sum(nr[0:(i-1)]))] < 10))
-            countsData2$PSI[indexNA] <- NA
-            colnames(countsData2)[(nr_tot*2+1)+j+sum(nr[0:(i-1)])] <- 
-                paste(conditionsNames[i], paste0("repl", j), sep="_")
+            indexNA <- intersect(which(countsData2[, nr_j] < 10), 
+                                which(countsData2[, nr_tot+nr_j] < 10))
+            countsData2[indexNA, nr_tot*2+nr_cumsum[i]+j] <- NA
         }
     }
     countsData2$vars <- rowVars(
