@@ -128,9 +128,6 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         for (index in seq_len(nbLines))
             psiInfo[index, ] <- infoLines[[index]]$psiInfo
         
-        events.df <- data.frame(events.names = eventsnames,
-                               events.mat = eventsmat)
-        
     } else {
         fileNameK2RG <- fileName
         EVENT <- 5
@@ -140,6 +137,7 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         lines <- readLines(fpath)
         lines <- lines[!startsWith(lines, "#")]
         lines <- strsplit(x = lines, split = "\t")
+        
         ## keep only events of the selected type (keepEvents)
         keptLines <- lapply(lines, function(X) {if(X[EVENT] %in% keepEvents) X})
         keptLines <- keptLines[!vapply(keptLines, is.null, isTRUE(1))]
@@ -152,42 +150,47 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         infoLines <- lapply(keptLines, .getInfoLineK2rg, counts, pairedEnd,
                             order, exonicReads)
         
-        iBcc <- length(lEvents)  ## number of unique bcc
+        ## events.names
+        eventsnames <- rep(NA, nbLines * 2)
+        eventsnames[seq(1, nbLines * 2, by = 2)] <- unlist(lapply(infoLines, function(X) X$eventName))
+        eventsnames[seq(2, nbLines * 2, by = 2)] <- unlist(lapply(infoLines, function(X) X$eventName))
         
-        ## Initialization of matrix
-        eventsmat <- matrix(NA, iBcc * 2, length(infoLines[[1]]$variantCountsUp) + 1)
-        eventsnames <- rep(NA, iBcc * 2)
-        psiInfo <- matrix(NA, iBcc * 2, length(infoLines[[1]]$psiInfoUp))
-        index <- 1
-        indexNames <- 1
-        for (index in seq_len(nbLines)){
-            resultLine <- infoLines[[index]]
-            eventsmat[indexNames, 1] <- as.numeric(resultLine$variantLengthUp)
-            eventsmat[indexNames, 2:NCOL(eventsmat)] <- resultLine$variantCountsUp
-            eventsnames[indexNames] <- resultLine$eventName
-            psiInfo[indexNames, ] <- resultLine$psiInfoUp
-              
-            eventsmat[indexNames + 1, 1] <- as.numeric(resultLine$variantLengthLow)
-            eventsmat[indexNames + 1, 2:NCOL(eventsmat)] <- resultLine$variantCountsLow
-            eventsnames[indexNames + 1] <- resultLine$eventName
-            psiInfo[indexNames + 1, ] <- resultLine$psiInfoLow
-            class(eventsmat) <- "numeric"
-            indexNames <- indexNames + 2
+        ## events.mat
+        infoFirstLine <- infoLines[[1]]
+        eventsmat <- matrix(NA, nbLines * 2, length(infoFirstLine$variantCountsUp) + 1)
+        eventsmat[seq(1, nbLines * 2, by = 2), ] <- cbind(
+            unlist(lapply(infoLines, function(X) X$variantLengthUp)),
+            matrix(unlist(lapply(infoLines, function(X) X$variantCountsUp)), nbLines, byrow = TRUE))
+        eventsmat[seq(2, nbLines * 2, by = 2), ] <- cbind(
+            unlist(lapply(infoLines, function(X) X$variantLengthLow)),
+            matrix(unlist(lapply(infoLines, function(X) X$variantCountsLow)), nbLines, byrow = TRUE))
+        
+        ## psiInfo
+        psiInfo <- matrix(NA, nbLines * 2, length(infoFirstLine$psiInfoUp))
+        # For loop that can not be optimized at the moment because of NULL 
+        # value yielded by the '.countsSet' function
+        for (index in seq_len(nbLines)) {
+            psiInfo[(index - 1)*2 + 1, ] <- infoLines[[index]]$psiInfoUp
+            psiInfo[(index - 1)*2 + 2, ] <- infoLines[[index]]$psiInfoLow
         }
-        events.df <- data.frame(events.names = eventsnames,
-                               events.mat = eventsmat)
+        
+        
     }
     
-    ## update col names
-    colnames(events.df) <- c("events.names", "events.length", paste("counts", 
-        seq_len(length(colnames(events.df)) - 2), sep=""))
+    eventsdf <- data.frame(events.names = eventsnames, events.mat = eventsmat)
+    colnames(eventsdf) <- c("events.names", 
+                            "events.length", 
+                            paste("counts", seq_len(length(colnames(eventsdf)) - 2), sep=""))
     
-    close(fpath)
     psiInfo <- data.frame(events.names = eventsnames, as.data.frame(psiInfo))
     
-    output <- list(countsEvents=events.df, psiInfo=psiInfo, 
-        exonicReadsInfo=exonicReads, k2rgFile=fileNameK2RG)
+    output <- list(countsEvents = eventsdf, 
+                    psiInfo = psiInfo, 
+                    exonicReadsInfo = exonicReads, 
+                    k2rgFile = fileNameK2RG)
     class(output) <- c("list", "countsData")
+    
+    close(fpath)
     return(output)
 }
 
