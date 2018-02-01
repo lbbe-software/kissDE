@@ -53,15 +53,16 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
         PSI <- countsData2[, nr_i] / denominator
         colnames(PSI) <- paste(conditionsNames[i], paste0("repl", seq_len(nr[i])), sep="_")
         countsData2 <- cbind(countsData2, PSI)
-        for (j in seq_len(nr[i])) {
-            nr_j <- j + nr_cumsum[i]
-            ## replace PSI by NA if count less or equal to 10 reads 
-            ## for the 2 isoforms
-            indexNA <- intersect(which(countsData2[, nr_j] < 10), 
-                                which(countsData2[, nr_tot+nr_j] < 10))
-            countsData2[indexNA, nr_tot*2+nr_cumsum[i]+j] <- NA
-        }
+        
+        nr_j <- seq_len(nr[i]) +  nr_cumsum[i]
+        countsData2[, nr_tot * 2 + nr_j] <- do.call("cbind", lapply(nr_j,
+               function(X) {
+                   countsData2[intersect(which(countsData2[, X] < 10), which(countsData2[, nr_tot + X] < 10)), nr_tot * 2 + X] <- NA
+                   countsData2[, nr_tot * 2 + X]
+               }
+        ))
     }
+    
     countsData2$vars <- rowVars(
         as.matrix(countsData2[, ((nr_tot+1)*2):(nr_tot*2+1+n_conds)]),
         na.rm=TRUE)
