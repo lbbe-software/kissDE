@@ -260,7 +260,7 @@
     not composed of numerical values.")
     }
     if(min(countsLength)<0) {
-        stop("Input error: in 'coutsData', the smallest value for the 
+        stop("Input error: in 'countsData', the smallest value for the 
     second column (length) should be 0 (the minimal value in the current 
     data is ", min(countsLength), ").")
     }
@@ -1276,16 +1276,6 @@
         return(wEvents)
     }
     
-    if (!is.null(remove)) {
-        for (i in seq_along(remove)) {
-            if (!remove[i] %in% append(x = EVENTS, values = "MULTI")) {
-                message("In remove: couldn't find ", remove[i])
-                stop("One of the element(s) of the remove vector is not part of:
-                    deletion, insertion, IR, ES, altA, altD, altAD, alt, 
-                    unclassified, -, MULTI, unclassifiedSNP")
-            }
-        }
-    }
     ES <- FALSE
     if (keep[1] == "All") {
         for (i in seq_along(EVENTS)) {
@@ -1305,20 +1295,10 @@
         return(wEvents)
     }
     for (i in seq_along(keep)) {
-        if (!keep[i] %in% EVENTS) {
-            message("In keep: couldn't find", keep[i])
-            stop("One of the element(s) of the keep vector is not part of:
-                deletion, insertion, IR, ES, altA, altD, altAD, alt, 
-                unclassified, -, unclassifiedSNP")
-        }
         if (ES == FALSE && keep[i] == "ES") {
             ES <- TRUE
         }
         wEvents <- append(x = wEvents, values = keep[i])
-    }
-    if (ES == FALSE && !is.null(remove)) {
-        stop("Keep and remove can not be set together, unless keep contain ES 
-            (in that case, remove will act on ES events)")
     }
     if (ES == FALSE) {
         return(wEvents)
@@ -1329,13 +1309,6 @@
                 values = paste("ES_", ES_EVENTS[i], sep=""))
         }
         return(wEvents)
-    }
-    for (i in seq_along(remove)){
-        if (!remove[i] %in% ES_EVENTS) {
-            message("In remove: couldn't find",remove[i])
-            stop("One of the element(s) of the remove vector is not part of: 
-                altA, altD, altAD, alt, MULTI")
-        }
     }
     for (i in seq_along(ES_EVENTS)) {
         if (!ES_EVENTS[i] %in% remove) {
