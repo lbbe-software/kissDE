@@ -1,6 +1,13 @@
 qualityControl <- function(countsData, conditions, storeFigs=FALSE, 
                             returnPCAdata=FALSE) {
     
+  # Check parameters
+  if(!is.logical(returnPCAdata)) {
+    stop("Input error: 'returnPCAdata' must be a boolean.")
+  }
+  
+  ## Other checks in .readAndPrepareData 
+  
     if (storeFigs == FALSE) {
         pathToFigs <- NA
     } else {

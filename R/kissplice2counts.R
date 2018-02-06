@@ -8,27 +8,27 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         stop("Input error: user's file does not exist.")
     }
     if(!counts%in%c(0,1,2)){
-        stop("Input error: counts option is not equal to 0, 1 or 2.")
+        stop("Input error: 'counts' option is not equal to 0, 1 or 2.")
     }
     if(!is.logical(pairedEnd)){
-        stop("Input error: pairedEnd option must be a boolean.")
+        stop("Input error: 'pairedEnd' option must be a boolean.")
     }
     if(!is.logical(exonicReads)){
-        stop("Input error: exonicReads option must be a boolean.")
+        stop("Input error: 'exonicReads' option must be a boolean.")
     }
     if(!is.logical(k2rg)){
-        stop("Input error: k2rg option must be a boolean.")
+        stop("Input error: 'k2rg' option must be a boolean.")
     }
     if(!is.null(order) & !is.vector(order, mode="numeric")) {
-        stop("Input error: order option must be a numeric vector.")
+        stop("Input error: 'order' option must be a numeric vector.")
     }
     if(!pairedEnd & !is.null(order)) {
-        stop("Input error: order option can be set only if pairedEnd is TRUE.")
+        stop("Input error: 'order' option can be set only if pairedEnd is TRUE.")
     }
     
     if(k2rg & keep!=c("All")) {
         if(!is.vector(keep)) {
-            stop("Input error: keep option must be a vector.")
+            stop("Input error: 'keep' option must be a vector.")
         }
 
         keep <- unique(keep)
@@ -82,13 +82,13 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
     ######## check options compatibility
     
     if (counts == 1 & exonicReads == TRUE) { 
-        ## when counts=1 set automatically exonicReads=TRUE
+        ## when counts=1 set automatically exonicReads=FALSE
         exonicReads <- FALSE
         warning("Changing 'exonicReads' value to FALSE for consistency with
     counts=1.")
     }
     if (counts == 0 & exonicReads == FALSE) { 
-        ## when counts=1 set automatically exonicReads=TRUE
+        ## when counts=0 set automatically exonicReads=TRUE
         exonicReads <- TRUE
         warning("Changing 'exonicReads' value to TRUE for consistency with
     counts=0.")

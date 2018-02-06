@@ -1297,12 +1297,12 @@ on a desktop computer with the following caracteristics: Intel Core i7, CPU
 \multicolumn{2}{|c}{Running time}  \\
 & & events & \footnotesize{\Rfunction{kissplice2counts}} &
 \footnotesize{\Rfunction{diffExpressedVariants}} \\ \hline
-\multirow{3}{*}{AS data} & \Rcode{counts=2},  & \multirow{3}{*}{68497} & 
-\multirow{3}{*}{12m} & \multirow{3}{*}{38m} \\ 
+\multirow{3}{*}{AS data} & \Rcode{counts=2},  & \multirow{3}{*}{59132} & 
+\multirow{3}{*}{7m} & \multirow{3}{*}{50m} \\ 
 & \Rcode{pairedEnd=TRUE} & & & \\
 & \Rcode{k2rg=TRUE} & & & \\ \hline
 \multirow{2}{*}{SNV data} & \Rcode{counts=0}, & \multirow{2}{*}{64824} & 
-\multirow{2}{*}{5m} & \multirow{2}{*}{36m} \\
+\multirow{2}{*}{2m} & \multirow{2}{*}{1h} \\
 & \Rcode{pairedEnd=TRUE} & & & \\
 \end{tabular}
 \caption{Profiling. Running time of the two principal functions of 
