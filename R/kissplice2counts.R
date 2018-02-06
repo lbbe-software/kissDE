@@ -23,7 +23,8 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         stop("Input error: 'order' option must be a numeric vector.")
     }
     if(!pairedEnd & !is.null(order)) {
-        stop("Input error: 'order' option can be set only if pairedEnd is TRUE.")
+        stop("Input error: 'order' option can be set only if 
+            pairedEnd is TRUE.")
     }
     
     if(k2rg & keep!=c("All")) {
