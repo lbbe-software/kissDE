@@ -17,7 +17,7 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
         message("Figures are stored in ", pathToFigs)
         if (isTRUE(storeFigs)) {
             message("This directory is temporary.
-  It will be removed when the R session is closed.")
+    It will be removed when the R session is closed.")
         }
     }
     
@@ -51,15 +51,17 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
         nr_i <- seq_len(nr[i]) + nr_cumsum[i]
         denominator <- (countsData2[, nr_i] + countsData2[, nr_tot + nr_i])
         PSI <- countsData2[, nr_i] / denominator
-        colnames(PSI) <- paste(conditionsNames[i], paste0("repl", seq_len(nr[i])), sep="_")
+        colnames(PSI) <- paste(conditionsNames[i], 
+            paste0("repl", seq_len(nr[i])), sep="_")
         countsData2 <- cbind(countsData2, PSI)
         
         nr_j <- seq_len(nr[i]) +  nr_cumsum[i]
         countsData2[, nr_tot * 2 + nr_j] <- do.call("cbind", lapply(nr_j,
-               function(X) {
-                   countsData2[intersect(which(countsData2[, X] < 10), which(countsData2[, nr_tot + X] < 10)), nr_tot * 2 + X] <- NA
-                   countsData2[, nr_tot * 2 + X]
-               }
+            function(X) {
+                countsData2[intersect(which(countsData2[, X] < 10), 
+                which(countsData2[, nr_tot + X] < 10)), nr_tot * 2 + X] <- NA
+                    countsData2[, nr_tot * 2 + X]
+                }
         ))
     }
     

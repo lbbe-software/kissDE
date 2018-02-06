@@ -34,7 +34,7 @@
         ## Replace all ASSB counts by their opposite and fill psiVec
         assbIndex <- grepl("ASSB", colnames(countsperCond))
         countsVec <- mapply(function(X,Y) if(X){-Y}else{Y}, assbIndex, 
-                          countsVec)
+            countsVec)
         psiVec <- mapply(function(X,Y) if(X){Y}else{0}, assbIndex, countsVec)
         if ((counts == 2) & (exonicReads == FALSE)) {
             ## Replace all S counts by 0
@@ -63,7 +63,8 @@
             ## for each part of the pair
             myby <- list(order)
             sums <- aggregate(x = sums$x, by = myby, FUN = function(x) {sum(x)})
-            assbPsi <- aggregate(x = assbPsi$x, by = myby, FUN = function(x) {sum(x)})
+            assbPsi <- aggregate(x = assbPsi$x, by = myby, 
+                FUN = function(x) {sum(x)})
         } 
         listASSB <- t(assbPsi)[2, ]
     } else {  # counts == 0 
@@ -104,7 +105,7 @@
         ## Replace all ASSB counts by their opposite and fill psiVec
         assbIndex <- grepl("ASSB", colnames(countsperCond))
         countsVec <- mapply(function(X,Y) if(X){-Y}else{Y}, assbIndex, 
-                          countsVec)
+            countsVec)
         psiVec <- mapply(function(X,Y) if(X){Y}else{0}, assbIndex, countsVec)
         if ((counts == 2) & (exonicReads == FALSE)) {
             ## Replace all S counts by 0
@@ -132,8 +133,10 @@
             ## in case data is paired-end, there is one more sum to do, 
             ## for each part of the pair
             myby <- list(order)
-            sums <- aggregate(x = sums$x, by = myby, FUN = function(x) {sum(x)})
-            assbPsi <- aggregate(x = assbPsi$x, by = myby, FUN = function(x) {sum(x)})
+            sums <- aggregate(x = sums$x, by = myby, 
+                FUN = function(x) {sum(x)})
+            assbPsi <- aggregate(x = assbPsi$x, by = myby, 
+                FUN = function(x) {sum(x)})
         } 
         listASSB <- t(assbPsi)[2, ]
     } else { ## counts == 0 
@@ -172,7 +175,8 @@
     }
     beginningLine <- line[seq_len(indexStart)]
     eventName <- paste(beginningLine[1], beginningLine[2], sep="|")
-    variantLength <- as.numeric(strsplit(x = beginningLine[4], split = "_")[[1]][4])
+    variantLength <- as.numeric(strsplit(x = beginningLine[4], 
+        split = "_")[[1]][4])
     endLine <- line[indexStart:length(line)]
     resultCountsSet <- .countsSet(endLine, counts, pairedEnd, order, 
                             exonicReads)
@@ -196,8 +200,10 @@
                             order, exonicReads)
     resultCountsSetLow <- .countsSetk2rg(countsLow, counts, pairedEnd, 
                             order, exonicReads)
-    variantLengthUp <- sum(as.numeric(strsplit(x = line[11], split = ",")[[1]]))
-    variantLengthLow <- sum(as.numeric(strsplit(x = line[17], split = ",")[[1]]))
+    variantLengthUp <- sum(as.numeric(strsplit(x = line[11], 
+                                                split = ",")[[1]]))
+    variantLengthLow <- sum(as.numeric(strsplit(x = line[17], 
+                                                split = ",")[[1]]))
     
     return(list(eventName=eventName, 
                 variantLengthUp=variantLengthUp, 
@@ -373,13 +379,15 @@
     eventTab <- data.frame(
         ID=rep(as.factor(df["ID"]), endPosCol4Counts-startPosColumn4Counts+1),
         cond=as.factor(unlist(lapply(
-            strsplit(x = names(df)[startPosColumn4Counts:endPosCol4Counts], split = "_"), 
+            strsplit(x = names(df)[startPosColumn4Counts:endPosCol4Counts], 
+                split = "_"), 
             FUN=function(d){paste(d[2:(length(d) - 2)], collapse="_")}), 
             use.names=FALSE)), 
         ## to manage the conditions names which contains "_"
         counts=as.numeric(df[startPosColumn4Counts:endPosCol4Counts]),
         path=as.factor(unlist(lapply(
-            strsplit(x = names(df)[startPosColumn4Counts:endPosCol4Counts], split = "|"), 
+            strsplit(x = names(df)[startPosColumn4Counts:endPosCol4Counts], 
+                split = "|"), 
             FUN=function(d){d[1]}), 
             use.names=FALSE)),
         row.names=NULL)

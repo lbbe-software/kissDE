@@ -121,7 +121,8 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         nbLines <- length(infoLines)
         eventsmat <- cbind(
             unlist(lapply(infoLines, function(X) X$variantLength)),
-            matrix(unlist(lapply(infoLines, function(X) X$variantCounts)), nbLines, byrow = TRUE))
+            matrix(unlist(lapply(infoLines, function(X) X$variantCounts)), 
+                nbLines, byrow = TRUE))
             
         infoFirstLine <- infoLines[[1]]
         psiInfo <- matrix(NA, nbLines, length(infoFirstLine$psiInfo))
@@ -141,7 +142,8 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         ## keep only events of the selected type (keepEvents)
         keptLines <- lapply(lines, function(X) {if(X[EVENT] %in% keepEvents) X})
         keptLines <- keptLines[!vapply(keptLines, is.null, isTRUE(1))]
-        keptLines <- keptLines[!duplicated(as.data.frame(do.call(rbind, keptLines))[EVENTNAME])]
+        keptLines <- keptLines[!duplicated(as.data.frame(do.call(rbind, 
+            keptLines))[EVENTNAME])]
         lEvents <- unlist(lapply(keptLines, function(X) X[EVENTNAME]))
         
         nbLines <- length(keptLines)
@@ -152,18 +154,23 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         
         ## events.names
         eventsnames <- rep(NA, nbLines * 2)
-        eventsnames[seq(1, nbLines * 2, by = 2)] <- unlist(lapply(infoLines, function(X) X$eventName))
-        eventsnames[seq(2, nbLines * 2, by = 2)] <- unlist(lapply(infoLines, function(X) X$eventName))
+        eventsnames[seq(1, nbLines * 2, by = 2)] <- unlist(lapply(infoLines, 
+            function(X) X$eventName))
+        eventsnames[seq(2, nbLines * 2, by = 2)] <- unlist(lapply(infoLines, 
+            function(X) X$eventName))
         
         ## events.mat
         infoFirstLine <- infoLines[[1]]
-        eventsmat <- matrix(NA, nbLines * 2, length(infoFirstLine$variantCountsUp) + 1)
+        eventsmat <- matrix(NA, nbLines * 2, 
+            length(infoFirstLine$variantCountsUp) + 1)
         eventsmat[seq(1, nbLines * 2, by = 2), ] <- cbind(
             unlist(lapply(infoLines, function(X) X$variantLengthUp)),
-            matrix(unlist(lapply(infoLines, function(X) X$variantCountsUp)), nbLines, byrow = TRUE))
+            matrix(unlist(lapply(infoLines, function(X) X$variantCountsUp)), 
+                nbLines, byrow = TRUE))
         eventsmat[seq(2, nbLines * 2, by = 2), ] <- cbind(
             unlist(lapply(infoLines, function(X) X$variantLengthLow)),
-            matrix(unlist(lapply(infoLines, function(X) X$variantCountsLow)), nbLines, byrow = TRUE))
+            matrix(unlist(lapply(infoLines, function(X) X$variantCountsLow)), 
+                nbLines, byrow = TRUE))
         
         ## psiInfo
         psiInfo <- matrix(NA, nbLines * 2, length(infoFirstLine$psiInfoUp))
@@ -180,7 +187,9 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
     eventsdf <- data.frame(events.names = eventsnames, events.mat = eventsmat)
     colnames(eventsdf) <- c("events.names", 
                             "events.length", 
-                            paste("counts", seq_len(length(colnames(eventsdf)) - 2), sep=""))
+                            paste("counts", 
+                                seq_len(length(colnames(eventsdf)) - 2), 
+                                sep=""))
     
     psiInfo <- data.frame(events.names = eventsnames, as.data.frame(psiInfo))
     
