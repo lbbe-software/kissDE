@@ -170,7 +170,7 @@
     } else {
         indexStart <- 5
     }
-    beginningLine <- line[1:indexStart]
+    beginningLine <- line[seq_len(indexStart)]
     eventName <- paste(beginningLine[1], beginningLine[2], sep="|")
     variantLength <- as.numeric(strsplit(x = beginningLine[4], split = "_")[[1]][4])
     endLine <- line[indexStart:length(line)]

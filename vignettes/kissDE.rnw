@@ -3,7 +3,7 @@
 %\VignetteEngine{utils::Sweave}
 \documentclass{article}
 <<style-Sweave, eval=TRUE, echo=FALSE, results=tex>>=
-BiocStyle::latex2()
+BiocStyle::latex()
 @
 \usepackage{booktabs} % book-quality tables
 \usepackage[utf8]{inputenc}
