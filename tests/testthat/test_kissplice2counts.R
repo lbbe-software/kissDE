@@ -22,7 +22,7 @@ test_that("loading data with kissplice2counts work as expected", {
   ## exonicReads = FALSE ##
   mySplicingcounts <- kissplice2counts(fpath2, pairedEnd = TRUE, k2rg = TRUE, counts = 2, exonicReads = FALSE)
   expect_equal(names(mySplicingcounts), c("countsEvents", "psiInfo", "exonicReadsInfo", "k2rgFile"))
-  matches(mySplicingcounts$k2rgFile, "output_k2rg_alt_splicing.txt")
+  expect_match(mySplicingcounts$k2rgFile, "output_k2rg_alt_splicing.txt")
   expect_false(mySplicingcounts$exonicReadsInfo)
   expect_equal(mySplicingcounts$countsEvents[, 1], mySplicingcounts$psiInfo[, 1])
   expect_equal(dim(mySplicingcounts$countsEvents)[2], 6)
