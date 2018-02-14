@@ -976,7 +976,7 @@ data. Counts can then be analysed using \kde.
 We present two distinct case study with \kde: analysis of AS events and 
 analysis of SNVs.
 
-\subsection{\kde~on alternative splicing data}
+\subsection{Application of \kde~to alternative splicing}
 \label{subsec:AS}
 This first example corresponds to the case of differential analysis of 
 alternative splicing (AS) events. 
@@ -1131,11 +1131,22 @@ writeOutputKissDE(myResults_AS, output = "psi_table.tab", writePSI = TRUE)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\kde~on SNV data}
+\subsection{Application of \kde~to SNPs/SNVs}
 \label{subsec:SNV}
-This second example present an analysis of SNVs done with \kde~on 
+This second example present an analysis of SNPs/SNVs done with \kde~on 
 RNA-Seq data from a subset of the case study presented in 
-\cite{Lopez-Maestre2016} (\url{http://kissplice.prabi.fr/TWAS/}).
+\cite{Lopez-Maestre2016} (\url{http://kissplice.prabi.fr/TWAS/}).\\
+The original purpose of this study was to demonstrate that the method can deal
+with pooled data (i.e. individuals are pooled prior to sequencing). Pooling 
+can be used to decrease the costs. It is also sometimes the only option, when
+too few RNA is available per individual.
+The method can in principle be used on unpooled data, polyploid genomes, and 
+for the detection of somatic mutations, but has for now only been evaluated 
+for the detection of SNPs/SNVs in pooled RNAseq data.\\
+In the remaining, we use the term SNV, which designates a variation of a
+single nucleotide, without any restriction on the frequency of the two
+alleles. The term SNP is indeed classically used for variants present in
+at least 1\% of a population.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
