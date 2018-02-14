@@ -46,7 +46,7 @@ It can be used to study splice variants, where the two variants of the pair
 differ by the inclusion/exclusion of an exonic or intronic region.
 It can also be used to study genomic variants (whenever they are transcribed),
 which differ by a single nucleotide variation (SNV) or an indel.\\
-The statistical framework is base on similar hypotheses as \Biocpkg{DESeq2} 
+The statistical framework is based on similar hypotheses as \Biocpkg{DESeq2} 
 \cite{DESeq2} and includes its normalization method using geometric means. 
 Counts are modelled using the negative binomial distribution. We use the 
 framework of the generalised linear model, and we test for association of a 
@@ -1160,7 +1160,7 @@ samples and 4 files for the two CEU samples.
 Paired-end files from a same sample have been given as following each other
 to \kp.\\
 
-\kp~output a fasta file that stores SNVs found in the dataset. Its structure 
+\kp~outputs a fasta file that stores SNVs found in the dataset. Its structure 
 is described in section \ref{subsubsec:input_ks}. The first SNV is presented
 below:
 
