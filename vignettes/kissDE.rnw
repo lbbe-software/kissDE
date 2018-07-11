@@ -782,8 +782,7 @@ because the sequencing depth can vary between samples.
 A model to describe the counts distribution is first chosen.
 When working with technical replicates (\Rcode{technicalReplicates} = 
 \Rcode{TRUE} in \Rfunction{diffExpressedVariants}), the Poisson model 
-is chosen in \kde~and the \CRANpkg{glmnet} \R{} package \cite{glmnet}
-(model $\mathcal{M}(\phi=0)$) is used.\\
+(model $\mathcal{M}(\phi=0)$) is chosen in \kde.\\
 When working with biological replicates (\Rcode{technicalReplicates} =
 \Rcode{FALSE} in \Rfunction{diffExpressedVariants}), the Poisson distribution's
 variance parameter is in general not flexible enough to describe the data,
