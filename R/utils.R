@@ -1,14 +1,16 @@
-.lineParse <- function(line) {
-    allcondi <- regexpr(pattern="C[[:digit:]]+_[[:digit:]]+", text=line, 
-                    perl=TRUE)
-    if (allcondi[[1]][1] == -1) {  # no C in the header => ASSB counts
-        allcondi <- regexpr(pattern="[ASB]{1,4}[[:digit:]]+_[[:digit:]]+", 
-                        text=line, perl=TRUE)
+.lineParse <- function(line, counts=0) {
+    if (counts == 0) {
+        splittedCounts <- grep(pattern="C[[:digit:]]+_[[:digit:]]+", x=line, 
+                               perl=TRUE, value=TRUE)
     }
-    splittedCounts <- regmatches(x=line, m=allcondi)
+    else {  # no C in the header => ASSB counts
+        splittedCounts <- grep(pattern="[ASB]{1,4}[[:digit:]]+_[[:digit:]]+", 
+                               x=line, perl=TRUE, value=TRUE)
+    }
     ## gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
-    countsperCond <- vapply(splittedCounts, .getJunctionCounts, 
-        c("jct_id"="0", "count"="0"))
+    split1 <- sub("(?=[0-9])(?<=[A-Z])", "_", splittedCounts, perl=TRUE)
+    split2 <- strsplit(split1, "_", fixed=TRUE)
+    countsperCond <- matrix(unlist(split2), nrow=3)
     
     return(countsperCond)
 }
@@ -17,42 +19,54 @@
 
 .getJunctionCounts <- function(X){
     return(unlist(regmatches(x=X[1], 
-        m=gregexpr(pattern="[0-9]+", text=X[1]))))
+                             m=gregexpr(pattern="[0-9]+", text=X[1]))))
+}
+
+
+
+.testAggregate <- function(nbVec, countsVec){
+    nbcond <- max(nbVec)
+    agg <- rep_len(0,nbcond)
+    for (i in seq_along(countsVec))
+        agg[nbVec[i]] = agg[nbVec[i]] + countsVec[i]
+    
+    return(agg)
 }
 
 
 
 .countsSetk2rg <- function(splittedCounts, counts=0, pairedEnd=FALSE, 
-                            order=NULL, exonicReads=TRUE) {
-    countsperCond <- vapply(splittedCounts[[1]], .getJunctionCounts, 
-        c("jct_id"="0", "count"="0"))
+                           order=NULL, exonicReads=TRUE) {
+    split1 <- sub("(?=[0-9])(?<=[A-Z])", "_", splittedCounts[[1]], perl=TRUE)
+    split2 <- strsplit(split1, "_", fixed=TRUE)
+    countsperCond <- matrix(unlist(split2), nrow=3)
     ## Create the vectors of counts and samples
-    nbVec <- as.numeric(countsperCond[1,])
-    countsVec <- as.numeric(countsperCond[2,])
-    psiVec <- rep.int(0, dim(countsperCond)[2])
+    namesVec <- countsperCond[1,]
+    nbVec <- as.numeric(countsperCond[2,])
+    countsVec <- as.numeric(countsperCond[3,])
+    psiVec <- rep.int(0, length(countsVec))
     if (counts >= 1) {
         ## Replace all ASSB counts by their opposite and fill psiVec
-        assbIndex <- grepl("ASSB", colnames(countsperCond))
-        countsVec <- mapply(function(X,Y) if(X){-Y}else{Y}, assbIndex, 
-            countsVec)
-        psiVec <- mapply(function(X,Y) if(X){Y}else{0}, assbIndex, countsVec)
+        assbIndex <- namesVec == "ASSB"
+        countsVec[assbIndex] <- -countsVec[assbIndex]
+        psiVec[assbIndex] <- countsVec[assbIndex]
+        
         if ((counts == 2) & (exonicReads == FALSE)) {
             ## Replace all S counts by 0
-            countsVec <- mapply(function(X,Y) if(X){0}else{Y}, 
-                            grepl("^S[0-9]+", colnames(countsperCond)), 
-                            countsVec)
+            sIndex <- namesVec == "S"
+            countsVec[sIndex] <- 0
+            
         }
     }
     if (counts >= 1) {
         ## sums the counts for each junction that belongs to the same event
-        myby <- list(nbVec)
-        sums <- aggregate(x = countsVec, by = myby, FUN = function(x) {sum(x)})
+        sums <- .testAggregate(nbVec, countsVec)
         ## dpsi will store counts of ASSB counts 
-        assbPsi <- aggregate(x = psiVec, by = myby, FUN = function(x) {sum(x)})
+        assbPsi <- .testAggregate(nbVec, psiVec)
         
         if (pairedEnd == TRUE) {
             if (is.null(order)) {
-                nr <- NROW(sums)/2
+                nr <- length(sums) / 2
                 order <- rep(x = seq_len(nr), times = rep(2, nr))
             } else {
                 if (!is.vector(order)) {
@@ -61,90 +75,15 @@
             }
             ## in case data is paired-end, there is one more sum to do, 
             ## for each part of the pair
-            myby <- list(order)
-            sums <- aggregate(x = sums$x, by = myby, FUN = function(x) {sum(x)})
-            assbPsi <- aggregate(x = assbPsi$x, by = myby, 
-                FUN = function(x) {sum(x)})
+            sums <- .testAggregate(order, sums)
+            assbPsi <- .testAggregate(order, assbPsi)
         } 
-        listASSB <- t(assbPsi)[2, ]
-    } else {  # counts == 0 
-        if (pairedEnd == TRUE) {
-            if (is.null(order)) {
-                ## for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) 
-                ## (assuming data is ordered)
-                nr <- dim(countsperCond)[2] / 2
-                order <- rep(x = seq_len(nr), times = rep(2, nr))
-            } else {
-                if (!is.vector(order)) {
-                    stop("Order vector seems to be in a wrong format.")
-                }
-            }
-        } else {
-            order <- c(seq_along(countsperCond[2,]))
-        }
-        myby <- list(order)
-        sums <- aggregate(x = countsVec, by = myby, FUN = function(x) {sum(x)})
-        listASSB <- NULL
-    }
-    listCounts <- t(sums)[2, ]
-    
-    return(list(vCounts=listCounts, psiCounts=listASSB))
-}
-
-
-
-.countsSet <- function(line, counts=0, pairedEnd=FALSE, 
-                        order=NULL, exonicReads=TRUE) {
-    
-    countsperCond <- .lineParse(line)
-    ## Create the vectors of counts and samples
-    nbVec <- as.numeric(countsperCond[1,])
-    countsVec <- as.numeric(countsperCond[2,])
-    psiVec <- rep.int(0, dim(countsperCond)[2])
-    if (counts >= 1) {
-        ## Replace all ASSB counts by their opposite and fill psiVec
-        assbIndex <- grepl("ASSB", colnames(countsperCond))
-        countsVec <- mapply(function(X,Y) if(X){-Y}else{Y}, assbIndex, 
-            countsVec)
-        psiVec <- mapply(function(X,Y) if(X){Y}else{0}, assbIndex, countsVec)
-        if ((counts == 2) & (exonicReads == FALSE)) {
-            ## Replace all S counts by 0
-            countsVec <- mapply(function(X,Y) if(X){0}else{Y}, 
-                            grepl("^S[0-9]+", colnames(countsperCond)), 
-                            countsVec)
-        }
-    }
-    if (counts >= 1) {
-        ## sums the counts for each junction that belongs to the same event
-        myby <- list(nbVec)
-        sums <- aggregate(x = countsVec, by = myby, FUN = function(x) {sum(x)})
-        ## dpsi will store counts of ASSB counts 
-        assbPsi <- aggregate(x = psiVec, by = myby, FUN = function(x) {sum(x)})
-        
-        if (pairedEnd == TRUE) {
-            if (is.null(order)) {
-                nr <- NROW(sums) / 2
-                order <- rep(x = seq_len(nr), times = rep(2, nr))
-            } else {
-                if (!is.vector(order)) {
-                    stop("Order vector seems to be in a wrong format.")
-                }
-            }
-            ## in case data is paired-end, there is one more sum to do, 
-            ## for each part of the pair
-            myby <- list(order)
-            sums <- aggregate(x = sums$x, by = myby, 
-                FUN = function(x) {sum(x)})
-            assbPsi <- aggregate(x = assbPsi$x, by = myby, 
-                FUN = function(x) {sum(x)})
-        } 
-        listASSB <- t(assbPsi)[2, ]
     } else { ## counts == 0 
         if (pairedEnd == TRUE) {
             if (is.null(order)) {
                 ## for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) 
                 ## (assuming data is ordered)
-                nr <- dim(countsperCond)[2] / 2
+                nr <- length(countsVec) / 2
                 order <- rep(x = seq_len(nr), times = rep(2, nr))
             } else {
                 if (!is.vector(order)) {
@@ -152,34 +91,98 @@
                 }
             }
         } else {
-            order <- c(seq_len(dim(countsperCond)[2]))
+            order <- c(seq_along(countsVec))
         }
         myby <- list(order)
-        sums <- aggregate(x = countsVec, by = myby, FUN = function(x) {sum(x)})
-        listASSB <- NULL
+        sums <- .testAggregate(order, countsVec)
+        assbPsi <- NULL
     }
-    listCounts <- t(sums)[2, ]
+    listCounts <- sums
     
     return(list(vCounts=listCounts, 
-                psiCounts=listASSB))
+                psiCounts=assbPsi))
+}
+
+
+
+.countsSet <- function(line, counts=0, pairedEnd=FALSE, 
+                       order=NULL, exonicReads=TRUE) {
+    
+    countsperCond <- .lineParse(line, counts)
+    ## Create the vectors of counts and samples
+    namesVec <- countsperCond[1,]
+    nbVec <- as.numeric(countsperCond[2,])
+    countsVec <- as.numeric(countsperCond[3,])
+    psiVec <- rep.int(0, length(countsVec))
+    if (counts >= 1) {
+        ## Replace all ASSB counts by their opposite and fill psiVec
+        assbIndex <- namesVec == "ASSB"
+        countsVec[assbIndex] <- -countsVec[assbIndex]
+        psiVec[assbIndex] <- countsVec[assbIndex]
+        
+        if ((counts == 2) & (exonicReads == FALSE)) {
+            ## Replace all S counts by 0
+            sIndex <- namesVec == "S"
+            countsVec[sIndex] <- 0
+            
+        }
+    }
+    if (counts >= 1) {
+        ## sums the counts for each junction that belongs to the same event
+        sums <- .testAggregate(nbVec, countsVec)
+        ## dpsi will store counts of ASSB counts 
+        assbPsi <- .testAggregate(nbVec, psiVec)
+        
+        if (pairedEnd == TRUE) {
+            if (is.null(order)) {
+                nr <- length(sums) / 2
+                order <- rep(x = seq_len(nr), times = rep(2, nr))
+            } else {
+                if (!is.vector(order)) {
+                    stop("Order vector seems to be in a wrong format.")
+                }
+            }
+            ## in case data is paired-end, there is one more sum to do, 
+            ## for each part of the pair
+            sums <- .testAggregate(order, sums)
+            assbPsi <- .testAggregate(order, assbPsi)
+        } 
+    } else { ## counts == 0 
+        if (pairedEnd == TRUE) {
+            if (is.null(order)) {
+                ## for length(s)=8, will create a vector c(1,1,2,2,3,3,4,4) 
+                ## (assuming data is ordered)
+                nr <- length(countsVec) / 2
+                order <- rep(x = seq_len(nr), times = rep(2, nr))
+            } else {
+                if (!is.vector(order)) {
+                    stop("'order' vector seems to be in a wrong format.")
+                }
+            }
+        } else {
+            order <- c(seq_along(countsVec))
+        }
+        myby <- list(order)
+        sums <- .testAggregate(order, countsVec)
+        assbPsi <- NULL
+    }
+    listCounts <- sums
+    
+    return(list(vCounts=listCounts, 
+                psiCounts=assbPsi))
 }
 
 
 
 .getInfoLine <- function(line, counts=0, pairedEnd=FALSE, order=NULL, 
-                            exonicReads=TRUE) {
-    if (any(grepl("branching_nodes", line))) {
-        indexStart <- 6
-    } else {
-        indexStart <- 5
-    }
+                         exonicReads=TRUE, indexStart=5) {
     beginningLine <- line[seq_len(indexStart)]
     eventName <- paste(beginningLine[1], beginningLine[2], sep="|")
     variantLength <- as.numeric(strsplit(x = beginningLine[4], 
-        split = "_")[[1]][4])
+                                         split = "_", fixed=TRUE)[[1]][4])
     endLine <- line[indexStart:length(line)]
     resultCountsSet <- .countsSet(endLine, counts, pairedEnd, order, 
-                            exonicReads)
+                                  exonicReads)
     
     return(list(eventName=eventName, 
                 variantLength=variantLength, 
@@ -190,20 +193,20 @@
 
 
 .getInfoLineK2rg <- function(line, counts=0, pairedEnd=FALSE, order=NULL, 
-                            exonicReads=TRUE) {
+                             exonicReads=TRUE) {
     firstPart <- line[16]
     firstPartSplit <- strsplit(x = firstPart, split = "|", fixed = TRUE)[[1]]
     eventName <- paste(firstPartSplit[1], firstPartSplit[2], sep="|")
-    countsUp <- strsplit(x = line[20], split = ",")
-    countsLow <- strsplit(x = line[21], split = ",")
+    countsUp <- strsplit(x = line[20], split = ",", fixed = TRUE)
+    countsLow <- strsplit(x = line[21], split = ",", fixed = TRUE)
     resultCountsSetUp <- .countsSetk2rg(countsUp, counts, pairedEnd, 
-                            order, exonicReads)
+                                        order, exonicReads)
     resultCountsSetLow <- .countsSetk2rg(countsLow, counts, pairedEnd, 
-                            order, exonicReads)
-    variantLengthUp <- sum(as.numeric(strsplit(x = line[11], 
-                                                split = ",")[[1]]))
-    variantLengthLow <- sum(as.numeric(strsplit(x = line[17], 
-                                                split = ",")[[1]]))
+                                         order, exonicReads)
+    variantLengthUp <- sum(as.numeric(strsplit(x = line[11], split = ",", 
+                                               fixed = TRUE)[[1]]))
+    variantLengthLow <- sum(as.numeric(strsplit(x = line[17], split = ",", 
+                                                fixed = TRUE)[[1]]))
     
     return(list(eventName=eventName, 
                 variantLengthUp=variantLengthUp, 
@@ -380,7 +383,7 @@
         ID=rep(as.factor(df["ID"]), endPosCol4Counts-startPosColumn4Counts+1),
         cond=as.factor(unlist(lapply(
             strsplit(x = names(df)[startPosColumn4Counts:endPosCol4Counts], 
-                split = "_"), 
+                split = "_", fixed = TRUE), 
             FUN=function(d){paste(d[2:(length(d) - 2)], collapse="_")}), 
             use.names=FALSE)), 
         ## to manage the conditions names which contains "_"
@@ -452,11 +455,11 @@
     # reduce data frame to the interesting columns
     nbAll <- sum(nr)
     dataPart <- countsData[, c(seq_len(2), 
-                        which(grepl("_Norm", names(countsData))))]
+                        which(grepl("_Norm", names(countsData), fixed = TRUE)))]
     dataPart$Path <- gl(2, 1, NROW(countsData), labels=c("UP","LP"))
     dataPart2 <- cbind(dataPart[seq(1, NROW(dataPart), 2), ], 
                     dataPart[seq(2, NROW(dataPart), 2), 
-                    grepl("Norm", names(dataPart))])
+                    grepl("Norm", names(dataPart), fixed = TRUE)])
     names(dataPart2)[3:(3 + nbAll - 1)] <- 
         paste("UP", names(dataPart2)[3:(3 + nbAll - 1)], sep="_")
     names(dataPart2)[(3 + nbAll + 1):(3 + 2 * nbAll + 1 - 1)] <- 
@@ -482,7 +485,7 @@
     allEventtables <- apply(dataPart2, 1, 
                             .eventtable,
                             startPosColumn4Counts=which(
-                                grepl("UP", names(dataPart2)))[1], 
+                                grepl("UP", names(dataPart2), fixed = TRUE))[1], 
                             endPosCol4Counts=ncol(dataPart2))
     
     ###################################################
@@ -516,7 +519,7 @@
     ### code chunk number 3: variance - mean - Event level1
     ###################################################
     ## compute mean and variance per Event (instead of per allele)
-    dd <- dataPart2[, which(grepl("_Norm", names(dataPart2)))]
+    dd <- dataPart2[, which(grepl("_Norm", names(dataPart2), fixed = TRUE))]
     event.mean.variance.df <- as.data.frame(
         cbind(rowSums(dd), rowVars(as.matrix(dd))))
     names(event.mean.variance.df) <- c("Mean", "Variance")
@@ -565,7 +568,7 @@
     allEventtables <- apply(dataPart3, 1, 
                             .eventtable, 
                             startPosColumn4Counts=which(
-                                grepl("UP", names(dataPart3)))[1], 
+                                grepl("UP", names(dataPart3), fixed = TRUE))[1], 
                             endPosCol4Counts=ncol(dataPart3))
     
     ###################################################
@@ -595,7 +598,7 @@
     ###################################################
     ### code chunk number 7: excl_errors
     ###################################################
-    sing.events <- which(grepl("Error", pALLGlobalPhiGlmNb[, 1]))
+    sing.events <- which(grepl("Error", pALLGlobalPhiGlmNb[, 1], fixed = TRUE))
     if (length(sing.events) != 0) {
         pALLGlobalPhiGlmNb <- pALLGlobalPhiGlmNb[-sing.events, ]
     }
@@ -801,7 +804,8 @@
         pALLGlobalPhi.glm.nb$final.pval.a.ia[li] <- 
             pALLGlobalPhi.glm.nb.pen[li, 4]
         
-        sing.events.final <- which(grepl("Error", pALLGlobalPhi.glm.nb[, 29]))
+        sing.events.final <- which(grepl("Error", pALLGlobalPhi.glm.nb[, 29], 
+            fixed = TRUE))
         if (length(sing.events.final) != 0) {
             pALLGlobalPhi.glm.nb <- pALLGlobalPhi.glm.nb[-sing.events.final, ]
         }
@@ -1197,7 +1201,7 @@
     
     line <- lines[1]
     if(startsWith(line, "#")) {
-        nCol <- length(strsplit(x = line, split = "\t")[[1]])
+        nCol <- length(strsplit(x = line, split = "\t", fixed = TRUE)[[1]])
         countsHead <- paste(nCol+1, countsName, sep=".")
         psiHead <- paste(nCol+2, psiName, sep=".")
         pvHead <- paste(nCol+3, K2RGKDE_APV, sep=".")

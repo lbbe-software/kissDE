@@ -113,9 +113,16 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         lines <- sub("^>", "", lines)
         lines <- strsplit(x = lines, split = "|", fixed = TRUE)
         
+        
+        if (any(grepl("branching_nodes", lines[1]))) {
+          indexStart <- 6
+        } else {
+          indexStart <- 5
+        }
+        
         ## get all the informations for all lines
         infoLines <- lapply(lines, .getInfoLine, counts, pairedEnd, order, 
-                            exonicReads)
+                            exonicReads, indexStart)
         
         eventsnames <- unlist(lapply(infoLines, function(X) X$eventName))
         
@@ -138,13 +145,13 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         
         lines <- readLines(fpath)
         lines <- lines[!startsWith(lines, "#")]
-        lines <- strsplit(x = lines, split = "\t")
+        lines <- strsplit(x = lines, split = "\t", fixed = TRUE)
         
         ## keep only events of the selected type (keepEvents)
         keptLines <- lapply(lines, function(X) {if(X[EVENT] %in% keepEvents) X})
         keptLines <- keptLines[!vapply(keptLines, is.null, isTRUE(1))]
-        keptLines <- keptLines[!duplicated(as.data.frame(do.call(rbind, 
-            keptLines))[EVENTNAME])]
+        keptLines <- keptLines[!duplicated(unlist(lapply(keptLines, 
+            function(X) X[EVENTNAME])))]
         lEvents <- unlist(lapply(keptLines, function(X) X[EVENTNAME]))
         
         nbLines <- length(keptLines)
