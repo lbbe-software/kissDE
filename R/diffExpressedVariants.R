@@ -68,7 +68,6 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
             ## chunk1$ASSBinfo
             ## chunk1$allEventtables
             ## chunk1$length
-            ## chunk1$phi
             ## chunk1$dispData
         }, error=function(err) {
             return(NA)
@@ -85,7 +84,6 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
                                                     chunk1$dataPart3, 
                                                     chunk1$allEventtables, 
                                                     pvalue, 
-                                                    chunk1$phi,
                                                     chunk0$nr, 
                                                     chunk1$dispData)
             #### chunk 2 var ####  
