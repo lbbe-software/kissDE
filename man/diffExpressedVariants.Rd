@@ -10,7 +10,8 @@ data.}
 \usage{
 diffExpressedVariants(countsData, conditions, pvalue = 1, 
     filterLowCountsVariants = 10, flagLowCountsConditions = 10,
-    technicalReplicates = FALSE)
+    technicalReplicates = FALSE,
+    nbCore = 1)
 }
 
 
@@ -36,6 +37,9 @@ conditions) must have low counts to flag the event as 'lowCounts'.}
 
 \item{technicalReplicates}{a boolean value indicating if the counts in 
 \code{countsData} come from technical replicates only or not.}
+
+\item{nbCore}{an integer indicating the number of cores to use for the model 
+fitting step.}
 }
 
 

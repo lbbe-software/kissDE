@@ -26,6 +26,9 @@ importFrom("stats",
             "prcomp",
             "reshape")
 importFrom("utils", "tail", "write.table")
+importFrom("foreach", "foreach", "%dopar%")
+importFrom("doParallel", "registerDoParallel")
+importFrom("parallel", "detectCores")
 
 export(diffExpressedVariants,
         kissplice2counts,

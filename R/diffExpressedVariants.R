@@ -1,7 +1,8 @@
 diffExpressedVariants <- function(countsData, conditions, pvalue=1, 
                                     filterLowCountsVariants=10, 
                                     flagLowCountsConditions=10,
-                                    technicalReplicates=FALSE) {
+                                    technicalReplicates=FALSE,
+                                    nbCore=1) {
     
     ######## check function inputs
     
@@ -25,6 +26,13 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
     
     if(!is.logical(technicalReplicates)) {
         stop("Input error: 'technicalReplicates' must be a boolean.")
+    }
+    
+    if(nbCore > 1 && nbCore >= detectCores()){
+        stop(paste("Your machine only have", detectCores(), "cores.",
+                   "The maximum value for nbCore on your machine is",
+                   detectCores()-1, ".",
+                   "Decrease the 'nbCore' parameter and relaunch."))
     }
     
     ########
@@ -60,7 +68,7 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
     a look at the very well-written vignette !")
         chunk1 <- tryCatch({.modelFit(chunk0$countsData, chunk0$n, chunk0$nr, 
                                         ASSBinfo, filterLowCountsVariants,
-                                        technicalReplicates)
+                                        technicalReplicates, nbCore)
             #### chunk 1 var ####
             ## chunk1$pALLGlobalPhi.glm.nb 
             ## chunk1$sing.events

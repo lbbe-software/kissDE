@@ -433,7 +433,7 @@
 
 
 .modelFit <-function(countsData, n, nr, ASSBinfo, filterLowCountsVariants, 
-                    techRep){
+                    techRep, nbCore){
     ##################################################
     ## code chunk number 1: event-list
     ##################################################
@@ -537,20 +537,18 @@
     ###################################################
     pALLGlobalPhiGlmNb <- data.frame(t(rep(NA, 7)))
     if(techRep) {
-        for (i in seq_along(allEventtables)) {
-            pALLGlobalPhiGlmNb[i, ] <- 
-                try(.fitNBglmModelsDSSPhi(allEventtables[[i]], 0, nbAll), 
-                    silent=TRUE)
-        }
+        registerDoParallel(cores=nbCore)
+        pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables)) %dopar% 
+                  .fitNBglmModelsDSSPhi(allEventtables[[i]], 0, nbAll)
+        pALLGlobalPhiGlmNb <- do.call(rbind.data.frame, pALLGlobalPhiGlmNb_list)
     }
     else {
-        for (i in seq_along(allEventtables)) {
-            pALLGlobalPhiGlmNb[i, ] <- 
-                try(.fitNBglmModelsDSSPhi(allEventtables[[i]], 
-                                    dispersion(dispData)[i], 
-                                    nbAll), 
-                    silent=TRUE)
-        }
+        registerDoParallel(cores=nbCore)
+        pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables)) %dopar% 
+                  .fitNBglmModelsDSSPhi(allEventtables[[i]], 
+                                       dispersion(dispData)[i],
+                                       nbAll)
+        pALLGlobalPhiGlmNb <- do.call(rbind.data.frame, pALLGlobalPhiGlmNb_list)
     }
     
     
