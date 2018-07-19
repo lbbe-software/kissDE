@@ -89,16 +89,16 @@ in each condition.\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Install and load \kde}
 
-In a \R{} session, \Bioconductor{} has first to be installed.
+In a \R{} session, the \CRANpkg{BiocManager} package has first to be installed.
 
 <<installBC,eval=FALSE, fig=FALSE>>=
-source("http://bioconductor.org/biocLite.R")
+install.packages("BiocManager")
 @
 
 Then, the \kde~package can be installed from \Bioconductor{} and finally loaded.
 
 <<install,eval=FALSE, fig=FALSE>>=
-biocLite("kissDE")
+BiocManager::install("kissDE")
 @
 
 <<library, fig=FALSE>>=
