@@ -17,6 +17,8 @@ test_that("diffExpressedVariants function works as expected on count file", {
 })
 
 test_that("diffExpressedVariants function works as expected on count file with 2 cores", {
+  # don't test on bioconductor
+  skip_on_bioc()
   # test nbCore parameter
   fpath1 <- system.file("extdata", "table_counts_alt_splicing.txt", package="kissDE")
   tableCounts <- read.table(fpath1, head = TRUE)
