@@ -1,0 +1,10 @@
+CHANGES IN VERSION 1.1.1
+-------------------------
+
+    o Optimization of kissplice2counts()
+    o Parallelization of diffExpressedVariants()
+  
+CHANGES IN VERSION 1.0.0
+-------------------------
+
+    o First release of the package

@@ -30,9 +30,9 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
     
     if(nbCore > 1 && nbCore >= detectCores()){
         stop(paste("Your machine only have", detectCores(), "cores.",
-                   "The maximum value for nbCore on your machine is",
-                   detectCores()-1, ".",
-                   "Decrease the 'nbCore' parameter and relaunch."))
+            "The maximum value for nbCore on your machine is",
+            detectCores()-1, ".",
+            "Decrease the 'nbCore' parameter and relaunch."))
     }
     
     ########
@@ -117,11 +117,11 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
                                                 class(chunk2$noCorrectPVal))
             chunk3 <- tryCatch({
                 sizeOfEffect <- .sizeOfEffectCalc(chunk2$signifVariants, 
-                                                chunk1$ASSBinfo, chunk0$n, 
-                                                chunk0$nr, 
-                                                chunk0$sortedconditions, 
-                                                flagLowCountsConditions, 
-                                                chunk1$lengths, 
+                                                chunk1$ASSBinfo, chunk0$n,
+                                                chunk0$nr,
+                                                chunk0$sortedconditions,
+                                                flagLowCountsConditions,
+                                                chunk1$lengths,
                                                 countsData$exonicReadsInfo)
                 return(list(finalTable=sizeOfEffect$signifVariants.sorted, 
                             correctedPVal=chunk2$correctedPVal, 

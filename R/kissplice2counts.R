@@ -115,9 +115,9 @@ kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
         
         
         if (any(grepl("branching_nodes", lines[1]))) {
-          indexStart <- 6
+            indexStart <- 6
         } else {
-          indexStart <- 5
+            indexStart <- 5
         }
         
         ## get all the informations for all lines

@@ -1,11 +1,11 @@
 .lineParse <- function(line, counts=0) {
     if (counts == 0) {
         splittedCounts <- grep(pattern="C[[:digit:]]+_[[:digit:]]+", x=line, 
-                               perl=TRUE, value=TRUE)
+                                perl=TRUE, value=TRUE)
     }
     else {  # no C in the header => ASSB counts
         splittedCounts <- grep(pattern="[ASB]{1,4}[[:digit:]]+_[[:digit:]]+", 
-                               x=line, perl=TRUE, value=TRUE)
+                            x=line, perl=TRUE, value=TRUE)
     }
     ## gets the junctions id (ex 1 in AS1) and the count (ex 6 in AS1_6)
     split1 <- sub("(?=[0-9])(?<=[A-Z])", "_", splittedCounts, perl=TRUE)
@@ -19,7 +19,7 @@
 
 .getJunctionCounts <- function(X){
     return(unlist(regmatches(x=X[1], 
-                             m=gregexpr(pattern="[0-9]+", text=X[1]))))
+        m=gregexpr(pattern="[0-9]+", text=X[1]))))
 }
 
 
@@ -36,7 +36,7 @@
 
 
 .countsSetk2rg <- function(splittedCounts, counts=0, pairedEnd=FALSE, 
-                           order=NULL, exonicReads=TRUE) {
+        order=NULL, exonicReads=TRUE) {
     split1 <- sub("(?=[0-9])(?<=[A-Z])", "_", splittedCounts[[1]], perl=TRUE)
     split2 <- strsplit(split1, "_", fixed=TRUE)
     countsperCond <- matrix(unlist(split2), nrow=3)
@@ -106,7 +106,7 @@
 
 
 .countsSet <- function(line, counts=0, pairedEnd=FALSE, 
-                       order=NULL, exonicReads=TRUE) {
+        order=NULL, exonicReads=TRUE) {
     
     countsperCond <- .lineParse(line, counts)
     ## Create the vectors of counts and samples
@@ -175,14 +175,14 @@
 
 
 .getInfoLine <- function(line, counts=0, pairedEnd=FALSE, order=NULL, 
-                         exonicReads=TRUE, indexStart=5) {
+        exonicReads=TRUE, indexStart=5) {
     beginningLine <- line[seq_len(indexStart)]
     eventName <- paste(beginningLine[1], beginningLine[2], sep="|")
     variantLength <- as.numeric(strsplit(x = beginningLine[4], 
-                                         split = "_", fixed=TRUE)[[1]][4])
+        split = "_", fixed=TRUE)[[1]][4])
     endLine <- line[indexStart:length(line)]
     resultCountsSet <- .countsSet(endLine, counts, pairedEnd, order, 
-                                  exonicReads)
+        exonicReads)
     
     return(list(eventName=eventName, 
                 variantLength=variantLength, 
@@ -193,7 +193,7 @@
 
 
 .getInfoLineK2rg <- function(line, counts=0, pairedEnd=FALSE, order=NULL, 
-                             exonicReads=TRUE) {
+        exonicReads=TRUE) {
     firstPart <- line[16]
     firstPartSplit <- strsplit(x = firstPart, split = "|", fixed = TRUE)[[1]]
     eventName <- paste(firstPartSplit[1], firstPartSplit[2], sep="|")
@@ -202,11 +202,11 @@
     resultCountsSetUp <- .countsSetk2rg(countsUp, counts, pairedEnd, 
                                         order, exonicReads)
     resultCountsSetLow <- .countsSetk2rg(countsLow, counts, pairedEnd, 
-                                         order, exonicReads)
+        order, exonicReads)
     variantLengthUp <- sum(as.numeric(strsplit(x = line[11], split = ",", 
-                                               fixed = TRUE)[[1]]))
+        fixed = TRUE)[[1]]))
     variantLengthLow <- sum(as.numeric(strsplit(x = line[17], split = ",", 
-                                                fixed = TRUE)[[1]]))
+        fixed = TRUE)[[1]]))
     
     return(list(eventName=eventName, 
                 variantLengthUp=variantLengthUp, 
@@ -423,9 +423,9 @@
     nbCode <- c(nbglmA@code, nbglmI@code)
     
     rslts <- c(nbAnov@anova.table$'P(> Chi2)'[2],
-               nbAIC,
-               nbCode,
-               nbSingHes)
+                nbAIC,
+                nbCode,
+                nbSingHes)
     
     return(rslts)  
 }
@@ -529,7 +529,7 @@
     allEventtables <- apply(dataPart3, 1, 
                             .eventtable, 
                             startPosColumn4Counts=which(
-                                grepl("UP", names(dataPart3), fixed = TRUE))[1], 
+                                grepl("UP", names(dataPart3), fixed = TRUE))[1],
                             endPosCol4Counts=ncol(dataPart3))
     
     ###################################################
@@ -539,15 +539,14 @@
     if(techRep) {
         registerDoParallel(cores=nbCore)
         pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables)) %dopar% 
-                  .fitNBglmModelsDSSPhi(allEventtables[[i]], 0, nbAll)
+            .fitNBglmModelsDSSPhi(allEventtables[[i]], 0, nbAll)
         pALLGlobalPhiGlmNb <- do.call(rbind.data.frame, pALLGlobalPhiGlmNb_list)
     }
     else {
         registerDoParallel(cores=nbCore)
         pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables)) %dopar% 
-                  .fitNBglmModelsDSSPhi(allEventtables[[i]], 
-                                       dispersion(dispData)[i],
-                                       nbAll)
+            .fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i],
+                nbAll)
         pALLGlobalPhiGlmNb <- do.call(rbind.data.frame, pALLGlobalPhiGlmNb_list)
     }
     
@@ -559,10 +558,8 @@
     if (length(sing.events) != 0) {
         pALLGlobalPhiGlmNb <- pALLGlobalPhiGlmNb[-sing.events, ]
     }
-    colnames(pALLGlobalPhiGlmNb) <- c("I vs A",
-                                      "bicA","bicI",
-                                      "codeA","codeI",
-                                      "shA","shI")
+    colnames(pALLGlobalPhiGlmNb) <- c("I vs A", "bicA", "bicI", "codeA", 
+                                        "codeI", "shA", "shI")
     if (length(sing.events) != 0) {
         rownames(pALLGlobalPhiGlmNb) <- dataPart3[-sing.events, 1]
     } else {
