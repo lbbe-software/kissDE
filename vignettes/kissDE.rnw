@@ -567,8 +567,9 @@ myResults <- diffExpressedVariants(countsData = myCounts,
 @
 
 The \Rfunction{diffExpressedVariants} function has three parameters to change
-the filters or the flags applied on the data, and one parameter 
-to indicate if the replicates are technical or biological:
+the filters or the flags applied on the data, one parameter 
+to indicate if the replicates are technical or biological, and one parameter
+to indicate how many cores should be used :
 
 \begin{itemize}
 
@@ -595,6 +596,11 @@ is set to \Rcode{TRUE}, the counts will be modeled with a Poisson distribution.
 If it is equal to \Rcode{FALSE}, the counts will be modeled with a Negative 
 Binomial distribution. For more information, see section 
 \ref{subsec:dispersion}. By default, this option is set to \Rcode{FALSE}.
+
+\item \Rcode{nbCore}: An integer value indicating how many cores should be used
+for the computation. This parameter should be strictly lower than the number of 
+core of the computer (\Rcode{nbCore} $<$ nbr computer cores $- 1$). By default, 
+this parameter is set to 1, meaning that the computation are not parallelized.
 \end{itemize}
 
 The \Rfunction{diffExpressedVariants} function returns a list of 6 objects:
@@ -1293,35 +1299,38 @@ writeOutputKissDE(myResults_SNV, output = "final_table_significants.tab",
 \subsection{Time / Requirements}
 \label{subsec:time}
 
-The data loading function (\Rfunction{kissplice2counts}) and the 
-statistical analysis function (\Rfunction{diffExpressedVariants})  
-are the most time-consuming steps. Here is an example of the running time 
-of these two functions on the two complete datasets presented in the case 
+The statistical analysis function (\Rfunction{diffExpressedVariants})  
+is the most time-consuming steps. Here is an example of the running time 
+of this function on the two complete datasets presented in the case 
 studies(section \ref{sec:casestudies}). The time presented were evaluated 
 on a desktop computer with the following caracteristics: Intel Core i7, CPU
 2,60 GHz, 16G RAM.
 
 \begin{table}[h]
-\begin{tabular}{c|c|c|c|c}
+\begin{tabular}{c|c|c|c}
 \multirow{2}{*}{Dataset} & \multirow{2}{*}{Options} & Number of & 
-\multicolumn{2}{|c}{Running time}  \\
-& & events & \footnotesize{\Rfunction{kissplice2counts}} &
-\footnotesize{\Rfunction{diffExpressedVariants}} \\ \hline
+Running time of  \\
+& & events & \footnotesize{\Rfunction{diffExpressedVariants}} \\ \hline
 \multirow{3}{*}{AS data} & \Rcode{counts=2},  & \multirow{3}{*}{59132} & 
-\multirow{3}{*}{7m} & \multirow{3}{*}{50m} \\ 
-& \Rcode{pairedEnd=TRUE} & & & \\
-& \Rcode{k2rg=TRUE} & & & \\ \hline
+\multirow{3}{*}{17m} \\ 
+& \Rcode{pairedEnd=TRUE} & & \\
+& \Rcode{k2rg=TRUE} & & \\ \hline
 \multirow{2}{*}{SNV data} & \Rcode{counts=0}, & \multirow{2}{*}{64824} & 
-\multirow{2}{*}{2m} & \multirow{2}{*}{1h} \\
-& \Rcode{pairedEnd=TRUE} & & & \\
+\multirow{2}{*}{18m} \\
+& \Rcode{pairedEnd=TRUE} & & \\
 \end{tabular}
-\caption{Profiling. Running time of the two principal functions of 
-\kde~(\Rfunction{kissplice2counts} and \Rfunction{diffExpressedVariants}
+\caption{Profiling. Running time of the principal function of 
+\kde~(\Rfunction{diffExpressedVariants})
 for two datasets (AS dataset from the ENCODE project \cite{Djebali2012} 
-described in section \ref{subsec:AS} and SNP dataset from the GEUVADIS 
+described in section \ref{subsec:AS} and SNV dataset from the GEUVADIS 
 project \cite{Lappalainen2013} described in section \ref{subsec:SNV}).}
 \label{tab:time}
 \end{table}
+
+To reduce even more the running time of \Rfunction{diffExpressedVariants}, the
+parameter \Rcode{nbCore} can be used to parallelize the most time-consuming
+step of this function (for more detailed explanation on this parameter see
+section \ref{subsec:diffanalysis}).
 
 
 
