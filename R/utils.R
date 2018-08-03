@@ -536,20 +536,23 @@
     ### code chunk number 6: pALLGlobalPhi.glm.nb
     ###################################################
     pALLGlobalPhiGlmNb <- data.frame(t(rep(NA, 7)))
+    ## create the cluster
+    cl <- parallel::makeCluster(nbCore)
+    doParallel::registerDoParallel(cl)
     if(techRep) {
-        registerDoParallel(cores=nbCore)
         pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables)) %dopar% 
             .fitNBglmModelsDSSPhi(allEventtables[[i]], 0, nbAll)
         pALLGlobalPhiGlmNb <- do.call(rbind.data.frame, pALLGlobalPhiGlmNb_list)
     }
     else {
-        registerDoParallel(cores=nbCore)
         pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables)) %dopar% 
             .fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i],
                 nbAll)
         pALLGlobalPhiGlmNb <- do.call(rbind.data.frame, pALLGlobalPhiGlmNb_list)
     }
     
+    ## close the cluster
+    parallel::stopCluster(cl)
     
     ###################################################
     ### code chunk number 7: excl_errors
