@@ -197,8 +197,8 @@
     firstPart <- line[16]
     firstPartSplit <- strsplit(x = firstPart, split = "|", fixed = TRUE)[[1]]
     eventName <- paste(firstPartSplit[1], firstPartSplit[2], sep="|")
-    countsUp <- strsplit(x = line[20], split = ",", fixed = TRUE)
-    countsLow <- strsplit(x = line[21], split = ",", fixed = TRUE)
+    countsUp <- strsplit(x = line[20], split = "|", fixed = TRUE)
+    countsLow <- strsplit(x = line[21], split = "|", fixed = TRUE)
     resultCountsSetUp <- .countsSetk2rg(countsUp, counts, pairedEnd, 
                                         order, exonicReads)
     resultCountsSetLow <- .countsSetk2rg(countsLow, counts, pairedEnd, 
