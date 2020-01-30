@@ -1,4 +1,4 @@
-kissplice2counts <- function(fileName, counts=0, pairedEnd=FALSE, order=NULL,
+kissplice2counts <- function(fileName, counts=2, pairedEnd=FALSE, order=NULL,
                             exonicReads=TRUE, k2rg=FALSE, keep=c("All"),
                             remove=NULL) {
     
