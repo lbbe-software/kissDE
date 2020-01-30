@@ -1077,65 +1077,66 @@
 
 
 .wantedEvents <- function(keep=c("All"), remove=NULL){
-    if("unclassified"%in%keep) {
-        keep <- append(x = keep, values = c("-", " ", "", "unclassifiedSNP"))
-    }
-    if("unclassified"%in%remove) {
-        remove <- append(x = remove, 
-            values = c("-", " ", "", "unclassifiedSNP"))
-    }
-    EVENTS <- c("deletion", "insertion", "IR", "ES", "altA", "altD", "altAD", 
-        "alt", "unclassified", "-", " ", "", "unclassifiedSNP")
-    ES_EVENTS <- c("MULTI", "alt", "altA", "altD", "altAD")
-    wEvents <- c()
-    if (keep == c("All") && is.null(remove)) {
-        wEvents <- EVENTS
-        for (i in seq_along(ES_EVENTS)) {
-            wEvents <- append(x = wEvents, 
-                values = paste("ES_", ES_EVENTS[i], sep=""))
-        }
-        return(wEvents)
-    }
-    
-    ES <- FALSE
-    if (keep[1] == "All") {
-        for (i in seq_along(EVENTS)) {
-            if (!EVENTS[i] %in% remove) {
-                wEvents <- append(x = wEvents, values = EVENTS[i])
-            }
-        }
-        if ("ES" %in% remove) {
-            ES <- TRUE
-        }
-        if (ES == FALSE) {
-            for (i in seq_along(ES_EVENTS)) {
-                wEvents <- append(x = wEvents, 
-                    values = paste("ES_", ES_EVENTS[i], sep=""))
-            }
-        }
-        return(wEvents)
-    }
-    for (i in seq_along(keep)) {
-        if (ES == FALSE && keep[i] == "ES") {
-            ES <- TRUE
-        }
-        wEvents <- append(x = wEvents, values = keep[i])
-    }
-    if (ES == FALSE) {
-        return(wEvents)
-    }
-    if (is.null(remove)) {
-        for (i in seq_along(ES_EVENTS)) {
-            wEvents <- append(x = wEvents, 
-                values = paste("ES_", ES_EVENTS[i], sep=""))
-        }
-        return(wEvents)
-    }
+  if("-"%in%keep) {
+    keep <- append(x = keep, values = c("-", "SNP","del"))
+  }
+  if("-"%in%remove) {
+    remove <- append(x = remove, 
+                     values = c("-", "SNP", "del"))
+  }
+  EVENTS <- c("deletion", "insertion", "IR", "ES", "altA", "altD", "altAD", 
+              "-", "SNP", "indel")
+  ES_EVENTS <- c("MULTI", "altA", "altD", "altAD", "MULTI_altA",
+                 "MULTI_altD", "MULTI_altAD")
+  wEvents <- c()
+  if (keep == c("All") && is.null(remove)) {
+    wEvents <- EVENTS
     for (i in seq_along(ES_EVENTS)) {
-        if (!ES_EVENTS[i] %in% remove) {
-            wEvents <- append(x = wEvents, 
-                values = paste("ES_", ES_EVENTS[i], sep=""))
-        }
+      wEvents <- append(x = wEvents, 
+                        values = paste("ES_", ES_EVENTS[i], sep=""))
     }
     return(wEvents)
+  }
+  
+  ES <- FALSE
+  if (keep[1] == "All") {
+    for (i in seq_along(EVENTS)) {
+      if (!EVENTS[i] %in% remove) {
+        wEvents <- append(x = wEvents, values = EVENTS[i])
+      }
+    }
+    if ("ES" %in% remove) {
+      ES <- TRUE
+    }
+    if (ES == FALSE) {
+      for (i in seq_along(ES_EVENTS)) {
+        wEvents <- append(x = wEvents, 
+                          values = paste("ES_", ES_EVENTS[i], sep=""))
+      }
+    }
+    return(wEvents)
+  }
+  for (i in seq_along(keep)) {
+    if (ES == FALSE && keep[i] == "ES") {
+      ES <- TRUE
+    }
+    wEvents <- append(x = wEvents, values = keep[i])
+  }
+  if (ES == FALSE) {
+    return(wEvents)
+  }
+  if (is.null(remove)) {
+    for (i in seq_along(ES_EVENTS)) {
+      wEvents <- append(x = wEvents, 
+                        values = paste("ES_", ES_EVENTS[i], sep=""))
+    }
+    return(wEvents)
+  }
+  for (i in seq_along(ES_EVENTS)) {
+    if (!ES_EVENTS[i] %in% remove) {
+      wEvents <- append(x = wEvents, 
+                        values = paste("ES_", ES_EVENTS[i], sep=""))
+    }
+  }
+  return(wEvents)
 }
