@@ -34,7 +34,7 @@ kissplice2counts <- function(fileName, counts=2, pairedEnd=FALSE, order=NULL,
 
         keep <- unique(keep)
         values <- c("deletion", "insertion", "IR", "ES", "altA", "altD", 
-            "altAD", "alt", "unclassified")
+            "altAD", "-", "indel")
         
         # vector of unauthorized 'keep' values
         notinValues <- keep[!keep%in%values]
@@ -42,7 +42,7 @@ kissplice2counts <- function(fileName, counts=2, pairedEnd=FALSE, order=NULL,
             notinValues <- paste(notinValues, collapse = ", ")
             stop("Input error: 'keep' must be a vector of values in 
     c('deletion', 'insertion', 'IR', 'ES', 'altA', 'altD', 'altAD', 
-    'alt', 'unclassified'.")
+    '-', 'indel').")
         }
     }
     
@@ -53,7 +53,7 @@ kissplice2counts <- function(fileName, counts=2, pairedEnd=FALSE, order=NULL,
 
         remove <- unique(remove)
         values <- c("deletion", "insertion", "IR", "ES", "altA", "altD", 
-                    "altAD", "alt", "unclassified", "MULTI")
+                    "altAD", "-", "indel", "MULTI")
         
         # vector of unauthorized 'remove' values
         notinValues <- remove[!remove%in%values]
@@ -61,18 +61,20 @@ kissplice2counts <- function(fileName, counts=2, pairedEnd=FALSE, order=NULL,
             notinValues <- paste(notinValues, collapse = ", ")
             stop("Input error: 'remove' must be a vector of values in 
     c('deletion', 'insertion', 'IR', 'ES', 'altA', 'altD', 'altAD', 
-    'alt', 'unclassified', 'MULTI'.")
+    '-', 'indel', 'MULTI').")
         }
         
         if(keep!=c("All") & "ES"%in%keep) {
-            values <- c("altA", "altD", "altAD", "alt", "MULTI")
+            values <- c("altA", "altD", "altAD", "MULTI",
+                       "MULTI_altA", "MULTI_altD", "MULTI_altAD")
             
             # vector of unauthorized 'remove' values
             notinValues <- remove[!remove%in%values]
             if(length(notinValues) > 0) {
                 notinValues <- paste(notinValues, collapse = ", ")
                 stop("Input error: if 'keep' contains 'ES', 'remove' must be a 
-    vector of values in: c('altA', 'altD', 'altAD', 'alt', 'MULTI'.")
+    vector of values in: c('altA', 'altD', 'altAD', 'MULTI', 'MULTI_altA',
+    MULTI_altD', 'MULTI_altAD').")
             }
         } else if(keep!=c("All")) {
             stop("Input error: 'keep' and 'remove' can not be used together,
