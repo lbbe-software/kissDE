@@ -357,7 +357,7 @@ the user's hard disk.}
 <<kissplice2counts_howto, fig=FALSE, keep.source=FALSE>>=
 fpath2 <- system.file("extdata", "output_kissplice_alt_splicing.fa", 
     package="kissDE")
-myCounts <- kissplice2counts(fpath2, counts = 2, pairedEnd = TRUE)
+myCounts <- kissplice2counts(fpath2, pairedEnd = TRUE)
 @
 
 The counts returned by \Rfunction{kissplice2counts} are extracted from the 
@@ -443,7 +443,7 @@ the user's hard disk.}
 <<kissplice2counts_k2rg_howto, fig=FALSE, keep.source=FALSE>>=
 fpath3 <- system.file("extdata", "output_k2rg_alt_splicing.txt", 
     package="kissDE")
-myCounts_k2rg <- kissplice2counts(fpath3, counts = 2, 
+myCounts_k2rg <- kissplice2counts(fpath3, 
     pairedEnd = TRUE, k2rg = TRUE)
 names(myCounts_k2rg)
 head(myCounts_k2rg$countsEvents)
@@ -457,8 +457,8 @@ choosen events. To do this, the \Rfunction{kissplice2counts} function
 contains two parameters: \Rcode{keep} and \Rcode{remove}. 
 Both take a character vector indicating the types of events to keep or remove. 
 The event names must be part of this list: \Rcode{deletion}, \Rcode{insertion},
-\Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt},
-\Rcode{unclassified}.\\
+\Rcode{IR}, \Rcode{ES}, \Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{indel},
+\Rcode{-}.\\
 Thus, if the user is only interested in intron retention events, the
 \Rcode{keep} option should be set to \Rcode{c("IR")}. If the user isn't
 interessed in deletions and insertions, the \Rcode{remove} option should be
@@ -468,18 +468,20 @@ only if \Rcode{ES} is part of the \Rcode{keep} vector. The \Rcode{remove}
 vector will then act on the different types of exon skipping: multi-exon
 skipping (\Rcode{MULTI}) or exon skipping associated with an alternative 
 acceptor site (\Rcode{altA}), an alternative donor site (\Rcode{altD}), 
-both alternative acceptor and donor site (\Rcode{altAD}) or an undetermined
-alternative splice site (\Rcode{alt}). Thus, in this specific case, the 
+both alternative acceptor and donor site (\Rcode{altAD}) or any of the alt
+combinaison with MULTI. Thus, in this specific case, the 
 \Rcode{remove} vector should contain names from this list: \Rcode{MULTI},
-\Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{alt}.
+\Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{MULTI_altA}, 
+\Rcode{MULTI_altD}, \Rcode{MULTI_altAD}.
 
 If the user wants to analyse only cassette exon events (i.e., a single exon is
 skipped or included), the following command should be used:
 
 <<kissplice2counts_k2rg_ESonly_howto, fig=FALSE, keep.source=FALSE>>=
-myCounts_k2rg_ES <- kissplice2counts(fpath3, counts = 2, pairedEnd = TRUE, 
+myCounts_k2rg_ES <- kissplice2counts(fpath3, pairedEnd = TRUE, 
     k2rg = TRUE, keep = c("ES"), 
-    remove = c("MULTI", "altA", "altD", "altAD", "alt"))
+    remove = c("MULTI", "altA", "altD", "altAD", "MULTI_altA",
+    "MULTI_altD", "MULTI_altAD"))
 @
 
 %TODO: check if it works also on SNV
