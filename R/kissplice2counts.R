@@ -141,6 +141,7 @@ kissplice2counts <- function(fileName, counts=2, pairedEnd=FALSE, order=NULL,
         
     } else {
         fileNameK2RG <- fileName
+        POS <- 3
         EVENT <- 5
         EVENTNAME <- 16
         keepEvents <- .wantedEvents(keep, remove)
@@ -150,7 +151,7 @@ kissplice2counts <- function(fileName, counts=2, pairedEnd=FALSE, order=NULL,
         lines <- strsplit(x = lines, split = "\t", fixed = TRUE)
         
         ## keep only events of the selected type (keepEvents)
-        keptLines <- lapply(lines, function(X) {if(X[EVENT] %in% keepEvents) X})
+        keptLines <- lapply(lines, function(X) {if(X[POS]!="multiple" & X[EVENT] %in% keepEvents) X})
         keptLines <- keptLines[!vapply(keptLines, is.null, isTRUE(1))]
         keptLines <- keptLines[!duplicated(unlist(lapply(keptLines, 
             function(X) X[EVENTNAME])))]
