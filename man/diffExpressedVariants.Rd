@@ -104,7 +104,7 @@ protein sequence. \emph{Nucleic Acids Research}, \bold{44}(19):e148.
 
 \examples{
 fpath1 <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
-mySNVcounts <- kissplice2counts(fpath1, pairedEnd = TRUE)
+mySNVcounts <- kissplice2counts(fpath1, counts = 0, pairedEnd = TRUE)
 mySNVconditions <- c("EUR", "EUR", "TSC", "TSC")
 # diffSNV <- diffExpressedVariants(mySNVcounts, mySNVconditions)
 
