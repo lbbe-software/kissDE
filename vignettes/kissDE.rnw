@@ -471,8 +471,8 @@ acceptor site (\Rcode{altA}), an alternative donor site (\Rcode{altD}),
 both alternative acceptor and donor site (\Rcode{altAD}) or any of the alt
 combinaison with MULTI. Thus, in this specific case, the 
 \Rcode{remove} vector should contain names from this list: \Rcode{MULTI},
-\Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{MULTI_altA}, 
-\Rcode{MULTI_altD}, \Rcode{MULTI_altAD}.
+\Rcode{altA}, \Rcode{altD}, \Rcode{altAD}, \Rcode{MULTI\_altA}, 
+\Rcode{MULTI\_altD}, \Rcode{MULTI\_altAD}.
 
 If the user wants to analyse only cassette exon events (i.e., a single exon is
 skipped or included), the following command should be used:
