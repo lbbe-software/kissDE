@@ -1,7 +1,7 @@
 context("qualityControl")
 test_that("qualityControl work as expected", {
   fpath1 <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
-  mySNVcounts <- kissplice2counts(fpath1, pairedEnd = TRUE)
+  mySNVcounts <- kissplice2counts(fpath1, counts = 0, pairedEnd = TRUE)
   mySNVconditions <- c("C1", "C1", "C2", "C2")
   # test qualityControl without storing figures
   qualityControl(mySNVcounts, mySNVconditions, storeFigs = FALSE)
