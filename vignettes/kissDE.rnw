@@ -1220,7 +1220,7 @@ object (for a detailed description of its structure, see section
 <<snv_counts, fig=FALSE , keep.source=FALSE>>=
 fileInSNV <- system.file("extdata", "output_kissplice_SNV.fa", 
     package = "kissDE")
-myCounts_SNV <- kissplice2counts(fileInSNV, pairedEnd = TRUE)
+myCounts_SNV <- kissplice2counts(fileInSNV, counts = 0, pairedEnd = TRUE)
 head(myCounts_SNV$countsEvents)
 @
 
