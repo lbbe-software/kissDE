@@ -10,7 +10,7 @@ can be used by other functions of the \code{KissDE} package.
 
 
 \usage{
-kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL, 
+kissplice2counts(fileName, counts = 2, pairedEnd = FALSE, order = NULL, 
     exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL)
 }
 
