@@ -51,17 +51,19 @@ kissplice2counts <- function(fileName, counts=2, pairedEnd=FALSE, order=NULL,
             stop("Input error: 'remove' must be a vector.")
         }
 
-        remove <- unique(remove)
-        values <- c("deletion", "insertion", "IR", "ES", "altA", "altD", 
-                    "altAD", "-", "indel", "MULTI")
-        
-        # vector of unauthorized 'remove' values
-        notinValues <- remove[!remove%in%values]
-        if(length(notinValues) > 0) {
-            notinValues <- paste(notinValues, collapse = ", ")
-            stop("Input error: 'remove' must be a vector of values in 
-    c('deletion', 'insertion', 'IR', 'ES', 'altA', 'altD', 'altAD', 
-    '-', 'indel', 'MULTI').")
+        if(!"ES"%in%keep) {
+            remove <- unique(remove)
+            values <- c("deletion", "insertion", "IR", "ES", "altA", "altD", 
+                        "altAD", "-", "indel", "MULTI")
+            
+            # vector of unauthorized 'remove' values
+            notinValues <- remove[!remove%in%values]
+            if(length(notinValues) > 0) {
+                notinValues <- paste(notinValues, collapse = ", ")
+                stop("Input error: 'remove' must be a vector of values in 
+        c('deletion', 'insertion', 'IR', 'ES', 'altA', 'altD', 'altAD', 
+        '-', 'indel', 'MULTI').")
+            }
         }
         
         if(keep!=c("All") & "ES"%in%keep) {
