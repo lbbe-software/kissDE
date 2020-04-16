@@ -59,7 +59,7 @@ experimental condition of one variant. Each row corresponds to one variant.
 
 \examples{
 fpath <- system.file("extdata", "output_kissplice_SNV.fa", package="kissDE")
-mySNVcounts <- kissplice2counts(fpath, pairedEnd=TRUE)
+mySNVcounts <- kissplice2counts(fpath, counts = 0, pairedEnd=TRUE)
 mySNVconditions <- c("EUR", "EUR", "TSC", "TSC")
 qualityControl(mySNVcounts, mySNVconditions)
 }
