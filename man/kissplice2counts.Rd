@@ -10,7 +10,7 @@ can be used by other functions of the \code{KissDE} package.
 
 
 \usage{
-kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL, 
+kissplice2counts(fileName, counts = 2, pairedEnd = FALSE, order = NULL, 
     exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL)
 }
 
@@ -131,7 +131,7 @@ be set to \code{c("ES")} and the \code{remove} option should be set to
 
 \examples{
 fpath <- system.file("extdata", "output_kissplice_SNV.fa", package="kissDE")
-mySNVcounts <- kissplice2counts(fpath, pairedEnd=TRUE)
+mySNVcounts <- kissplice2counts(fpath, counts = 0, pairedEnd=TRUE)
 names(mySNVcounts)
 str(mySNVcounts)
 head(mySNVcounts$countsEvents)

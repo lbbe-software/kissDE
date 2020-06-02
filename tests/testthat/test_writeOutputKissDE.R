@@ -2,7 +2,7 @@ context("writeOutputKissDE")
 test_that("writeOutputKissDE work as expected", {
   # input = kissplice fasta file
   fpath1 <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
-  mySNVcounts <- kissplice2counts(fpath1, pairedEnd = TRUE)
+  mySNVcounts <- kissplice2counts(fpath1, counts = 0, pairedEnd = TRUE)
   mySNVconditions <- c("C1", "C1", "C2", "C2")
   diffSNV <- diffExpressedVariants(mySNVcounts, mySNVconditions)
   writeOutputKissDE(diffSNV, output = "kissDE_output_SVN.tab")

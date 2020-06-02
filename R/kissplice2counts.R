@@ -51,18 +51,21 @@ kissplice2counts <- function(fileName, counts=2, pairedEnd=FALSE, order=NULL,
             stop("Input error: 'remove' must be a vector.")
         }
 
-        remove <- unique(remove)
-        values <- c("deletion", "insertion", "IR", "ES", "altA", "altD", 
-                    "altAD", "-", "indel", "MULTI")
-        
-        # vector of unauthorized 'remove' values
-        notinValues <- remove[!remove%in%values]
-        if(length(notinValues) > 0) {
-            notinValues <- paste(notinValues, collapse = ", ")
-            stop("Input error: 'remove' must be a vector of values in 
-    c('deletion', 'insertion', 'IR', 'ES', 'altA', 'altD', 'altAD', 
-    '-', 'indel', 'MULTI').")
+        if(!"ES"%in%keep) {
+            remove <- unique(remove)
+            values <- c("deletion", "insertion", "IR", "ES", "altA", "altD", 
+                        "altAD", "-", "indel", "MULTI")
+            
+            # vector of unauthorized 'remove' values
+            notinValues <- remove[!remove%in%values]
+            if(length(notinValues) > 0) {
+                notinValues <- paste(notinValues, collapse = ", ")
+                stop("Input error: 'remove' must be a vector of values in 
+        c('deletion', 'insertion', 'IR', 'ES', 'altA', 'altD', 'altAD', 
+        '-', 'indel', 'MULTI').")
+            }
         }
+        
         
         if(keep!=c("All") & "ES"%in%keep) {
             values <- c("altA", "altD", "altAD", "MULTI",
@@ -83,6 +86,17 @@ kissplice2counts <- function(fileName, counts=2, pairedEnd=FALSE, order=NULL,
     }
     
     ######## check options compatibility
+  
+    splitFileName=strsplit(fileName,"_type_")[[1]]
+    l=len(splitFileName)
+    if(l>1) {
+      fileType=substr(splitFileName[l],1,1)
+      if(fileType=="0" & counts!=0) {
+        counts=0
+        warning("Changing 'counts' value to 0 for consistency with
+    inputed file type.")
+      }
+    }
     
     if (counts == 1 & exonicReads == TRUE) { 
         ## when counts=1 set automatically exonicReads=FALSE

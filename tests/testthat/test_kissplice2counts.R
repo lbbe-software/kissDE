@@ -2,7 +2,7 @@ context("kisslice2counts")
 test_that("loading data with kissplice2counts work as expected", {
   ## test load kissplice fasta file ##
   fpath1 <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
-  mySNVcounts <- kissplice2counts(fpath1, pairedEnd = TRUE)
+  mySNVcounts <- kissplice2counts(fpath1, counts = 0, pairedEnd = TRUE)
   expect_equal(names(mySNVcounts), c("countsEvents", "psiInfo", "exonicReadsInfo", "k2rgFile"))
   expect_null(mySNVcounts$k2rgFile)
   expect_true(mySNVcounts$exonicReadsInfo)

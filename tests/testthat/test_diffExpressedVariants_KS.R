@@ -2,7 +2,7 @@ context("diffExpressedVariants_KS")
 test_that("diffExpressedVariants function works as expected on kissplice fasta file", {
   # test on kissplice fasta file
   fpath1 <- system.file("extdata", "output_kissplice_SNV.fa", package = "kissDE")
-  mySNVcounts <- kissplice2counts(fpath1, pairedEnd = TRUE)
+  mySNVcounts <- kissplice2counts(fpath1, counts = 0, pairedEnd = TRUE)
   mySNVconditions <- c("C1", "C1", "C2", "C2")
   diffSNV <- diffExpressedVariants(mySNVcounts, mySNVconditions)
   expect_equal(names(diffSNV), c("finalTable", "correctedPVal", "uncorrectedPVal", "resultFitNBglmModel", "f/psiTable", "k2rgFile"))
