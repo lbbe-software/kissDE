@@ -87,14 +87,13 @@ kissplice2counts <- function(fileName, counts=2, pairedEnd=FALSE, order=NULL,
     
     ######## check options compatibility
   
-    splitFileName=strsplit(fileName,"_type_")[[1]]
-    l=len(splitFileName)
-    if(l>1) {
-      fileType=substr(splitFileName[l],1,1)
-      if(fileType=="0" & counts!=0) {
-        counts=0
-        warning("Changing 'counts' value to 0 for consistency with
-    inputed file type.")
+    splitFileName <- strsplit(fileName, "_type_")[[1]]
+    l <- length(splitFileName)
+    if(l > 1) {
+      fileType <- substr(splitFileName[l], 1, 1)
+      if(fileType == "0" & counts != 0) {
+        counts <- 0
+        warning("Changing 'counts' value to 0 for consistency with inputed file type.")
       }
     }
     
