@@ -11,14 +11,14 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
     }
     
     if((length(filterLowCountsVariants)>1) | 
-        (filterLowCountsVariants-round(filterLowCountsVariants+0.5)!=0) | 
+        (filterLowCountsVariants!=as.integer(filterLowCountsVariants)) | 
         (filterLowCountsVariants<0)) {
             stop("Input error: 'filterLowCountsVariants' must be a 
     positive integer.")
     }
     
     if((length(flagLowCountsConditions)>1) | 
-        (flagLowCountsConditions-round(flagLowCountsConditions+0.5)!=0) | 
+        (flagLowCountsConditions!=as.integer(flagLowCountsConditions)) | 
         (flagLowCountsConditions<0)) {
             stop("Input error: 'flagLowCountsConditions' must be a 
     positive integer.")
