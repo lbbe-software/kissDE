@@ -197,7 +197,7 @@
     firstPart <- line[16]
     firstPartSplit <- strsplit(x = firstPart, split = "|", fixed = TRUE)[[1]]
     eventName <- paste(firstPartSplit[1], firstPartSplit[2], sep="|")
-    if(grepl(",",line[20],fixed = T)) { # old k2rg file version
+    if(grepl(",", line[20], fixed = TRUE)) { # old k2rg file version
       countsUp <- strsplit(x = line[20], split = ",", fixed = TRUE)
       countsLow <- strsplit(x = line[21], split = ",", fixed = TRUE)
     } else { # new k2rg file version
