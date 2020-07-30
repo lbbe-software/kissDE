@@ -312,7 +312,7 @@
     }
     
     for (i in 2:n) {
-        for (j in seq_len(nr[n])) {
+        for (j in seq_len(nr[i])) {
             namesData[2 + cumsum(nr)[i - 1] + j] <- 
                 paste(sortedconditions[cumsum(nr)[i - 1] + j], "_repl", j, 
                     sep="", collapse="")
@@ -489,7 +489,7 @@
             current[(sum(nr)+1):(2*sum(nr))]
     }
     
-    designs <- rep(c(0,1),nr)
+    designs <- rep(0:(n-1),nr)
     dispData <- newSeqCountSet(dataNormCountsEventSum, as.data.frame(designs), 
                         normalizationFactor = rep(1, nbAll))
     ## fix the seed to avoid the stochastic outputs of the 
