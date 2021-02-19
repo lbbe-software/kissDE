@@ -78,6 +78,7 @@ jobs:
           remotes::install_cran("rcmdcheck")
           install.packages("BiocManager")
           BiocManager::install(c("DESeq2", "DSS"))
+          tinytex::tlmgr_install("bera")
         shell: Rscript {0}
 
       - name: Check
