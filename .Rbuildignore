@@ -5,3 +5,4 @@ tags
 ./doc/kissDE_doc.tex.backup
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.github$
