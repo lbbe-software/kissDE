@@ -81,6 +81,7 @@ jobs:
           tinytex::tlmgr_install("bera")
           tinytex::parse_install(text = "! LaTeX Error: File `titlesec.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `fancyhdr.sty' not found.")
+          tinytex::parse_install(text = "! LaTeX Error: File `enumitem.sty' not found.")
         shell: Rscript {0}
 
       - name: Check
