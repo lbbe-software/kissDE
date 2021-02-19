@@ -78,6 +78,7 @@ jobs:
           remotes::install_cran("rcmdcheck")
           install.packages("BiocManager")
           BiocManager::install(c("DESeq2", "DSS"))
+          install.packages('tinytex')
           tinytex::tlmgr_install("bera")
           tinytex::parse_install(text = "! LaTeX Error: File `titlesec.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `fancyhdr.sty' not found.")
