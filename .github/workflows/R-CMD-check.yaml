@@ -80,6 +80,7 @@ jobs:
           BiocManager::install(c("DESeq2", "DSS"))
           tinytex::tlmgr_install("bera")
           tinytex::parse_install(text = "! LaTeX Error: File `titlesec.sty' not found.")
+          tinytex::parse_install(text = "! LaTeX Error: File `fancyhdr.sty' not found.")
         shell: Rscript {0}
 
       - name: Check
