@@ -173,7 +173,7 @@ kissplice2counts <- function(fileName, counts=2, pairedEnd=FALSE, order=NULL,
     
     
     ## keep only events of the selected type (keepEvents)
-    keptLines <- lapply(lines, function(X) {if(!X[PARA] %in% c("one_path_mapped","not_mapped","missed_type2") & X[EVENT] %in% keepEvents) X})
+    keptLines <- lapply(lines, function(X) {if(!X[PARA] %in% c("one_path_mapped","not_mapped","missed_type2") & sum(strsplit(X[EVENT],split = ",")[[1]] %in% keepEvents)>0) X})
     keptLines <- keptLines[!vapply(keptLines, is.null, isTRUE(1))]
     keptLines <- keptLines[!duplicated(unlist(lapply(keptLines, 
                                                      function(X) X[EVENTNAME])))]
