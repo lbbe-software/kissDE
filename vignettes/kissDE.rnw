@@ -183,7 +183,7 @@ only, because \kde was uniquely tested in this context. To remove samples from
 the analysis the "*" character can be used:
 
 <<conditionVectorRemove_howto, fig=FALSE, keep.source=FALSE, eval=FALSE>>=
-myConditions <- c(rep("condition_1", 2), rep("*", 2), rep("condition_3", 2))
+myConditionsRm <- c(rep("condition_1", 2), rep("*", 2), rep("condition_3", 2))
 @
 
 Here, there are 3 conditions and 2 replicates per condition, but only
