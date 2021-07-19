@@ -84,6 +84,7 @@ jobs:
           tinytex::parse_install(text = "! LaTeX Error: File `fancyhdr.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `enumitem.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `parskip.sty' not found.")
+          tinytex::parse_install(text = "! LaTeX Error: File `nowidow.sty' not found.")
         shell: Rscript {0}
 
       - name: Check
