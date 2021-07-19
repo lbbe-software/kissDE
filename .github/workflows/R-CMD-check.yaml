@@ -46,7 +46,7 @@ jobs:
       - name: Install libraries for Linux
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get install texlive-fonts-extra texlive-lang-european texlive-latex-recommended texlive-extra-utils texlive-formats-extra
+          sudo apt-get install texlive-fonts-extra texlive-lang-european texlive-latex-recommended
           sudo apt-get install libcurl4-openssl-dev
        
       - name: Query dependencies
@@ -79,8 +79,7 @@ jobs:
           install.packages("BiocManager")
           BiocManager::install(c("DESeq2", "DSS"))
           install.packages('tinytex')
-          tinytex::tlmgr_install("bera")
-          tinytex::tlmgr_install("titlesec")
+          tinytex::tlmgr_install(c("bera", "titlesec", "fancyhdr", "enumitem", "parskip", "nowidow", "parnotes", "authblk"))
         shell: Rscript {0}
 
       - name: Check
