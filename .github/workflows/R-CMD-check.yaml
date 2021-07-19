@@ -80,13 +80,8 @@ jobs:
           BiocManager::install(c("DESeq2", "DSS"))
           install.packages('tinytex')
           tinytex::tlmgr_install("bera")
-          tinytex::parse_install(text = "! LaTeX Error: File `titlesec.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `fancyhdr.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `enumitem.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `parskip.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `nowidow.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `parnotes.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `nowidow.sty' not found.")
+          packs <- c("titlesec.sty'", "enumitem.sty'", "parskip.sty'", "nowidow.sty'", "fancyhdr.sty'", "parnotes.sty'", "authblk.sty'")
+          for (i in 1:length(packs)) {tinytex::parse_install(text = paste('! LaTeX Error: File', packs[i],'not found.')) }
         shell: Rscript {0}
 
       - name: Check
