@@ -80,6 +80,7 @@ jobs:
           BiocManager::install(c("DESeq2", "DSS"))
           install.packages('tinytex')
           tinytex::tlmgr_install("bera")
+          tinytex::tlmgr_install("titlesec")
         shell: Rscript {0}
 
       - name: Check
