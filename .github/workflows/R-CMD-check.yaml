@@ -81,6 +81,7 @@ jobs:
           install.packages('tinytex')
           tinytex::parse_install(text = "! LaTeX Error: File `authblk.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `soul.sty' not found.")
+          tinytex::parse_install(text = "! LaTeX Error: File `placeins.sty' not found.")
           tinytex::tlmgr_install(c("bera", "titlesec", "fancyhdr", "enumitem", "parskip", "nowidow", "parnotes", "authblk"))
         shell: Rscript {0}
 
