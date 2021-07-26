@@ -72,9 +72,6 @@ jobs:
             eval sudo $cmd
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
 
-      - name: preinstall some CTAN packages
-        run: tlmgr install authblk placeins ragged2e soul
-
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
@@ -82,10 +79,10 @@ jobs:
           install.packages("BiocManager")
           BiocManager::install(c("DESeq2", "DSS"))
           install.packages('tinytex')
-          # tinytex::parse_install(text = "! LaTeX Error: File `authblk.sty' not found.")
-          # tinytex::parse_install(text = "! LaTeX Error: File `soul.sty' not found.")
-          # tinytex::parse_install(text = "! LaTeX Error: File `placeins.sty' not found.")
-          # tinytex::parse_install(text = "! LaTeX Error: File `ragged2e.sty' not found.")
+          tinytex::parse_install(text = "! LaTeX Error: File `authblk.sty' not found.")
+          tinytex::parse_install(text = "! LaTeX Error: File `soul.sty' not found.")
+          tinytex::parse_install(text = "! LaTeX Error: File `placeins.sty' not found.")
+          tinytex::parse_install(text = "! LaTeX Error: File `ragged2e.sty' not found.")
           tinytex::tlmgr_install(c("bera", "titlesec", "fancyhdr", "enumitem", "parskip", "nowidow", "parnotes"))
         shell: Rscript {0}
 
