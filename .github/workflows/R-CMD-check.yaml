@@ -89,6 +89,7 @@ jobs:
           tinytex::parse_install(text = "! LaTeX Error: File `caption.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `xstring.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `mathtools.sty' not found.")
+          tinytex::parse_install(text = "! LaTeX Error: File `multirow.sty' not found.")
           tinytex::tlmgr_install(c("bera", "titlesec", "fancyhdr", "enumitem", "parskip", "nowidow", "parnotes"))
         shell: Rscript {0}
 
