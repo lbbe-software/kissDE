@@ -86,6 +86,7 @@ jobs:
           tinytex::parse_install(text = "! LaTeX Error: File `footmisc.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `marginfix.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `changepage.sty' not found.")
+          tinytex::parse_install(text = "! LaTeX Error: File `caption.sty' not found.")
           tinytex::tlmgr_install(c("bera", "titlesec", "fancyhdr", "enumitem", "parskip", "nowidow", "parnotes"))
         shell: Rscript {0}
 
