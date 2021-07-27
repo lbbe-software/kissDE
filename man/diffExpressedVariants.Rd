@@ -99,7 +99,7 @@ the other condition (sum by replicates for each conditions).}
 Lopez-Maestre et al., 2016. Snp calling from rna-seq data without a reference 
 genome: identification, quantification, differential analysis and impact on the 
 protein sequence. \emph{Nucleic Acids Research}, \bold{44}(19):e148. 
-\url{https://doi.org/10.1093/nar/gkw655}
+\doi{10.1093/nar/gkw655}
 }
 
 \examples{
