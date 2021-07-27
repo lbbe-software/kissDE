@@ -858,7 +858,7 @@
     ###################################################
     signifVariants <- cbind(signifVariants, dPvector1)
     sortOrder <- 
-        order(-abs(dPvector1), signifVariants[NCOL(signifVariants) - 1])
+        order(-abs(dPvector1), as.matrix(signifVariants[NCOL(signifVariants) - 1]))
     
     ## sorting by delta psi then by pvalue
     signifVariants.sorted <- signifVariants[sortOrder, ]
