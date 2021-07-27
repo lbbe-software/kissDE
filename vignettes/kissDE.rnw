@@ -655,7 +655,8 @@ The \Rcode{finalTable} object is the main output of the
 \Rfunction{diffExpressedVariants} function.
 The first 3 rows of the \Robject{myResults\$finalTable} output are as follows:
 <<finaltable_description, fig=FALSE, echo=TRUE, keep.source=FALSE>>=
-print(head(myResults$finalTable, n = 3), row.names = FALSE)
+# print(headhead(myResults$finalTable, n = 3), row.names = FALSE)
+print(str(myResults))
 @
 
 The columns of this table contain the following information:
