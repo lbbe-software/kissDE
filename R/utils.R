@@ -352,14 +352,14 @@
     ## create a DESeqDataSet object
     suppressMessages(dds <- DESeqDataSetFromMatrix(
         countData=countsEventsSum, 
-        colData=data.frame(condition=conds),
+        colData=data.frame(condition=as.factor(conds)),
         design=~ condition))
     
     ddsSF <- estimateSizeFactors(dds)
     sizeFactorsSum <- sizeFactors(ddsSF)
     suppressMessages(ddsSF <- DESeqDataSetFromMatrix(
         countData=countsEventsCounts, 
-        colData=data.frame(condition=conds),
+        colData=data.frame(condition=as.factor(conds)),
         design=~ condition))
     sizeFactors(ddsSF) <- sizeFactorsSum
     shouldWeNormalize <- sum(is.na(sizeFactors(ddsSF))) < 1
