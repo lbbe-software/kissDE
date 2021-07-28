@@ -23,7 +23,7 @@ test_that("diffExpressedVariants function works as expected on count file with 2
   fpath1 <- system.file("extdata", "table_counts_alt_splicing.txt", package="kissDE")
   tableCounts <- read.table(fpath1, head = TRUE)
   conditions <- c("C1", "C1", "C2", "C2")
-  if (detectCores() >= 2){
+  if (detectCores() - 1 >= 2){
     diff <- diffExpressedVariants(tableCounts, conditions, nbCore=2)
     expect_equal(names(diff), c("finalTable", "correctedPVal", "uncorrectedPVal", "resultFitNBglmModel", "f/psiTable", "k2rgFile"))
     expect_equal(dim(diff$finalTable)[2], 13)
