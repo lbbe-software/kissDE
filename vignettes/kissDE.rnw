@@ -1274,7 +1274,8 @@ the result for the first three events is printed:
 
 <<snv_test, fig=FALSE, keep.source=FALSE>>=
 myResult_SNV <- diffExpressedVariants(myCounts_SNV, myConditions_SNV)
-head(myResult_SNV$finalTable, n = 3)
+# head(myResult_SNV$finalTable, n = 3)
+str(myResult_SNV)
 @
 
 The first event in the \Robject{myResult\_SNV} output has a low p-value 
