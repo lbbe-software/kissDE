@@ -738,7 +738,7 @@ The first three rows of the \Rcode{f/psiTable} output of the
 look like this:
 
 <<fPSItable_description, fig=FALSE, echo=FALSE, keep.source=FALSE>>=
-head(myResults$`f/psiTable`, n = 3)
+# head(myResults$`f/psiTable`, n = 3)
 @
 
 This output can be useful to carry out downstream analysis or to produce 
