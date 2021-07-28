@@ -1108,7 +1108,8 @@ description of its structure, see section \ref{subsubsec:finaltable})
 and the result for the first three events is given below:
 <<AS_test, fig=FALSE, keep.source=TRUE>>=
 myResult_AS <- diffExpressedVariants(myCounts_AS, myConditions_AS)
-head(myResult_AS$finalTable, n = 3)
+# head(myResult_AS$finalTable, n = 3)
+str(myResult_AS)
 @
 
 The first event in the \Robject{myResult\_AS} output has a very low p-value 
