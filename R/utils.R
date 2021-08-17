@@ -46,16 +46,14 @@
     countsVec <- as.numeric(countsperCond[3,])
     psiVec <- rep.int(0, length(countsVec))
     if (counts >= 1) {
-        
         ## Replace the maximum of AS or SB by the minimum of AS or SB
         asIndex <- namesVec == "AS"
         sbIndex <- namesVec == "SB"
-        if(countsVec[asIndex]>=countsVec[sbIndex]) {
-            countsVec[asIndex]=countsVec[sbIndex]
-            
-        } else {
-            countsVec[sbIndex]=countsVec[asIndex]
-        }
+        dASB <- data.frame(AS=countsVec[asIndex],
+                           SB=countsVec[sbIndex])
+        dASB$min=apply(dASB,1,min)
+        countsVec[asIndex]=dASB$min
+        countsVec[sbIndex]=dASB$min
         ## Replace all ASSB counts by their opposite and fill psiVec
         assbIndex <- namesVec == "ASSB"
         countsVec[assbIndex] <- -countsVec[assbIndex]
@@ -128,12 +126,11 @@
         ## Replace the maximum of AS or SB by the minimum of AS or SB
         asIndex <- namesVec == "AS"
         sbIndex <- namesVec == "SB"
-        if(countsVec[asIndex]>=countsVec[sbIndex]) {
-            countsVec[asIndex]=countsVec[sbIndex]
-            
-        } else {
-            countsVec[sbIndex]=countsVec[asIndex]
-        }
+        dASB <- data.frame(AS=countsVec[asIndex],
+                           SB=countsVec[sbIndex])
+        dASB$min=apply(dASB,1,min)
+        countsVec[asIndex]=dASB$min
+        countsVec[sbIndex]=dASB$min
         ## Replace all ASSB counts by their opposite and fill psiVec
         assbIndex <- namesVec == "ASSB"
         countsVec[assbIndex] <- -countsVec[assbIndex]
