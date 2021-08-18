@@ -93,11 +93,12 @@ jobs:
           tinytex::tlmgr_install(c("bera", "titlesec", "fancyhdr", "enumitem", "parskip", "nowidow", "parnotes"))
         shell: Rscript {0}
         
-      - name: Install Windows RCurl
+      - name: Install Windows dependencies
         if: runner.os == 'Windows'
         run: |
           install.packages("BiocManager")
           BiocManager::install("RCurl",type="binary")
+          install.packages("XML")
         shell: Rscript {0}
 
       - name: Check
