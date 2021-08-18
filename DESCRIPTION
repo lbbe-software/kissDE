@@ -13,7 +13,7 @@ Authors@R: c(
 	person("Frank", "Picard", role = "ctb"), 
 	person("Laurent", "Jacob", role = "ctb"), 
 	person("Vincent", "Miele", role = "ctb"))
-Imports: aod, Biobase, DESeq2, DSS, ggplot2, gplots, graphics, grDevices, matrixStats, stats, utils, foreach, doParallel, parallel, RCurl
+Imports: aod, Biobase, DESeq2, DSS, ggplot2, gplots, graphics, grDevices, matrixStats, stats, utils, foreach, doParallel, parallel, BiocManager, RCurl
 Suggests: BiocStyle, testthat
 License: GPL (>= 2)
 Contact: Vincent Lacroix <vincent.lacroix@univ-lyon1.fr>
