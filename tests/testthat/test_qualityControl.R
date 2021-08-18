@@ -12,7 +12,7 @@ test_that("qualityControl work as expected", {
   expect_true(file.exists(paste0(dirname, "/kissDEFigures/pca.png")))
   unlink(paste0(dirname,"/kissDEFigures"), recursive = TRUE)
   # test qualityControl storing figures in a path choosen by the user
-  qqualityControl(mySNVcounts, mySNVconditions, storeFigs = "Rplots")
+  qualityControl(mySNVcounts, mySNVconditions, storeFigs = "Rplots")
   expect_true(file.exists("Rplots/heatmap.png"))
   expect_true(file.exists("Rplots/pca.png"))
   unlink("Rplots",recursive = T)
