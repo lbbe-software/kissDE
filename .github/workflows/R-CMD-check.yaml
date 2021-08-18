@@ -96,7 +96,8 @@ jobs:
       - name: Install Windows RCurl
         if: runner.os == 'Windows'
         run: |
-          install.packages("RCurl_1.98-1.3.zip", repos=NULL, type="source")
+          source("http://bioconductor.org/biocLite.R")
+          biocLite("RCurl")
         shell: Rscript {0}
 
       - name: Check
