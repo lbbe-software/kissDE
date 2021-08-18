@@ -91,9 +91,12 @@ jobs:
           tinytex::parse_install(text = "! LaTeX Error: File `mathtools.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `multirow.sty' not found.")
           tinytex::tlmgr_install(c("bera", "titlesec", "fancyhdr", "enumitem", "parskip", "nowidow", "parnotes"))
-          if: runner.os == 'Windows'
-          run: |
-            install.packages("RCurl_1.98-1.3.zip", repos=NULL, type="source")
+        shell: Rscript {0}
+        
+      - name: Install Windows RCurl
+        if: runner.os == 'Windows'
+        run: |
+          install.packages("RCurl_1.98-1.3.zip", repos=NULL, type="source")
         shell: Rscript {0}
 
       - name: Check
