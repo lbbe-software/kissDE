@@ -29,13 +29,13 @@ test_that("loading data with kissplice2counts work as expected", {
   expect_equal(dim(mySplicingcounts$countsEvents)[1], 212)
   expect_equal(dim(mySplicingcounts$psiInfo)[2], 5)
   ## test computed value (with ASSB) ##
-  realCountsSplicing_withASSB <- data.frame(counts1 = c(2, 33), counts2 = c(1, 14), counts3 = c(23, 6), counts4 = c(8, 3))
+  realCountsSplicing_withASSB <- data.frame(counts1 = c(2, 33), counts2 = c(0, 14), counts3 = c(8, 6), counts4 = c(3, 3))
   row.names(realCountsSplicing_withASSB) <- NULL
   computedCountsSplicing_withASSB <- mySplicingcounts$countsEvents[which(mySplicingcounts$countsEvents[,1] == "bcc_68965|Cycle_4"),c(3:6)]
   row.names(computedCountsSplicing_withASSB) <- NULL
   expect_equal(computedCountsSplicing_withASSB, realCountsSplicing_withASSB)
   ## test computed value ##
-  realCountsSplicing <- data.frame(counts1 = c(54, 49), counts2 = c(21, 23), counts3 = c(8, 19), counts4 = c(7, 41), row.names = c(25,26))
+  realCountsSplicing <- data.frame(counts1 = c(8, 49), counts2 = c(4, 23), counts3 = c(2, 19), counts4 = c(0, 41), row.names = c(1,2))
   row.names(realCountsSplicing) <- NULL
   computedCountsSplicing <- mySplicingcounts$countsEvents[which(mySplicingcounts$countsEvents[,1] == "bcc_140028|Cycle_1"),c(3:6)]
   row.names(computedCountsSplicing) <- NULL
@@ -43,7 +43,7 @@ test_that("loading data with kissplice2counts work as expected", {
   ## exonicReads = TRUE ##
   mySplicingcounts2 <- kissplice2counts(fpath2, pairedEnd = TRUE, k2rg = TRUE, counts = 2, exonicReads = TRUE)
   ## test computed value (with exonic reads) ##
-  realCountsSplicing2 <- data.frame(counts1 = c(150, 49), counts2 = c(98, 23), counts3 = c(35, 19), counts4 = c(31, 41))
+  realCountsSplicing2 <- data.frame(counts1 = c(104, 49), counts2 = c(81, 23), counts3 = c(29, 19), counts4 = c(24, 41))
   row.names(realCountsSplicing2) <- NULL
   computedCountsSplicing2 <- mySplicingcounts2$countsEvents[which(mySplicingcounts2$countsEvents[,1] == "bcc_140028|Cycle_1"),c(3:6)]
   row.names(computedCountsSplicing2) <- NULL
