@@ -98,7 +98,7 @@ jobs:
         run: |
           install.packages("BiocManager")
           BiocManager::install("RCurl",type="binary")
-          install.packages("XML")
+          install.packages("XML",type="binary")
         shell: Rscript {0}
 
       - name: Check
