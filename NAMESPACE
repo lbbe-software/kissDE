@@ -18,6 +18,7 @@ importFrom("gplots", "heatmap.2")
 importFrom("graphics", "par")
 importFrom("grDevices", "adjustcolor", "dev.off", "palette", "png")
 importFrom("matrixStats", "rowVars")
+import("RCurl")
 importFrom("stats",
             "as.dist", 
             "complete.cases", 
