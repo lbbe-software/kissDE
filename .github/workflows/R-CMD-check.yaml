@@ -97,7 +97,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           install.packages("BiocManager")
-          BiocManager::install("RCurl")
+          BiocManager::install("RCurl",type="binary")
         shell: Rscript {0}
 
       - name: Check
