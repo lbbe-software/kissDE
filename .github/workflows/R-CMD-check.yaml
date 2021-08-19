@@ -98,7 +98,8 @@ jobs:
         run: |
           install.packages("BiocManager")
           BiocManager::install("RCurl",type="binary")
-          install.packages("XML",type="binary")
+          Sys.setenv(LOCAL_CPPFLAGS = "-I/mingw$(WIN)/include/libxml2")
+          install.packages("XML")
         shell: Rscript {0}
 
       - name: Check
