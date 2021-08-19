@@ -48,11 +48,6 @@ jobs:
         run: |
           sudo apt-get install texlive-fonts-extra texlive-lang-european texlive-latex-recommended
           sudo apt-get install libcurl4-openssl-dev
-          
-      - name: Install libraries for Windows
-        if: runner.os == 'Windows'
-        run: |
-          sudo apt-get install libcurl4-openssl-dev
        
       - name: Query dependencies
         run: |
@@ -102,7 +97,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           install.packages("BiocManager")
-          BiocManager::install("RCurl",type="binary")
+          BiocManager::install("RCurl",type="binary",force=TRUE)
           Sys.setenv(LOCAL_CPPFLAGS = "-I/mingw$(WIN)/include/libxml2")
           install.packages("XML")
         shell: Rscript {0}
