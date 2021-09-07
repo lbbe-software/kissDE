@@ -48,14 +48,15 @@ works if \code{counts = 2}.}
 \item{keep}{a character vector listing the names of the events to be kept for
 the statistical test (for \code{k2rg = TRUE}, analyses all of the events by 
 default). The test will be more sensitive the selected events. Event(s) name(s) 
-must be part of this list: deletion, insertion, IR, ES, altA, altD, altAD, alt, 
-unclassified. For more information on this parameter, see Details below.}
+must be part of this list: deletion, insertion, indel, IR, ES, altA, altD, altAD, alt, 
+- (for unclassified events). For more information on this parameter, see Details 
+below.}
 
 \item{remove}{a character vector listing the names of the events to remove
 for the statistical test (for \code{k2rg = TRUE}, does not remove any event by 
 default). The test will be more sensitive for the non-selected events.
-Event(s) name(s) must be part of this list: deletion, insertion, IR, ES, altA, 
-altD, altAD, alt, unclassified, MULTI.
+Event(s) name(s) must be part of this list: deletion, insertion, indel, IR, ES, 
+altA, altD, altAD, alt, - (for unclassified events), MULTI.
 This option can not be used along with the \code{keep} option, unless ES is
 one of the events to be kept. In this case, the \code{remove} option will
 work on specific ES events.
