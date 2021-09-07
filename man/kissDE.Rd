@@ -69,7 +69,6 @@ one of the events to be kept. In this case, the \code{remove} option will
 work on specific ES events.
 For more information on this parameter, see Details in 
 \code{\link{kissplice2counts}}.}
-}
                            
 \item{pvalue}{a numerical value indicating the p-value threshold below which
 the events will be kept in the final data frame.}
@@ -113,6 +112,6 @@ None.
 kissplice2refgenome_file <- system.file("extdata", 
     "output_k2rg_alt_splicing.txt", package="kissDE")
 mySplicingconditions <- c("C1", "C1", "C2", "C2")
-kissDE(fileName=kissplice2refgenome_file, conditions=mySplicingconditions, 
-       output="results.tsv", counts=2, pairedEnd=TRUE, k2rg=TRUE)
+#kissDE(fileName=kissplice2refgenome_file, conditions=mySplicingconditions, 
+#       output="results.tsv", counts=2, pairedEnd=TRUE, k2rg=TRUE)
 }
