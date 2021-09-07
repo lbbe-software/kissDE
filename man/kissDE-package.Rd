@@ -1,6 +1,5 @@
 \name{kissDE-package}
 \alias{kissDE-package}
-\alias{kissDE}
 \docType{package}
 
 \title{Retrieves condition-specific variants in RNA-seq data}
