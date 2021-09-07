@@ -46,6 +46,10 @@ pairs are not in the expected order (see \code{pairedEnd} option).
 It has as many elements as there are samples in total.
 For more information on this parameter, see Details in 
 \code{\link{kissplice2counts}}.}
+       
+\item{exonicReads}{a logical indicating if exonic/intronic read counts will be 
+kept (\code{TRUE}, default) or discareded (\code{FALSE}). This option only 
+works if \code{counts = 2}.}
 
 \item{k2rg}{a logical indicating if the input file is a 
 \code{KisSplice2RefGenome} (\code{TRUE}) output or a 
