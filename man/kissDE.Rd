@@ -1,5 +1,5 @@
 \name{kissDE}
-\alias{kissDEfunc}
+\alias{kissDE}
 
 \title{Run the whole kissDE analysis}
 
