@@ -29,6 +29,12 @@ kissplice2counts(fileName, counts = 0, pairedEnd = FALSE, order = NULL,
 
 writeOutputKissDE(resDiffExprVariant, output, adjPvalMax = 1, dPSImin = 0, 
     writePSI = FALSE)
+         
+kissDE(fileName, conditions, output, counts = 2, pairedEnd = FALSE,
+       order = NULL, exonicReads = TRUE, k2rg = FALSE, keep = c("All"),
+       remove = NULL, pvalue = 1, filterLowCountsVariants = 10,
+       flagLowCountsConditions = 10, technicalReplicates = FALSE,
+       nbCore = 1, adjPvalMax = 1, dPSImin = 0, writePSI = FALSE)
 }
 
 
