@@ -1,5 +1,5 @@
 \name{kissDE}
-\alias{kissDE}
+\alias{kissDEfunc}
 
 \title{Run the whole kissDE analysis}
 
@@ -7,8 +7,7 @@
 \description{This function will sequentially call the
 \code{\link{kissplice2counts}}, \code{\link{diffExpressedVariants}} and
 \code{\link{writeOutputKissDE}} functions in order to run a complete
-kissDE analysis.
-}
+kissDE analysis.}
 
 
 \usage{
