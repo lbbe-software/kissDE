@@ -455,6 +455,27 @@
 
 .modelFit <-function(countsData, n, nr, ASSBinfo, filterLowCountsVariants, 
                     techRep, nbCore){
+    .fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, nbAll){
+
+        ## binomial negative model, with phi DSS
+        nbglmA <- negbin(counts~cond + path, data=eventdata, random=~1, 
+                    fixpar=list(4, phiDSS))
+        nbglmI <- negbin(counts~cond * path, data=eventdata, random=~1, 
+                    fixpar=list(5, phiDSS))
+
+        nbAnov <- anova(nbglmA, nbglmI)
+        nbAIC <- c(AIC(nbglmA, k=log(nbAll))@istats$AIC, 
+                    AIC(nbglmI, k=log(nbAll))@istats$AIC)
+        nbSingHes <- c(nbglmA@singular.hessian, nbglmI@singular.hessian)
+        nbCode <- c(nbglmA@code, nbglmI@code)
+
+        rslts <- c(nbAnov@anova.table$'P(> Chi2)'[2],
+                    nbAIC,
+                    nbCode,
+                    nbSingHes)
+
+        return(rslts)  
+    }
     ##################################################
     ## code chunk number 1: event-list
     ##################################################
