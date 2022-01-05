@@ -562,12 +562,12 @@
     doParallel::registerDoParallel(cl)
     if(techRep) {
         pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables), .packages = c("aod","DSS")) %dopar% 
-            .fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]), 0, nbAll)
+            .fitNBglmModelsDSSPhi(allEventtables[[i]], 0, nbAll)
         pALLGlobalPhiGlmNb <- do.call(rbind.data.frame, pALLGlobalPhiGlmNb_list)
     }
     else {
         pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables), .packages = c("aod","DSS")) %dopar% 
-            .fitNBglmModelsDSSPhi(.addOneCount(allEventtables[[i]]), dispersion(dispData)[i],
+            .fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i],
                 nbAll)
         pALLGlobalPhiGlmNb <- do.call(rbind.data.frame, pALLGlobalPhiGlmNb_list)
     }
