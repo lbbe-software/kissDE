@@ -818,14 +818,20 @@
                         "_repl", i, sep=""))
             }
         } 
+        
         colnames(psiPairCond) <- namesPsiPairCond
         rownames(psiPairCond) <- rownames(signifVariants)
         rownames(sumLowCond) <- rownames(signifVariants)
-        NaNSums <- rowSums((is.na(psiPairCond)) + 0)  ## 1 if NaN, 0 else
+        ucond=unique(sortedconditions)
+        #NaNSums <- rowSums((is.na(psiPairCond)) + 0)  ## 1 if NaN, 0 else
+        NaNSums_C1 <- rowSums((is.na(psiPairCond[,grep(paste("^",ucond[1],"_",sep=""),colnames(psiPairCond))])) + 0)  ## 1+ if NaN, 0 else
+        NaNSums_C2 <- rowSums((is.na(psiPairCond[,grep(paste("^",ucond[2],"_",sep=""),colnames(psiPairCond))])) + 0)  ## 1+ if NaN, 0 else
         
         ## if there are 2 NaN and 3 values for a bcc, nanSums is at 2 when
         ## there are more NaN than nb of column/2, we don't calculate the psi
-        listNaN <- names(NaNSums[which(NaNSums > NCOL(psiPairCond) / 2)])
+        listNaN <- unique(c(names(NaNSums_C1[which(NaNSums_C1 > sum(sortedconditions==ucond[1]) / 2)]), names(NaNSums_C2[which(NaNSums_C2 > sum(sortedconditions==ucond[2]) / 2)])))
+        ## add the PSI in the data frame
+        psi <- merge(psi, psiPairCond, by.x="ID", by.y="row.names")
         psiPairCond[listNaN, ] <- NaN
         
         ## delta psi is the mean of the psis of the 2nd condition 
@@ -838,9 +844,6 @@
         
         deltapsi[, indexdeltapsi] <- deltaPsiCond 
         indexdeltapsi <- indexdeltapsi + 1
-        
-        ## add the PSI in the data frame
-        psi <- merge(psi, psiPairCond, by.x="ID", by.y="row.names")
     }
     
     ## when there are more than 2 conditions, we want to simplify the output:
