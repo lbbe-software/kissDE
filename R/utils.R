@@ -431,24 +431,34 @@
 
 .fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, nbAll){
     
-    ## binomial negative model, with phi DSS
-    nbglmA <- negbin(counts~cond + path, data=eventdata, random=~1, 
-                fixpar=list(4, phiDSS))
-    nbglmI <- negbin(counts~cond * path, data=eventdata, random=~1, 
-                fixpar=list(5, phiDSS))
+  ## binomial negative model, with phi DSS
+  nbglmA <- aodml(counts~cond + path, data=eventdata, phi.formula=~1, 
+                  fixpar=list(4, phiDSS), family = "nb")
+  nbglmI <- aodml(counts~cond * path, data=eventdata, phi.formula=~1, 
+                  fixpar=list(5, phiDSS), family = "nb")
     
-    nbAnov <- anova(nbglmA, nbglmI)
-    nbAIC <- c(AIC(nbglmA, k=log(nbAll))@istats$AIC, 
-                AIC(nbglmI, k=log(nbAll))@istats$AIC)
-    nbSingHes <- c(nbglmA@singular.hessian, nbglmI@singular.hessian)
-    nbCode <- c(nbglmA@code, nbglmI@code)
-    
-    rslts <- c(nbAnov@anova.table$'P(> Chi2)'[2],
-                nbAIC,
-                nbCode,
-                nbSingHes)
-    
-    return(rslts)  
+  if(nbglmA$singular.hessian | nbglmI$singular.hessian) {
+    ed=eventdata
+    l=levels(eventdata$cond)
+    ed$cond=ifelse(ed$cond==l[1],l[2],l[1])
+    nbglmA <- aodml(counts~cond + path, data=ed, phi.formula=~1, 
+                    fixpar=list(4, phiDSS), family = "nb")
+    nbglmI <- aodml(counts~cond * path, data=ed, phi.formula=~1, 
+                    fixpar=list(5, phiDSS), family = "nb")
+  }
+  
+  nbAnov <- anova(nbglmA, nbglmI)
+  nbAIC <- c(AIC.aodml(nbglmA)$AIC, 
+             AIC.aodml(nbglmI)$AIC)
+  nbSingHes <- c(nbglmA$singular.hessian, nbglmI$singular.hessian)
+  nbCode <- c(nbglmA$code, nbglmI$code)
+  
+  rslts <- c(nbAnov$anova.table$`P(>LR stat.)`[2],
+             nbAIC,
+             nbCode,
+             nbSingHes)
+  
+  return(rslts)  
 }
 
 
@@ -561,12 +571,12 @@
     cl <- parallel::makeCluster(nbCore)
     doParallel::registerDoParallel(cl)
     if(techRep) {
-        pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables), .packages = c("aod","DSS")) %dopar% 
+        pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables), .packages = c("aods3","DSS")) %dopar% 
             .fitNBglmModelsDSSPhi(allEventtables[[i]], 0, nbAll)
         pALLGlobalPhiGlmNb <- do.call(rbind.data.frame, pALLGlobalPhiGlmNb_list)
     }
     else {
-        pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables), .packages = c("aod","DSS")) %dopar% 
+        pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables), .packages = c("aods3","DSS")) %dopar% 
             .fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i],
                 nbAll)
         pALLGlobalPhiGlmNb <- do.call(rbind.data.frame, pALLGlobalPhiGlmNb_list)
@@ -818,14 +828,20 @@
                         "_repl", i, sep=""))
             }
         } 
+        
         colnames(psiPairCond) <- namesPsiPairCond
         rownames(psiPairCond) <- rownames(signifVariants)
         rownames(sumLowCond) <- rownames(signifVariants)
-        NaNSums <- rowSums((is.na(psiPairCond)) + 0)  ## 1 if NaN, 0 else
+        ucond=unique(sortedconditions)
+        #NaNSums <- rowSums((is.na(psiPairCond)) + 0)  ## 1 if NaN, 0 else
+        NaNSums_C1 <- rowSums((is.na(psiPairCond[,grep(paste("^",ucond[1],"_",sep=""),colnames(psiPairCond))])) + 0)  ## 1+ if NaN, 0 else
+        NaNSums_C2 <- rowSums((is.na(psiPairCond[,grep(paste("^",ucond[2],"_",sep=""),colnames(psiPairCond))])) + 0)  ## 1+ if NaN, 0 else
         
         ## if there are 2 NaN and 3 values for a bcc, nanSums is at 2 when
         ## there are more NaN than nb of column/2, we don't calculate the psi
-        listNaN <- names(NaNSums[which(NaNSums > NCOL(psiPairCond) / 2)])
+        listNaN <- unique(c(names(NaNSums_C1[which(NaNSums_C1 > sum(sortedconditions==ucond[1]) / 2)]), names(NaNSums_C2[which(NaNSums_C2 > sum(sortedconditions==ucond[2]) / 2)])))
+        ## add the PSI in the data frame
+        psi <- merge(psi, psiPairCond, by.x="ID", by.y="row.names")
         psiPairCond[listNaN, ] <- NaN
         
         ## delta psi is the mean of the psis of the 2nd condition 
@@ -838,9 +854,6 @@
         
         deltapsi[, indexdeltapsi] <- deltaPsiCond 
         indexdeltapsi <- indexdeltapsi + 1
-        
-        ## add the PSI in the data frame
-        psi <- merge(psi, psiPairCond, by.x="ID", by.y="row.names")
     }
     
     ## when there are more than 2 conditions, we want to simplify the output:
