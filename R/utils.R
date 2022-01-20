@@ -431,24 +431,34 @@
 
 .fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, nbAll){
     
-    ## binomial negative model, with phi DSS
-    nbglmA <- negbin(counts~cond + path, data=eventdata, random=~1, 
-                fixpar=list(4, phiDSS))
-    nbglmI <- negbin(counts~cond * path, data=eventdata, random=~1, 
-                fixpar=list(5, phiDSS))
+  ## binomial negative model, with phi DSS
+  nbglmA <- aodml(counts~cond + path, data=eventdata, phi.formula=~1, 
+                  fixpar=list(4, phiDSS), family = "nb")
+  nbglmI <- aodml(counts~cond * path, data=eventdata, phi.formula=~1, 
+                  fixpar=list(5, phiDSS), family = "nb")
     
-    nbAnov <- anova(nbglmA, nbglmI)
-    nbAIC <- c(AIC(nbglmA, k=log(nbAll))@istats$AIC, 
-                AIC(nbglmI, k=log(nbAll))@istats$AIC)
-    nbSingHes <- c(nbglmA@singular.hessian, nbglmI@singular.hessian)
-    nbCode <- c(nbglmA@code, nbglmI@code)
-    
-    rslts <- c(nbAnov@anova.table$'P(> Chi2)'[2],
-                nbAIC,
-                nbCode,
-                nbSingHes)
-    
-    return(rslts)  
+  if(nbglmA$singular.hessian | nbglmI$singular.hessian) {
+    ed=eventdata
+    l=levels(eventdata$cond)
+    ed$cond=ifelse(ed$cond==l[1],l[2],l[1])
+    nbglmA <- aodml(counts~cond + path, data=ed, phi.formula=~1, 
+                    fixpar=list(4, phiDSS), family = "nb")
+    nbglmI <- aodml(counts~cond * path, data=ed, phi.formula=~1, 
+                    fixpar=list(5, phiDSS), family = "nb")
+  }
+  
+  nbAnov <- anova(nbglmA, nbglmI)
+  nbAIC <- c(AIC.aodml(nbglmA)$AIC, 
+             AIC.aodml(nbglmI)$AIC)
+  nbSingHes <- c(nbglmA$singular.hessian, nbglmI$singular.hessian)
+  nbCode <- c(nbglmA$code, nbglmI$code)
+  
+  rslts <- c(nbAnov$anova.table$`P(>LR stat.)`[2],
+             nbAIC,
+             nbCode,
+             nbSingHes)
+  
+  return(rslts)  
 }
 
 
@@ -561,12 +571,12 @@
     cl <- parallel::makeCluster(nbCore)
     doParallel::registerDoParallel(cl)
     if(techRep) {
-        pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables), .packages = c("aod","DSS")) %dopar% 
+        pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables), .packages = c("aods3","DSS")) %dopar% 
             .fitNBglmModelsDSSPhi(allEventtables[[i]], 0, nbAll)
         pALLGlobalPhiGlmNb <- do.call(rbind.data.frame, pALLGlobalPhiGlmNb_list)
     }
     else {
-        pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables), .packages = c("aod","DSS")) %dopar% 
+        pALLGlobalPhiGlmNb_list <- foreach(i=seq_along(allEventtables), .packages = c("aods3","DSS")) %dopar% 
             .fitNBglmModelsDSSPhi(allEventtables[[i]], dispersion(dispData)[i],
                 nbAll)
         pALLGlobalPhiGlmNb <- do.call(rbind.data.frame, pALLGlobalPhiGlmNb_list)
