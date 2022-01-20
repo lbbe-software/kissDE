@@ -79,6 +79,7 @@ jobs:
           install.packages("BiocManager")
           BiocManager::install(c("DESeq2", "DSS"))
           install.packages('tinytex')
+          install.packages('aods3')
           tinytex::parse_install(text = "! LaTeX Error: File `authblk.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `soul.sty' not found.")
           tinytex::parse_install(text = "! LaTeX Error: File `placeins.sty' not found.")
