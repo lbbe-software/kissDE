@@ -151,7 +151,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     
     ## Less important info
     dfAddInfo <- resK2RG[,c(16,14,6:8,13,12,18,10,22,23)]
-    colnames(dfAddInfo) <- c("ID","ComplexEvent","VariablePartLength","Frameshift?","inCDS?","Paralogs?","upperPathSS","lowerPathSS","unkownSS","SS_IR","NormalisedCounts")
+    colnames(dfAddInfo) <- c("ID","ComplexEvent","VariablePartLength","Frameshift","inCDS","Paralogs","upperPathSS","lowerPathSS","unkownSS","SS_IR","NormalisedCounts")
     ## Merge
     PSItable <- merge(dfInfo,PSItable,by=1,all.x=F,all.y=T)
     diffTable <- merge(dfAddInfo,diffTable,by=1,all.x=F,all.y=T)
@@ -237,6 +237,42 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
                                                                               )
                                                        )
                                                        ),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
                                                        br(),
                                                        DT::dataTableOutput('selectedPointsPCA')
                                              )
@@ -331,6 +367,41 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
                                                                                 )
                                                          )
                                                          ),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
+                                                         br(),
                                                          br(),
                                                          DT::dataTableOutput('selectedPoints')
                                                )
@@ -531,7 +602,8 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     
     output$PCAplot <- renderPlot({
       PCAplot()[[2]]
-    })
+    },
+    height = 1000)
     
     output$selectedPointsPCA <- DT::renderDataTable({
       data <- PCAplot()[[1]]
@@ -566,6 +638,8 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
       }
       cdata <- plotData$data
       if(input$plotDensity) {
+        xLab <- "x"
+        yLab <- "y"
         n <- length(input$plotXdensity)
         if(!is.na(res$k2rgRes)) {
           data <- data.frame(ID=rep(cdata$ID,n),
@@ -600,6 +674,8 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
           stat_summary(fun=median, geom="point", fill="white", shape=23, size=1)
       } else {
         data <- cdata
+        xLab <- input$plotX
+        yLab <- input$plotY
         if(input$plotXtrans!="None") {
           minVal <- min(data[[input$plotX]][data[[input$plotX]]!=0])
           data[[input$plotX]][data[[input$plotX]]==0]=minVal
@@ -622,8 +698,6 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
         if(input$plotYgroup!="None") {
           data$wrapY <- data[[input$plotYgroup]]
         }
-        g<-ggplot(data = data, aes_string(x=input$plotX,y=input$plotY))+
-          theme_bw()
         if(input$plotX%in%colDiffDiscrete) {
           g <- ggplot(data = data, aes_string(x=input$plotX,y=input$plotY,fill=input$plotX))+
             theme_bw()+
@@ -633,7 +707,8 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
             stat_summary(fun=mean, geom="point", color="black", size=2)+
             stat_summary(fun=median, geom="point", fill="white", shape=23, size=1)
         } else {
-          g <- g+
+          g <- ggplot(data = data, aes_string(x=input$plotX,y=input$plotY))+
+            theme_bw()+
             geom_point(stroke=0.15,shape=21)
         }
       }
@@ -649,14 +724,37 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
         g <- g+
           facet_wrap(wrapY~.)
       }
-      g
+      list(data,xLab,yLab,g)
     })
     
     output$Plot <- renderPlot({
-      Plot()
+      Plot()[[4]]
     },height = 1000)
+    
+    output$selectedPoints <- DT::renderDataTable({
+      lData <- Plot()
+      data <- lData[[1]]
+      xLab <- lData[[2]]
+      yLab <- lData[[3]]
+      dataToShow <- data
+      if (!is.null(input$plotBrush)){
+        dataToShow <- brushedPoints(data, input$plotBrush)
+      } else if (!is.null(input$plotClick)){
+        dataToShow <- nearPoints(data, input$plotClick)
+      }
+      if(!input$plotDensity) {
+        dataToShow <- dataToShow[,-which(colnames(dataToShow)%in%input$fCol)]
+      }
+      DT::datatable(dataToShow, rownames = FALSE,
+                    options = list(scrollX = TRUE),
+                    caption = 'Select points on the plot to show them in this table.')
+    })
   }
-  
+
   shinyApp(ui, server)
 }
 
+xmin=0.02
+xmax=1.03
+ymin=0
+ymax=1.01
