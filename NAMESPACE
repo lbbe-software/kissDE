@@ -28,6 +28,7 @@ importFrom("ade4","dudi.pca")
 import("shiny")
 import("factoextra")
 import("shinycssloaders")
+import("DT")
 
 export(diffExpressedVariants,
         kissplice2counts,
