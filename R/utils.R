@@ -447,7 +447,7 @@
                     fixpar=list(5, phiDSS), family = "nb")
   }
   
-  nbAnov <- anova(nbglmA, nbglmI)
+  nbAnov <- stats::anova(nbglmA, nbglmI)
   nbAIC <- c(AIC.aodml(nbglmA)$AIC, 
              AIC.aodml(nbglmI)$AIC)
   nbSingHes <- c(nbglmA$singular.hessian, nbglmI$singular.hessian)

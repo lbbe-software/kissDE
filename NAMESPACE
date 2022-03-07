@@ -19,6 +19,7 @@ importFrom("graphics", "par")
 importFrom("grDevices", "adjustcolor", "dev.off", "palette", "png")
 importFrom("matrixStats", "rowVars")
 importFrom("stats",
+            "anova",
             "as.dist", 
             "complete.cases", 
             "cor", 
