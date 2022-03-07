@@ -26,6 +26,8 @@ writeOutputKissDE <- function(resDiffExprVariant, output, adjPvalMax=1,
     
     k2rgFile <- resDiffExprVariant$k2rgFile
     
+    resDiffExprVariant$k2rgRes <- NA
+    
     if (writePSI) {
         .writePSITable(resDiffExprVariant, adjPvalMax, dPSImin, output)
     } else {
@@ -35,6 +37,9 @@ writeOutputKissDE <- function(resDiffExprVariant, output, adjPvalMax=1,
         } else {
             .writeMergeOutput(resDiffExprVariant, k2rgFile, adjPvalMax, 
                 dPSImin, output)
+            resDiffExprVariant$k2rgRes <- output
         }
     }
+    
+    saveRDS(resDiffExprVariant,paste(output,"rds",sep="."))
 }
