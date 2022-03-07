@@ -7,13 +7,7 @@ importFrom("DESeq2",
             "sizeFactors",
             "sizeFactors<-")
 importFrom("DSS", "dispersion", "estDispersion", "newSeqCountSet")
-importFrom("ggplot2", 
-            "ggplot", 
-            "aes_string", 
-            "geom_point", 
-            "xlab", 
-            "ylab", 
-            "ggsave")
+import("ggplot2")
 importFrom("gplots", "heatmap.2")
 importFrom("graphics", "par")
 importFrom("grDevices", "adjustcolor", "dev.off", "palette", "png")
@@ -30,11 +24,17 @@ importFrom("utils", "tail", "write.table")
 importFrom("foreach", "foreach", "%dopar%")
 importFrom("doParallel", "registerDoParallel")
 importFrom("parallel", "detectCores")
+importFrom("ade4","dudi.pca")
+import("shiny")
+import("factoextra")
+import("shinycssloaders")
 
 export(diffExpressedVariants,
         kissplice2counts,
         qualityControl,
-        writeOutputKissDE)
+        writeOutputKissDE,
+       kissDE,
+       exploreResults)
 
 S3method("print", "countsData")
 S3method("print", "pval")
