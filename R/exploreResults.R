@@ -420,6 +420,8 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     
     PSIcol <- grep("_repl\\d+",colnames(PSItable))
     
+    cDataPSI <- reactiveValues(data = NULL)
+    cDataDiff <- reactiveValues(data = NULL)
     
     # Keep only the selected PSI lines
     dataPSI <- reactive({
@@ -448,7 +450,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
           data <- data[data$EventPosition!="multiple",]
         }
       }
-      cDataPSI <<- data
+      cDataPSI$data <- data
       data
     })
     
@@ -496,7 +498,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
           data <- data[data$EventPosition!="multiple",]
         }
       }
-      cDataDiff <<- data
+      cDataDiff$data <- data
       data <- data[,-which(colnames(data)%in%input$fCol)]
       data
     })
@@ -557,6 +559,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
                               contrib = NULL)
     
     observeEvent(input$aPCA,{
+      cDataPSI <- cDataPSI$data
       m <- as.matrix(cDataPSI[,PSIcol])
       rownames(m) <- cDataPSI$ID
       if(!is.na(res$k2rgRes)) {
@@ -624,7 +627,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     plotData <- reactiveValues(data = NULL)
     
     observeEvent(input$aPlot,{
-      data <- cDataDiff
+      data <- cDataDiff$data
       if(!is.na(res$k2rgRes)) {
         data$EventType[grep(",",data$EventType)] <- unlist(lapply(strsplit(data$EventType[grep(",",data$EventType)],","),"[[",1))
         data$Biotype[grep("protein_coding",data$Biotype)] <- "protein_coding"
@@ -725,7 +728,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
             geom_point(stroke=0.15)+
             scale_color_manual(values = cols)+
             scale_shape_manual(values=pchs)+
-            guides(color=F,shape=F)
+            guides(color="none",shape="none")
         }
       }
       if(input$plotXgroup!="None") {
