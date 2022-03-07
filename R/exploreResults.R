@@ -754,7 +754,3 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
   shinyApp(ui, server)
 }
 
-xmin=0.02
-xmax=1.03
-ymin=0
-ymax=1.01
