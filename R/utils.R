@@ -566,6 +566,37 @@
     ###################################################
     ### code chunk number 6: pALLGlobalPhi.glm.nb
     ###################################################
+    .fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, nbAll){
+      
+      ## binomial negative model, with phi DSS
+      nbglmA <- aodml(counts~cond + path, data=eventdata, phi.formula=~1, 
+                      fixpar=list(4, phiDSS), family = "nb")
+      nbglmI <- aodml(counts~cond * path, data=eventdata, phi.formula=~1, 
+                      fixpar=list(5, phiDSS), family = "nb")
+      
+      if(nbglmA$singular.hessian | nbglmI$singular.hessian) {
+        ed=eventdata
+        l=levels(eventdata$cond)
+        ed$cond=ifelse(ed$cond==l[1],l[2],l[1])
+        nbglmA <- aodml(counts~cond + path, data=ed, phi.formula=~1, 
+                        fixpar=list(4, phiDSS), family = "nb")
+        nbglmI <- aodml(counts~cond * path, data=ed, phi.formula=~1, 
+                        fixpar=list(5, phiDSS), family = "nb")
+      }
+      
+      nbAnov <- anova(nbglmA, nbglmI)
+      nbAIC <- c(AIC.aodml(nbglmA)$AIC, 
+                 AIC.aodml(nbglmI)$AIC)
+      nbSingHes <- c(nbglmA$singular.hessian, nbglmI$singular.hessian)
+      nbCode <- c(nbglmA$code, nbglmI$code)
+      
+      rslts <- c(nbAnov$anova.table$`P(>LR stat.)`[2],
+                 nbAIC,
+                 nbCode,
+                 nbSingHes)
+      
+      return(rslts)  
+    }
     pALLGlobalPhiGlmNb <- data.frame(t(rep(NA, 7)))
     ## create the cluster
     cl <- parallel::makeCluster(nbCore)
@@ -623,6 +654,37 @@
         ###################################################
         ###  code chunk number 4: Pseudo-counts
         ###################################################
+        .fitNBglmModelsDSSPhi <- function(eventdata, phiDSS, nbAll){
+          
+          ## binomial negative model, with phi DSS
+          nbglmA <- aodml(counts~cond + path, data=eventdata, phi.formula=~1, 
+                          fixpar=list(4, phiDSS), family = "nb")
+          nbglmI <- aodml(counts~cond * path, data=eventdata, phi.formula=~1, 
+                          fixpar=list(5, phiDSS), family = "nb")
+          
+          if(nbglmA$singular.hessian | nbglmI$singular.hessian) {
+            ed=eventdata
+            l=levels(eventdata$cond)
+            ed$cond=ifelse(ed$cond==l[1],l[2],l[1])
+            nbglmA <- aodml(counts~cond + path, data=ed, phi.formula=~1, 
+                            fixpar=list(4, phiDSS), family = "nb")
+            nbglmI <- aodml(counts~cond * path, data=ed, phi.formula=~1, 
+                            fixpar=list(5, phiDSS), family = "nb")
+          }
+          
+          nbAnov <- anova(nbglmA, nbglmI)
+          nbAIC <- c(AIC.aodml(nbglmA)$AIC, 
+                     AIC.aodml(nbglmI)$AIC)
+          nbSingHes <- c(nbglmA$singular.hessian, nbglmI$singular.hessian)
+          nbCode <- c(nbglmA$code, nbglmI$code)
+          
+          rslts <- c(nbAnov$anova.table$`P(>LR stat.)`[2],
+                     nbAIC,
+                     nbCode,
+                     nbSingHes)
+          
+          return(rslts)  
+        }
         singhes <- which(rowSums(matrixpALLGlobalPhi[, c(6, 7)]) != 0)
         
         singhes_n <- names(singhes)
@@ -1087,6 +1149,10 @@
                                     y = finalAndPsiTable,
                                     by.x = 1,
                                     by.y = 0)
+    finalAndPsiTable.signi <- finalAndPsiTable[!is.na(finalAndPsiTable$Adjusted_pvalue) & finalAndPsiTable$Adjusted_pvalue<=0.05,]
+    finalAndPsiTable.ns <- finalAndPsiTable[is.na(finalAndPsiTable$Adjusted_pvalue) | finalAndPsiTable$Adjusted_pvalue>0.05,]
+    finalAndPsiTable <- finalAndPsiTable.signi[order(-abs(finalAndPsiTable.signi$`Deltaf/DeltaPSI`)),]
+    finalAndPsiTable <- rbind(finalAndPsiTable, finalAndPsiTable.ns[order(finalAndPsiTable.ns$Adjusted_pvalue, -abs(finalAndPsiTable.ns$`Deltaf/DeltaPSI`)),])
     writeLines(paste(finalAndPsiTable[, 2], finalAndPsiTable[, 3],
             finalAndPsiTable[, 4], finalAndPsiTable[, 5], 
             finalAndPsiTable[, 6],finalAndPsiTable[, 7], sep="\t"), fOut)
@@ -1173,4 +1239,27 @@
     }
   }
   return(wEvents)
+}
+
+.ShinyPCA <- function(m, a1, a2, n) {
+  # m = matrix of value
+  # a1 = first axis of the PCA
+  # a2 = second axis of the PCA
+  # n = number of most variable instance to use (0 for all)
+  # return a data.frame from ade4 dudi.pca function
+  
+  # 1) filter incomplete cases
+  m <- m[complete.cases(m),]
+  
+  # 2) select the instances
+  if(n!=0) {
+    m.var <- apply(m,1,var)
+    m <- m[order(m.var),]
+    m <- head(m,n)
+  }
+  
+  # 3) do dudi.pca
+  pca <- dudi.pca(t(m), scannf=FALSE, nf=a2)
+  
+  return(pca)
 }
