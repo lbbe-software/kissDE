@@ -19,8 +19,10 @@ importFrom("stats",
             "cor", 
             "p.adjust",
             "prcomp",
-            "reshape")
-importFrom("utils", "tail", "write.table")
+            "reshape",
+           "median",
+           "var")
+importFrom("utils", "tail", "write.table","head","read.table")
 importFrom("foreach", "foreach", "%dopar%")
 importFrom("doParallel", "registerDoParallel")
 importFrom("parallel", "detectCores")
