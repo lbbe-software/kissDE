@@ -4,10 +4,11 @@
 \title{Run the whole kissDE analysis}
 
 
-\description{This function will sequentially call the
-\code{\link{kissplice2counts}}, \code{\link{diffExpressedVariants}} and
-\code{\link{writeOutputKissDE}} functions in order to run a complete
-kissDE analysis.}
+\description{This function will sequentially call the 
+\code{\link{kissplice2counts}}, \code{\link{diffExpressedVariants}} and 
+\code{\link{writeOutputKissDE}} functions in order to run a complete 
+kissDE analysis. It may also call the \code{\link{qualityControl}} and 
+the \code{\link{exploreResults}} functions.}
 
 
 \usage{
@@ -15,7 +16,7 @@ kissDE(fileName, conditions, output, counts = 2, pairedEnd = FALSE,
        order = NULL, exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL,
        pvalue = 1, filterLowCountsVariants = 10, flagLowCountsConditions = 10,
        technicalReplicates = FALSE, nbCore = 1, adjPvalMax = 1, dPSImin = 0,
-       writePSI = FALSE)
+       writePSI = FALSE, doQualityControl = TRUE, resultsInShiny=TRUE)
 }
 
 
@@ -103,6 +104,10 @@ higher than this threshold will be kept in the output file.}
 
 \item{writePSI}{a boolean indicating if the user wants the f/PSI table to be
 printed (\code{TRUE}) instead of the final table (\code{FALSE}, default).}
+
+\item{doQualityControl}{a boolean indicating if the user wants quality control plots to be written in the output folder (\code{TRUE}, default) or not (\code{FALSE}). See details in \code{\link{qualityControl}}.}
+
+\item{resultsInShiny}{a boolean indicating if the user wants the results to be printed in a Shiny application (\code{TRUE}, default) or not (\code{FALSE}). See details in \code{\link{exploreResults}}.}
 }
 
 

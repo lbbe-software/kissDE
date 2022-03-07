@@ -2,7 +2,7 @@
 \alias{writeOutputKissDE}
 
 \title{Create and store the output of the \code{\link{diffExpressedVariants}}
-function in a file.}
+function in a file and in a rds object.}
 
 
 \description{If a \code{KisSplice} fasta file was used as input for the 
@@ -21,6 +21,10 @@ PSI computed from normalized counts, adjusted p-value, deltaPSI and a boolean
 indicating if the splicing event/SNV was sufficiently expressed in at least 
 half of the conditions (controled by the \code{flagLowCountsConditions} option 
 from the \code{\link{diffExpressedVariants}} function).
+
+In both cases, an rds object is saved in the output folder, that can be used to 
+explore the results of kissDE through a Shiny application with the 
+\code{\link{exploreResults}} function.
 }
 
 
