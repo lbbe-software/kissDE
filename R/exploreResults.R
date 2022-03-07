@@ -355,6 +355,8 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
                                                                              selectInput("plotY","Choose the values to print on the y-axis:",choices = colDiffContinuous, multiple = F,selected = "Adjusted_pvalue")),
                                                             radioButtons("plotXtrans","Transformation to use for the x-axis:",choices = c("None","log10","-log10"),selected = "None"),
                                                             radioButtons("plotYtrans","Transformation to use for the y-axis:",choices = c("None","log10","-log10"),selected = "-log10"),
+                                                            numericInput("plotFDR","Maximum adjusted p-value (FDR) to highlight a point:",min = 0,max = 1,value = 0.05,step = 0.001),
+                                                            numericInput("plotDPSI","Minimum absolute deltaPSI value to highlight a point:",min = 0,max = 100,value = 10,step=1),
                                                             selectInput("plotXgroup","Horizontal wrap:",choices = c("None",colDiffDiscrete), selected = "EventType"),
                                                             selectInput("plotYgroup","Vertical wrap:",choices = c("None",colDiffDiscrete))
                                                ),
@@ -674,6 +676,14 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
           stat_summary(fun=median, geom="point", fill="white", shape=23, size=1)
       } else {
         data <- cdata
+        data$pch <- ifelse(data$Adjusted_pvalue<=input$plotFDR,"19","1")
+        data$col <- ifelse(data$pch=="1","black",
+                           ifelse(data$DeltaPSI<=(-input$plotDPSI),"blue",
+                                  ifelse(data$DeltaPSI>=input$plotDPSI,"red","black")
+                           )
+        )
+        cols <- c("black"="black","blue"="blue","red"="red")
+        pchs <- c("1"=1,"19"=19)
         xLab <- input$plotX
         yLab <- input$plotY
         if(input$plotXtrans!="None") {
@@ -707,9 +717,15 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
             stat_summary(fun=mean, geom="point", color="black", size=2)+
             stat_summary(fun=median, geom="point", fill="white", shape=23, size=1)
         } else {
-          g <- ggplot(data = data, aes_string(x=input$plotX,y=input$plotY))+
+          print(head(data))
+          print(tail(data))
+          print(table(data$pch))
+          g <- ggplot(data = data, aes_string(x=input$plotX,y=input$plotY,shape="pch",color="col"))+
             theme_bw()+
-            geom_point(stroke=0.15,shape=21)
+            geom_point(stroke=0.15)+
+            scale_color_manual(values = cols)+
+            scale_shape_manual(values=pchs)+
+            guides(color=F,shape=F)
         }
       }
       if(input$plotXgroup!="None") {
