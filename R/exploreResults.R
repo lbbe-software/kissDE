@@ -44,13 +44,13 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
       stop(paste("Input error: a k2rgRes file is provided but 'rdsFile' \"",rdsFile,"\" result from a kissDE run without a k2rg file. You may want to run kissplice2refgenome prior to kissDE to annotate the alternative splicing events."))
     }
     res$k2rgRes <- k2rgRes
-    resK2RG <- read.table(res$k2rgRes, sep="\t", comment.char = "", h=T)
+    resK2RG <- read.table(res$k2rgRes, sep="\t", comment.char = "", header = T)
   } else {
     if(is.na(res$k2rgRes)) {
       warning(paste("rds file \"",rdsFile,"\" have no kissplice2refgenome file associated with it. You may want to run kissplice2refgenome prior to kissDE to annotate the alternative splicing events.",sep=""))
       resK2RG <- NA
     } else {
-      resK2RG <- read.table(res$k2rgRes, sep="\t", comment.char = "", h=T)
+      resK2RG <- read.table(res$k2rgRes, sep="\t", comment.char = "", header = T)
     }
   }
   
@@ -597,7 +597,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
                          y=data[[paste("Axis",a2,sep="")]],
                          group=data$group,
                          label=data$label)
-      g<-ggplot(data=data, aes(x=x, y=y, colour=group, label=label))+
+      g<-ggplot(data=data, aes_string(x="x", y="y", colour="group", label="label"))+
         geom_hline(yintercept = 0,size=0.3)+
         geom_vline(xintercept = 0,size=0.3)+
         geom_point(size=3,stroke=0.2)+
@@ -753,8 +753,8 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     output$selectedPoints <- DT::renderDataTable({
       lData <- Plot()
       data <- lData[[1]]
-      xLab <- lData[[2]]
-      yLab <- lData[[3]]
+      #xLab <- lData[[2]]
+      #yLab <- lData[[3]]
       dataToShow <- data
       if (!is.null(input$plotBrush)){
         dataToShow <- brushedPoints(data, input$plotBrush)

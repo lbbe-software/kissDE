@@ -27,10 +27,15 @@ importFrom("foreach", "foreach", "%dopar%")
 importFrom("doParallel", "registerDoParallel")
 importFrom("parallel", "detectCores")
 importFrom("ade4","dudi.pca")
-import("shiny")
-import("factoextra")
-import("shinycssloaders")
-import("DT")
+importFrom("shiny","selectizeInput","actionButton","br","brushOpts","brushedPoints","checkboxGroupInput",
+           "checkboxInput","column","conditionalPanel","downloadButton","downloadHandler",
+           "fluidPage","fluidRow","h1","h2","mainPanel","navbarPage","nearPoints",
+           "numericInput","observeEvent","p","plotOutput","radioButtons","reactive",
+           "reactiveValues","renderPlot","renderUI","selectInput","shinyApp","sidebarLayout",
+           "sidebarPanel","sliderInput","strong","tabPanel","tagList","uiOutput","wellPanel")
+importFrom("factoextra","get_pca_var")
+importFrom("shinycssloaders","withSpinner")
+importFrom("DT","renderDataTable","dataTableOutput","datatable")
 
 export(diffExpressedVariants,
         kissplice2counts,
