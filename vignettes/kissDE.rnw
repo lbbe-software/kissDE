@@ -1137,6 +1137,34 @@ writeOutputKissDE(myResults_AS, output = "results_table.tab")
 writeOutputKissDE(myResults_AS, output = "psi_table.tab", writePSI = TRUE)
 @
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Explore results}
+
+The \Rfunction{writeOutputKissDE} function also write an \Rcode{rds} file in the
+output directory, with a \Rcode{.rds} extension. This file can be inputed in the
+\Rfunction{exploreResults} function in order to explore and plot the results of
+\kde through a Shiny interface:
+
+<<snv_export_result, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
+exploreResults(rdsFile = "results_table.tab.rds")
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{One command to rule them all}
+
+All of \kde R command line can be run at once with the \Rfunction{kissDE}
+function.
+
+<<snv_export_result, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
+fileInAS <- system.file("extdata", "output_k2rg_alt_splicing.txt",
+    package = "kissDE")
+myConditions_AS <- c(rep("SKNSH",2), rep("SKNSH-RA",2))
+kissDE(fileName = fileInAS, conditions = myConditions_AS, 
+       output = "results_table.tab", counts = 2, pairedEnd = TRUE, k2rg = TRUE,
+       exonicReads = FALSE, writePSI = TRUE, doQualityControl = TRUE,
+       resultsInShiny = TRUE)
+@
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1298,6 +1326,34 @@ are saved in a \file{final_table_significants.tab} file, with the
 <<snv_export_result, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
 writeOutputKissDE(myResults_SNV, output = "final_table_significants.tab", 
     adjPvalMax = 0.05)
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Explore results}
+
+The \Rfunction{writeOutputKissDE} function also write an \Rcode{rds} file in the
+output directory, with a \Rcode{.rds} extension. This file can be inputed in the
+\Rfunction{exploreResults} function in order to explore and plot the results of
+\kde through a Shiny interface:
+
+<<snv_export_result, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
+exploreResults(rdsFile = "final_table_significants.tab.rds")
+@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{One command to rule them all}
+
+All of \kde R command line can be run at once with the \Rfunction{kissDE}
+function.
+
+<<snv_export_result, fig=FALSE, eval=FALSE, keep.source=FALSE>>=
+fileInSNV <- system.file("extdata", "output_kissplice_SNV.fa", 
+    package = "kissDE")
+myConditions_SNV <- c(rep("TSC",2), rep("CEU",2))
+kissDE(fileName = fileInSNV, conditions = myConditions_SNV, 
+       output = "results_table.tab", counts = 2, pairedEnd = TRUE, k2rg = TRUE,
+       exonicReads = FALSE, writePSI = TRUE, doQualityControl = TRUE,
+       resultsInShiny = TRUE)
 @
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
