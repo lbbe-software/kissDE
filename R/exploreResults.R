@@ -152,7 +152,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     ## Less important info
     dfAddInfo <- resK2RG[,c(16,14,6:8,13,12,18,10,22,23)]
     colnames(dfAddInfo) <- c("ID","ComplexEvent","VariablePartLength","Frameshift","inCDS","Paralogs","upperPathSS","lowerPathSS","unkownSS","SS_IR","NormalisedCounts")
-    asNumCompEvents <- as.numeric(dfAddInfo$ComplexEvent)
+    asNumCompEvents <- as.numeric(dfAddInfo$ComplexEvent[dfAddInfo$ComplexEvent!="-"])
     dfAddInfo$ComplexEvent <- factor(dfAddInfo$ComplexEvent, levels = c("-",as.character(unique(sort(asNumCompEvents)))))
     ## Merge
     PSItable <- merge(dfInfo,PSItable,by=1,all.x=F,all.y=T)
