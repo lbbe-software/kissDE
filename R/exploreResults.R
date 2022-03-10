@@ -152,6 +152,8 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     ## Less important info
     dfAddInfo <- resK2RG[,c(16,14,6:8,13,12,18,10,22,23)]
     colnames(dfAddInfo) <- c("ID","ComplexEvent","VariablePartLength","Frameshift","inCDS","Paralogs","upperPathSS","lowerPathSS","unkownSS","SS_IR","NormalisedCounts")
+    asNumCompEvents <- as.numeric(dfAddInfo$ComplexEvent)
+    dfAddInfo$ComplexEvent <- factor(dfAddInfo$ComplexEvent, levels = c("-",as.character(unique(sort(asNumCompEvents)))))
     ## Merge
     PSItable <- merge(dfInfo,PSItable,by=1,all.x=F,all.y=T)
     diffTable <- merge(dfAddInfo,diffTable,by=1,all.x=F,all.y=T)
@@ -627,7 +629,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     plotData <- reactiveValues(data = NULL)
     
     observeEvent(input$aPlot,{
-      data <- cDataDiff$data
+      data <- cDataDiff$data[input[["diffTable_rows_all"]],]
       if(!is.na(res$k2rgRes)) {
         data$EventType[grep(",",data$EventType)] <- unlist(lapply(strsplit(data$EventType[grep(",",data$EventType)],","),"[[",1))
         data$Biotype[grep("protein_coding",data$Biotype)] <- "protein_coding"
@@ -720,9 +722,6 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
             stat_summary(fun=mean, geom="point", color="black", size=2)+
             stat_summary(fun=median, geom="point", fill="white", shape=23, size=1)
         } else {
-          print(head(data))
-          print(tail(data))
-          print(table(data$pch))
           g <- ggplot(data = data, aes_string(x=input$plotX,y=input$plotY,shape="pch",color="col"))+
             theme_bw()+
             geom_point(stroke=0.15)+
