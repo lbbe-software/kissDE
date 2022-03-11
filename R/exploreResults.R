@@ -11,7 +11,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     stop("Input error: 'rdsFile' must be a character.")
   }
   
-  if(strsplit(rdsFile,split = "\\.")[[1]][-1]!="rds") {
+  if(tail(strsplit(rdsFile,split = "\\.")[[1]],n=1)!="rds") {
     stop(paste("Input error: 'rdsFile' \"",rdsFile, "\" does not have the \".rds\" extension. Is that a kissDE result rds file?" , sep=""))
   }
   
