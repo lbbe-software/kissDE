@@ -191,97 +191,6 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     title="KissDE results",
     
     navbarPage(paste(C1," vs ",C2,sep=""),
-               tabPanel("PSI table",
-                        fluidRow(
-                          column(width=12,
-                                 h1(strong("kissDE PSIs for each ASE")),
-                                 sidebarLayout(position="right",
-                                               sidebarPanel(h2("Filter Events"),
-                                                            width = 3,
-                                                            
-                                                            checkboxInput("fCompleteCases", "Only show complete cases (filter ASE with one or more NA PSI value)", F),
-                                                            keepPanelEvents,
-                                                            filterPanelEvents,
-                                                            keepPanelBiotypes,
-                                                            filterPanelBiotypes,
-                                                            filterPanelRepeats
-                                               ),
-                                               mainPanel(width=9,
-                                                         tagList(
-                                                           DT::dataTableOutput('PSItable')
-                                                         )
-                                               )
-                                 )
-                                 
-                          ),
-                          column(width=6,
-                                 downloadButton("dlPSI","Download the printed Dataset")
-                          )
-                        ),
-                        column(width=12,
-                               h1("PCA analysis on the selected lines"),
-                               sidebarLayout(position="right",
-                                             sidebarPanel(h2("PCA parameters"),
-                                                          width=3,
-                                                          numericInput("PCA1","Choose the PC for the x-axis:",value = 1,min = 1,max=nC-1,step = 1),
-                                                          uiOutput("PCA2")
-                                             ),
-                                             mainPanel(width=9,
-                                                       radioButtons("PCAtype","Choose the input data for the PCA:",choiceNames = c("All ASE","n most variables ASE"), choiceValues = c("all","n")),
-                                                       conditionalPanel("input.PCAtype == 'n'",
-                                                                        numericInput("PCAn",label = "Number of most variable ASE to use:",value = 500,min=2,step=1)
-                                                       ),
-                                                       actionButton("aPCA","Update PCA"),
-                                                       withSpinner(plotOutput('PCAplot',
-                                                                              click = "plotClickPCA",
-                                                                              brush = brushOpts(
-                                                                                id = "plotBrushPCA"
-                                                                              )
-                                                       )
-                                                       ),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       br(),
-                                                       DT::dataTableOutput('selectedPointsPCA')
-                                             )
-                               )
-                        )
-               ),
-               
                tabPanel("Differential anakysis",
                         fluidRow(
                           column(width=12,
@@ -413,6 +322,98 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
                           )
                         )
                         
+               ),
+               
+               
+               tabPanel("PSI table",
+                        fluidRow(
+                          column(width=12,
+                                 h1(strong("kissDE PSIs for each ASE")),
+                                 sidebarLayout(position="right",
+                                               sidebarPanel(h2("Filter Events"),
+                                                            width = 3,
+                                                            
+                                                            checkboxInput("fCompleteCases", "Only show complete cases (filter ASE with one or more NA PSI value)", F),
+                                                            keepPanelEvents,
+                                                            filterPanelEvents,
+                                                            keepPanelBiotypes,
+                                                            filterPanelBiotypes,
+                                                            filterPanelRepeats
+                                               ),
+                                               mainPanel(width=9,
+                                                         tagList(
+                                                           DT::dataTableOutput('PSItable')
+                                                         )
+                                               )
+                                 )
+                                 
+                          ),
+                          column(width=6,
+                                 downloadButton("dlPSI","Download the printed Dataset")
+                          )
+                        ),
+                        column(width=12,
+                               h1("PCA analysis on the selected lines"),
+                               sidebarLayout(position="right",
+                                             sidebarPanel(h2("PCA parameters"),
+                                                          width=3,
+                                                          numericInput("PCA1","Choose the PC for the x-axis:",value = 1,min = 1,max=nC-1,step = 1),
+                                                          uiOutput("PCA2")
+                                             ),
+                                             mainPanel(width=9,
+                                                       radioButtons("PCAtype","Choose the input data for the PCA:",choiceNames = c("All ASE","n most variables ASE"), choiceValues = c("all","n")),
+                                                       conditionalPanel("input.PCAtype == 'n'",
+                                                                        numericInput("PCAn",label = "Number of most variable ASE to use:",value = 500,min=2,step=1)
+                                                       ),
+                                                       actionButton("aPCA","Update PCA"),
+                                                       withSpinner(plotOutput('PCAplot',
+                                                                              click = "plotClickPCA",
+                                                                              brush = brushOpts(
+                                                                                id = "plotBrushPCA"
+                                                                              )
+                                                       )
+                                                       ),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       br(),
+                                                       DT::dataTableOutput('selectedPointsPCA')
+                                             )
+                               )
+                        )
                )
     )
     
