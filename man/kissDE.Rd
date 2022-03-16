@@ -16,7 +16,7 @@ kissDE(fileName, conditions, output, counts = 2, pairedEnd = FALSE,
        order = NULL, exonicReads = TRUE, k2rg = FALSE, keep = c("All"), remove = NULL,
        pvalue = 1, filterLowCountsVariants = 10, flagLowCountsConditions = 10,
        technicalReplicates = FALSE, nbCore = 1, adjPvalMax = 1, dPSImin = 0,
-       writePSI = FALSE, doQualityControl = TRUE, resultsInShiny=TRUE)
+       writePSI = TRUE, doQualityControl = TRUE, resultsInShiny=TRUE)
 }
 
 
@@ -103,7 +103,7 @@ SNVs/splicing events having an absolute value of deltaf/deltaPSI
 higher than this threshold will be kept in the output file.}
 
 \item{writePSI}{a boolean indicating if the user wants the f/PSI table to be
-printed (\code{TRUE}) instead of the final table (\code{FALSE}, default).}
+printed (\code{TRUE}, default) along with the final table (\code{FALSE}).}
 
 \item{doQualityControl}{a boolean indicating if the user wants quality control plots to be written in the output folder (\code{TRUE}, default) or not (\code{FALSE}). See details in \code{\link{qualityControl}}.}
 
