@@ -770,6 +770,6 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     })
   }
 
-  shinyApp(ui, server)
+  shinyApp(ui, server, options = list(port=3838))
 }
 
