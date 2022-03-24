@@ -136,10 +136,26 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
         d <- dfSS[i,]
         chrom <- d$chrom
         cBloc <- strsplit(d$mergeUniqSS,split = ",")[[1]]
-        cAltBloc <- paste(chrom,":",cBloc[1],"-",cBloc[2],sep="")
+        a1=0
+        e1=0
+        if(length(grep(cBloc[1],d$constitutiveBlocs))!=0) {
+          s1=1
+        }
+        if(length(grep(cBloc[2],d$constitutiveBlocs))!=0) {
+          e1=1
+        }
+        cAltBloc <- paste(chrom,":",as.numeric(cBloc[1])+s1,"-",as.numeric(cBloc[2])-e1,sep="")
         j=3
         while(j<length(cBloc)) {
-          cAltBloc <- c(cAltBloc, paste(chrom,":",cBloc[j],"-",cBloc[j+1],sep=""))
+          a1=0
+          e1=0
+          if(length(grep(cBloc[j],d$constitutiveBlocs))!=0) {
+            s1=1
+          }
+          if(length(grep(cBloc[j+1],d$constitutiveBlocs))!=0) {
+            e1=1
+          }
+          cAltBloc <- paste(chrom,":",as.numeric(cBloc[j])+s1,"-",as.numeric(cBloc[j+1])-e1,sep="")
           j=j+2
         }
         dfSS$alternativeBlocs[i] <- paste(cAltBloc,collapse = "_")
