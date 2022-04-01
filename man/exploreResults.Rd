@@ -10,18 +10,13 @@ application allowing users to explore and plot the results of kissDE.}
 
 
 \usage{
-exploreResults(rdsFile, k2rgRes = NA)
+exploreResults(rdsFile)
 }
 
 
 \arguments{
 \item{rdsFile}{a string indicating the path to the rds file outputed by
 \code{\link{writeOutputKissDE}}.}
-
-\item{k2rgRes}{an optionnal string indicating the path to the 
-\code{KisSplice2RefGenome} file used in the \code{kissDE} analysis, if any. Use 
-this parameters only if this file have been moved since the \code{kissDE}
-analysis.}
 }
 
 

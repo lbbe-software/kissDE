@@ -1,7 +1,6 @@
-exploreResults <- function(rdsFile, k2rgRes=NA) {
+exploreResults <- function(rdsFile) {
   ## rdsFile is outputed by "writeOutputKissDE" with a ".rds" extension
-  ## k2rgRes is a kissplice2refgenome file and is not mandatory. By default, we will search the k2rg file in the k2rg field in the rdsFile.
-  
+
   ## Input check
   if(is.na(rdsFile)) {
     stop("Input error: 'rdsFile' must be specified.")
@@ -19,16 +18,6 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     stop(paste("Input error: 'rdsFile' \"",rdsFile, "\" does not exists.", sep=""))
   }
   
-  if(!is.na(k2rgRes)) {
-    if(!is.character(k2rgRes)) {
-      stop("Input error: 'k2rgRes' must be a character.")
-    }
-    
-    if(!file.exists(k2rgRes)) {
-      stop(paste("Input error: 'k2rgRes' \"",k2rgRes, "\" does not exists. If you have moved it, please enter its new localisation with the 'k2rgRes' parameter.", sep=""))
-    }
-  }
-  
   ## Read rds file
   res <- readRDS(rdsFile)
   
@@ -37,22 +26,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     stop(paste("Input error: 'rdsFile' \"",rdsFile, "\" does not correspond to the expected format. Is that a kissDE result rds file?", sep=""))
   }
   
-  if(!is.na(k2rgRes)) {
-    if(!is.na(res$k2rgRes)) {
-      warning(paste("Replacing kissDE+kissplice2refgenome result file \"",res$k2rgRes,"\" by user defined value file \"",k2rgRes,"\". Are you sure that this later file correspond to the \"",rdsFile,"\" rds file?",sep=""))
-    } else {
-      stop(paste("Input error: a k2rgRes file is provided but 'rdsFile' \"",rdsFile,"\" result from a kissDE run without a k2rg file. You may want to run kissplice2refgenome prior to kissDE to annotate the alternative splicing events."))
-    }
-    res$k2rgRes <- k2rgRes
-    resK2RG <- read.table(res$k2rgRes, sep="\t", comment.char = "", header = T)
-  } else {
-    if(is.na(res$k2rgRes)) {
-      warning(paste("rds file \"",rdsFile,"\" have no kissplice2refgenome file associated with it. You may want to run kissplice2refgenome prior to kissDE to annotate the alternative splicing events.",sep=""))
-      resK2RG <- NA
-    } else {
-      resK2RG <- read.table(res$k2rgRes, sep="\t", comment.char = "", header = T)
-    }
-  }
+  resK2RG <- res$k2rgRes
   
   ## Format tables
   # All tables must have these first columns if k2rg is present:
@@ -78,12 +52,21 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
   meanPSI <- data.frame(ID=PSItable$ID)
   C1lab <- paste("meanPSI.",C1,sep="")
   C2lab <- paste("meanPSI.",C2,sep="")
+  C1labVar <- paste("sd.",C1,sep="")
+  C2labVar <- paste("sd.",C2,sep="")
   meanPSI[[C1lab]] <- ifelse(okC1,
                                                    rowMeans(PSItable[,grep(condRepl[1],colnames(PSItable))],na.rm = T),
                                                    NA)
+  meanPSI[[C1labVar]] <- ifelse(okC1,
+                             apply(PSItable[,grep(condRepl[1],colnames(PSItable))],1,sd,na.rm = T),
+                             NA)
   meanPSI[[C2lab]] <- ifelse(okC2,
                                                    rowMeans(PSItable[,grep(condRepl[2],colnames(PSItable))],na.rm = T),
                                                    NA)
+  meanPSI[[C2labVar]] <- ifelse(okC2,
+                                apply(PSItable[,grep(condRepl[2],colnames(PSItable))],1,sd,na.rm = T),
+                                NA)
+  meanPSI[,-1] <- round(meanPSI[,-1],1)
   ### FDR/dPSIs
   diffTable <- res$finalTable[,c("ID","Adjusted_pvalue","Deltaf/DeltaPSI","lowcounts")]
   colnames(diffTable) <- c("ID","Adjusted_pvalue","DeltaPSI","lowcounts")
@@ -93,21 +76,32 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
   ## Add the meanPSIs
   o <- diffTable$ID # order for after the merge
   diffTable <- merge(meanPSI, diffTable, by=1, all.x=F, all.y=T)
-  hideCol <- c("lowcounts")
+  showCol <- colnames(diffTable)
+  #hideCol <- c("lowcounts")
   
+  filterPanelSize <- ""
   filterPanelEvents <- ""
   filterPanelBiotypes <- ""
   keepPanelEvents <- ""
   keepPanelBiotypes <- ""
   filterPanelRepeats <- ""
+  filterPanelGenomicWindow <- ""
+  filterPanelChrom <- ""
+  filterPanelStart <- ""
+  filterPanelEnd <- ""
   filterPanelEventsDiff <- ""
   filterPanelBiotypesDiff <- ""
   keepPanelEventsDiff <- ""
   keepPanelBiotypesDiff <- ""
   filterPanelRepeatsDiff <- ""
+  filterPanelGenomicWindowDiff <- ""
+  filterPanelChromDiff <- ""
+  filterPanelStartDiff <- ""
+  filterPanelEndDiff <- ""
   
+
   ### ADDITIONAL INFORMATIONS given by k2rg
-  if(!is.na(res$k2rgRes)) {
+  if(!is.null(res$k2rgFile)) {
     ## Make the required columns
     dfInfo <- resK2RG[,c(16,1,2,3,4,5,9)]
     colnames(dfInfo) <- c("ID","GeneID","GeneName","EventPosition","Strand","EventType","Biotype")
@@ -136,10 +130,26 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
         d <- dfSS[i,]
         chrom <- d$chrom
         cBloc <- strsplit(d$mergeUniqSS,split = ",")[[1]]
-        cAltBloc <- paste(chrom,":",cBloc[1],"-",cBloc[2],sep="")
+        s1=0
+        e1=0
+        if(length(grep(cBloc[1],d$constitutiveBlocs))!=0) {
+          s1=1
+        }
+        if(length(grep(cBloc[2],d$constitutiveBlocs))!=0) {
+          e1=1
+        }
+        cAltBloc <- paste(chrom,":",as.numeric(cBloc[1])+s1,"-",as.numeric(cBloc[2])-e1,sep="")
         j=3
         while(j<length(cBloc)) {
-          cAltBloc <- c(cAltBloc, paste(chrom,":",cBloc[j],"-",cBloc[j+1],sep=""))
+          s1=0
+          e1=0
+          if(length(grep(cBloc[j],d$constitutiveBlocs))!=0) {
+            s1=1
+          }
+          if(length(grep(cBloc[j+1],d$constitutiveBlocs))!=0) {
+            e1=1
+          }
+          cAltBloc <- paste(chrom,":",as.numeric(cBloc[j])+s1,"-",as.numeric(cBloc[j+1])-e1,sep="")
           j=j+2
         }
         dfSS$alternativeBlocs[i] <- paste(cAltBloc,collapse = "_")
@@ -150,40 +160,76 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     }
     
     ## Less important info
-    dfAddInfo <- resK2RG[,c(16,14,6:8,13,12,18,10,22,23)]
-    colnames(dfAddInfo) <- c("ID","ComplexEvent","VariablePartLength","Frameshift","inCDS","Paralogs","upperPathSS","lowerPathSS","unkownSS","SS_IR","NormalisedCounts")
+    dfAddInfo <- resK2RG[,c(16,14,6:8,13,12,18,10,22)]
+    colnames(dfAddInfo) <- c("ID","ComplexEvent","VariablePartLength","Frameshift","inCDS","Paralogs","upperPathSS","lowerPathSS","unkownSS","SS_IR")
     asNumCompEvents <- as.numeric(dfAddInfo$ComplexEvent[dfAddInfo$ComplexEvent!="-"])
     dfAddInfo$ComplexEvent <- factor(dfAddInfo$ComplexEvent, levels = c("-",as.character(unique(sort(asNumCompEvents)))))
+    ## eventCoverage estimation
+    normCountsHead <- names(resK2RG)[23] # Format : X23.CountsNorm.VariantX_<cond>_replY_Norm.Variant...
+    normCond <- unlist(strsplit(strsplit(normCountsHead,split="Variant\\d+_")[[1]][-1],"_repl\\d+"))[c(T,F)]
+    normCond[1:nC] <- paste(normCond[1:nC],"V1",sep=".")
+    normCond[(nC+1):(nC*2)] <- paste(normCond[(nC+1):(nC*2)],"V2",sep=".")
+    lSplitNorm <- strsplit(resK2RG[,23],",")
+    normMeanC1V1 <- unlist(lapply(lSplitNorm, function(x){mean(as.numeric(x[normCond==paste(C1,"V1",sep=".")]),na.rm = T)}))
+    normMeanC1V2 <- unlist(lapply(lSplitNorm, function(x){mean(as.numeric(x[normCond==paste(C1,"V2",sep=".")]),na.rm = T)}))
+    normMeanC2V1 <- unlist(lapply(lSplitNorm, function(x){mean(as.numeric(x[normCond==paste(C2,"V1",sep=".")]),na.rm = T)}))
+    normMeanC2V2 <- unlist(lapply(lSplitNorm, function(x){mean(as.numeric(x[normCond==paste(C2,"V2",sep=".")]),na.rm = T)}))
+    normMeanC1 <- normMeanC1V1+normMeanC1V2
+    normMeanC2 <- normMeanC2V1+normMeanC2V2
+    C1eC <- paste("EventCoverageMean",C1,sep=".")
+    C2eC <- paste("EventCoverageMean",C2,sep=".")
+    dfAddInfo[[C1eC]] <- round(normMeanC1,1)
+    dfAddInfo[[C2eC]] <- round(normMeanC2,1)
+    dfAddInfo[["EventCoverageMean"]] <- round(rowMeans(dfAddInfo[,tail(names(dfAddInfo),2)]),1)
     ## Merge
     PSItable <- merge(dfInfo,PSItable,by=1,all.x=F,all.y=T)
     diffTable <- merge(dfAddInfo,diffTable,by=1,all.x=F,all.y=T)
     diffTable <- merge(dfSS,diffTable,by=1,all.x=F,all.y=T)
     diffTable <- merge(dfInfo,diffTable,by=1,all.x=F,all.y=T)
-    hideCol <- colnames(diffTable)[c(5,7:19,24)]
+    #hideCol <- colnames(diffTable)[c(5,7:19,21,23,26)]
+    #showCol <- colnames(diffTable)[c(1:4,6,20,22,24:25)]
+    showCol <- c("ID","GeneID","GeneName","EventPosition","EventType","EventCoverageMean","Adjusted_pvalue","DeltaPSI")
     
     events <- unique(PSItable$EventType)
     events <- events[-grep(",",events)]
     biotypes <- unique(PSItable$Biotype)
     biotypes <- biotypes[-grep(",",biotypes)]
+    lPos <- strsplit(PSItable$EventPosition[PSItable$EventPosition!="multiple"],":|-")
+    chromPos <- sort(unique(unlist(lapply(lPos,"[[",1))))
+    posMin <- 0 # aletrnatively, min(as.integer(unlist(lapply(lPos,"[[",2))))
+    posMax <- max(as.integer(unlist(lapply(lPos,"[[",3))))
     eventsDiff <- unique(diffTable$EventType)
     eventsDiff <- eventsDiff[-grep(",",eventsDiff)]
     biotypesDiff <- unique(diffTable$Biotype)
     biotypesDiff <- biotypesDiff[-grep(",",biotypesDiff)]
+    lPosDiff <- strsplit(PSItable$EventPosition[diffTable$EventPosition!="multiple"],":|-")
+    chromPosDiff <- sort(unique(unlist(lapply(lPosDiff,"[[",1))))
+    posMinDiff <- 0 # aletrnatively, min(as.integer(unlist(lapply(lPos,"[[",2))))
+    posMaxDiff <- max(as.integer(unlist(lapply(lPosDiff,"[[",3))))
+    filterPanelSize <- checkboxInput("plotSize","Adapt the size of the points to the mean event coverage?",T)
     filterPanelEvents <- selectizeInput("fEvents","Filter this type of event:",choices = events,selected = NULL,multiple=T)
     filterPanelBiotypes <- selectizeInput("fBio","Filter this type of biotype:",choices = biotypes,selected = NULL,multiple=T)
     keepPanelEvents <- selectizeInput("fEventsK","Keep this type of event:",choices = events,selected = NULL,multiple=T)
     keepPanelBiotypes <- selectizeInput("fBioK","Keep this type of biotype:",choices = biotypes,selected = NULL,multiple=T)
     filterPanelRepeats <- checkboxInput("fRepeats","Filter repeat-linked event",F)
+    filterPanelGenomicWindow <- checkboxInput("fGenomicWindow","Activate genomic window filter",F)
+    filterPanelChrom <- selectizeInput("fChrom","Keep this chromosome:",choices = chromPos,selected = NULL,multiple=T)
+    filterPanelStart <- numericInput("fStartPos","Start of the genomic window:",value = posMin,min = posMin,max = posMax)
+    filterPanelEnd <- numericInput("fEndPos","End of the genomic window:",value = posMax,min = posMin,max = posMax)
     filterPanelEventsDiff <- selectizeInput("fEventsDiff","Filter this type of event:",choices = eventsDiff,selected = NULL,multiple=T)
     filterPanelBiotypesDiff <- selectizeInput("fBioDiff","Filter this type of biotype:",choices = biotypesDiff,selected = NULL,multiple=T)
     keepPanelEventsDiff <- selectizeInput("fEventsDiffK","Keep this type of event:",choices = eventsDiff,selected = NULL,multiple=T)
     keepPanelBiotypesDiff <- selectizeInput("fBioDiffK","Keep this type of biotype:",choices = biotypesDiff,selected = NULL,multiple=T)
     filterPanelRepeatsDiff <- checkboxInput("fRepeatsDiff","Filter repeat-linked event",F)
+    filterPanelChromDiff <- selectizeInput("fChromDiff","Keep this chromosome:",choices = chromPosDiff,selected = NULL,multiple=T)
+    filterPanelGenomicWindowDiff <- checkboxInput("fGenomicWindowDiff","Activate genomic window filter",F)
+    filterPanelStartDiff <- numericInput("fStartPosDiff","Start of the genomic window:",value = posMinDiff,min = posMinDiff,max = posMaxDiff)
+    filterPanelEndDiff <- numericInput("fEndPosDiff","End of the genomic window:",value = posMaxDiff,min = posMinDiff,max = posMaxDiff)
   }
   diffTable <- diffTable[match(o, diffTable$ID),]
   colDiff <- colnames(diffTable)[-grep("ID|Name|Position|Blocs|Counts|SS$",colnames(diffTable))]
-  colDiffContinuous <- colDiff[grep("meanPSI|pvalue|DeltaPSI|Length",colDiff)]
-  colDiffDiscrete <- colDiff[-grep("meanPSI|pvalue|DeltaPSI|Length",colDiff)]
+  colDiffContinuous <- colDiff[grep("EventCoverage|meanPSI|pvalue|DeltaPSI|Length",colDiff)]
+  colDiffDiscrete <- colDiff[-grep("EventCoverage|meanPSI|pvalue|DeltaPSI|Length",colDiff)]
   colMeanPSI <- colDiff[grep("meanPSI",colDiff)]
   ## Shiny interface
   # ui
@@ -191,13 +237,14 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     title="KissDE results",
     
     navbarPage(paste(C1," vs ",C2,sep=""),
-               tabPanel("Differential anakysis",
+               tabPanel("Differential analysis",
                         fluidRow(
                           column(width=12,
                                  h1(strong(paste("kissDE results (",C1," vs ",C2,")",sep="")),
                                  ),
                                  sidebarLayout(position="right",
-                                               sidebarPanel(h2("Filter Events"),
+                                               sidebarPanel(
+                                                 h2("Filter Events"),
                                                             width = 3,
                                                             
                                                             numericInput("fFDR",
@@ -230,7 +277,12 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
                                                             filterPanelEventsDiff,
                                                             keepPanelBiotypesDiff,
                                                             filterPanelBiotypesDiff,
-                                                            filterPanelRepeatsDiff
+                                                            filterPanelRepeatsDiff,
+                                                 h2("Select Genomic Window"),
+                                                 filterPanelGenomicWindowDiff,
+                                                 filterPanelChromDiff,
+                                                 filterPanelStartDiff,
+                                                 filterPanelEndDiff
                                                ),
                                                mainPanel(width=9,
                                                          tagList(
@@ -242,11 +294,11 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
                           column(width=12,
                                  column(width=6,
                                         wellPanel(
-                                          checkboxGroupInput("fCol", "Hide these columns:", choices = unique(colnames(diffTable)), selected = hideCol,inline = T)
+                                          checkboxGroupInput("fCol", "Show these columns:", choices = unique(colnames(diffTable)), selected = showCol,inline = T)
                                         )
                                  ),
                                  column(width=6,
-                                        downloadButton("dlDiff","Download the printed Dataset")
+                                        downloadButton("dlDiff","Download this Dataset")
                                  )
                           ),
                           column(width=12,
@@ -256,6 +308,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
                                                             p("By default, plot a Volcano plot seperated by event type."),
                                                             p("x-axis: discrete or continuous values are allowed. If the 'Plot density' checbox is selected, only continuous values are allowed and multiple choices are allowed."),
                                                             p("y-axis: only continuous values are allowed. If coupled with a discrete x-axis, the density will be printed (box-violin plot)"),
+                                                            p("In plots with two continuous values, the bigger the points, the higher the mean coverage of the event (EventCoverageMean column, the max is reached at 100)."),
                                                             width=3,
                                                             checkboxInput("plotDensity","Plot box-violin plot of x-axis continuous values?",F),
                                                             conditionalPanel("input.plotDensity",
@@ -268,8 +321,10 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
                                                             radioButtons("plotYtrans","Transformation to use for the y-axis:",choices = c("None","log10","-log10"),selected = "-log10"),
                                                             numericInput("plotFDR","Maximum adjusted p-value (FDR) to highlight a point:",min = 0,max = 1,value = 0.05,step = 0.001),
                                                             numericInput("plotDPSI","Minimum absolute deltaPSI value to highlight a point:",min = 0,max = 100,value = 10,step=1),
-                                                            selectInput("plotXgroup","Horizontal wrap:",choices = c("None",colDiffDiscrete), selected = "EventType"),
-                                                            selectInput("plotYgroup","Vertical wrap:",choices = c("None",colDiffDiscrete))
+                                                            selectInput("plotXgroup","Wrap 1:",choices = c("None",colDiffDiscrete), selected = "EventType"),
+                                                            selectInput("plotYgroup","Wrap 2:",choices = c("None",colDiffDiscrete)),
+                                                            filterPanelSize
+                                                            
                                                ),
                                                mainPanel(width=9,
                                                          actionButton("aPlot","Update plot with the data from the above table"),
@@ -338,7 +393,12 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
                                                             filterPanelEvents,
                                                             keepPanelBiotypes,
                                                             filterPanelBiotypes,
-                                                            filterPanelRepeats
+                                                            filterPanelRepeats,
+                                                            h2("Select Genomic Window"),
+                                                            filterPanelGenomicWindow,
+                                                            filterPanelChrom,
+                                                            filterPanelStart,
+                                                            filterPanelEnd
                                                ),
                                                mainPanel(width=9,
                                                          tagList(
@@ -432,7 +492,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
       if(input$fCompleteCases) {
         data <- data[complete.cases(data[,PSIcol]),]
       }
-      if(!is.na(res$k2rgRes)) {
+      if(!is.null(res$k2rgFile)) {
         if(!is.null(input$fEventsK)) {
           grepEvents <- paste("\\b",paste(input$fEventsK,collapse = "\\b|\\b"),"\\b",sep="")
           data <- data[grep(grepEvents,data$EventType),]
@@ -451,6 +511,18 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
         }
         if(input$fRepeats) {
           data <- data[data$EventPosition!="multiple",]
+        }
+        if(input$fGenomicWindow) {
+          if(!is.null(input$fChrom)) {
+            data <- data[data$EventPosition!="multiple",]
+            lChrom <- unlist(lapply(strsplit(data$EventPosition,":"),"[[",1))
+            data <- data[lChrom%in%input$fChrom,]
+          }
+          if(input$fStartPos!=posMin | input$fEndPos!=posMax) {
+            data <- data[data$EventPosition!="multiple",]
+            lPos <- strsplit(data$EventPosition,":|-")
+            data <- data[as.integer(unlist(lapply(lPos,"[[",2)))>=input$fStartPos & as.integer(unlist(lapply(lPos,"[[",3)))<=input$fEndPos,]
+          }
         }
       }
       cDataPSI$data <- data
@@ -480,7 +552,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
       if(input$fPSIC2[1]!=0) {
         data <- data[!is.na(data[[C2lab]]) & data[[C2lab]] >= input$fPSIC2[1] & data[[C2lab]] <= input$fPSIC2[2],]
       }
-      if(!is.na(res$k2rgRes)) {
+      if(!is.null(res$k2rgFile)) {
         if(!is.null(input$fEventsDiffK)) {
           grepEvents <- paste("\\b",paste(input$fEventsDiffK,collapse = "\\b|\\b"),"\\b",sep="")
           data <- data[grep(grepEvents,data$EventType),]
@@ -500,9 +572,21 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
         if(input$fRepeatsDiff) {
           data <- data[data$EventPosition!="multiple",]
         }
+        if(input$fGenomicWindowDiff) {
+          if(!is.null(input$fChromDiff)) {
+            data <- data[data$EventPosition!="multiple",]
+            lChrom <- unlist(lapply(strsplit(data$EventPosition,":"),"[[",1))
+            data <- data[lChrom%in%input$fChromDiff,]
+          }
+          if(input$fStartPosDiff!=posMin | input$fEndPosDiff!=posMax) {
+            data <- data[data$EventPosition!="multiple",]
+            lPos <- strsplit(data$EventPosition,":|-")
+            data <- data[as.integer(unlist(lapply(lPos,"[[",2)))>=input$fStartPosDiff & as.integer(unlist(lapply(lPos,"[[",3)))<=input$fEndPosDiff,]
+          }
+        }
       }
       cDataDiff$data <- data
-      data <- data[,-which(colnames(data)%in%input$fCol)]
+      data <- data[,which(colnames(data)%in%input$fCol)]
       data
     })
     
@@ -510,24 +594,30 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     # display the PSI table
     output$PSItable <- DT::renderDataTable(DT::datatable(
       dataPSI(),
+      extensions = c('Buttons','ColReorder'),
       rownames = FALSE,
       filter = "top",
       options = list(
         dom = 'Bfrtip',
-        pageLength = 15,
-        scrollX = TRUE
+        pageLength = 20,
+        buttons = c('copy','csv','excel'),
+        scrollX = TRUE,
+        colReorder = TRUE
       )
     ))
     
     # display the diff table
     output$diffTable <- DT::renderDataTable(DT::datatable(
       dataDiff(),
+      extensions = c('Buttons','ColReorder'),
       rownames = FALSE,
       filter = "top",
       options = list(
         dom = 'Bfrtip',
-        pageLength = 15,
-        scrollX = TRUE
+        buttons = c('copy','csv','excel'),
+        pageLength = 20,
+        scrollX = TRUE,
+        colReorder = TRUE
       )
     ))
     
@@ -565,7 +655,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
       cDataPSI <- cDataPSI$data
       m <- as.matrix(cDataPSI[,PSIcol])
       rownames(m) <- cDataPSI$ID
-      if(!is.na(res$k2rgRes)) {
+      if(!is.null(res$k2rgFile)) {
         rownames(m) <- paste(cDataPSI$ID,cDataPSI$GeneName,cDataPSI$EventPosition,cDataPSI$EventType,sep="@")
       }
       if(input$PCAtype=="all") {
@@ -631,7 +721,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     
     observeEvent(input$aPlot,{
       data <- cDataDiff$data[input[["diffTable_rows_all"]],]
-      if(!is.na(res$k2rgRes)) {
+      if(!is.null(res$k2rgFile)) {
         data$EventType[grep(",",data$EventType)] <- unlist(lapply(strsplit(data$EventType[grep(",",data$EventType)],","),"[[",1))
         data$Biotype[grep("protein_coding",data$Biotype)] <- "protein_coding"
         data$Biotype[grep(",",data$Biotype)] <- unlist(lapply(strsplit(data$Biotype[grep(",",data$Biotype)],","),"[[",1))
@@ -646,10 +736,10 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
       }
       cdata <- plotData$data
       if(input$plotDensity) {
-        xLab <- "x"
-        yLab <- "y"
+        xName <- "x"
+        yName <- "y"
         n <- length(input$plotXdensity)
-        if(!is.na(res$k2rgRes)) {
+        if(!is.null(res$k2rgFile)) {
           data <- data.frame(ID=rep(cdata$ID,n),
                              GeneName=rep(cdata$GeneName,n),
                              EventPosition=rep(cdata$EventPosition,n),
@@ -682,6 +772,11 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
           stat_summary(fun=median, geom="point", fill="white", shape=23, size=1)
       } else {
         data <- cdata
+        if(!is.null(res$k2rgFile) & input$plotSize & min(data[["EventCoverageMean"]])<100) {
+          alphaEstimation <- data[["EventCoverageMean"]]/100
+          data$alpha <- ifelse(alphaEstimation>1,1,alphaEstimation)
+          data$size <- data$alpha*2
+        }
         data$pch <- ifelse(data$Adjusted_pvalue<=input$plotFDR,"19","1")
         data$col <- ifelse(data$pch=="1","black",
                            ifelse(data$DeltaPSI<=(-input$plotDPSI),"blue",
@@ -690,23 +785,35 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
         )
         cols <- c("black"="black","blue"="blue","red"="red")
         pchs <- c("1"=1,"19"=19)
-        xLab <- input$plotX
-        yLab <- input$plotY
+        xName <- input$plotX
+        yName <- input$plotY
         if(input$plotXtrans!="None") {
-          minVal <- min(data[[input$plotX]][data[[input$plotX]]!=0])
-          data[[input$plotX]][data[[input$plotX]]==0]=minVal
-          data[[input$plotX]] <- log10(data[[input$plotX]])
+          xName <- paste("log10(",xName,")",sep="")
+          dataX <- data[[input$plotX]]
+          minVal <- min(dataX[dataX!=0])
+          dataX[dataX==0] <- minVal
+          dataX <- log10(dataX)
           if(input$plotXtrans=="-log10") {
-            data[[input$plotX]] <- -data[[input$plotX]]
+            xName <- paste("-",xName,sep="")
+            dataX <- (-1)*dataX
           }
+          data$x <- dataX
+        } else {
+          data$x <- data[[xName]]
         }
         if(input$plotYtrans!="None") {
-          minVal <- min(data[[input$plotY]][data[[input$plotY]]!=0])
-          data[[input$plotY]][data[[input$plotY]]==0]=minVal
-          data[[input$plotY]] <- log10(data[[input$plotY]])
+          yName <- paste("log10(",yName,")",sep="")
+          dataY <- data[[input$plotY]]
+          minVal <- min(dataY[dataY!=0])
+          dataY[dataY==0] <- minVal
+          dataY <- log10(dataY)
           if(input$plotYtrans=="-log10") {
-            data[[input$plotY]] <- -data[[input$plotY]]
+            yName <- paste("-",yName,sep="")
+            dataY <- (-1)*dataY
           }
+          data$y <- dataY
+        } else {
+          data$y <- data[[yName]]
         }
         if(input$plotXgroup!="None") {
           data$wrapX <- data[[input$plotXgroup]]
@@ -715,20 +822,37 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
           data$wrapY <- data[[input$plotYgroup]]
         }
         if(input$plotX%in%colDiffDiscrete) {
-          g <- ggplot(data = data, aes_string(x=input$plotX,y=input$plotY,fill=input$plotX))+
+          g <- ggplot(data = data, aes_string(x="x",y="y",fill=input$plotX))+
             theme_bw()+
             theme(strip.background =element_rect(fill="white"),strip.text.y = element_text(angle = 0),legend.position = "none")+
             geom_violin(scale = "width") +
             geom_boxplot(aes(alpha=100),width=0.1,outlier.shape = NA) +
             stat_summary(fun=mean, geom="point", color="black", size=2)+
+            xlab(xName)+
+            ylab(yName)+
             stat_summary(fun=median, geom="point", fill="white", shape=23, size=1)
         } else {
-          g <- ggplot(data = data, aes_string(x=input$plotX,y=input$plotY,shape="pch",color="col"))+
-            theme_bw()+
-            geom_point(stroke=0.15)+
-            scale_color_manual(values = cols)+
-            scale_shape_manual(values=pchs)+
-            guides(color="none",shape="none")
+          if(!is.null(res$k2rgFile) & input$plotSize) {
+            g <- ggplot(data = data, aes_string(x="x",y="y",shape="pch",color="col",alpha="alpha",size="size"))+
+              theme_bw()+
+              geom_point(stroke=0.15)+
+              scale_color_manual(values = cols)+
+              scale_shape_manual(values=pchs)+
+              scale_alpha(range = c(0,1))+
+              scale_size(range=c(0,2))+
+              xlab(xName)+
+              ylab(yName)+
+              guides(color="none",shape="none",alpha="none",size="none")
+          } else {
+            g <- ggplot(data = data, aes_string(x="x",y="y",shape="pch",color="col"))+
+              theme_bw()+
+              geom_point(stroke=0.15)+
+              scale_color_manual(values = cols)+
+              scale_shape_manual(values=pchs)+
+              xlab(xName)+
+              ylab(yName)+
+              guides(color="none",shape="none")
+          }
         }
       }
       if(input$plotXgroup!="None") {
@@ -743,7 +867,7 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
         g <- g+
           facet_wrap(wrapY~.)
       }
-      list(data,xLab,yLab,g)
+      list(data,xName,yName,g)
     })
     
     output$Plot <- renderPlot({
@@ -753,8 +877,8 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
     output$selectedPoints <- DT::renderDataTable({
       lData <- Plot()
       data <- lData[[1]]
-      #xLab <- lData[[2]]
-      #yLab <- lData[[3]]
+      xName <- lData[[2]]
+      yName <- lData[[3]]
       dataToShow <- data
       if (!is.null(input$plotBrush)){
         dataToShow <- brushedPoints(data, input$plotBrush)
@@ -762,10 +886,14 @@ exploreResults <- function(rdsFile, k2rgRes=NA) {
         dataToShow <- nearPoints(data, input$plotClick)
       }
       if(!input$plotDensity) {
-        dataToShow <- dataToShow[,-which(colnames(dataToShow)%in%input$fCol)]
+        dataToShow <- dataToShow[,which(colnames(dataToShow)%in%c(input$fCol))]
       }
       DT::datatable(dataToShow, rownames = FALSE,
-                    options = list(scrollX = TRUE),
+                    extensions = c('Buttons','ColReorder'),
+                    options = list(scrollX = TRUE,
+                                   dom = 'Bfrtip',
+                                   colReorder = TRUE,
+                                   buttons =c('copy','csv','excel')),
                     caption = 'Select points on the plot to show them in this table.')
     })
   }
