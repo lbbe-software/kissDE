@@ -98,6 +98,7 @@ exploreResults <- function(rdsFile) {
   filterPanelChromDiff <- ""
   filterPanelStartDiff <- ""
   filterPanelEndDiff <- ""
+  filterPanelCoverageDiff <- ""
   
 
   ### ADDITIONAL INFORMATIONS given by k2rg
@@ -206,7 +207,7 @@ exploreResults <- function(rdsFile) {
     chromPosDiff <- sort(unique(unlist(lapply(lPosDiff,"[[",1))))
     posMinDiff <- 0 # aletrnatively, min(as.integer(unlist(lapply(lPos,"[[",2))))
     posMaxDiff <- max(as.integer(unlist(lapply(lPosDiff,"[[",3))))
-    filterPanelSize <- checkboxInput("plotSize","Adapt the size of the points to the mean event coverage?",T)
+    filterPanelSize <- checkboxInput("plotSize","Adapt the size of the points to the mean event coverage (up to 100)?",T)
     filterPanelEvents <- selectizeInput("fEvents","Filter this type of event:",choices = events,selected = NULL,multiple=T)
     filterPanelBiotypes <- selectizeInput("fBio","Filter this type of biotype:",choices = biotypes,selected = NULL,multiple=T)
     keepPanelEvents <- selectizeInput("fEventsK","Keep this type of event:",choices = events,selected = NULL,multiple=T)
@@ -225,6 +226,7 @@ exploreResults <- function(rdsFile) {
     filterPanelGenomicWindowDiff <- checkboxInput("fGenomicWindowDiff","Activate genomic window filter",F)
     filterPanelStartDiff <- numericInput("fStartPosDiff","Start of the genomic window:",value = posMinDiff,min = posMinDiff,max = posMaxDiff)
     filterPanelEndDiff <- numericInput("fEndPosDiff","End of the genomic window:",value = posMaxDiff,min = posMinDiff,max = posMaxDiff)
+    filterPanelCoverageDiff <- numericInput("fCoverDiff","Minimum mean event coverage:",value = 0,min = 0)
   }
   diffTable <- diffTable[match(o, diffTable$ID),]
   colDiff <- colnames(diffTable)[-grep("ID|Name|Position|Blocs|Counts|SS$",colnames(diffTable))]
@@ -273,6 +275,7 @@ exploreResults <- function(rdsFile) {
                                                                         max = 100,
                                                                         value = c(0,100),
                                                                         step = 1),
+                                                 filterPanelCoverageDiff,
                                                             keepPanelEventsDiff,
                                                             filterPanelEventsDiff,
                                                             keepPanelBiotypesDiff,
@@ -553,6 +556,7 @@ exploreResults <- function(rdsFile) {
         data <- data[!is.na(data[[C2lab]]) & data[[C2lab]] >= input$fPSIC2[1] & data[[C2lab]] <= input$fPSIC2[2],]
       }
       if(!is.null(res$k2rgFile)) {
+        data <- data[data$EventCoverageMean>=input$fCoverDiff,]
         if(!is.null(input$fEventsDiffK)) {
           grepEvents <- paste("\\b",paste(input$fEventsDiffK,collapse = "\\b|\\b"),"\\b",sep="")
           data <- data[grep(grepEvents,data$EventType),]
@@ -832,7 +836,7 @@ exploreResults <- function(rdsFile) {
             ylab(yName)+
             stat_summary(fun=median, geom="point", fill="white", shape=23, size=1)
         } else {
-          if(!is.null(res$k2rgFile) & input$plotSize) {
+          if(!is.null(res$k2rgFile) & input$plotSize & min(data[["EventCoverageMean"]])<100) {
             g <- ggplot(data = data, aes_string(x="x",y="y",shape="pch",color="col",alpha="alpha",size="size"))+
               theme_bw()+
               geom_point(stroke=0.15)+
