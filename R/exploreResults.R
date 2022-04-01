@@ -79,7 +79,7 @@ exploreResults <- function(rdsFile) {
   showCol <- colnames(diffTable)
   #hideCol <- c("lowcounts")
   
-  filterPanelSize <- ""
+  filterPanelSize <- checkboxInput("plotSize","Adapt the size of the points to the mean event coverage (up to 100)?",T)
   filterPanelEvents <- ""
   filterPanelBiotypes <- ""
   keepPanelEvents <- ""
@@ -98,8 +98,7 @@ exploreResults <- function(rdsFile) {
   filterPanelChromDiff <- ""
   filterPanelStartDiff <- ""
   filterPanelEndDiff <- ""
-  filterPanelCoverageDiff <- ""
-  
+  filterPanelCoverageDiff <- numericInput("fCoverDiff","Minimum mean event coverage:",value = 0,min = 0)
 
   ### ADDITIONAL INFORMATIONS given by k2rg
   if(!is.null(res$k2rgFile)) {
@@ -207,7 +206,6 @@ exploreResults <- function(rdsFile) {
     chromPosDiff <- sort(unique(unlist(lapply(lPosDiff,"[[",1))))
     posMinDiff <- 0 # aletrnatively, min(as.integer(unlist(lapply(lPos,"[[",2))))
     posMaxDiff <- max(as.integer(unlist(lapply(lPosDiff,"[[",3))))
-    filterPanelSize <- checkboxInput("plotSize","Adapt the size of the points to the mean event coverage (up to 100)?",T)
     filterPanelEvents <- selectizeInput("fEvents","Filter this type of event:",choices = events,selected = NULL,multiple=T)
     filterPanelBiotypes <- selectizeInput("fBio","Filter this type of biotype:",choices = biotypes,selected = NULL,multiple=T)
     keepPanelEvents <- selectizeInput("fEventsK","Keep this type of event:",choices = events,selected = NULL,multiple=T)
@@ -226,7 +224,24 @@ exploreResults <- function(rdsFile) {
     filterPanelGenomicWindowDiff <- checkboxInput("fGenomicWindowDiff","Activate genomic window filter",F)
     filterPanelStartDiff <- numericInput("fStartPosDiff","Start of the genomic window:",value = posMinDiff,min = posMinDiff,max = posMaxDiff)
     filterPanelEndDiff <- numericInput("fEndPosDiff","End of the genomic window:",value = posMaxDiff,min = posMinDiff,max = posMaxDiff)
-    filterPanelCoverageDiff <- numericInput("fCoverDiff","Minimum mean event coverage:",value = 0,min = 0)
+  } else {
+    # NO K2RG FILE
+    # We still have info about event coverage
+    dfAddInfo <- res$finalTable[,c(1,grep("Variant",names(res$finalTable)))]
+    normMeanC1V1 <- rowMeans(dfAddInfo[,grep(paste("Variant1_",C1,"_repl",sep=""),names(dfAddInfo))],na.rm = T)
+    normMeanC2V1 <- rowMeans(dfAddInfo[,grep(paste("Variant1_",C2,"_repl",sep=""),names(dfAddInfo))],na.rm = T)
+    normMeanC1V2 <- rowMeans(dfAddInfo[,grep(paste("Variant2_",C1,"_repl",sep=""),names(dfAddInfo))],na.rm = T)
+    normMeanC2V2 <- rowMeans(dfAddInfo[,grep(paste("Variant2_",C2,"_repl",sep=""),names(dfAddInfo))],na.rm = T)
+    normMeanC1 <- normMeanC1V1+normMeanC1V2
+    normMeanC2 <- normMeanC2V1+normMeanC2V2
+    C1eC <- paste("EventCoverageMean",C1,sep=".")
+    C2eC <- paste("EventCoverageMean",C2,sep=".")
+    dfAddInfo[[C1eC]] <- round(normMeanC1,1)
+    dfAddInfo[[C2eC]] <- round(normMeanC2,1)
+    dfAddInfo[["EventCoverageMean"]] <- round(rowMeans(dfAddInfo[,tail(names(dfAddInfo),2)]),1)
+    dfAddInfo <- dfAddInfo[,c(1,grep("EventCoverageMean",names(dfAddInfo)))]
+    diffTable <- merge(dfAddInfo,diffTable,by=1,all.x=F,all.y=T)
+    showCol <- c("ID","EventCoverageMean",C1lab,C2lab,"Adjusted_pvalue","DeltaPSI")
   }
   diffTable <- diffTable[match(o, diffTable$ID),]
   colDiff <- colnames(diffTable)[-grep("ID|Name|Position|Blocs|Counts|SS$",colnames(diffTable))]
@@ -555,8 +570,8 @@ exploreResults <- function(rdsFile) {
       if(input$fPSIC2[1]!=0) {
         data <- data[!is.na(data[[C2lab]]) & data[[C2lab]] >= input$fPSIC2[1] & data[[C2lab]] <= input$fPSIC2[2],]
       }
+      data <- data[data$EventCoverageMean>=input$fCoverDiff,]
       if(!is.null(res$k2rgFile)) {
-        data <- data[data$EventCoverageMean>=input$fCoverDiff,]
         if(!is.null(input$fEventsDiffK)) {
           grepEvents <- paste("\\b",paste(input$fEventsDiffK,collapse = "\\b|\\b"),"\\b",sep="")
           data <- data[grep(grepEvents,data$EventType),]
@@ -776,7 +791,9 @@ exploreResults <- function(rdsFile) {
           stat_summary(fun=median, geom="point", fill="white", shape=23, size=1)
       } else {
         data <- cdata
-        if(!is.null(res$k2rgFile) & input$plotSize & min(data[["EventCoverageMean"]])<100) {
+        doSize <- F
+        if(input$plotSize & min(data[["EventCoverageMean"]])<100) {
+          doSize <- T
           alphaEstimation <- data[["EventCoverageMean"]]/100
           data$alpha <- ifelse(alphaEstimation>1,1,alphaEstimation)
           data$size <- data$alpha*2
@@ -836,7 +853,7 @@ exploreResults <- function(rdsFile) {
             ylab(yName)+
             stat_summary(fun=median, geom="point", fill="white", shape=23, size=1)
         } else {
-          if(!is.null(res$k2rgFile) & input$plotSize & min(data[["EventCoverageMean"]])<100) {
+          if(doSize) {
             g <- ggplot(data = data, aes_string(x="x",y="y",shape="pch",color="col",alpha="alpha",size="size"))+
               theme_bw()+
               geom_point(stroke=0.15)+
