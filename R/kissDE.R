@@ -8,10 +8,7 @@ kissDE <- function(fileName, conditions, output, counts = 2, pairedEnd = FALSE, 
   }
   res <- diffExpressedVariants(count, conditions, pvalue, filterLowCountsVariants, flagLowCountsConditions, technicalReplicates, nbCore)
   
-  writeOutputKissDE(res, output, adjPvalMax, dPSImin)
-  if(writePSI) {
-    writeOutputKissDE(res, paste(output, "PSIs", sep = "."), adjPvalMax, dPSImin, writePSI)
-  }
+  writeOutputKissDE(res, output, adjPvalMax, dPSImin, writePSI)
   
   if(resultsInShiny) {
     exploreResults(rdsFile = paste(output, "rds", sep = "."))
