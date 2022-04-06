@@ -99,6 +99,20 @@ exploreResults <- function(rdsFile) {
   filterPanelStartDiff <- ""
   filterPanelEndDiff <- ""
   filterPanelCoverageDiff <- numericInput("fCoverDiff","Minimum mean event coverage:",value = 0,min = 0)
+  
+  dfAddInfoCov <- res$finalTable[,c(1,grep("Variant",names(res$finalTable)))]
+  normMeanC1V1 <- rowMeans(dfAddInfoCov[,grep(paste("Variant1_",C1,"_repl",sep=""),names(dfAddInfoCov))],na.rm = T)
+  normMeanC2V1 <- rowMeans(dfAddInfoCov[,grep(paste("Variant1_",C2,"_repl",sep=""),names(dfAddInfoCov))],na.rm = T)
+  normMeanC1V2 <- rowMeans(dfAddInfoCov[,grep(paste("Variant2_",C1,"_repl",sep=""),names(dfAddInfoCov))],na.rm = T)
+  normMeanC2V2 <- rowMeans(dfAddInfoCov[,grep(paste("Variant2_",C2,"_repl",sep=""),names(dfAddInfoCov))],na.rm = T)
+  normMeanC1 <- normMeanC1V1+normMeanC1V2
+  normMeanC2 <- normMeanC2V1+normMeanC2V2
+  C1eC <- paste("EventCoverageMean",C1,sep=".")
+  C2eC <- paste("EventCoverageMean",C2,sep=".")
+  dfAddInfoCov[[C1eC]] <- round(normMeanC1,1)
+  dfAddInfoCov[[C2eC]] <- round(normMeanC2,1)
+  dfAddInfoCov[["EventCoverageMean"]] <- round(rowMeans(dfAddInfoCov[,tail(names(dfAddInfoCov),2)]),1)
+  dfAddInfoCov <- dfAddInfoCov[,c(1,grep("EventCoverageMean",names(dfAddInfoCov)))]
 
   ### ADDITIONAL INFORMATIONS given by k2rg
   if(!is.null(res$k2rgFile)) {
@@ -164,31 +178,15 @@ exploreResults <- function(rdsFile) {
     colnames(dfAddInfo) <- c("ID","ComplexEvent","VariablePartLength","Frameshift","inCDS","Paralogs","upperPathSS","lowerPathSS","unkownSS","SS_IR")
     asNumCompEvents <- as.numeric(dfAddInfo$ComplexEvent[dfAddInfo$ComplexEvent!="-"])
     dfAddInfo$ComplexEvent <- factor(dfAddInfo$ComplexEvent, levels = c("-",as.character(unique(sort(asNumCompEvents)))))
-    ## eventCoverage estimation
-    normCountsHead <- names(resK2RG)[23] # Format : X23.CountsNorm.VariantX_<cond>_replY_Norm.Variant...
-    normCond <- unlist(strsplit(strsplit(normCountsHead,split="Variant\\d+_")[[1]][-1],"_repl\\d+"))[c(T,F)]
-    normCond[1:nC] <- paste(normCond[1:nC],"V1",sep=".")
-    normCond[(nC+1):(nC*2)] <- paste(normCond[(nC+1):(nC*2)],"V2",sep=".")
-    lSplitNorm <- strsplit(resK2RG[,23],",")
-    normMeanC1V1 <- unlist(lapply(lSplitNorm, function(x){mean(as.numeric(x[normCond==paste(C1,"V1",sep=".")]),na.rm = T)}))
-    normMeanC1V2 <- unlist(lapply(lSplitNorm, function(x){mean(as.numeric(x[normCond==paste(C1,"V2",sep=".")]),na.rm = T)}))
-    normMeanC2V1 <- unlist(lapply(lSplitNorm, function(x){mean(as.numeric(x[normCond==paste(C2,"V1",sep=".")]),na.rm = T)}))
-    normMeanC2V2 <- unlist(lapply(lSplitNorm, function(x){mean(as.numeric(x[normCond==paste(C2,"V2",sep=".")]),na.rm = T)}))
-    normMeanC1 <- normMeanC1V1+normMeanC1V2
-    normMeanC2 <- normMeanC2V1+normMeanC2V2
-    C1eC <- paste("EventCoverageMean",C1,sep=".")
-    C2eC <- paste("EventCoverageMean",C2,sep=".")
-    dfAddInfo[[C1eC]] <- round(normMeanC1,1)
-    dfAddInfo[[C2eC]] <- round(normMeanC2,1)
-    dfAddInfo[["EventCoverageMean"]] <- round(rowMeans(dfAddInfo[,tail(names(dfAddInfo),2)]),1)
     ## Merge
     PSItable <- merge(dfInfo,PSItable,by=1,all.x=F,all.y=T)
+    diffTable <- merge(dfAddInfoCov,diffTable,by=1,all.x=F,all.y=T)
     diffTable <- merge(dfAddInfo,diffTable,by=1,all.x=F,all.y=T)
     diffTable <- merge(dfSS,diffTable,by=1,all.x=F,all.y=T)
     diffTable <- merge(dfInfo,diffTable,by=1,all.x=F,all.y=T)
     #hideCol <- colnames(diffTable)[c(5,7:19,21,23,26)]
     #showCol <- colnames(diffTable)[c(1:4,6,20,22,24:25)]
-    showCol <- c("ID","GeneID","GeneName","EventPosition","EventType","EventCoverageMean","Adjusted_pvalue","DeltaPSI")
+    showCol <- c("ID","GeneID","GeneName","EventPosition","EventType","EventCoverageMean",C1lab,C2lab,"Adjusted_pvalue","DeltaPSI")
     
     events <- unique(PSItable$EventType)
     events <- events[-grep(",",events)]
@@ -227,20 +225,7 @@ exploreResults <- function(rdsFile) {
   } else {
     # NO K2RG FILE
     # We still have info about event coverage
-    dfAddInfo <- res$finalTable[,c(1,grep("Variant",names(res$finalTable)))]
-    normMeanC1V1 <- rowMeans(dfAddInfo[,grep(paste("Variant1_",C1,"_repl",sep=""),names(dfAddInfo))],na.rm = T)
-    normMeanC2V1 <- rowMeans(dfAddInfo[,grep(paste("Variant1_",C2,"_repl",sep=""),names(dfAddInfo))],na.rm = T)
-    normMeanC1V2 <- rowMeans(dfAddInfo[,grep(paste("Variant2_",C1,"_repl",sep=""),names(dfAddInfo))],na.rm = T)
-    normMeanC2V2 <- rowMeans(dfAddInfo[,grep(paste("Variant2_",C2,"_repl",sep=""),names(dfAddInfo))],na.rm = T)
-    normMeanC1 <- normMeanC1V1+normMeanC1V2
-    normMeanC2 <- normMeanC2V1+normMeanC2V2
-    C1eC <- paste("EventCoverageMean",C1,sep=".")
-    C2eC <- paste("EventCoverageMean",C2,sep=".")
-    dfAddInfo[[C1eC]] <- round(normMeanC1,1)
-    dfAddInfo[[C2eC]] <- round(normMeanC2,1)
-    dfAddInfo[["EventCoverageMean"]] <- round(rowMeans(dfAddInfo[,tail(names(dfAddInfo),2)]),1)
-    dfAddInfo <- dfAddInfo[,c(1,grep("EventCoverageMean",names(dfAddInfo)))]
-    diffTable <- merge(dfAddInfo,diffTable,by=1,all.x=F,all.y=T)
+    diffTable <- merge(dfAddInfoCov,diffTable,by=1,all.x=F,all.y=T)
     showCol <- c("ID","EventCoverageMean",C1lab,C2lab,"Adjusted_pvalue","DeltaPSI")
   }
   diffTable <- diffTable[match(o, diffTable$ID),]
