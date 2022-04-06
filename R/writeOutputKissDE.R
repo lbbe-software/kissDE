@@ -30,15 +30,15 @@ writeOutputKissDE <- function(resDiffExprVariant, output, adjPvalMax=1,
     
     if (writePSI) {
         .writePSITable(resDiffExprVariant, adjPvalMax, dPSImin, paste(output,"PSI",sep="."))
+    } 
+    
+    if (is.null(k2rgFile)) {
+        .writeTableOutput(resDiffExprVariant$finalTable, adjPvalMax, 
+                          dPSImin, output)
     } else {
-        if (is.null(k2rgFile)) {
-            .writeTableOutput(resDiffExprVariant$finalTable, adjPvalMax, 
-                dPSImin, output)
-        } else {
-            .writeMergeOutput(resDiffExprVariant, k2rgFile, adjPvalMax, 
-                dPSImin, output)
-            resDiffExprVariant$k2rgRes <- read.table(k2rgFile, sep="\t", comment.char = "", header = T)
-        }
+        .writeMergeOutput(resDiffExprVariant, k2rgFile, adjPvalMax, 
+                          dPSImin, output)
+        resDiffExprVariant$k2rgRes <- read.table(k2rgFile, sep="\t", comment.char = "", header = T)
     }
     
     saveRDS(resDiffExprVariant,paste(output,"rds",sep="."))
