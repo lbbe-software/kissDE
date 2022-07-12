@@ -1051,12 +1051,19 @@
     K2RG_COVUP <- "Read_coverage(upper_path)"
     K2RG_COVLOW <- "Read_coverage(lower_path)"
     K2RG_CANON <- "Canonical_sites?"
+    K2RG_PID <- "protein_id"
+    K2RG_DESC <- "description"
+    K2RG_BRANK <- "busco_rank"
+    K2RG_BID <- "busco_id"
+    K2RG_BSCORE <- "busco_score"
+    K2RG_BDESC <- "busco_description"
     LK2RG <- c(K2RG_GENEID, K2RG_GENENAME, K2RG_POS, K2RG_STRAND, K2RG_TYPE, 
-        K2RG_VARLENGTH, K2RG_FS, K2RG_CDS, K2RG_BIO, K2RG_KNOWNSS, 
-        K2RG_BLOCUP, K2RG_POSUP, K2RG_PARA, K2RG_COMPLEX, K2RG_SNP, 
-        K2RG_EVENT, K2RG_BLOCLOW, K2RG_POSLOW, K2RG_PSI, K2RG_COVUP, 
-        K2RG_COVLOW, K2RG_CANON)
-    
+             K2RG_VARLENGTH, K2RG_FS, K2RG_CDS, K2RG_BIO, K2RG_KNOWNSS, 
+             K2RG_BLOCUP, K2RG_POSUP, K2RG_PARA, K2RG_COMPLEX, K2RG_SNP, 
+             K2RG_EVENT, K2RG_BLOCLOW, K2RG_POSLOW, K2RG_PSI, K2RG_COVUP, 
+             K2RG_COVLOW, K2RG_CANON, K2RG_PID, K2RG_DESC, K2RG_BRANK,
+             K2RG_BID, K2RG_BSCORE, K2RG_BDESC)
+  
     K2RGKDE_APV <- "adjusted_pvalue"
     K2RGKDE_DPSI <- "dPSI"
     K2RGKDE_WARN <- "warnings"
