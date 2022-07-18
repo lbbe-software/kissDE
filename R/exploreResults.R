@@ -174,8 +174,21 @@ exploreResults <- function(rdsFile) {
     }
     
     ## Less important info
-    dfAddInfo <- resK2RG[,c(16,14,6:8,13,12,18,10,22)]
-    colnames(dfAddInfo) <- c("ID","ComplexEvent","VariablePartLength","Frameshift","inCDS","Paralogs","upperPathSS","lowerPathSS","unkownSS","SS_IR")
+    dfAddInfo <- resK2RG[, c(16, 14, 6:8, 13, 12, 18, 10, 
+                             22:length(resK2RG))]
+    if (length(dfAddInfo)==12) {
+      colnames(dfAddInfo) <- c("ID", "ComplexEvent", "VariablePartLength", 
+                               "Frameshift", "inCDS", "Paralogs", "upperPathSS", 
+                               "lowerPathSS", "unkownSS", "SS_IR", "Protein ID",
+                               "Description (from annotaiton)")
+    }
+    else {
+      colnames(dfAddInfo) <- c("ID", "ComplexEvent", "VariablePartLength", 
+                             "Frameshift", "inCDS", "Paralogs", "upperPathSS", 
+                             "lowerPathSS", "unkownSS", "SS_IR", "Protein ID",
+                             "Description (from annotaiton)", "Busco Rank",
+                             "Busco ID", "Busco Score", "Description (from BUSCO)")
+    }
     asNumCompEvents <- as.numeric(dfAddInfo$ComplexEvent[dfAddInfo$ComplexEvent!="-"])
     dfAddInfo$ComplexEvent <- factor(dfAddInfo$ComplexEvent, levels = c("-",as.character(unique(sort(asNumCompEvents)))))
     ## Merge
@@ -187,7 +200,6 @@ exploreResults <- function(rdsFile) {
     #hideCol <- colnames(diffTable)[c(5,7:19,21,23,26)]
     #showCol <- colnames(diffTable)[c(1:4,6,20,22,24:25)]
     showCol <- c("ID","GeneID","GeneName","EventPosition","EventType","EventCoverageMean",C1lab,C2lab,"Adjusted_pvalue","DeltaPSI")
-    
     events <- unique(PSItable$EventType)
     events <- events[-grep(",",events)]
     biotypes <- unique(PSItable$Biotype)
