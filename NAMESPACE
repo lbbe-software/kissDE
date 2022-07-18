@@ -17,11 +17,12 @@ importFrom("stats",
             "as.dist", 
             "complete.cases", 
             "cor", 
+            "median",
             "p.adjust",
             "prcomp",
             "reshape",
-           "median",
-           "var")
+            "sd",
+            "var")
 importFrom("utils", "tail", "write.table","head","read.table")
 importFrom("foreach", "foreach", "%dopar%")
 importFrom("doParallel", "registerDoParallel")
