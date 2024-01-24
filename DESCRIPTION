@@ -19,3 +19,5 @@ License: GPL (>= 2)
 Contact: Vincent Lacroix <vincent.lacroix@univ-lyon1.fr>
 Encoding: UTF-8
 biocViews: AlternativeSplicing, DifferentialSplicing, ExperimentalDesign, GenomicVariation, RNASeq, Transcriptomics
+URL: https://github.com/lbbe-software/kissDE
+Issues: https://github.com/lbbe-software/kissDE/issues
