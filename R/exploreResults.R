@@ -55,16 +55,16 @@ exploreResults <- function(rdsFile) {
   C1labVar <- paste("sd.",C1,sep="")
   C2labVar <- paste("sd.",C2,sep="")
   meanPSI[[C1lab]] <- ifelse(okC1,
-                                                   rowMeans(PSItable[,grep(condRepl[1],colnames(PSItable))],na.rm = T),
+                                                   rowMeans(PSItable[,grep(condRepl[1],colnames(PSItable))],na.rm = TRUE),
                                                    NA)
   meanPSI[[C1labVar]] <- ifelse(okC1,
-                             apply(PSItable[,grep(condRepl[1],colnames(PSItable))],1,sd,na.rm = T),
+                             apply(PSItable[,grep(condRepl[1],colnames(PSItable))],1,sd,na.rm = TRUE),
                              NA)
   meanPSI[[C2lab]] <- ifelse(okC2,
-                                                   rowMeans(PSItable[,grep(condRepl[2],colnames(PSItable))],na.rm = T),
+                                                   rowMeans(PSItable[,grep(condRepl[2],colnames(PSItable))],na.rm = TRUE),
                                                    NA)
   meanPSI[[C2labVar]] <- ifelse(okC2,
-                                apply(PSItable[,grep(condRepl[2],colnames(PSItable))],1,sd,na.rm = T),
+                                apply(PSItable[,grep(condRepl[2],colnames(PSItable))],1,sd,na.rm = TRUE),
                                 NA)
   meanPSI[,-1] <- round(meanPSI[,-1],1)
   ### FDR/dPSIs
@@ -75,11 +75,11 @@ exploreResults <- function(rdsFile) {
   diffTable[,3] <- round(diffTable[,3]*100,1)
   ## Add the meanPSIs
   o <- diffTable$ID # order for after the merge
-  diffTable <- merge(meanPSI, diffTable, by=1, all.x=F, all.y=T)
+  diffTable <- merge(meanPSI, diffTable, by=1, all.x=FALSE, all.y=TRUE)
   showCol <- colnames(diffTable)
   #hideCol <- c("lowcounts")
   
-  filterPanelSize <- checkboxInput("plotSize","Adapt the size of the points to the mean event coverage (up to 100)?",T)
+  filterPanelSize <- checkboxInput("plotSize","Adapt the size of the points to the mean event coverage (up to 100)?",TRUE)
   filterPanelEvents <- ""
   filterPanelBiotypes <- ""
   keepPanelEvents <- ""
@@ -101,10 +101,10 @@ exploreResults <- function(rdsFile) {
   filterPanelCoverageDiff <- numericInput("fCoverDiff","Minimum mean event coverage:",value = 0,min = 0)
   
   dfAddInfoCov <- res$finalTable[,c(1,grep("Variant",names(res$finalTable)))]
-  normMeanC1V1 <- rowMeans(dfAddInfoCov[,grep(paste("Variant1_",C1,"_repl",sep=""),names(dfAddInfoCov))],na.rm = T)
-  normMeanC2V1 <- rowMeans(dfAddInfoCov[,grep(paste("Variant1_",C2,"_repl",sep=""),names(dfAddInfoCov))],na.rm = T)
-  normMeanC1V2 <- rowMeans(dfAddInfoCov[,grep(paste("Variant2_",C1,"_repl",sep=""),names(dfAddInfoCov))],na.rm = T)
-  normMeanC2V2 <- rowMeans(dfAddInfoCov[,grep(paste("Variant2_",C2,"_repl",sep=""),names(dfAddInfoCov))],na.rm = T)
+  normMeanC1V1 <- rowMeans(dfAddInfoCov[,grep(paste("Variant1_",C1,"_repl",sep=""),names(dfAddInfoCov))],na.rm = TRUE)
+  normMeanC2V1 <- rowMeans(dfAddInfoCov[,grep(paste("Variant1_",C2,"_repl",sep=""),names(dfAddInfoCov))],na.rm = TRUE)
+  normMeanC1V2 <- rowMeans(dfAddInfoCov[,grep(paste("Variant2_",C1,"_repl",sep=""),names(dfAddInfoCov))],na.rm = TRUE)
+  normMeanC2V2 <- rowMeans(dfAddInfoCov[,grep(paste("Variant2_",C2,"_repl",sep=""),names(dfAddInfoCov))],na.rm = TRUE)
   normMeanC1 <- normMeanC1V1+normMeanC1V2
   normMeanC2 <- normMeanC2V1+normMeanC2V2
   C1eC <- paste("EventCoverageMean",C1,sep=".")
@@ -192,11 +192,11 @@ exploreResults <- function(rdsFile) {
     asNumCompEvents <- as.numeric(dfAddInfo$ComplexEvent[dfAddInfo$ComplexEvent!="-"])
     dfAddInfo$ComplexEvent <- factor(dfAddInfo$ComplexEvent, levels = c("-",as.character(unique(sort(asNumCompEvents)))))
     ## Merge
-    PSItable <- merge(dfInfo,PSItable,by=1,all.x=F,all.y=T)
-    diffTable <- merge(dfAddInfoCov,diffTable,by=1,all.x=F,all.y=T)
-    diffTable <- merge(dfAddInfo,diffTable,by=1,all.x=F,all.y=T)
-    diffTable <- merge(dfSS,diffTable,by=1,all.x=F,all.y=T)
-    diffTable <- merge(dfInfo,diffTable,by=1,all.x=F,all.y=T)
+    PSItable <- merge(dfInfo,PSItable,by=1,all.x=FALSE,all.y=TRUE)
+    diffTable <- merge(dfAddInfoCov,diffTable,by=1,all.x=FALSE,all.y=TRUE)
+    diffTable <- merge(dfAddInfo,diffTable,by=1,all.x=FALSE,all.y=TRUE)
+    diffTable <- merge(dfSS,diffTable,by=1,all.x=FALSE,all.y=TRUE)
+    diffTable <- merge(dfInfo,diffTable,by=1,all.x=FALSE,all.y=TRUE)
     #hideCol <- colnames(diffTable)[c(5,7:19,21,23,26)]
     #showCol <- colnames(diffTable)[c(1:4,6,20,22,24:25)]
     showCol <- c("ID","GeneID","GeneName","EventPosition","EventType","EventCoverageMean",C1lab,C2lab,"Adjusted_pvalue","DeltaPSI")
@@ -216,28 +216,28 @@ exploreResults <- function(rdsFile) {
     chromPosDiff <- sort(unique(unlist(lapply(lPosDiff,"[[",1))))
     posMinDiff <- 0 # aletrnatively, min(as.integer(unlist(lapply(lPos,"[[",2))))
     posMaxDiff <- max(as.integer(unlist(lapply(lPosDiff,"[[",3))))
-    filterPanelEvents <- selectizeInput("fEvents","Filter this type of event:",choices = events,selected = NULL,multiple=T)
-    filterPanelBiotypes <- selectizeInput("fBio","Filter this type of biotype:",choices = biotypes,selected = NULL,multiple=T)
-    keepPanelEvents <- selectizeInput("fEventsK","Keep this type of event:",choices = events,selected = NULL,multiple=T)
-    keepPanelBiotypes <- selectizeInput("fBioK","Keep this type of biotype:",choices = biotypes,selected = NULL,multiple=T)
-    filterPanelRepeats <- checkboxInput("fRepeats","Filter repeat-linked event",F)
-    filterPanelGenomicWindow <- checkboxInput("fGenomicWindow","Activate genomic window filter",F)
-    filterPanelChrom <- selectizeInput("fChrom","Keep this chromosome:",choices = chromPos,selected = NULL,multiple=T)
+    filterPanelEvents <- selectizeInput("fEvents","Filter this type of event:",choices = events,selected = NULL,multiple=TRUE)
+    filterPanelBiotypes <- selectizeInput("fBio","Filter this type of biotype:",choices = biotypes,selected = NULL,multiple=TRUE)
+    keepPanelEvents <- selectizeInput("fEventsK","Keep this type of event:",choices = events,selected = NULL,multiple=TRUE)
+    keepPanelBiotypes <- selectizeInput("fBioK","Keep this type of biotype:",choices = biotypes,selected = NULL,multiple=TRUE)
+    filterPanelRepeats <- checkboxInput("fRepeats","Filter repeat-linked event",FALSE)
+    filterPanelGenomicWindow <- checkboxInput("fGenomicWindow","Activate genomic window filter",FALSE)
+    filterPanelChrom <- selectizeInput("fChrom","Keep this chromosome:",choices = chromPos,selected = NULL,multiple=TRUE)
     filterPanelStart <- numericInput("fStartPos","Start of the genomic window:",value = posMin,min = posMin,max = posMax)
     filterPanelEnd <- numericInput("fEndPos","End of the genomic window:",value = posMax,min = posMin,max = posMax)
-    filterPanelEventsDiff <- selectizeInput("fEventsDiff","Filter this type of event:",choices = eventsDiff,selected = NULL,multiple=T)
-    filterPanelBiotypesDiff <- selectizeInput("fBioDiff","Filter this type of biotype:",choices = biotypesDiff,selected = NULL,multiple=T)
-    keepPanelEventsDiff <- selectizeInput("fEventsDiffK","Keep this type of event:",choices = eventsDiff,selected = NULL,multiple=T)
-    keepPanelBiotypesDiff <- selectizeInput("fBioDiffK","Keep this type of biotype:",choices = biotypesDiff,selected = NULL,multiple=T)
-    filterPanelRepeatsDiff <- checkboxInput("fRepeatsDiff","Filter repeat-linked event",F)
-    filterPanelChromDiff <- selectizeInput("fChromDiff","Keep this chromosome:",choices = chromPosDiff,selected = NULL,multiple=T)
-    filterPanelGenomicWindowDiff <- checkboxInput("fGenomicWindowDiff","Activate genomic window filter",F)
+    filterPanelEventsDiff <- selectizeInput("fEventsDiff","Filter this type of event:",choices = eventsDiff,selected = NULL,multiple=TRUE)
+    filterPanelBiotypesDiff <- selectizeInput("fBioDiff","Filter this type of biotype:",choices = biotypesDiff,selected = NULL,multiple=TRUE)
+    keepPanelEventsDiff <- selectizeInput("fEventsDiffK","Keep this type of event:",choices = eventsDiff,selected = NULL,multiple=TRUE)
+    keepPanelBiotypesDiff <- selectizeInput("fBioDiffK","Keep this type of biotype:",choices = biotypesDiff,selected = NULL,multiple=TRUE)
+    filterPanelRepeatsDiff <- checkboxInput("fRepeatsDiff","Filter repeat-linked event",FALSE)
+    filterPanelChromDiff <- selectizeInput("fChromDiff","Keep this chromosome:",choices = chromPosDiff,selected = NULL,multiple=TRUE)
+    filterPanelGenomicWindowDiff <- checkboxInput("fGenomicWindowDiff","Activate genomic window filter",FALSE)
     filterPanelStartDiff <- numericInput("fStartPosDiff","Start of the genomic window:",value = posMinDiff,min = posMinDiff,max = posMaxDiff)
     filterPanelEndDiff <- numericInput("fEndPosDiff","End of the genomic window:",value = posMaxDiff,min = posMinDiff,max = posMaxDiff)
   } else {
     # NO K2RG FILE
     # We still have info about event coverage
-    diffTable <- merge(dfAddInfoCov,diffTable,by=1,all.x=F,all.y=T)
+    diffTable <- merge(dfAddInfoCov,diffTable,by=1,all.x=FALSE,all.y=TRUE)
     showCol <- c("ID","EventCoverageMean",C1lab,C2lab,"Adjusted_pvalue","DeltaPSI")
   }
   diffTable <- diffTable[match(o, diffTable$ID),]
@@ -267,8 +267,8 @@ exploreResults <- function(rdsFile) {
                                                                          max = 1,
                                                                          value = 1,
                                                                          step = 0.001),
-                                                            checkboxInput("fNADPSI","Filter events with an NA deltaPSI",T),
-                                                            checkboxInput("fAbsDPSI","Use absolute value for dPSI filter",F),
+                                                            checkboxInput("fNADPSI","Filter events with an NA deltaPSI",TRUE),
+                                                            checkboxInput("fAbsDPSI","Use absolute value for dPSI filter",FALSE),
                                                             numericInput("fDPSI",
                                                                          label = "Minimum deltaPSI value (maximum value if negative)",
                                                                          min = -100,
@@ -309,7 +309,7 @@ exploreResults <- function(rdsFile) {
                           column(width=12,
                                  column(width=6,
                                         wellPanel(
-                                          checkboxGroupInput("fCol", "Show these columns:", choices = unique(colnames(diffTable)), selected = showCol,inline = T)
+                                          checkboxGroupInput("fCol", "Show these columns:", choices = unique(colnames(diffTable)), selected = showCol,inline = TRUE)
                                         )
                                  ),
                                  column(width=6,
@@ -325,13 +325,13 @@ exploreResults <- function(rdsFile) {
                                                             p("y-axis: only continuous values are allowed. If coupled with a discrete x-axis, the density will be printed (box-violin plot)"),
                                                             p("In plots with two continuous values, the bigger the points, the higher the mean coverage of the event (EventCoverageMean column, the max is reached at 100)."),
                                                             width=3,
-                                                            checkboxInput("plotDensity","Plot box-violin plot of x-axis continuous values?",F),
+                                                            checkboxInput("plotDensity","Plot box-violin plot of x-axis continuous values?",FALSE),
                                                             conditionalPanel("input.plotDensity",
-                                                                             selectInput("plotXdensity","Choose the values to print on the x-axis:",choices = colDiffContinuous,multiple = T,selected = colMeanPSI)
+                                                                             selectInput("plotXdensity","Choose the values to print on the x-axis:",choices = colDiffContinuous,multiple = TRUE,selected = colMeanPSI)
                                                             ),
                                                             conditionalPanel("!input.plotDensity",
-                                                                             selectInput("plotX","Choose the values to print on the x-axis:",choices = colDiff,multiple = F,selected = "DeltaPSI"),
-                                                                             selectInput("plotY","Choose the values to print on the y-axis:",choices = colDiffContinuous, multiple = F,selected = "Adjusted_pvalue")),
+                                                                             selectInput("plotX","Choose the values to print on the x-axis:",choices = colDiff,multiple = FALSE,selected = "DeltaPSI"),
+                                                                             selectInput("plotY","Choose the values to print on the y-axis:",choices = colDiffContinuous, multiple = FALSE,selected = "Adjusted_pvalue")),
                                                             radioButtons("plotXtrans","Transformation to use for the x-axis:",choices = c("None","log10","-log10"),selected = "None"),
                                                             radioButtons("plotYtrans","Transformation to use for the y-axis:",choices = c("None","log10","-log10"),selected = "-log10"),
                                                             numericInput("plotFDR","Maximum adjusted p-value (FDR) to highlight a point:",min = 0,max = 1,value = 0.05,step = 0.001),
@@ -403,7 +403,7 @@ exploreResults <- function(rdsFile) {
                                                sidebarPanel(h2("Filter Events"),
                                                             width = 3,
                                                             
-                                                            checkboxInput("fCompleteCases", "Only show complete cases (filter ASE with one or more NA PSI value)", F),
+                                                            checkboxInput("fCompleteCases", "Only show complete cases (filter ASE with one or more NA PSI value)", FALSE),
                                                             keepPanelEvents,
                                                             filterPanelEvents,
                                                             keepPanelBiotypes,
@@ -641,14 +641,14 @@ exploreResults <- function(rdsFile) {
     output$dlPSI <- downloadHandler(
       filename = paste("kissDE.PSI.",C1,"_vs_",C2,".tab",sep=""),
       content = function(file) {
-        write.table(dataPSI(),file,sep="\t",quote=F,row.names = F)
+        write.table(dataPSI(),file,sep="\t",quote=FALSE,row.names = FALSE)
       }
     )
     
     output$dlDiff <- downloadHandler(
       filename = paste("kissDE.results.",C1,"_vs_",C2,".tab",sep=""),
       content = function(file) {
-        write.table(dataDiff(),file,sep="\t",quote=F,row.names = F)
+        write.table(dataDiff(),file,sep="\t",quote=FALSE,row.names = FALSE)
       }
     )
     
@@ -788,9 +788,9 @@ exploreResults <- function(rdsFile) {
           stat_summary(fun=median, geom="point", fill="white", shape=23, size=1)
       } else {
         data <- cdata
-        doSize <- F
+        doSize <- FALSE
         if(input$plotSize & min(data[["EventCoverageMean"]])<100) {
-          doSize <- T
+          doSize <- TRUE
           alphaEstimation <- data[["EventCoverageMean"]]/100
           data$alpha <- ifelse(alphaEstimation>1,1,alphaEstimation)
           data$size <- data$alpha*2
