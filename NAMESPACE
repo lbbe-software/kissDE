@@ -47,3 +47,4 @@ export(diffExpressedVariants,
 
 S3method("print", "countsData")
 S3method("print", "pval")
+importFrom("rlang", .data)

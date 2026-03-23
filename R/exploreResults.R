@@ -706,7 +706,7 @@ exploreResults <- function(rdsFile) {
                          y=data[[paste("Axis",a2,sep="")]],
                          group=data$group,
                          label=data$label)
-      g<-ggplot(data=data, aes_string(x="x", y="y", colour="group", label="label"))+
+      g<-ggplot(data=data, aes(x=.data$x, y=.data$y, colour=.data$group, label=.data$label))+
         geom_hline(yintercept = 0,size=0.3)+
         geom_vline(xintercept = 0,size=0.3)+
         geom_point(size=3,stroke=0.2)+
@@ -779,7 +779,7 @@ exploreResults <- function(rdsFile) {
         if(input$plotYgroup!="None") {
           data$wrapY <- unlist(cdata[,input$plotYgroup])
         }
-        g<-ggplot(data = data, aes_string(x="x",y="y",fill="x"))+
+        g<-ggplot(data = data, aes(x=.data$x,y=.data$y,fill=.data$x))+
           theme_bw()+
           theme(strip.background =element_rect(fill="white"),strip.text.y = element_text(angle = 0),legend.position = "none")+
           geom_violin(scale = "width") +
@@ -840,7 +840,7 @@ exploreResults <- function(rdsFile) {
           data$wrapY <- data[[input$plotYgroup]]
         }
         if(input$plotX%in%colDiffDiscrete) {
-          g <- ggplot(data = data, aes_string(x="x",y="y",fill=input$plotX))+
+          g <- ggplot(data = data, aes(x=.data$x,y=.data$y,fill=input$plotX))+
             theme_bw()+
             theme(strip.background =element_rect(fill="white"),strip.text.y = element_text(angle = 0),legend.position = "none")+
             geom_violin(scale = "width") +
@@ -851,7 +851,7 @@ exploreResults <- function(rdsFile) {
             stat_summary(fun=median, geom="point", fill="white", shape=23, size=1)
         } else {
           if(doSize) {
-            g <- ggplot(data = data, aes_string(x="x",y="y",shape="pch",color="col",alpha="alpha",size="size"))+
+            g <- ggplot(data = data, aes(x=.data$x,y=.data$y,shape=.data$pch,color=.data$col,alpha=.data$alpha,size=.data$size))+
               theme_bw()+
               geom_point(stroke=0.15)+
               scale_color_manual(values = cols)+
@@ -862,7 +862,7 @@ exploreResults <- function(rdsFile) {
               ylab(yName)+
               guides(color="none",shape="none",alpha="none",size="none")
           } else {
-            g <- ggplot(data = data, aes_string(x="x",y="y",shape="pch",color="col"))+
+            g <- ggplot(data = data, aes(x=.data$x,y=.data$y,shape=.data$pch,color=.data$col))+
               theme_bw()+
               geom_point(stroke=0.15)+
               scale_color_manual(values = cols)+
