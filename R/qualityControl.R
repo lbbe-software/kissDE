@@ -116,12 +116,12 @@ qualityControl <- function(countsData, conditions, storeFigs=FALSE,
     # create the data.frame for ggplot
     d <- data.frame(PC1=pca$x[,1], PC2=pca$x[,2], group=sort(conditions))
     if (storeFigs == FALSE) {
-        p <- ggplot(data=d, aes_string(x="PC1", y="PC2", color="group")) + 
+        p <- ggplot(data=d, aes(x=.data$PC1, y=.data$PC2, color=.data$group)) + 
             geom_point(size=3) + xlab(pc1lab) + ylab(pc2lab)
         print(p)
     } else {
         filename <- paste(pathToFigs, "/pca.png", sep="")
-        p <- ggplot(data=d, aes_string(x="PC1", y="PC2", color="group")) + 
+        p <- ggplot(data=d, aes(x=.data$PC1, y=.data$PC2, color=.data$group)) + 
             geom_point(size=3) + xlab(pc1lab) + ylab(pc2lab)
         ggsave(filename, plot = p, device = "png", width = 7, height = 7)
     }

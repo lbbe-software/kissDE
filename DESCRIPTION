@@ -1,5 +1,5 @@
 Package: kissDE
-Version: 1.23.0
+Version: 1.31.1
 Title: Retrieves Condition-Specific Variants in RNA-Seq Data
 Description: Retrieves condition-specific variants in RNA-seq data (SNVs, alternative-splicings, indels). It has been developed as a post-treatment of 'KisSplice' but can also be used with user's own data.
 Authors@R: c(
@@ -13,11 +13,11 @@ Authors@R: c(
 	person("Frank", "Picard", role = "ctb"), 
 	person("Laurent", "Jacob", role = "ctb"), 
 	person("Vincent", "Miele", role = "ctb"))
-Imports: aods3, Biobase, DESeq2, DSS, ggplot2, gplots, graphics, grDevices, matrixStats, stats, utils, foreach, doParallel, parallel, shiny, shinycssloaders, ade4, factoextra, DT
+Imports: aods3, Biobase, DESeq2, DSS, ggplot2, gplots, graphics, grDevices, matrixStats, stats, utils, foreach, doParallel, parallel, shiny, shinycssloaders, ade4, factoextra, DT, rlang
 Suggests: BiocStyle, testthat
 License: GPL (>= 2)
 Contact: Vincent Lacroix <vincent.lacroix@univ-lyon1.fr>
 Encoding: UTF-8
 biocViews: AlternativeSplicing, DifferentialSplicing, ExperimentalDesign, GenomicVariation, RNASeq, Transcriptomics
 URL: https://github.com/lbbe-software/kissDE
-Issues: https://github.com/lbbe-software/kissDE/issues
+BugReports: https://github.com/lbbe-software/kissDE/issues
