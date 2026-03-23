@@ -38,7 +38,7 @@ writeOutputKissDE <- function(resDiffExprVariant, output, adjPvalMax=1,
     } else {
         .writeMergeOutput(resDiffExprVariant, k2rgFile, adjPvalMax, 
                           dPSImin, output)
-        resDiffExprVariant$k2rgRes <- read.table(k2rgFile, sep="\t", comment.char = "", header = T, quote = '')
+        resDiffExprVariant$k2rgRes <- read.table(k2rgFile, sep="\t", comment.char = "", header = TRUE, quote = '')
     }
     
     saveRDS(resDiffExprVariant,paste(output,"rds",sep="."))
