@@ -124,7 +124,7 @@ exploreResults <- function(rdsFile) {
       dfSS <- res$dfSS
     } else {
       dfSS <- resK2RG[resK2RG$X3.Chromosome_and_genomic_position!="multiple" & !resK2RG$X5.Event_type%in%c("insertion","deletion","indel"),c(16,3,12,18)]
-      colnames(dfSS)[1]="ID"
+      colnames(dfSS)[1] <- "ID"
       dfSS$chrom <- gsub("(.*):\\d+-\\d+","\\1",dfSS$X3.Chromosome_and_genomic_position)
       dfSS$mergeSS <- ifelse(dfSS$X12.genomic_position_of_each_splice_site_.upper_path..of_each_SNP=="-",
                              dfSS$X18.genomic_position_of_each_splice_site_.lower_path.,
