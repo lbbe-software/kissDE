@@ -29,10 +29,10 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
     }
     
     if(nbCore > 1 && nbCore >= detectCores()){
-        stop(paste("Your machine only have", detectCores(), "cores.",
-            "The maximum value for nbCore on your machine is",
-            detectCores()-1, ".",
-            "Decrease the 'nbCore' parameter and relaunch."))
+        stop("Your machine only have ", parallel::detectCores(), " cores. ",
+            "The maximum value for 'nbCore' on your machine is ",
+            parallel::detectCores()-1, ". ",
+            "Decrease the 'nbCore' parameter and relaunch.")
     }
     
     ########
