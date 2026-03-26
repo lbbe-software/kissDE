@@ -45,12 +45,12 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
           
-      - name: Install dependencies
+      - name: Install bioconductor packages
         run: |
           install.packages("BiocManager")
-          BiocManager::install(c("DESeq2", "DSS"))
-          install.packages('aods3')
-          
+          BiocManager::install(c('DESeq2', 'DSS', 'aods3'))
+        shell: Rscript {0}
+        
       - name: Setup R packages
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
