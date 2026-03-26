@@ -30,65 +30,28 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
       
-      - uses: r-lib/actions/setup-pandoc@v2
-
-      - uses: r-lib/actions/setup-r@v2
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
           
-      - uses: r-lib/actions/setup-tinytex@v2
-      
-      - name: Install libraries for Linux
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get install texlive-fonts-extra texlive-lang-european texlive-latex-recommended
-          sudo apt-get install libcurl4-openssl-dev
-       
-      - name: Install dependencies
-        run: |
-          install.packages("remotes")
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("rcmdcheck")
-          install.packages("BiocManager")
-          BiocManager::install(c("DESeq2", "DSS"))
-          install.packages('tinytex')
-          install.packages('aods3')
-          tinytex::parse_install(text = "! LaTeX Error: File `authblk.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `soul.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `placeins.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `ragged2e.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `footmisc.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `marginfix.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `changepage.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `caption.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `xstring.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `mathtools.sty' not found.")
-          tinytex::parse_install(text = "! LaTeX Error: File `multirow.sty' not found.")
-          tinytex::tlmgr_install(c("bera", "titlesec", "fancyhdr", "enumitem", "parskip", "nowidow", "parnotes"))
-        shell: Rscript {0}
-        
-      # - name: Install Windows dependencies
-      #   if: runner.os == 'Windows'
-      #   run: |
-      #     install.packages("BiocManager")
-      #     BiocManager::install("RCurl",type="binary",force=TRUE)
-      #     Sys.setenv(LOCAL_CPPFLAGS = "-I/mingw$(WIN)/include/libxml2")
-      #     install.packages("XML")
-      #   shell: Rscript {0}
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2        
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
+      - name: Setup R packages
+        uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          # pak-version: devel
-          # extra-packages: any::rcmdcheck, any::XML
           extra-packages: any::rcmdcheck
           needs: check
           # See https://github.com/r-lib/actions/issues/559 for the XML issue
 
-      - uses: r-lib/actions/check-r-package@v2
+      - name: Check package
+        uses: r-lib/actions/check-r-package@v2
         with:
           args: 'c("--no-manual", "--as-cran")'
           error-on: '"error"'
