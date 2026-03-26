@@ -62,7 +62,7 @@ bibliography: bibliography.bib
 vignette: >
   %\VignetteEngine{quarto::html}
   %\VignetteIndexEntry{kissDE Reference Manual} 
-  %!\VignetteEncoding{UTF-8}
+  %\VignetteEncoding{UTF-8}
 ---
 
 
@@ -935,7 +935,7 @@ This first example corresponds to the case of differential analysis of
 alternative splicing (AS) events. 
 The sample data presented here is a subset of the case study used in 
 @Benoit-Pilven (see 
-[http://kissplice.prabi.fr/pipeline_ks_farline/](http://kissplice.prabi.fr/pipeline_ks_farline/)).
+[https://kissplice.prabi.fr/pipeline_ks_farline/](https://kissplice.prabi.fr/pipeline_ks_farline/)).
 
 
 #### Dataset
@@ -957,7 +957,7 @@ Alternative Acceptor (AltA), \dots).
 
 For further information on these tools (*KisSplice* and *KisSplice2refgenome*),
 please refer to the manual that can be found on this web page: 
-[http://kissplice.prabi.fr/](http://kissplice.prabi.fr/).
+[https://kissplice.prabi.fr/](https://kissplice.prabi.fr/).
 
 The output file of *KisSplice2refgenome* is a tab-delimited file that stores 
 the annotated alternative splicing events found in the dataset. 
