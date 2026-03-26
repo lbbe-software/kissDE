@@ -45,6 +45,12 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
           
+      - name: Install dependencies
+        run: |
+          install.packages("BiocManager")
+          BiocManager::install(c("DESeq2", "DSS"))
+          install.packages('aods3')
+          
       - name: Setup R packages
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
