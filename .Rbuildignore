@@ -1,8 +1,4 @@
-devtests
-tags
-./doc/kissDE_doc.*x
-./dockissDE_doc.log
-./doc/kissDE_doc.tex.backup
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.github$
+^vignettes/*_files$
