@@ -59,6 +59,7 @@ theme: flatly # Pour garder le theme classique (default), supprime cette ligne
 toc: true
 number-sections: true
 bibliography: bibliography.bib
+html-math-method: katex
 vignette: >
   %\VignetteEngine{quarto::html}
   %\VignetteIndexEntry{kissDE Reference Manual} 
