@@ -53,12 +53,13 @@ abstract: >
   The workflow for SNPs/SNVs is fully described in @Lopez-Maestre2016, 
   the workflow for splicing is fully described in @Benoit-Pilven.
 execute:
-  cache: true # Conserve les computations des cellules de code 
+  cache: false # Conserve les computations des cellules de code 
   warning: false
 theme: flatly # Pour garder le theme classique (default), supprime cette ligne 
 toc: true
 number-sections: true
 bibliography: bibliography.bib
+html-math-method: katex
 vignette: >
   %\VignetteEngine{quarto::html}
   %\VignetteIndexEntry{kissDE Reference Manual} 
@@ -803,13 +804,9 @@ Then we design two models to take into account interactions with variants
 We  use the generalised linear model framework. The expected intensity 
 $\lambda_{ijk}$ can be written as follows:
 
-\begin{equation}
-\mathcal{M_0}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j}\\
-\end{equation}
-\begin{equation}
-\mathcal{M_1}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} + \beta_{j} +
-\left(\alpha \beta \right)_{ij}
-\end{equation}
+$$ \mathcal{M_0}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} +\beta_{j}$$
+
+$$ \mathcal{M_1}:\:\:\log \lambda_{ijk} = \mu + \alpha_{i} + \beta_{j} + \left(\alpha \beta \right)_{ij} $$
 
 where $\mu$ is the local mean expression of the transcript that contains the 
 variant, $\alpha_{i}$ the effect of variant $i$ on the expression, $\beta_{j}$ 
@@ -887,16 +884,9 @@ using the difference of Percent Spliced In (PSI) between the two conditions.
 These two measures turn out to be equivalent and can be summarized using the 
 following formula:
 
-\begin{equation}
-PSI \:=\: f  \:=\:  \frac{\#counts*\_variant_1}{\#counts*\_variant_1 + 
-\#counts\_variant_2}
-\end{equation}
-\begin{equation}
-\Delta PSI \:=\: PSI_{cond1} - PSI_{cond2}
-\end{equation}
-\begin{equation}
-\Delta f \:=\: f_{cond1} - f_{cond2}
-\end{equation}
+$$ PSI \:=\: f  \:=\:  \frac{\#counts*\_variant_1}{\#counts*\_variant_1 + \#counts\_variant_2} $$
+$$ \Delta PSI \:=\: PSI_{cond1} - PSI_{cond2} $$
+$$ \Delta f \:=\: f_{cond1} - f_{cond2} $$
 
 In this formula, $\#counts*\_variant_1$ correspond to the normalized number 
 of reads of the $variant_1$, itself normalized for the variant length.

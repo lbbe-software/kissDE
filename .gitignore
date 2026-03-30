@@ -4,3 +4,4 @@ kissDE.Rproj
 .RData
 .Ruserdata
 vignettes/*_files
+vignettes/*.html
