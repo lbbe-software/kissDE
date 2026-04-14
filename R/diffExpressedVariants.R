@@ -6,19 +6,19 @@ diffExpressedVariants <- function(countsData, conditions, pvalue=1,
     
     ######## check function inputs
     
-    if(length(pvalue)>1 | !is.double(pvalue) | pvalue<0 | pvalue>1) {
+    if(length(pvalue)>1 || !is.double(pvalue) || pvalue<0 || pvalue>1) {
         stop("Input error: 'pvalue' must be a double between 0 and 1.")
     }
     
     if((length(filterLowCountsVariants)>1) | 
-        (filterLowCountsVariants!=as.integer(filterLowCountsVariants)) | 
+        (filterLowCountsVariants!=as.integer(filterLowCountsVariants)) || 
         (filterLowCountsVariants<0)) {
             stop("Input error: 'filterLowCountsVariants' must be a 
     positive integer.")
     }
     
     if((length(flagLowCountsConditions)>1) | 
-        (flagLowCountsConditions!=as.integer(flagLowCountsConditions)) | 
+        (flagLowCountsConditions!=as.integer(flagLowCountsConditions)) || 
         (flagLowCountsConditions<0)) {
             stop("Input error: 'flagLowCountsConditions' must be a 
     positive integer.")

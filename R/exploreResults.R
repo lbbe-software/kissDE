@@ -11,11 +11,11 @@ exploreResults <- function(rdsFile) {
   }
   
   if(tail(strsplit(rdsFile,split = "\\.")[[1]],n=1)!="rds") {
-    stop(paste("Input error: 'rdsFile' \"",rdsFile, "\" does not have the \".rds\" extension. Is that a kissDE result rds file?" , sep=""))
+    stop("Input error: 'rdsFile' \"",rdsFile, "\" does not have the \".rds\" extension. Is that a kissDE result rds file?")
   }
   
   if(!file.exists(rdsFile)) {
-    stop(paste("Input error: 'rdsFile' \"",rdsFile, "\" does not exists.", sep=""))
+    stop("Input error: 'rdsFile' \"",rdsFile, "\" does not exists.")
   }
   
   ## Read rds file
@@ -23,7 +23,7 @@ exploreResults <- function(rdsFile) {
   
   ## Rds file check
   if(!all(names(res)%in%c("finalTable", "correctedPVal", "uncorrectedPVal", "resultFitNBglmModel", "f/psiTable", "k2rgFile", "k2rgRes","dfSS"))) {
-    stop(paste("Input error: 'rdsFile' \"",rdsFile, "\" does not correspond to the expected format. Is that a kissDE result rds file?", sep=""))
+    stop("Input error: 'rdsFile' \"",rdsFile, "\" does not correspond to the expected format. Is that a kissDE result rds file?")
   }
   
   resK2RG <- res$k2rgRes
@@ -140,31 +140,31 @@ exploreResults <- function(rdsFile) {
                       sep="")
       dfSS$constitutiveBlocs <- paste(const1,const2,sep="_")
       dfSS$alternativeBlocs <- NA
-      for(i in c(1:nrow(dfSS))) {
+      for(i in seq_len(nrow(dfSS))) {
         d <- dfSS[i,]
         chrom <- d$chrom
         cBloc <- strsplit(d$mergeUniqSS,split = ",")[[1]]
-        s1=0
-        e1=0
+        s1 <- 0
+        e1 <- 0
         if(length(grep(cBloc[1],d$constitutiveBlocs))!=0) {
-          s1=1
+          s1 <- 1
         }
         if(length(grep(cBloc[2],d$constitutiveBlocs))!=0) {
-          e1=1
+          e1 <- 1
         }
         cAltBloc <- paste(chrom,":",as.numeric(cBloc[1])+s1,"-",as.numeric(cBloc[2])-e1,sep="")
-        j=3
+        j <- 3
         while(j<length(cBloc)) {
-          s1=0
-          e1=0
+          s1 <- 0
+          e1 <- 0
           if(length(grep(cBloc[j],d$constitutiveBlocs))!=0) {
-            s1=1
+            s1 <- 1
           }
           if(length(grep(cBloc[j+1],d$constitutiveBlocs))!=0) {
-            e1=1
+            e1 <- 1
           }
           cAltBloc <- paste(chrom,":",as.numeric(cBloc[j])+s1,"-",as.numeric(cBloc[j+1])-e1,sep="")
-          j=j+2
+          j <- j+2
         }
         dfSS$alternativeBlocs[i] <- paste(cAltBloc,collapse = "_")
       }
@@ -176,7 +176,7 @@ exploreResults <- function(rdsFile) {
     ## Less important info
     dfAddInfo <- resK2RG[, c(16, 14, 6:8, 13, 12, 18, 10, 
                              22:length(resK2RG))]
-    if (length(dfAddInfo)==12) {
+    if (length(dfAddInfo) == 12) {
       colnames(dfAddInfo) <- c("ID", "ComplexEvent", "VariablePartLength", 
                                "Frameshift", "inCDS", "Paralogs", "upperPathSS", 
                                "lowerPathSS", "unkownSS", "SS_IR", "Protein ID",
@@ -248,7 +248,7 @@ exploreResults <- function(rdsFile) {
   ## Shiny interface
   # ui
   ui <- fluidPage(
-    title="KissDE results",
+    title = "KissDE results",
     
     navbarPage(paste(C1," vs ",C2,sep=""),
                tabPanel("Differential analysis",
@@ -496,7 +496,7 @@ exploreResults <- function(rdsFile) {
   
   server <- function(input, output) {
     
-    PSIcol <- grep("_repl\\d+",colnames(PSItable))
+    PSIcol <- grep("_repl\\d+", colnames(PSItable))
     
     cDataPSI <- reactiveValues(data = NULL)
     cDataDiff <- reactiveValues(data = NULL)
@@ -918,4 +918,3 @@ exploreResults <- function(rdsFile) {
 
   shinyApp(ui, server, options = list(port=3838, host='0.0.0.0'))
 }
-

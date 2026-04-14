@@ -894,7 +894,7 @@
         colnames(psiPairCond) <- namesPsiPairCond
         rownames(psiPairCond) <- rownames(signifVariants)
         rownames(sumLowCond) <- rownames(signifVariants)
-        ucond=unique(sortedconditions)
+        ucond <- unique(sortedconditions)
         #NaNSums <- rowSums((is.na(psiPairCond)) + 0)  ## 1 if NaN, 0 else
         NaNSums_C1 <- rowSums((is.na(psiPairCond[,grep(paste("^",ucond[1],"_",sep=""),colnames(psiPairCond))])) + 0)  ## 1+ if NaN, 0 else
         NaNSums_C2 <- rowSums((is.na(psiPairCond[,grep(paste("^",ucond[2],"_",sep=""),colnames(psiPairCond))])) + 0)  ## 1+ if NaN, 0 else
